@@ -6,6 +6,7 @@
  */
 
 import * as _ from 'lodash';
+import * as PIXI from 'pixi.js';
 import { Edge } from './edge';
 import { Group } from './group';
 import { Node } from './node';
@@ -28,7 +29,13 @@ export interface ITopo {
 
 export class Topo implements ITopo {
 
+  public loader: PIXI.loaders.Loader | null = null;
+
   private elements: PIXI.Container[] = [];
+
+  constructor(loader: PIXI.loaders.Loader) {
+    this.loader = loader;
+  }
 
   public addElements(element: Node | Group) {
     this.elements.push(element);

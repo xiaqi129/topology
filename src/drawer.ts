@@ -7,14 +7,16 @@
 
 import { ITopo } from './topo';
 
-class Drawer {
+export class Drawer {
+
+  private topo: ITopo | null = null;
 
   constructor(topo: ITopo) {
-    
+    this.topo = topo;
   }
 
   public syncView() {
-
+    
   }
 
 }
