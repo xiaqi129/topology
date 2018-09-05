@@ -10,7 +10,7 @@ import { ITopo } from './topo';
 class Drawer {
 
   constructor(topo: ITopo) {
-
+    
   }
 
   public syncView() {

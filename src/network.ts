@@ -10,10 +10,10 @@ import { Topo } from './topo';
 class Network {
 
   constructor() {
-
+    
   }
 
-  public setImagesCache() {
+  public addImagesCache() {
     // TODO
   }
 
