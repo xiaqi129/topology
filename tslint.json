@@ -1,0 +1,22 @@
+{
+    "defaultSeverity": "warning",
+    "extends": [
+        "tslint:recommended",
+        "tslint-consistent-codestyle",
+        "tslint-config-airbnb",
+        "tslint-eslint-rules"
+    ],
+    "linterOptions": {
+        "project": "tsconfig.json",
+        "exclude": [
+            "node_modules"
+        ]
+    },
+    
+    "jsRules": {},
+    "rules": {
+        "no-duplicate-variable": true,
+		"no-duplicate-key": true
+    },
+    "rulesDirectory": ["./src/"]
+}
