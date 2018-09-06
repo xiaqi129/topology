@@ -14,9 +14,9 @@ class Network {
   private topo: Topo | null = null;
   private drawer: Drawer | null = null;
 
-  constructor() {
+  constructor(domRegex: string) {
     this.topo = new Topo(this.loader);
-    this.drawer = new Drawer(this.topo);
+    this.drawer = new Drawer(domRegex, this.topo);
   }
 
   public addImagesCache(key: string, image: string) {

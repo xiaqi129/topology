@@ -4,7 +4,7 @@
   "description": "web network topology lib",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha -r ts-node/register -r jsdom-global/register test/**/*.ts"
   },
   "repository": {
     "type": "git",
@@ -16,17 +16,27 @@
   "author": "gsp-dalian-ued@cisco.com",
   "license": "ISC",
   "devDependencies": {
+    "@types/chai": "^4.1.4",
     "@types/lodash": "^4.14.116",
+    "@types/mocha": "^5.2.5",
     "@types/pixi.js": "^4.8.0",
+    "canvas-prebuilt": "^1.6.5-prerelease.1",
+    "chai": "^4.1.2",
+    "jsdom": "12.0.0",
+    "jsdom-global": "3.0.2",
+    "mocha": "^5.2.0",
+    "ts-node": "^7.0.1",
     "tslint": "^5.11.0",
     "tslint-config-airbnb": "^5.11.0",
     "tslint-config-ms-recommended": "^0.1.2",
     "tslint-consistent-codestyle": "^1.13.3",
     "tslint-eslint-rules": "^5.4.0",
-    "typescript": "^3.0.3"
+    "typescript": "^3.0.3",
+    "typings": "^2.1.1"
   },
   "dependencies": {
     "lodash": "^4.17.10",
-    "pixi.js": "^4.8.2"
+    "pixi.js": "^4.8.2",
+    "rxjs": "^6.3.2"
   }
 }
