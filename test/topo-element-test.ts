@@ -1,0 +1,23 @@
+/**
+ * @license
+ * Copyright Cisco Inc. All Rights Reserved.
+ *
+ * Author: gsp-dalian-ued@cisco.com
+ */
+
+import { expect } from 'chai';
+import * as PIXI from 'pixi.js';
+import { Edge } from '../src/edge';
+import { Group } from '../src/group';
+import { Node } from '../src/node';
+
+describe('Topo Element Class', () => {
+  it('should be the instance of PIXI.Container', () => {
+    const node = new Node();
+    const group = new Group();
+    const edge = new Edge(node, group);
+    expect(node instanceof PIXI.Container &&
+      group instanceof PIXI.Container &&
+      edge instanceof PIXI.Container).to.equal(true);
+  });
+});
