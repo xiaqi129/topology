@@ -11,7 +11,7 @@ import { Edge } from '../src/edge';
 import { Group } from '../src/group';
 import { Node } from '../src/node';
 
-describe('Topo Element Class', () => {
+describe('Topo Element Type', () => {
   it('should be the instance of PIXI.Container', () => {
     const node = new Node();
     const group = new Group();

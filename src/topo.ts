@@ -37,7 +37,7 @@ export class Topo implements ITopo {
     this.loader = loader;
   }
 
-  public addElements(element: Node | Group) {
+  public addElements(element: Node | Group | Edge) {
     this.elements.push(element);
   }
 

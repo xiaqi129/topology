@@ -5,42 +5,66 @@
  * Author: gsp-dalian-ued@cisco.com
  */
 
+import * as _ from 'lodash';
 import * as PIXI from 'pixi.js';
+import { Application } from './application';
 import { Drawer } from './drawer';
+import { Edge } from './edge';
+import { Group } from './group';
+import { Node } from './node';
 import { Topo } from './topo';
 
-class Network {
+export class Network {
   private loader = PIXI.loader;
-  private topo: Topo | null = null;
-  private drawer: Drawer | null = null;
+  private topo: Topo;
+  private drawer: Drawer;
+  private app: Application;
 
   constructor(domRegex: string) {
     this.topo = new Topo(this.loader);
     this.drawer = new Drawer(domRegex, this.topo);
+    this.app = new Application(domRegex);
   }
 
-  public addImagesCache(key: string, image: string) {
+  public addResourceCache(key: string, image: string) {
     this.loader.add(key, image);
+    return this.loader;
   }
 
   public createNode() {
-    // TODO
+    return this.topo.createNode();
   }
 
   public createGroup() {
-    // TODO
+    return this.topo.createGroup();
   }
 
-  public createEdge() {
-    // TODO
+  public createEdge(startNode: Node | Group, endNode: Node | Group) {
+    return this.topo.createEdge(startNode, endNode);
   }
 
   public clear() {
-    // TODO
+    const elements = this.topo.getElements();
+    _.each(elements, (element) => {
+      element.destroy();
+    });
+    _.remove(elements, undefined);
   }
 
-  public removeElements() {
-    // TODO
+  public getElements() {
+    return this.topo.getElements();
+  }
+
+  public addElement(element: Node | Group | Edge) {
+    this.topo.addElements(element);
+  }
+
+  public removeElements(element: PIXI.Container) {
+    element.destroy();
+    const elements = this.topo.getElements();
+    _.remove(elements, (elem) => {
+      return element === elem;
+    });
   }
 
   private syncView() {
