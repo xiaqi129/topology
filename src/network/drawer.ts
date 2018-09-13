@@ -11,14 +11,14 @@ import { ITopo } from './topo';
 export class Drawer {
 
   private topo: ITopo | null = null;
-  private whiteBoard: PIXI.Application | null = null;
+  private whiteBoard: Application;
 
   constructor(container: string, topo: ITopo) {
     this.topo = topo;
     this.whiteBoard = new Application(container);
   }
 
-  public getWhiteBoard() {
+  public getWhiteBoard(): Application {
     return this.whiteBoard;
   }
 

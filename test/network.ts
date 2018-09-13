@@ -6,10 +6,10 @@
  */
 
 import { expect } from 'chai';
-import { Edge } from '../src/edge';
-import { Group } from '../src/group';
-import { Network } from '../src/network';
-import { Node } from '../src/node';
+import { Edge } from '../src/network/edge';
+import { Group } from '../src/network/group';
+import { Network } from '../src/network/network';
+import { Node } from '../src/network/node';
 
 describe('Network class methods test', () => {
 

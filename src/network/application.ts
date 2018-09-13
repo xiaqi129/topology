@@ -32,7 +32,7 @@ export class Application extends PIXI.Application {
     this.setup();
   }
 
-  public setup() {
+  private setup() {
     this.initApplication();
     this.fitWrapperSize();
   }

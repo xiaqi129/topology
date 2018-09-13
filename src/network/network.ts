@@ -23,7 +23,7 @@ export class Network {
   constructor(domRegex: string) {
     this.topo = new Topo(this.loader);
     this.drawer = new Drawer(domRegex, this.topo);
-    this.app = new Application(domRegex);
+    this.app = this.drawer.getWhiteBoard();
   }
 
   public addResourceCache(key: string, image: string) {

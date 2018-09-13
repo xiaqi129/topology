@@ -7,9 +7,9 @@
 
 import { expect } from 'chai';
 import * as PIXI from 'pixi.js';
-import { Edge } from '../src/edge';
-import { Group } from '../src/group';
-import { Node } from '../src/node';
+import { Edge } from '../src/network/edge';
+import { Group } from '../src/network/group';
+import { Node } from '../src/network/node';
 
 describe('Topo Element Type', () => {
   it('should be the instance of PIXI.Container', () => {

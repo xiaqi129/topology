@@ -15,10 +15,10 @@ export class CommonElement extends PIXI.Container {
 
   public defaultView() {
     const graph = new PIXI.Graphics();
-    graph.x = 0;
-    graph.y = 0;
+    graph.lineStyle(2, 0xFF00FF);
     graph.beginFill(0xfff012, 1);
-    graph.drawCircle(0, 0, 30);
+    graph.drawCircle(0, 0, 10);
+    graph.endFill();
     this.addChild(graph);
   }
 
