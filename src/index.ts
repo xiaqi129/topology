@@ -2,8 +2,11 @@ import { Network } from './network/network';
 
 const network = new Network('div#network');
 
-const node = network.createNode();
-network.addElement(node);
-network.syncView();
-node.x = 12;
-node.y = 12;
+for (let i: number = 0, len: number = 2000; i < len;) {
+  i += 1;
+  const node = network.createNode();
+  network.addElement(node);
+  network.syncView();
+  node.x = Math.random() * 500;
+  node.y = Math.random() * 300;
+}

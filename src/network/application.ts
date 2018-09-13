@@ -21,18 +21,17 @@ export class Application extends PIXI.Application {
       antialias: true
       , autoResize: true
       , height: 0
+      , powerPreference: 'high-performance'
       , resolution: 2
       , transparent: true
-      , width: 0
-      ,
-      // ,   powerPreference: "high-performance"
+      , width: 0,
     });
     this.container = new PIXI.Container();
     this.domRegex = domRegex;
     this.setup();
   }
 
-  private setup() {
+  public setup() {
     this.initApplication();
     this.fitWrapperSize();
   }

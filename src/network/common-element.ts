@@ -8,6 +8,8 @@
 import * as PIXI from 'pixi.js';
 
 export class CommonElement extends PIXI.Container {
+
+  public renderer: any;
   constructor() {
     super();
     this.defaultView();
