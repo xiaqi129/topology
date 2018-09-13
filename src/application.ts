@@ -9,11 +9,12 @@ import * as _ from 'lodash';
 import * as PIXI from 'pixi.js';
 import * as Rx from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
+import { Group } from './group';
 
 export class Application extends PIXI.Application {
   private domRegex: string = '';
   private viewWrapper: HTMLDivElement | null = null;
-  private container: PIXI.Container | null = null;
+  private container: PIXI.Container;
 
   constructor(domRegex: string = '', options = null) {
     super(options || {
@@ -26,6 +27,7 @@ export class Application extends PIXI.Application {
       ,
       // ,   powerPreference: "high-performance"
     });
+    this.container = new PIXI.Container();
     this.domRegex = domRegex;
     this.setup();
   }
@@ -40,7 +42,6 @@ export class Application extends PIXI.Application {
     if (this.viewWrapper) {
       this.viewWrapper.appendChild(this.view);
     }
-    this.container = new PIXI.Container();
     this.stage.addChild(this.container);
   }
 
@@ -73,4 +74,19 @@ export class Application extends PIXI.Application {
     return this.container;
   }
 
+  public clearContainer() {
+    this.container.removeChildren(0, this.container.children.length);
+  }
+
+  public addElement(element: PIXI.Container) {
+    this.container.addChild(element);
+  }
+
+  public addElements(elements: PIXI.Container[]) {
+    _.each(elements, (element) => {
+      if (!(element.parent instanceof Group)) {
+        this.container.addChild(element);
+      }
+    });
+  }
 }

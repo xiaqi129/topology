@@ -67,8 +67,9 @@ export class Network {
     });
   }
 
-  private syncView() {
-    // TODO
+  public syncView() {
+    this.app.clearContainer();
+    const elements = this.topo.getElements();
+    this.app.addElements(elements);
   }
-
 }

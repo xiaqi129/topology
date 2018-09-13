@@ -42,6 +42,7 @@ describe('Network class methods test', () => {
     const node = network.createNode();
     network.addElement(node);
     expect(network.getElements().length).to.equal(1);
+    network.syncView();
     network.clear();
     expect(network.getElements().length).to.equal(0);
   });
