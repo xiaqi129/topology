@@ -17,9 +17,9 @@ export class CommonElement extends PIXI.Container {
 
   public defaultView() {
     const graph = new PIXI.Graphics();
-    graph.lineStyle(2, 0xFF00FF);
-    graph.beginFill(0xfff012, 1);
-    graph.drawCircle(0, 0, 10);
+    graph.lineStyle(1, 0xEEEEEE);
+    graph.beginFill(0xDDDDDD, 1);
+    graph.drawCircle(0, 0, 5);
     graph.endFill();
     this.addChild(graph);
   }

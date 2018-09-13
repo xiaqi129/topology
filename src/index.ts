@@ -7,6 +7,6 @@ for (let i: number = 0, len: number = 2000; i < len;) {
   const node = network.createNode();
   network.addElement(node);
   network.syncView();
-  node.x = Math.random() * 500;
-  node.y = Math.random() * 300;
+  node.x = Math.random() * 1200;
+  node.y = Math.random() * 900;
 }
