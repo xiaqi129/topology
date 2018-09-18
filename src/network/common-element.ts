@@ -5,6 +5,7 @@
  * Author: gsp-dalian-ued@cisco.com
  */
 
+import * as _ from 'lodash';
 import * as PIXI from 'pixi.js';
 
 export class CommonElement extends PIXI.Container {
@@ -22,6 +23,10 @@ export class CommonElement extends PIXI.Container {
     graph.drawCircle(0, 0, 5);
     graph.endFill();
     this.addChild(graph);
+  }
+
+  public setStyle(styles: object) {
+    _.extend(this, styles);
   }
 
 }

@@ -18,6 +18,7 @@ export class Edge extends CommonElement {
     super();
     this.startNode = startNode;
     this.endNode = endNode;
+    this.defaultView();
   }
 
   public setStartNode(node: Node | Group) {
@@ -38,6 +39,17 @@ export class Edge extends CommonElement {
    */
   public setArrowStyle(type: number) {
     this.arrowType = type;
+  }
+
+  public defaultView() {
+    const graph = new PIXI.Graphics();
+    graph.lineStyle(1, 0xC7254E);
+    graph.beginFill(0xC7254E, 1);
+    graph.drawCircle(0, 0, 5);
+    graph.endFill();
+    this.addChild(graph);
+    this.x = 25;
+    this.y = 25;
   }
 
 }

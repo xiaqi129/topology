@@ -31,7 +31,7 @@ export class Topo implements ITopo {
 
   public loader: PIXI.loaders.Loader | null = null;
 
-  private elements: PIXI.Container[] = [];
+  private elements: any [] = [];
 
   constructor(loader: PIXI.loaders.Loader) {
     this.loader = loader;
