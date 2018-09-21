@@ -2,7 +2,7 @@ import { Network } from './network/network';
 
 const network = new Network('div#network');
 
-for (let i: number = 0, len: number = 10000; i < len;) {
+for (let i: number = 0, len: number = 50; i < len;) {
   i += 1;
   const node = network.createNode();
   network.addElement(node);
@@ -10,16 +10,20 @@ for (let i: number = 0, len: number = 10000; i < len;) {
   node.y = Math.random() * 900;
 }
 let nodes = network.getElements();
-let srcNode = nodes[0];
-let destNode = nodes[1];
-let edge = network.createEdge(srcNode, destNode);
-edge.setStyle({ 
-  'arrow.fill': 'red',
-  'arrow.stroke': 'red',
-  'arrow.stroke.weight': 2,
-  'arrow.distance': 25,
-  'arow.length': 34,
-  'line.style': 0xC7254E
-});
-network.addElement(edge);
+for (let i: number = 0, len: number = 50; i < len;) {
+  let srcNode = nodes[i];
+  let destNode = nodes[i+1];
+  let edge = network.createEdge(srcNode, destNode);
+  i += 2;
+  edge.setStyle({
+    // lineDistance: 5,
+    // arrowWidth: 1,
+    // arrowColor: 0Xc71bd3,
+    // arrowLength: 15,
+    // lineWidth: 2,
+    // lineColor: 0xC7254E,
+    // arrowType: 3,
+  });
+  network.addElement(edge);
+}
 network.syncView();

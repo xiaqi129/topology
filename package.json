@@ -4,6 +4,7 @@
   "description": "web network topology lib",
   "main": "index.js",
   "scripts": {
+    "start": "webpack-dev-server --hot",
     "test": "mocha -r ts-node/register -r jsdom-global/register test/**/*.ts"
   },
   "repository": {

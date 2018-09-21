@@ -11,8 +11,10 @@ import * as PIXI from 'pixi.js';
 export class CommonElement extends PIXI.Container {
 
   public renderer: any;
+  // public styles: {[x: string]: any};
   constructor() {
     super();
+    // this.styles = {};
     this.defaultView();
   }
 
@@ -25,8 +27,8 @@ export class CommonElement extends PIXI.Container {
     this.addChild(graph);
   }
 
-  public setStyle(styles: object) {
-    _.extend(this, styles);
-  }
+  // public setStyle(styles: object) {
+  //   _.extend(this.styles, styles);
+  // }
 
 }
