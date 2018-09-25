@@ -25,6 +25,7 @@ export class Edge extends CommonElement {
   private _arrowColor: number;
   private _arrowWidth: number;
   private _arrowLength: number;
+  private _fillArrow: boolean;
 
 
   constructor(startNode: Node | Group, endNode: Node | Group) {
@@ -41,7 +42,7 @@ export class Edge extends CommonElement {
     this._arrowWidth =  1;
     this._lineDistance = 0;
     this._arrowLength = 15;
-    console.log(this);
+    this._fillArrow = false;
     this.drawLine();
   }
 
@@ -54,6 +55,7 @@ export class Edge extends CommonElement {
     this._arrowWidth = this.styles.arrowWidth || 1.4;
     this._arrowType = this.styles.arrowType || 0;
     this._arrowLength = this.styles.arrowLength || 15;
+    this._fillArrow = this.styles.fillArrow;
     this.drawLine();
   }
 
@@ -161,29 +163,41 @@ public getArrowPints(pos:any, angle:number, direction:number) {
       case 1:
         this.arrow.lineStyle(this._arrowWidth, this._arrowColor, 1)
         let arrowPoints = this.getArrowPints(endNodePos, angle, 1);
+        if(this._fillArrow) {
+          this.arrow.beginFill(this._arrowColor);
+        }
         this.arrow.drawPolygon(_.flatMap(_.map(_.values(arrowPoints), (o) => { return [o.x, o.y] })));
         this.edge.moveTo(srcNodePos.x, srcNodePos.y);
         this.edge.lineTo(arrowPoints.p3.x, arrowPoints.p3.y);
+        this.arrow.endFill();
         this.addChild(this.edge);
         this.addChild(this.arrow);
         break;
       case 2:
         this.arrow.lineStyle(this._arrowWidth, this._arrowColor, 1)
         let arrowPoints1 = this.getArrowPints(srcNodePos, angle, -1);;
+        if(this._fillArrow) {
+          this.arrow.beginFill(this._arrowColor);
+        }
         this.arrow.drawPolygon(_.flatMap(_.map(_.values(arrowPoints1), (o) => { return [o.x, o.y] })));
         this.edge.moveTo(endNodePos.x, endNodePos.y);
         this.edge.lineTo(arrowPoints1.p3.x, arrowPoints1.p3.y);
+        this.arrow.endFill();
         this.addChild(this.edge);
         this.addChild(this.arrow);
         break;
       case 3:
         this.arrow.lineStyle(this._arrowWidth, this._arrowColor, 1)
         let arrowPoints2 = this.getArrowPints(endNodePos, angle, 1);;
+        if(this._fillArrow) {
+          this.arrow.beginFill(this._arrowColor);
+        }
         this.arrow.drawPolygon(_.flatMap(_.map(_.values(arrowPoints2), (o) => { return [o.x, o.y] })));
         let arrowPoints3 = this.getArrowPints(srcNodePos, angle, -1);;
         this.arrow.drawPolygon(_.flatMap(_.map(_.values(arrowPoints3), (o) => { return [o.x, o.y] })));
         this.edge.moveTo(arrowPoints2.p3.x, arrowPoints2.p3.y);
         this.edge.lineTo(arrowPoints3.p3.x, arrowPoints3.p3.y);
+        this.arrow.endFill();
         this.addChild(this.edge);
         this.addChild(this.arrow);
         break;
