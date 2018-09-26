@@ -151,8 +151,6 @@ public getArrowPints(pos:any, angle:number, direction:number) {
     srcNodePos = this.getAdjustedLocation(srcNodePos, -1, angle, this.startNode.width * 0.5 + this._lineDistance);
     endNodePos = this.getAdjustedLocation(endNodePos, 1, angle, this.endNode.width * 0.5 + this._lineDistance);
     this.edge.lineStyle(this._lineWidth, this._lineColor, 1);
-    // this.edge.moveTo(srcNodePos.x, srcNodePos.y);
-    // this.edge.lineTo(endNodePos.x, endNodePos.y);
     switch(this._arrowType)
     {
       case 0:

@@ -10,6 +10,7 @@ for (let i: number = 0, len: number = 200; i < len;) {
   node.y = Math.random() * 900;
 }
 let nodes = network.getElements();
+// console.log(nodes);
 for (let i: number = 0, len: number = 200; i < len;) {
   let srcNode = nodes[i];
   let destNode = nodes[i+1];
