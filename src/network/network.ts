@@ -13,6 +13,8 @@ import { Edge } from './edge';
 import { Group } from './group';
 import { Node } from './node';
 import { Topo } from './topo';
+declare var require: any
+let polygon = require('polygon');
 
 export class Network {
   private loader = PIXI.loader;
@@ -112,44 +114,40 @@ export class Network {
 
   public groupNode(rectangle: any) {
     let bounds = rectangle.getBounds();
-    const elements = this.topo.getElements();
+    let elements = this.topo.getElements();
     let selectedList = new Array;
     _.each(elements,(element: Node) => {
-      if (element instanceof Node) {
-        let nodeBounds = element.getBounds();
-        if((nodeBounds.top >= bounds.top) && (nodeBounds.right <= bounds.right) &&
-         (nodeBounds.bottom <= bounds.bottom) && (nodeBounds.left >= bounds.left)) {
-           selectedList.push(element)
-         }
-      }
-      if (element instanceof Edge) {
-        let nodeBounds = element.getBounds();
-        if((nodeBounds.top >= bounds.top) && (nodeBounds.right <= bounds.right) &&
-         (nodeBounds.bottom <= bounds.bottom) && (nodeBounds.left >= bounds.left)) {
-           element.alpha = 0;
-         }
-      }
+      let nodeBounds = element.getBounds();
+      if((nodeBounds.top >= bounds.top) && (nodeBounds.right <= bounds.right) &&
+        (nodeBounds.bottom <= bounds.bottom) && (nodeBounds.left >= bounds.left)) {
+          selectedList.push(element);
+        }
     });
-    let group = this.createGroup();
-    _.each(selectedList,(selected) => {
-      group.addChild(selected);
-    });
-    // this.defaultView();
-    console.log(group);
+    this.calculateCenter(selectedList,rectangle);
   }
 
-  // public defaultView() {
-  //   const graph = new PIXI.Graphics();
-  //   graph.lineStyle(1, 0xEEEEEE);
-  //   graph.beginFill(0X08A029, 1);
-  //   graph.drawCircle(0, 0, 25);
-  //   graph.endFill();
-  //   graph.interactive = true;
-  //   graph.buttonMode = true;
-  //   graph.on("click",(event: any) =>{
-  //     console.log(this);
-  //   });
-  //   this.app.addElement(graph);
-  // }
-
+  public calculateCenter(selectedList: any,rectangle: any) {
+    if(selectedList.length > 1) {
+      let group = this.createGroup();
+      this.app.addElement(group);
+      let positionNode:any [] =[];
+      _.each(selectedList,(selected) => {
+        group.setChildrenNodes(selected);
+        if (selected instanceof Node) {
+          let position = {'x': selected.x,'y': selected.y};
+          positionNode.push(position);
+        }
+      });
+      let p = new polygon(positionNode);
+      let x = p.center().x;
+      let y = p.center().y;
+      group.x = x;
+      group.y = y;
+      rectangle.clear();
+      console.log(group);
+    } else {
+      rectangle.clear();
+    }
+  }
+  
 }

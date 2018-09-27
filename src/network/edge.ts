@@ -112,18 +112,12 @@ export class Edge extends CommonElement {
 public getArrowPints(pos:any, angle:number, direction:number) {
   var
       arrow_angel: any = arrow_angel || 20,
-      // arrow_length: any = arrow_length || 15,
       middle_length: any = middle_length || 10,
       angel_t = angle + _.divide(arrow_angel * Math.PI, 180),
       angel_b = angle - _.divide(arrow_angel * Math.PI, 180),
       x = pos.x,
       y = pos.y;
       let t = direction
-  // if (arguments.length == 2) {
-  //     var t = 1;
-  // } else {
-  //     t = endArrow ? 1 : -1;
-  // }
   return {
       p1: { x: x, y: y },
       p2: {
