@@ -144,10 +144,33 @@ export class Network {
       group.x = x;
       group.y = y;
       rectangle.clear();
-      console.log(group);
+      this.drawGroupLine(group)
     } else {
       rectangle.clear();
     }
+  }
+
+  public drawGroupLine(group: any) {
+    let elements = this.topo.getElements();
+    _.each(elements,(edge: any) => {
+      if(edge instanceof Edge) {
+        group.setEdgeList(edge);
+        _.each(group.getChildrenNodes(),(childrenNodes) => {
+          if(edge.startNode.position === childrenNodes.position) {
+            let edgeGroup = this.createEdge(group,edge.endNode);
+            this.app.addElement(edgeGroup);
+            edgeGroup.setStyle(edge.styles);
+            group.setGroupEdgeList(edgeGroup);
+          }
+          if(edge.endNode.position === childrenNodes.position) {
+            let edgeGroup = this.createEdge(edge.startNode,group);
+            this.app.addElement(edgeGroup);
+            edgeGroup.setStyle(edge.styles);
+            group.setGroupEdgeList(edgeGroup);
+          }
+        });
+      }
+    });
   }
   
 }

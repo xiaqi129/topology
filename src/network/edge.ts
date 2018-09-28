@@ -15,8 +15,8 @@ const  Point = PIXI.Point;
 export class Edge extends CommonElement {
   private edge: PIXI.Graphics;
   private arrow: PIXI.Graphics;
-  private startNode: any;
-  private endNode: any;
+  public startNode: any;
+  public endNode: any;
   public styles: {[x: string]: any};
   private _arrowType: number;
   private _lineColor: number;

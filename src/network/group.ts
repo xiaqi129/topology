@@ -10,10 +10,14 @@ import { CommonElement } from './common-element';
 
 export class Group extends CommonElement {
   private childrenNodes: any[] = [];
-  private isExpanded: boolean = false;
+  private edgeList: any[] = [];
+  private groupEdgeList: any[] = [];
+  public isExpanded: boolean = false;
   constructor() {
     super();
     this.childrenNodes = [];
+    this.edgeList = [];
+    this.groupEdgeList = [];
     this.defaultView();
   }
 
@@ -21,13 +25,35 @@ export class Group extends CommonElement {
     this.isExpanded = expanded;
   }
 
-  public getExpaned() {
-    return this.isExpanded;
-  }
-
   public setChildrenNodes(element: any) {
     this.childrenNodes.push(element);
     element.alpha = 0;
+  }
+
+  public setEdgeList(element: any) {
+    this.edgeList.push(element);
+  }
+
+  public setGroupEdgeList(element: any) {
+    this.groupEdgeList.push(element);
+  }
+
+  public setGroupEdge(edge:any, edgeGroup:any) {
+    if(this.isExpanded) {
+      edge.alpha = 1;
+      edgeGroup.alpha = 0;
+    } else {
+      edge.alpha = 0;
+      edgeGroup.alpha = 1;
+    }
+  }
+
+  public getChildrenNodes() {
+    return this.childrenNodes;
+  }
+
+  public getEdgeList() {
+    return this.edgeList;
   }
 
   public defaultView() {
@@ -44,9 +70,14 @@ export class Group extends CommonElement {
         this.childrenNodes.forEach(element => {
           element.alpha = 1;
         });
+        this.edgeList.forEach(edge => {
+          this.groupEdgeList.forEach(edgeGroup => {
+            edge.alpha = 1;
+            edgeGroup.alpha = 0;
+          });
+        });
         graph.clear();
       }
-      console.log(this);
     });
     this.addChild(graph);
   }
