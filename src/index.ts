@@ -1,8 +1,10 @@
 import { Network } from './network/network';
+import * as _ from 'lodash';
 
 const network = new Network('div#network');
+let num = 50;
 
-for (let i: number = 0, len: number = 200; i < len;) {
+for (let i: number = 0, len: number = num; i < len;) {
   i += 1;
   const node = network.createNode();
   network.addElement(node);
@@ -10,8 +12,7 @@ for (let i: number = 0, len: number = 200; i < len;) {
   node.y = Math.random() * 900;
 }
 let nodes = network.getElements();
-// console.log(nodes);
-for (let i: number = 0, len: number = 200; i < len;) {
+for (let i: number = 0, len: number = num; i < len;) {
   let srcNode = nodes[i];
   let destNode = nodes[i+1];
   let edge = network.createEdge(srcNode, destNode);
@@ -28,4 +29,13 @@ for (let i: number = 0, len: number = 200; i < len;) {
   });
   network.addElement(edge);
 }
+
+const group = network.createGroup();
+network.addElement(group);
+let groupNodes = _.slice(_.shuffle(_.dropRight(nodes,(num/2) + 1)),0,num/10);
+_.each(groupNodes,(node) => {
+  group.setChildrenNodes(node);
+});
+group.setGroupPosition();
+network.drawGroupLine(group);
 network.syncView();

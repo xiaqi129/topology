@@ -6,18 +6,22 @@
  */
 
 import { CommonElement } from './common-element';
+import { Edge } from './edge';
+import * as _ from 'lodash';
+declare var require: any
+let polygon = require('polygon');
+
 
 
 export class Group extends CommonElement {
   private childrenNodes: any[] = [];
   private edgeList: any[] = [];
   private groupEdgeList: any[] = [];
+  private positionNodes:any [] =[];
+  private group:any;
   public isExpanded: boolean = false;
   constructor() {
     super();
-    this.childrenNodes = [];
-    this.edgeList = [];
-    this.groupEdgeList = [];
     this.defaultView();
   }
 
@@ -27,8 +31,41 @@ export class Group extends CommonElement {
 
   public setChildrenNodes(element: any) {
     this.childrenNodes.push(element);
+    let position = {'x': element.x,'y': element.y};
+    this.positionNodes.push(position);
     element.alpha = 0;
   }
+
+  public setGroupPosition() {
+    let p = new polygon(this.positionNodes);
+    let x = p.center().x;
+    let y = p.center().y;
+    this.x = x;
+    this.y = y;
+    return [x,y]
+  }
+
+  // public drawGroupLine() {
+  //   _.each(edges,(edge: any) => {
+  //     if(edge instanceof Edge) {
+  //       this.setEdgeList(edge);
+  //       _.each(this.getChildrenNodes(),(childrenNodes) => {
+  //         if(edge.startNode.position === childrenNodes.position) {
+  //           let edgeGroup = new Edge(this.group,edge.endNode);
+  //           this.topo.addElements(edgeGroup);
+  //           edgeGroup.setStyle(edge.styles);
+  //           this.setGroupEdgeList(edgeGroup);
+  //         }
+  //         if(edge.endNode.position === childrenNodes.position) {
+  //           let edgeGroup = new Edge(edge.startNode,this.group);
+  //           this.topo.addElements(edgeGroup);
+  //           edgeGroup.setStyle(edge.styles);
+  //           this.setGroupEdgeList(edgeGroup);
+  //         }
+  //       });
+  //     }
+  //   });
+  // }
 
   public setEdgeList(element: any) {
     this.edgeList.push(element);
@@ -36,16 +73,6 @@ export class Group extends CommonElement {
 
   public setGroupEdgeList(element: any) {
     this.groupEdgeList.push(element);
-  }
-
-  public setGroupEdge(edge:any, edgeGroup:any) {
-    if(this.isExpanded) {
-      edge.alpha = 1;
-      edgeGroup.alpha = 0;
-    } else {
-      edge.alpha = 0;
-      edgeGroup.alpha = 1;
-    }
   }
 
   public getChildrenNodes() {
@@ -56,8 +83,19 @@ export class Group extends CommonElement {
     return this.edgeList;
   }
 
+  public calcRect() {
+    let xArr :any[] = [];
+    let yArr :any[] = [];
+    _.each(this.positionNodes,(positionNode) => {
+      xArr.push(positionNode.x);
+      yArr.push(positionNode.y);
+    });
+    return [xArr,yArr]
+  }
+
   public defaultView() {
     const graph = new PIXI.Graphics();
+    const rectangle = new PIXI.Graphics();
     graph.lineStyle(1, 0xEEEEEE);
     graph.beginFill(0X08A029, 1);
     graph.drawCircle(0, 0, 25);
@@ -71,15 +109,53 @@ export class Group extends CommonElement {
           element.alpha = 1;
         });
         this.edgeList.forEach(edge => {
-          this.groupEdgeList.forEach(edgeGroup => {
-            edge.alpha = 1;
-            edgeGroup.alpha = 0;
-          });
+          edge.alpha = 1;
         });
-        graph.clear();
+        this.groupEdgeList.forEach(edgeGroup => {
+          edgeGroup.alpha = 0;
+        });
+        graph.alpha = 0 ;
+        rectangle.clear();
+        const minX = _.min(this.calcRect()[0]);
+        const maxX = _.max(this.calcRect()[0]);
+        const minY = _.min(this.calcRect()[1]);
+        const maxY = _.max(this.calcRect()[1]);
+        const width = maxX - minX;
+        const height = maxY - minY;
+        rectangle.beginFill(0x66CCFF);
+        rectangle.alpha = 0.2;
+        rectangle.drawRect(minX, minY, width, height);
+        rectangle.endFill();
+        rectangle.x = 0;
+        rectangle.y = 0;
+        this.x = 0;
+        this.y = 0;
       }
     });
+    this.addChild(rectangle);
     this.addChild(graph);
+    rectangle.interactive = true;
+    rectangle.buttonMode = true;
+    rectangle.on('click', (event: any) => {
+      this.setExpaned(!this.isExpanded);
+      if(!this.isExpanded) {
+        this.childrenNodes.forEach(element => {
+          element.alpha = 0;
+        });
+        this.edgeList.forEach(edge => {
+          edge.alpha = 0;
+        });
+        this.groupEdgeList.forEach(edgeGroup => {
+          edgeGroup.alpha = 1;
+        });
+        graph.alpha = 1 ;
+        rectangle.alpha = 0;
+        this.x = this.setGroupPosition()[0];
+        this.y = this.setGroupPosition()[1];
+      }
+    });
+
   }
+
 
 }
