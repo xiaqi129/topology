@@ -38,12 +38,12 @@ export class Node extends CommonElement {
   }
 
   public createSprite() {
-    let texture = PIXI.Texture.fromImage('/pic/point.png');
-    let node = new PIXI.Sprite(texture);
+    const texture = PIXI.Texture.fromImage('/pic/point.png');
+    const node = new PIXI.Sprite(texture);
     node.width = 25;
     node.height = 25;
     node.interactive = true;
-    node.on("click",(event: any) =>{
+    node.on("click",(event: any) => {
       alert("aaaaa");
     });
     this.addChild(node);

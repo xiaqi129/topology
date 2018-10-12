@@ -5,57 +5,58 @@
  * Author: gsp-dalian-ued@cisco.com
  */
 
-import { CommonElement } from './common-element';
 import * as _ from 'lodash';
+import { CommonElement } from './common-element';
 import { Group } from './group';
 import { Node } from './node';
 
 const  Point = PIXI.Point;
 
 export class Edge extends CommonElement {
-  private edge: PIXI.Graphics;
-  private arrow: PIXI.Graphics;
   public startNode: any;
   public endNode: any;
   public styles: {[x: string]: any};
-  private _arrowType: number;
-  private _lineColor: number;
-  private _lineWidth: number;
-  private _lineDistance: number;
-  private _arrowColor: number;
-  private _arrowWidth: number;
-  private _arrowLength: number;
-  private _fillArrow: boolean;
-
+  private edge: PIXI.Graphics;
+  private arrow: PIXI.Graphics;
+  private arrowType: number;
+  private lineColor: number;
+  private lineWidth: number;
+  private lineDistance: number;
+  private arrowColor: number;
+  private arrowWidth: number;
+  private arrowLength: number;
+  private fillArrow: boolean;
+  private srcNodePos: any;
+  private endNodePos:any;
 
   constructor(startNode: Node | Group, endNode: Node | Group) {
     super();
-    this.edge = new PIXI.Graphics;
-    this.arrow = new PIXI.Graphics;
+    this.edge = new PIXI.Graphics();
+    this.arrow = new PIXI.Graphics();
     this.startNode = startNode;
     this.endNode = endNode;
-    this._arrowType = 0;
+    this.arrowType = 0;
     this.styles = {};
-    this._lineColor = 0X000000;
-    this._lineWidth =  1.4;
-    this._arrowColor = 0X000000;
-    this._arrowWidth =  1;
-    this._lineDistance = 0;
-    this._arrowLength = 15;
-    this._fillArrow = false;
+    this.lineColor = 0X000000;
+    this.lineWidth =  1.4;
+    this.arrowColor = 0X000000;
+    this.arrowWidth =  1;
+    this.lineDistance = 0;
+    this.arrowLength = 15;
+    this.fillArrow = false;
     this.drawLine();
   }
 
   public setStyle(styles: object) {
     _.extend(this.styles, styles);
-    this._lineColor = this.styles.lineColor || 0X000000;
-    this._lineWidth = this.styles.lineWidth || 1.4;
-    this._lineDistance = this.styles.lineDistance || 0;
-    this._arrowColor = this.styles.arrowColor || 0X000000;
-    this._arrowWidth = this.styles.arrowWidth || 1.4;
-    this._arrowType = this.styles.arrowType || 0;
-    this._arrowLength = this.styles.arrowLength || 15;
-    this._fillArrow = this.styles.fillArrow;
+    this.lineColor = this.styles.lineColor || 0X000000;
+    this.lineWidth = this.styles.lineWidth || 1.4;
+    this.lineDistance = this.styles.lineDistance || 0;
+    this.arrowColor = this.styles.arrowColor || 0X000000;
+    this.arrowWidth = this.styles.arrowWidth || 1.4;
+    this.arrowType = this.styles.arrowType || 0;
+    this.arrowLength = this.styles.arrowLength || 15;
+    this.fillArrow = this.styles.fillArrow;
     this.drawLine();
   }
 
@@ -81,112 +82,118 @@ export class Edge extends CommonElement {
    * :3 from <-> to
    */
   public setArrowStyle(type: number) {
-    this._arrowType = type;
+    this.arrowType = type;
   }
 
   public getLineFromNodePos(startNode: any) {
-    return {
-        x: startNode.x,
-        y: startNode.y
-    }
-}
-
-  public getLineEndNodePos(endNode: any) {
-    return {
-      x: endNode.x,
-      y: endNode.y 
+    let nodePos = {
+      x: startNode.x,
+      y: startNode.y,
+    };
+    return nodePos;
   }
-}
+
+  public getLineendNodePos(endNode: any) {
+    let nodePos = {
+      x: endNode.x,
+      y: endNode.y,
+    };
+    return nodePos;
+  }
 
   public getAngle(startNode: any, endNode: any) {
     return Math.atan2(startNode.x - endNode.x, startNode.y - endNode.y);
-}
+  }
 
-  public getAdjustedLocation(node: any, n: number, angel: number, distance_round: number) {
-    return {
-        x: node.x + n * distance_round * Math.sin(angel),
-        y: node.y + n * distance_round * Math.cos(angel)
+  public getAdjustedLocation(node: any, n: number, angel: number, distanceRound: number) {
+    const location = {
+      x: node.x + n * distanceRound * Math.sin(angel),
+      y: node.y + n * distanceRound * Math.cos(angel),
     };
-}
+    return location;
+  }
 
-public getArrowPints(pos:any, angle:number, direction:number) {
-  var
-      arrow_angel: any = arrow_angel || 20,
-      middle_length: any = middle_length || 10,
-      angel_t = angle + _.divide(arrow_angel * Math.PI, 180),
-      angel_b = angle - _.divide(arrow_angel * Math.PI, 180),
-      x = pos.x,
-      y = pos.y;
-      let t = direction
-  return {
-      p1: { x: x, y: y },
+  public getArrowPints(pos: any, angle: number, direction: number) {
+    const arrowAngel =  20;
+    const middleLength =  10;
+    const angelT = angle + _.divide(arrowAngel * Math.PI, 180);
+    const angelB = angle - _.divide(arrowAngel * Math.PI, 180);
+    const x = pos.x;
+    const y = pos.y;
+    const t = direction;
+    return {
+      p1: { x: x + 0, y: y + 0 },
       p2: {
-          x: x + this._arrowLength * Math.sin(angel_t) * t,
-          y: y + this._arrowLength * Math.cos(angel_t) * t
+        x: x + this.arrowLength * Math.sin(angelT) * t,
+        y: y + this.arrowLength * Math.cos(angelT) * t,
       },
       p3: {
-          x: x + middle_length * Math.sin(angle) * t,
-          y: y + middle_length * Math.cos(angle) * t
+        x: x + middleLength * Math.sin(angle) * t,
+        y: y + middleLength * Math.cos(angle) * t,
       },
       p4: {
-          x: x + this._arrowLength * Math.sin(angel_b) * t,
-          y: y + this._arrowLength * Math.cos(angel_b) * t
+        x: x + this.arrowLength * Math.sin(angelB) * t,
+        y: y + this.arrowLength * Math.cos(angelB) * t,
       },
-      p5: { x: x, y: y }
-  };
-}
+      p5: { x: x + 0, y: y + 0 },
+    };
+  }
 
   public drawLine() {
     this.edge.clear();
     this.arrow.clear();
-    let srcNodePos = this.getLineFromNodePos(this.startNode);
-    let endNodePos = this.getLineEndNodePos(this.endNode);
-    let angle = this.getAngle(srcNodePos, endNodePos);
-    srcNodePos = this.getAdjustedLocation(srcNodePos, -1, angle, this.startNode.width * 0.5 + this._lineDistance);
-    endNodePos = this.getAdjustedLocation(endNodePos, 1, angle, this.endNode.width * 0.5 + this._lineDistance);
-    this.edge.lineStyle(this._lineWidth, this._lineColor, 1);
-    switch(this._arrowType)
+    this.srcNodePos = this.getLineFromNodePos(this.startNode);
+    this.endNodePos = this.getLineendNodePos(this.endNode);
+    const angle = this.getAngle(this.srcNodePos, this.endNodePos);
+    this.srcNodePos = this.getAdjustedLocation(this.srcNodePos, -1,angle, this.startNode.width * 0.5 + this.lineDistance);
+    this.endNodePos = this.getAdjustedLocation(this.endNodePos, 1, angle, this.endNode.width * 0.5 + this.lineDistance);
+    this.edge.lineStyle(this.lineWidth, this.lineColor, 1);
+    switch (this.arrowType)
     {
       case 0:
-        this.edge.moveTo(srcNodePos.x, srcNodePos.y);
-        this.edge.lineTo(endNodePos.x, endNodePos.y);
+        this.edge.moveTo(this.srcNodePos.x, this.srcNodePos.y);
+        this.edge.lineTo(this.endNodePos.x, this.endNodePos.y);
         this.addChild(this.edge);
         break;
       case 1:
-        this.arrow.lineStyle(this._arrowWidth, this._arrowColor, 1)
-        let arrowPoints = this.getArrowPints(endNodePos, angle, 1);
-        if(this._fillArrow) {
-          this.arrow.beginFill(this._arrowColor);
+        this.arrow.lineStyle(this.arrowWidth, this.arrowColor, 1);
+        const arrowPoints = this.getArrowPints(this.endNodePos, angle, 1);
+        if (this.fillArrow) {
+          this.arrow.beginFill(this.arrowColor);
         }
-        this.arrow.drawPolygon(_.flatMap(_.map(_.values(arrowPoints), (o) => { return [o.x, o.y] })));
-        this.edge.moveTo(srcNodePos.x, srcNodePos.y);
+        this.arrow.drawPolygon(_.flatMap(_.map(
+          _.values(arrowPoints), o => ([o.x, o.y]))));
+        this.edge.moveTo(this.srcNodePos.x, this.srcNodePos.y);
         this.edge.lineTo(arrowPoints.p3.x, arrowPoints.p3.y);
         this.arrow.endFill();
         this.addChild(this.edge);
         this.addChild(this.arrow);
         break;
       case 2:
-        this.arrow.lineStyle(this._arrowWidth, this._arrowColor, 1)
-        let arrowPoints1 = this.getArrowPints(srcNodePos, angle, -1);;
-        if(this._fillArrow) {
-          this.arrow.beginFill(this._arrowColor);
+        this.arrow.lineStyle(this.arrowWidth, this.arrowColor, 1)
+        const arrowPoints1 = this.getArrowPints(this.srcNodePos, angle, -1);;
+        if (this.fillArrow) {
+          this.arrow.beginFill(this.arrowColor);
         }
-        this.arrow.drawPolygon(_.flatMap(_.map(_.values(arrowPoints1), (o) => { return [o.x, o.y] })));
-        this.edge.moveTo(endNodePos.x, endNodePos.y);
+        this.arrow.drawPolygon(_.flatMap(_.map(
+          _.values(arrowPoints1), o => ([o.x, o.y]))));
+        this.edge.moveTo(this.endNodePos.x, this.endNodePos.y);
         this.edge.lineTo(arrowPoints1.p3.x, arrowPoints1.p3.y);
         this.arrow.endFill();
         this.addChild(this.edge);
         this.addChild(this.arrow);
         break;
       case 3:
-        this.arrow.lineStyle(this._arrowWidth, this._arrowColor, 1)
-        let arrowPoints2 = this.getArrowPints(endNodePos, angle, 1);;
-        if(this._fillArrow) {
-          this.arrow.beginFill(this._arrowColor);
+        this.arrow.lineStyle(this.arrowWidth, this.arrowColor, 1);
+        const arrowPoints2 = this.getArrowPints(this.endNodePos, angle, 1);
+        if (this.fillArrow) {
+          this.arrow.beginFill(this.arrowColor);
         }
-        this.arrow.drawPolygon(_.flatMap(_.map(_.values(arrowPoints2), (o) => { return [o.x, o.y] })));
-        let arrowPoints3 = this.getArrowPints(srcNodePos, angle, -1);;
-        this.arrow.drawPolygon(_.flatMap(_.map(_.values(arrowPoints3), (o) => { return [o.x, o.y] })));
+        this.arrow.drawPolygon(_.flatMap(_.map(
+          _.values(arrowPoints2), o => ([o.x, o.y]))));
+        const arrowPoints3 = this.getArrowPints(this.srcNodePos, angle, -1);
+        this.arrow.drawPolygon(_.flatMap(_.map(
+          _.values(arrowPoints3), o => ([o.x, o.y]))));
         this.edge.moveTo(arrowPoints2.p3.x, arrowPoints2.p3.y);
         this.edge.lineTo(arrowPoints3.p3.x, arrowPoints3.p3.y);
         this.arrow.endFill();
@@ -197,5 +204,4 @@ public getArrowPints(pos:any, angle:number, direction:number) {
         break;
     }
   }
-
 }

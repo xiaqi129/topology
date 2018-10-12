@@ -13,8 +13,8 @@ import { Edge } from './edge';
 import { Group } from './group';
 import { Node } from './node';
 import { Topo } from './topo';
-declare var require: any
-let polygon = require('polygon');
+declare const require: any;
+const polygon = require('polygon');
 
 export class Network {
   private loader = PIXI.loader;
@@ -77,13 +77,13 @@ export class Network {
   }
 
   // public moveSelect() {
-  //   let canvas = document.querySelector('canvas'); 
-  //   let rectangle = new PIXI.Graphics();
-  //   let flag = false;
-  //   let oldLeft = 0;
-  //   let oldTop = 0;
-  //   let width = 0;
-  //   let height = 0;
+  //   const canvas = document.querySelector('canvas'); 
+  //   const rectangle = new PIXI.Graphics();
+  //   const flag = false;
+  //   const oldLeft = 0;
+  //   const oldTop = 0;
+  //   const width = 0;
+  //   const height = 0;
   //   if(canvas) {
   //     canvas.addEventListener('mousedown', (event: any) => {
   //       flag = true;
@@ -113,11 +113,11 @@ export class Network {
   // }
 
   // public groupNode(rectangle: any) {
-  //   let bounds = rectangle.getBounds();
-  //   let elements = this.topo.getElements();
-  //   let selectedList = new Array;
+  //   const bounds = rectangle.getBounds();
+  //   const elements = this.topo.getElements();
+  //   const selectedList = new Array;
   //   _.each(elements,(element: Node) => {
-  //     let nodeBounds = element.getBounds();
+  //     const nodeBounds = element.getBounds();
   //     if((nodeBounds.top >= bounds.top) && (nodeBounds.right <= bounds.right) &&
   //       (nodeBounds.bottom <= bounds.bottom) && (nodeBounds.left >= bounds.left)) {
   //         selectedList.push(element);
@@ -128,21 +128,21 @@ export class Network {
 
   // public calculateCenter(selectedList: any,rectangle: any) {
   //   if(selectedList.length > 1) {
-  //     let group = this.createGroup();
+  //     const group = this.createGroup();
   //     this.app.addElement(group);
   //     console.log(group);
-  //     let positionNode:any [] =[];
+  //     const positionNode:any [] =[];
   //     _.each(selectedList,(selected) => {
   //       group.setChildrenNodes(selected);
   //       // console.log(selected);
   //       if (selected instanceof Node) {
-  //         let position = {'x': selected.x,'y': selected.y};
+  //         const position = {'x': selected.x,'y': selected.y};
   //         positionNode.push(position);
   //       }
   //     });
-  //     let p = new polygon(positionNode);
-  //     let x = p.center().x;
-  //     let y = p.center().y;
+  //     const p = new polygon(positionNode);
+  //     const x = p.center().x;
+  //     const y = p.center().y;
   //     group.x = x;
   //     group.y = y;
   //     rectangle.clear();
@@ -151,14 +151,14 @@ export class Network {
   // }
 
   public drawGroupLine(group: any) {
-    let elements = this.topo.getElements();
+    const elements = this.topo.getElements();
     _.each(elements,(edge: any) => {
-      if(edge instanceof Edge) {
+      if (edge instanceof Edge) {
         _.each(group.getChildrenNodes(),(childrenNodes) => {
-          if(edge.startNode.position === childrenNodes.position) {
+          if (edge.startNode.position === childrenNodes.position) {
             group.setEdgeList(edge);
             edge.alpha = 0;
-            let edgeGroup = this.createEdge(group,edge.endNode);
+            const edgeGroup = this.createEdge(group, edge.endNode);
             this.topo.addElements(edgeGroup);
             edgeGroup.setStyle(edge.styles);
             group.setGroupEdgeList(edgeGroup);
@@ -166,7 +166,7 @@ export class Network {
           if(edge.endNode.position === childrenNodes.position) {
             group.setEdgeList(edge);
             edge.alpha = 0;
-            let edgeGroup = this.createEdge(edge.startNode,group);
+            const edgeGroup = this.createEdge(edge.startNode,group);
             this.topo.addElements(edgeGroup);
             edgeGroup.setStyle(edge.styles);
             group.setGroupEdgeList(edgeGroup);
@@ -175,5 +175,4 @@ export class Network {
       }
     });
   }
-  
 }

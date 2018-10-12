@@ -15,7 +15,6 @@ export interface ITopo {
 
   getElements(): PIXI.Container[];
 
-
   addElements(node: PIXI.Container): void;
 
   createNode(): Node;
@@ -45,7 +44,6 @@ export class Topo implements ITopo {
   public getElements() {
     return this.elements;
   }
-
 
   public createNode(): Node {
     return new Node();

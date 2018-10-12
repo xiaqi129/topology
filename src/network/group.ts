@@ -5,20 +5,18 @@
  * Author: gsp-dalian-ued@cisco.com
  */
 
+import * as _ from 'lodash';
 import { CommonElement } from './common-element';
 import { Edge } from './edge';
-import * as _ from 'lodash';
-declare var require: any
-let polygon = require('polygon');
-
-
+declare var require: any;
+const polygon = require('polygon');
 
 export class Group extends CommonElement {
   private childrenNodes: any[] = [];
   private edgeList: any[] = [];
   private groupEdgeList: any[] = [];
-  private positionNodes:any [] =[];
-  private group:any;
+  private positionNodes: any [] = [];
+  private group: any;
   public isExpanded: boolean = false;
   constructor() {
     super();
@@ -31,15 +29,15 @@ export class Group extends CommonElement {
 
   public setChildrenNodes(element: any) {
     this.childrenNodes.push(element);
-    let position = {'x': element.x,'y': element.y};
+    const position = {'x': element.x, 'y': element.y };
     this.positionNodes.push(position);
     element.alpha = 0;
   }
 
   public setGroupPosition() {
-    let p = new polygon(this.positionNodes);
-    let x = p.center().x;
-    let y = p.center().y;
+    const p = new polygon(this.positionNodes);
+    const x = p.center().x;
+    const y = p.center().y;
     this.x = x;
     this.y = y;
     return [x,y]
@@ -51,13 +49,13 @@ export class Group extends CommonElement {
   //       this.setEdgeList(edge);
   //       _.each(this.getChildrenNodes(),(childrenNodes) => {
   //         if(edge.startNode.position === childrenNodes.position) {
-  //           let edgeGroup = new Edge(this.group,edge.endNode);
+  //           const edgeGroup = new Edge(this.group,edge.endNode);
   //           this.topo.addElements(edgeGroup);
   //           edgeGroup.setStyle(edge.styles);
   //           this.setGroupEdgeList(edgeGroup);
   //         }
   //         if(edge.endNode.position === childrenNodes.position) {
-  //           let edgeGroup = new Edge(edge.startNode,this.group);
+  //           const edgeGroup = new Edge(edge.startNode,this.group);
   //           this.topo.addElements(edgeGroup);
   //           edgeGroup.setStyle(edge.styles);
   //           this.setGroupEdgeList(edgeGroup);
@@ -84,8 +82,8 @@ export class Group extends CommonElement {
   }
 
   public calcRect() {
-    let xArr :any[] = [];
-    let yArr :any[] = [];
+    const xArr :any[] = [];
+    const yArr :any[] = [];
     _.each(this.positionNodes,(positionNode) => {
       xArr.push(positionNode.x);
       yArr.push(positionNode.y);
@@ -156,6 +154,4 @@ export class Group extends CommonElement {
     });
 
   }
-
-
 }

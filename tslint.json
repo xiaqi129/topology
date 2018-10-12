@@ -16,7 +16,11 @@
     "jsRules": {},
     "rules": {
         "no-duplicate-variable": true,
-		"no-duplicate-key": true
+        "no-duplicate-key": true,
+        "max-line-length": [
+            true,
+            140
+          ],
     },
     "rulesDirectory": ["./src/"]
 }
