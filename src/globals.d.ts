@@ -1,8 +1,8 @@
 declare class Polygon {
-    constructor(points: any);
-    center: any;
+  public center: any;
+  constructor(points: any);
 }
 
-declare module "polygon" {
-    export = Polygon;
+declare module 'polygon' {
+  export = Polygon;
 }
