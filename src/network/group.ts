@@ -6,18 +6,20 @@
  */
 
 import * as _ from 'lodash';
+import 'polygon';
 import { CommonElement } from './common-element';
 import { Edge } from './edge';
-declare var require: any;
-const polygon = require('polygon');
+
+declare var polygon: any;
 
 export class Group extends CommonElement {
+  public isExpanded: boolean = false;
   private childrenNodes: any[] = [];
   private edgeList: any[] = [];
   private groupEdgeList: any[] = [];
   private positionNodes: any [] = [];
   private group: any;
-  public isExpanded: boolean = false;
+
   constructor() {
     super();
     this.defaultView();
@@ -29,7 +31,7 @@ export class Group extends CommonElement {
 
   public setChildrenNodes(element: any) {
     this.childrenNodes.push(element);
-    const position = {'x': element.x, 'y': element.y };
+    const position = { x: element.x, y: element.y };
     this.positionNodes.push(position);
     element.alpha = 0;
   }
@@ -40,7 +42,7 @@ export class Group extends CommonElement {
     const y = p.center().y;
     this.x = x;
     this.y = y;
-    return [x,y]
+    return [x, y];
   }
 
   // public drawGroupLine() {
@@ -82,13 +84,13 @@ export class Group extends CommonElement {
   }
 
   public calcRect() {
-    const xArr :any[] = [];
-    const yArr :any[] = [];
-    _.each(this.positionNodes,(positionNode) => {
+    const xArr: any[] = [];
+    const yArr: any[] = [];
+    _.each(this.positionNodes, (positionNode) => {
       xArr.push(positionNode.x);
       yArr.push(positionNode.y);
     });
-    return [xArr,yArr]
+    return [xArr, yArr];
   }
 
   public defaultView() {
@@ -100,16 +102,16 @@ export class Group extends CommonElement {
     graph.endFill();
     graph.interactive = true;
     graph.buttonMode = true;
-    graph.on("click",(event: any) =>{
+    graph.on('click', (event: any) => {
       this.setExpaned(!this.isExpanded);
-      if(this.isExpanded) {
-        this.childrenNodes.forEach(element => {
+      if (this.isExpanded) {
+        this.childrenNodes.forEach((element) => {
           element.alpha = 1;
         });
-        this.edgeList.forEach(edge => {
+        this.edgeList.forEach((edge) => {
           edge.alpha = 1;
         });
-        this.groupEdgeList.forEach(edgeGroup => {
+        this.groupEdgeList.forEach((edgeGroup) => {
           edgeGroup.alpha = 0;
         });
         graph.alpha = 0 ;
@@ -136,14 +138,14 @@ export class Group extends CommonElement {
     rectangle.buttonMode = true;
     rectangle.on('click', (event: any) => {
       this.setExpaned(!this.isExpanded);
-      if(!this.isExpanded) {
-        this.childrenNodes.forEach(element => {
+      if (!this.isExpanded) {
+        this.childrenNodes.forEach((element) => {
           element.alpha = 0;
         });
-        this.edgeList.forEach(edge => {
+        this.edgeList.forEach((edge) => {
           edge.alpha = 0;
         });
-        this.groupEdgeList.forEach(edgeGroup => {
+        this.groupEdgeList.forEach((edgeGroup) => {
           edgeGroup.alpha = 1;
         });
         graph.alpha = 1 ;

@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "webpack-dev-server --open",
-    "test": "mocha -r ts-node/register -r jsdom-global/register test/**/*.ts"
+    "test": "mocha -r ts-node/register -r jsdom-global/register test/**/*.ts",
+    "tslint": "tslint 'src/**/*.ts?(x)' --project tsconfig.json && exit 0"
   },
   "repository": {
     "type": "git",

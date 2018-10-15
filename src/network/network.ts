@@ -7,14 +7,16 @@
 
 import * as _ from 'lodash';
 import * as PIXI from 'pixi.js';
+import 'polygon';
 import { Application } from './application';
 import { Drawer } from './drawer';
 import { Edge } from './edge';
 import { Group } from './group';
 import { Node } from './node';
+
 import { Topo } from './topo';
-declare const require: any;
-const polygon = require('polygon');
+
+declare var polygon: any;
 
 export class Network {
   private loader = PIXI.loader;
@@ -77,7 +79,7 @@ export class Network {
   }
 
   // public moveSelect() {
-  //   const canvas = document.querySelector('canvas'); 
+  //   const canvas = document.querySelector('canvas');
   //   const rectangle = new PIXI.Graphics();
   //   const flag = false;
   //   const oldLeft = 0;
@@ -105,11 +107,11 @@ export class Network {
   //       flag = false;
   //     });
   //   }
-    // rectangle.interactive = true;
-    // rectangle.buttonMode = true;
-    // rectangle.on('click', (event: any) => {
-    //   this.groupNode(rectangle);
-    // });
+  // rectangle.interactive = true;
+  // rectangle.buttonMode = true;
+  // rectangle.on('click', (event: any) => {
+  //   this.groupNode(rectangle);
+  // });
   // }
 
   // public groupNode(rectangle: any) {
@@ -147,14 +149,14 @@ export class Network {
   //     group.y = y;
   //     rectangle.clear();
   //     this.drawGroupLine(group)
-  //   } 
+  //   }
   // }
 
   public drawGroupLine(group: any) {
     const elements = this.topo.getElements();
-    _.each(elements,(edge: any) => {
+    _.each(elements, (edge: any) => {
       if (edge instanceof Edge) {
-        _.each(group.getChildrenNodes(),(childrenNodes) => {
+        _.each(group.getChildrenNodes(), (childrenNodes) => {
           if (edge.startNode.position === childrenNodes.position) {
             group.setEdgeList(edge);
             edge.alpha = 0;
@@ -163,10 +165,10 @@ export class Network {
             edgeGroup.setStyle(edge.styles);
             group.setGroupEdgeList(edgeGroup);
           }
-          if(edge.endNode.position === childrenNodes.position) {
+          if (edge.endNode.position === childrenNodes.position) {
             group.setEdgeList(edge);
             edge.alpha = 0;
-            const edgeGroup = this.createEdge(edge.startNode,group);
+            const edgeGroup = this.createEdge(edge.startNode, group);
             this.topo.addElements(edgeGroup);
             edgeGroup.setStyle(edge.styles);
             group.setGroupEdgeList(edgeGroup);

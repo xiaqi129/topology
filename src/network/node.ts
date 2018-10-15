@@ -31,8 +31,8 @@ export class Node extends CommonElement {
     graph.endFill();
     graph.interactive = true;
     graph.buttonMode = true;
-    graph.on("click",(event: any) =>{
-      console.log(this);
+    graph.on('click', (event: any) => {
+      // console.log(this);
     });
     this.addChild(graph);
   }
@@ -43,10 +43,9 @@ export class Node extends CommonElement {
     node.width = 25;
     node.height = 25;
     node.interactive = true;
-    node.on("click",(event: any) => {
-      alert("aaaaa");
+    node.on('click', (event: any) => {
+      alert('aaaaa');
     });
     this.addChild(node);
-}
-
+  }
 }
