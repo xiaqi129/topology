@@ -43,8 +43,8 @@ export abstract class CommonElement extends PIXI.Container {
     arrowWidth: 1,
     fillArrow: true,
     lineDistance: 5,
-    padding: 10,
-    margin: 10,
+    padding: 5,
+    margin: 5,
     height: 15,
     width: 15,
   };

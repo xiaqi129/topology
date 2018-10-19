@@ -1,4 +1,3 @@
-/// <reference path="./typings/polygon.d.ts" /> 
-/// <reference path="./typings/polygon-offset.d.ts" />
-/// <reference path="./typings/graham-scan-convex-hull.d.ts" />
-
+import './typings/graham-scan-convex-hull.d.ts';
+import './typings/polygon-offset.d.ts';
+import './typings/polygon.d.ts';

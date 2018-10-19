@@ -7,10 +7,10 @@
 
 import * as _ from 'lodash';
 import * as PIXI from 'pixi.js';
+import { CommonElement } from './common-element';
 import { Edge } from './edge';
 import { Group } from './group';
 import { Node } from './node';
-import { CommonElement } from './common-element';
 
 export interface ITopo {
 

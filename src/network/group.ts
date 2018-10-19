@@ -13,16 +13,17 @@ import Offset from 'polygon-offset/dist/offset';
 import { CommonElement, IPosition } from './common-element';
 import { Edge } from './edge';
 import ConvexHullGrahamScan from './lib/convex-hull';
-import Line from './lib/line';
+import Point from './lib/point';
 import { Node } from './node';
 
 export class Group extends CommonElement {
   public isExpanded: boolean = true;
   private edgeList: Edge[] = [];
-  private groupEdgeList: any[] = [];
+  private edgeListGroup: Edge[][] = [];
   private positionList: IPosition[] = [];
   private networkEdges: Edge[];
-  private polygonHullFrameName: string = _.uniqueId('hull_frame_');
+  private polygonHullOutlineName: string = _.uniqueId('hull_outline_');
+  private outLineStyleType: number = 2;
 
   constructor(edges: Edge[]) {
     super();
@@ -75,9 +76,9 @@ export class Group extends CommonElement {
     this.edgeList.push(element);
   }
 
-  public setGroupEdgeList(element: any) {
-    this.groupEdgeList.push(element);
-  }
+  // public setGroupEdgeList(element: any) {
+  //   this.groupEdgeList.push(element);
+  // }
 
   public getEdgeList() {
     return this.edgeList;
@@ -122,6 +123,16 @@ export class Group extends CommonElement {
     this.addChild(graph);
   }
 
+  // 1: polygon, 2: ellipse
+  public setOutlineStyle(styleType: number) {
+    if (_.indexOf([1, 2], styleType) < 0) {
+      throw Error(
+        'The group outline type only support polygon & ellipse. 1: polygon, 2: ellipse.');
+    }
+    this.outLineStyleType = styleType;
+    this.draw();
+  }
+
   public marginPolygon(rectVertexPoints: number[], margin: number) {
     const offset = new Offset();
     return offset.data(rectVertexPoints).margin(margin || 10);
@@ -142,83 +153,109 @@ export class Group extends CommonElement {
     return hulls;
   }
 
-  public setFrameGraphicStyle(graphic: PIXI.Graphics) {
+  public setOutlineGraphicStyle(graphic: PIXI.Graphics) {
     const style = this.defaultStyle;
     graphic.lineStyle(style.lineWidth, style.lineColor);
     graphic.beginFill(style.fillColor, style.fillOpacity);
     return graphic;
   }
 
-  public createFrameGraphic() {
+  public createOutlineGraphic() {
     const graph = new PIXI.Graphics();
-    graph.name = this.polygonHullFrameName;
+    graph.name = this.polygonHullOutlineName;
     graph.interactive = true;
     graph.buttonMode = true;
     this.addChild(graph);
     return graph;
   }
 
-  public drawPolygonStyle(graph: PIXI.Graphics, vertexPointsNumber: number[][]) {
+  public getMaxSize(nodes: Node[]) {
+    const nodeSize = _.map(nodes, (node) => {
+      if (! node) {
+        return [0, 0];
+      }
+      return [node.getWidth(), node.getHeight()];
+    });
+    return _.max(_.flatten(nodeSize)) || 0;
+  }
+
+  public drawHull(graph: PIXI.Graphics, vertexPointsNumber: number[][]) {
+    const nodes = this.getAllVisibleNodes();
+    const size = this.getMaxSize(nodes);
     const polygonObject: any = new polygon(vertexPointsNumber);
     const rectVertexPoints = polygonObject.toArray();
     const hulls = this.getHulls(rectVertexPoints);
-    const marginedPolygon: any = this.marginPolygon(hulls, this.defaultStyle.margin);
+    const marginedPolygon: any = this.marginPolygon(hulls, this.defaultStyle.padding + size);
     const coordinates: number[] = _.flattenDeep(marginedPolygon);
     graph.drawPolygon(coordinates);
     graph.endFill();
   }
 
-  public drawEllipseStyle(graph: PIXI.Graphics, vertexPointsNumber: number[][]) {
-    const nodes = this.getAllVisibleNodes();
-    let ellipseWidth = 0;
-    let ellipseHeight = 0;
-    let ellipseX = 0;
-    let ellipseY = 0;
-    if (nodes.length === 2) {
-      const nodesCoordinatesList = _.map(nodes, (node) => {
-        if (! node) {
-          return [0, 0];
-        }
-        return [node.x, node.y];
-      });
-      const nodeSize = _.map(nodes, (node) => {
-        if (! node) {
-          return [0, 0];
-        }
-        return [node.getWidth(), node.getHeight()];
-      });
-      const maxLength: number = _.max(_.flatten(nodeSize)) || 0;
-      ellipseHeight =
-        Math.sqrt(
-          Math.pow(nodesCoordinatesList[0][0] - nodesCoordinatesList[1][0], 2) +
-          Math.pow(nodesCoordinatesList[0][1] - nodesCoordinatesList[1][1], 2),
-        );
-      ellipseWidth = maxLength * 2;
-      ellipseX = _.multiply(nodesCoordinatesList[1][0] + nodesCoordinatesList[0][0], 0.5);
-      ellipseY = _.multiply(nodesCoordinatesList[1][1] + nodesCoordinatesList[0][1], 0.5);
-      // console.log(ellipseX, ellipseY, ellipseWidth, ellipseHeight);
-      graph.drawEllipse(ellipseX, ellipseY, ellipseWidth, ellipseHeight);
-      // graph.rotation = 12;
-      graph.on('click', () => {
-        alert('222');
-      });
-
+  public drawPolygonOutline(graph: PIXI.Graphics, vertexPointsNumber: number[][]) {
+    if (vertexPointsNumber.length > 2) {
+      this.drawHull(graph, vertexPointsNumber);
+    } else {
+      const nodes = this.getAllVisibleNodes();
+      let ellipseX = 0;
+      let ellipseY = 0;
+      if (nodes.length === 2) {
+        const nodesCoordinatesList = _.map(nodes, (node) => {
+          if (!node) {
+            return [0, 0];
+          }
+          return [node.x, node.y];
+        });
+        ellipseX = _.multiply(nodesCoordinatesList[1][0] + nodesCoordinatesList[0][0], 0.5);
+        ellipseY = _.multiply(nodesCoordinatesList[1][1] + nodesCoordinatesList[0][1], 0.5);
+        vertexPointsNumber.push([ellipseX, ellipseY + 0.5]);
+        this.drawHull(graph, vertexPointsNumber);
+      } else {
+        let size = this.getMaxSize(nodes);
+        const node = nodes.pop();
+        const x = node ? node.x : 0;
+        const y = node ? node.y : 0;
+        size += this.defaultStyle.padding;
+        graph.drawEllipse(x, y, size, size);
+      }
     }
   }
 
-  // draw polygon frame
-  public drawGroupPolygonFrame() {
+  public drawEllipseOutline(graph: PIXI.Graphics, vertexPointsNumber: number[][]) {
+    const nodes = this.getAllVisibleNodes();
+    const size = this.getMaxSize(nodes);
+    const padding = size + this.defaultStyle.padding;
+    const polygonObject: any = new polygon(vertexPointsNumber);
+    const rect = polygonObject.aabb();
+    const x = rect.x - padding;
+    const y = rect.y - padding;
+    const width = rect.w + padding;
+    const height = rect.h + padding;
+    const centerX = x + width * 0.5;
+    const centerY = y + height * 0.5;
+    const ellipseWidth = width / Math.sqrt(2);
+    const ellipseHeight = height / Math.sqrt(2);
+    graph.drawEllipse(centerX, centerY, ellipseWidth, ellipseHeight);
+    graph.endFill();
+  }
+
+  // draw polygon background outline
+  public drawGroupExpandedOutline() {
     const vertexPointsNumber = this.getGroupVertexNumber();
     const pointsCount = vertexPointsNumber.length;
-    const graph = this.createFrameGraphic();
-    this.setFrameGraphicStyle(graph);
+    const graph = this.createOutlineGraphic();
+    this.setOutlineGraphicStyle(graph);
     if (pointsCount === 0) {
       return false;
     }
-    if (vertexPointsNumber.length > 2) {
-      this.drawPolygonStyle(graph, vertexPointsNumber);
-    } else {
-      this.drawEllipseStyle(graph, vertexPointsNumber);
+    switch (this.outLineStyleType) {
+      case 1:
+        this.drawPolygonOutline(graph, vertexPointsNumber);
+        break;
+      case 2:
+        this.drawEllipseOutline(graph, vertexPointsNumber);
+        break;
+      default:
+        this.drawPolygonOutline(graph, vertexPointsNumber);
     }
   }
 
@@ -227,8 +264,8 @@ export class Group extends CommonElement {
   }
 
   public sortGraphicsIndex() {
-    const graphic = this.getChildByName(this.polygonHullFrameName);
-    const children = this.children;
+    const graphic = this.getChildByName(this.polygonHullOutlineName);
+    // const children = this.children;
     if (graphic) {
       this.setChildIndex(graphic, 0);
     }
@@ -240,7 +277,7 @@ export class Group extends CommonElement {
       this.drawGroupNode();
       this.drawEdges();
     } else {
-      this.drawGroupPolygonFrame();
+      this.drawGroupExpandedOutline();
     }
     this.sortGraphicsIndex();
   }
@@ -258,12 +295,11 @@ export class Group extends CommonElement {
       return false;
     });
 
-    // this.edgeList = _.groupBy(edges, (edge: Edge) => {
-    //   const srcNodeId = edge.getSrcNode().getUID();
-    //   const targetNodeId = edge.getTargetNode().getUID();
-    //   return _.join([srcNodeId, targetNodeId].sort());
-    // });
-    // console.log(edges);
+    this.edgeListGroup = _.values(_.groupBy(edges, (edge: Edge) => {
+      const srcNodeId = edge.getSrcNode().getUID();
+      const targetNodeId = edge.getTargetNode().getUID();
+      return _.join([srcNodeId, targetNodeId].sort());
+    }));
   }
 
 }
