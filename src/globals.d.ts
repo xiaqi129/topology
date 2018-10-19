@@ -1,8 +1,4 @@
-declare class Polygon {
-  public center: any;
-  constructor(points: any);
-}
+/// <reference path="./typings/polygon.d.ts" /> 
+/// <reference path="./typings/polygon-offset.d.ts" />
+/// <reference path="./typings/graham-scan-convex-hull.d.ts" />
 
-declare module 'polygon' {
-  export = Polygon;
-}

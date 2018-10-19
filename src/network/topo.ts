@@ -10,6 +10,7 @@ import * as PIXI from 'pixi.js';
 import { Edge } from './edge';
 import { Group } from './group';
 import { Node } from './node';
+import { CommonElement } from './common-element';
 
 export interface ITopo {
 
@@ -50,7 +51,10 @@ export class Topo implements ITopo {
   }
 
   public createGroup(): Group {
-    return new Group();
+    const links = _.filter(this.elements, (element: CommonElement) => {
+      return element instanceof Edge;
+    });
+    return new Group(links);
   }
 
   public createEdge(startNode: Node | Group, endNode: Node | Group): Edge {

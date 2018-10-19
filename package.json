@@ -57,6 +57,8 @@
     "pixi.js": "^4.8.2",
     "polygon": "^1.0.2",
     "pre-commit": "^1.2.2",
-    "rxjs": "^6.3.2"
+    "rxjs": "^6.3.2",
+    "graham-scan-convex-hull": "^0.2.0",
+    "polygon-offset": "^0.3.1"
   }
 }

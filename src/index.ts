@@ -32,10 +32,10 @@ for (let i: number = 0, len: number = num; i < len;) {
 
 const group = network.createGroup();
 network.addElement(group);
-const groupNodes = _.slice(_.shuffle(_.dropRight(nodes, (num / 2) + 1)), 0 , num / 10);
+const groupNodes = _.slice(_.shuffle(_.dropRight(nodes, (num / 2) + 1)), 0, 2);
 _.each(groupNodes, (node) => {
-  group.setChildrenNodes(node);
+  node.setStyle({ lineColor: 0xf55d54 });
+  group.addChildNodes(node);
 });
-group.setGroupPosition();
-network.drawGroupLine(group);
+group.setExpaned(true);
 network.syncView();

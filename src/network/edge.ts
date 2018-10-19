@@ -6,7 +6,7 @@
  */
 
 import * as _ from 'lodash';
-import { CommonElement } from './common-element';
+import { CommonElement, IStyles } from './common-element';
 import { Group } from './group';
 import { Node } from './node';
 
@@ -15,17 +15,8 @@ const Point = PIXI.Point;
 export class Edge extends CommonElement {
   public startNode: any;
   public endNode: any;
-  public styles: { [x: string]: any };
   private edge: PIXI.Graphics;
   private arrow: PIXI.Graphics;
-  private arrowType: number;
-  private lineColor: number;
-  private lineWidth: number;
-  private lineDistance: number;
-  private arrowColor: number;
-  private arrowWidth: number;
-  private arrowLength: number;
-  private fillArrow: boolean;
   private srcNodePos: any;
   private endNodePos: any;
 
@@ -35,29 +26,20 @@ export class Edge extends CommonElement {
     this.arrow = new PIXI.Graphics();
     this.startNode = startNode;
     this.endNode = endNode;
-    this.arrowType = 0;
-    this.styles = {};
-    this.lineColor = 0X000000;
-    this.lineWidth = 1.4;
-    this.arrowColor = 0X000000;
-    this.arrowWidth = 1;
-    this.lineDistance = 0;
-    this.arrowLength = 15;
-    this.fillArrow = false;
-    this.drawLine();
+    this.draw();
+  }
+
+  public getSrcNode() {
+    return this.startNode;
+  }
+
+  public getTargetNode() {
+    return this.endNode;
   }
 
   public setStyle(styles: object) {
-    _.extend(this.styles, styles);
-    this.lineColor = this.styles.lineColor || 0X000000;
-    this.lineWidth = this.styles.lineWidth || 1.4;
-    this.lineDistance = this.styles.lineDistance || 0;
-    this.arrowColor = this.styles.arrowColor || 0X000000;
-    this.arrowWidth = this.styles.arrowWidth || 1.4;
-    this.arrowType = this.styles.arrowType || 0;
-    this.arrowLength = this.styles.arrowLength || 15;
-    this.fillArrow = this.styles.fillArrow;
-    this.drawLine();
+    _.extend(this.defaultStyle, styles);
+    this.draw();
   }
 
   public setNodes(startNode: Node | Group, endNode: Node | Group) {
@@ -82,7 +64,7 @@ export class Edge extends CommonElement {
    * :3 from <-> to
    */
   public setArrowStyle(type: number) {
-    this.arrowType = type;
+    this.defaultStyle.arrowType = type;
   }
 
   public getLineFromNodePos(startNode: any) {
@@ -121,46 +103,48 @@ export class Edge extends CommonElement {
     const x = pos.x;
     const y = pos.y;
     const t = direction;
+    const style = this.defaultStyle;
     return {
       p1: { x: x + 0, y: y + 0 },
       p2: {
-        x: x + this.arrowLength * Math.sin(angelT) * t,
-        y: y + this.arrowLength * Math.cos(angelT) * t,
+        x: x + style.arrowLength * Math.sin(angelT) * t,
+        y: y + style.arrowLength * Math.cos(angelT) * t,
       },
       p3: {
         x: x + middleLength * Math.sin(angle) * t,
         y: y + middleLength * Math.cos(angle) * t,
       },
       p4: {
-        x: x + this.arrowLength * Math.sin(angelB) * t,
-        y: y + this.arrowLength * Math.cos(angelB) * t,
+        x: x + style.arrowLength * Math.sin(angelB) * t,
+        y: y + style.arrowLength * Math.cos(angelB) * t,
       },
       p5: { x: x + 0, y: y + 0 },
     };
   }
 
-  public drawLine() {
+  public draw() {
+    const style = this.defaultStyle;
     this.edge.clear();
     this.arrow.clear();
     this.srcNodePos = this.getLineFromNodePos(this.startNode);
     this.endNodePos = this.getLineendNodePos(this.endNode);
     const angle = this.getAngle(this.srcNodePos, this.endNodePos);
     this.srcNodePos = this.getAdjustedLocation(
-      this.srcNodePos, -1, angle, this.startNode.width * 0.5 + this.lineDistance);
+      this.srcNodePos, -1, angle, this.startNode.width * 0.5 + style.lineDistance);
     this.endNodePos = this.getAdjustedLocation(
-      this.endNodePos, 1, angle, this.endNode.width * 0.5 + this.lineDistance);
-    this.edge.lineStyle(this.lineWidth, this.lineColor, 1);
-    switch (this.arrowType) {
+      this.endNodePos, 1, angle, this.endNode.width * 0.5 + style.lineDistance);
+    this.edge.lineStyle(style.lineWidth, style.lineColor, 1);
+    switch (style.arrowType) {
       case 0:
         this.edge.moveTo(this.srcNodePos.x, this.srcNodePos.y);
         this.edge.lineTo(this.endNodePos.x, this.endNodePos.y);
         this.addChild(this.edge);
         break;
       case 1:
-        this.arrow.lineStyle(this.arrowWidth, this.arrowColor, 1);
+        this.arrow.lineStyle(style.arrowWidth, style.arrowColor, 1);
         const arrowPoints = this.getArrowPints(this.endNodePos, angle, 1);
-        if (this.fillArrow) {
-          this.arrow.beginFill(this.arrowColor);
+        if (style.fillArrow) {
+          this.arrow.beginFill(style.arrowColor);
         }
         this.arrow.drawPolygon(_.flatMap(_.map(
           _.values(arrowPoints), o => ([o.x, o.y]))));
@@ -171,10 +155,10 @@ export class Edge extends CommonElement {
         this.addChild(this.arrow);
         break;
       case 2:
-        this.arrow.lineStyle(this.arrowWidth, this.arrowColor, 1);
+        this.arrow.lineStyle(style.arrowWidth, style.arrowColor, 1);
         const arrowPoints1 = this.getArrowPints(this.srcNodePos, angle, -1);
-        if (this.fillArrow) {
-          this.arrow.beginFill(this.arrowColor);
+        if (style.fillArrow) {
+          this.arrow.beginFill(style.arrowColor);
         }
         this.arrow.drawPolygon(_.flatMap(_.map(
           _.values(arrowPoints1), o => ([o.x, o.y]))));
@@ -185,10 +169,10 @@ export class Edge extends CommonElement {
         this.addChild(this.arrow);
         break;
       case 3:
-        this.arrow.lineStyle(this.arrowWidth, this.arrowColor, 1);
+        this.arrow.lineStyle(style.arrowWidth, style.arrowColor, 1);
         const arrowPoints2 = this.getArrowPints(this.endNodePos, angle, 1);
-        if (this.fillArrow) {
-          this.arrow.beginFill(this.arrowColor);
+        if (style.fillArrow) {
+          this.arrow.beginFill(style.arrowColor);
         }
         this.arrow.drawPolygon(_.flatMap(_.map(
           _.values(arrowPoints2), o => ([o.x, o.y]))));

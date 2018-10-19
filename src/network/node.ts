@@ -5,14 +5,16 @@
  * Author: gsp-dalian-ued@cisco.com
  */
 
-import { CommonElement } from './common-element';
+import * as _ from 'lodash';
+import { CommonElement, IStyles } from './common-element';
 import { Group } from './group';
 
 export class Node extends CommonElement {
   private parentNode: Group | null = null;
+
   constructor() {
     super();
-    this.defaultView();
+    this.draw();
   }
 
   public setParentNode(node: Group) {
@@ -23,10 +25,12 @@ export class Node extends CommonElement {
     return this.parentNode;
   }
 
-  public defaultView() {
+  public draw() {
+    this.clearDisplayObjects();
+    const style = this.defaultStyle;
     const graph = new PIXI.Graphics();
-    graph.lineStyle(1, 0xEEEEEE);
-    graph.beginFill(0xDDDDDD, 1);
+    graph.lineStyle(style.lineWidth, style.lineColor);
+    graph.beginFill(style.fillColor, style.fillOpacity);
     graph.drawCircle(0, 0, 5);
     graph.endFill();
     graph.interactive = true;
@@ -40,12 +44,18 @@ export class Node extends CommonElement {
   public createSprite() {
     const texture = PIXI.Texture.fromImage('/pic/point.png');
     const node = new PIXI.Sprite(texture);
-    node.width = 25;
-    node.height = 25;
+    node.width = this.defaultStyle.width;
+    node.height = this.defaultStyle.height;
     node.interactive = true;
-    node.on('click', (event: any) => {
-      alert('aaaaa');
-    });
     this.addChild(node);
   }
+
+  public getWidth() {
+    return this.defaultStyle.width;
+  }
+
+  public getHeight() {
+    return this.defaultStyle.height;
+  }
+
 }
