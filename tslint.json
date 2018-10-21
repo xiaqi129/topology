@@ -16,7 +16,7 @@
         "no-duplicate-variable": true,
         "import-name": false,
         "object-literal-sort-keys": false,
-        "no-namespace": false,
+        "no-namespace": false
     },
     "rulesDirectory": [
         "./src/"

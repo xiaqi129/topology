@@ -306,12 +306,12 @@ export class Group extends CommonElement {
       const targetNode = edge.getTargetNode();
       const srcNodeInGroup = _.includes(nodes, srcNode);
       const targetNodeInGroup = _.includes(nodes, targetNode);
-      let groupEdge: GroupEdge | undefined = undefined; 
+      let groupEdge: GroupEdge | undefined;
       if (srcNodeInGroup && !targetNodeInGroup) {
         groupEdge = new GroupEdge(this, targetNode, edges);
-      } 
+      }
       if (!srcNodeInGroup && targetNodeInGroup) {
-        groupEdge = new GroupEdge(srcNode, this, edges)
+        groupEdge = new GroupEdge(srcNode, this, edges);
       }
       if (groupEdge) {
         this.groupEdges.push(groupEdge);

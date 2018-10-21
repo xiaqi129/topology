@@ -6,9 +6,9 @@
  */
 
 import * as _ from 'lodash';
+import { Edge } from './edge';
 import { Group } from './group';
 import { Node } from './node';
-import { Edge } from './edge';
 
 export class GroupEdge extends Edge {
   public startNode: any;
@@ -43,7 +43,7 @@ export class GroupEdge extends Edge {
       }
     }
 
-    return { x: x, y: y };
+    return { x, y };
   }
 
   public draw() {

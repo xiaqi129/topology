@@ -6,12 +6,11 @@
  */
 
 import * as _ from 'lodash';
-import ElementsTypes from './node-types';
 import { Application } from './application';
-import { ITopo } from './topo';
 import { Edge } from './edge';
 import { Group } from './group';
 import { Node } from './node';
+import { ITopo } from './topo';
 
 export class Drawer {
 
@@ -34,13 +33,12 @@ export class Drawer {
   public sortElements(elements: PIXI.DisplayObject[]) {
     _.sortBy(elements, (element) => {
       if (element instanceof Node) {
-        console.log(0);
         return 1;
-      } else if (element instanceof Group) {
-        console.log(2);
+      }
+      if (element instanceof Group) {
         return 0;
-      } else if (element instanceof Edge) {
-        console.log(1);
+      }
+      if (element instanceof Edge) {
         return 2;
       }
     });
@@ -64,7 +62,7 @@ export class Drawer {
         if (b instanceof Node) {
           return -1;
         }
-        if(b instanceof Edge) {
+        if (b instanceof Edge) {
           return -1;
         }
       }
@@ -73,7 +71,7 @@ export class Drawer {
         if (b instanceof Node) {
           return -1;
         }
-        if(b instanceof Group) {
+        if (b instanceof Group) {
           return 1;
         }
       }
