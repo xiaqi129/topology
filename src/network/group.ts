@@ -5,30 +5,48 @@
  * Author: gsp-dalian-ued@cisco.com
  */
 
-import convexHull from 'graham-scan-convex-hull/src/convex-hull';
+// import convexHull from 'graham-scan-convex-hull/src/convex-hull';
 import * as _ from 'lodash';
 import * as PIXI from 'pixi.js';
 import polygon from 'polygon';
 import Offset from 'polygon-offset/dist/offset';
 import { CommonElement, IPosition } from './common-element';
 import { Edge } from './edge';
+import { GroupEdge } from './edge-conn-group';
 import ConvexHullGrahamScan from './lib/convex-hull';
 import Point from './lib/point';
 import { Node } from './node';
 
 export class Group extends CommonElement {
   public isExpanded: boolean = true;
-  private edgeList: Edge[] = [];
-  private edgeListGroup: Edge[][] = [];
   private positionList: IPosition[] = [];
-  private networkEdges: Edge[];
+  private elements: Edge | CommonElement[];
   private polygonHullOutlineName: string = _.uniqueId('hull_outline_');
-  private outLineStyleType: number = 2;
+  private outLineStyleType: number = 1;
+  private lastClickTime: number = 0;
+  private groupEdges: GroupEdge[] = [];
 
-  constructor(edges: Edge[]) {
+  constructor(elements: Edge | CommonElement[]) {
     super();
-    this.networkEdges = edges;
+    this.elements = elements;
     this.draw();
+  }
+
+  public toggleGroupExpand() {
+    const graph = this.getChildByName(this.polygonHullOutlineName);
+    graph.on('click', (event) => {
+      event.stopPropagation();
+      const currentTime = new Date().getTime();
+      if (currentTime - this.lastClickTime < 500) {
+        this.isExpanded = ! this.isExpanded;
+        this.draw();
+        this.lastClickTime = 0;
+        this.setExpaned(this.isExpanded);
+      } else {
+        this.lastClickTime = currentTime;
+      }
+      this.toggleShowEdges(this.isExpanded);
+    });
   }
 
   public setExpaned(expanded: boolean) {
@@ -43,7 +61,7 @@ export class Group extends CommonElement {
     if (!preventDraw) {
       this.draw();
     }
-    this.analyzeEdges();
+    // this.analyzeEdges();
   }
 
   public toggleChildNodesVisible(visible: boolean, element?: Node | Group) {
@@ -72,16 +90,12 @@ export class Group extends CommonElement {
     return [center.x, center.y];
   }
 
-  public setEdgeList(element: any) {
-    this.edgeList.push(element);
-  }
-
   // public setGroupEdgeList(element: any) {
   //   this.groupEdgeList.push(element);
   // }
 
   public getEdgeList() {
-    return this.edgeList;
+    return _.flatten(this.analyzeEdges());
   }
 
   public getAllVisibleNodes(children?: PIXI.DisplayObject[]) {
@@ -112,8 +126,9 @@ export class Group extends CommonElement {
 
   public drawGroupNode() {
     const position = this.getGroupPosition();
-    const graph = new PIXI.Graphics();
     const style = this.defaultStyle;
+    const graph = new PIXI.Graphics();
+    graph.name = this.polygonHullOutlineName;
     graph.lineStyle(style.lineWidth, style.lineWidth);
     graph.beginFill(style.fillColor, style.fillOpacity);
     graph.drawCircle(position[0], position[1], style.width);
@@ -123,7 +138,9 @@ export class Group extends CommonElement {
     this.addChild(graph);
   }
 
-  // 1: polygon, 2: ellipse
+  /**
+   * 1: polygon, 2: ellipse
+   */
   public setOutlineStyle(styleType: number) {
     if (_.indexOf([1, 2], styleType) < 0) {
       throw Error(
@@ -179,9 +196,14 @@ export class Group extends CommonElement {
     return _.max(_.flatten(nodeSize)) || 0;
   }
 
-  public drawHull(graph: PIXI.Graphics, vertexPointsNumber: number[][]) {
+  public getNodesMaxSize() {
     const nodes = this.getAllVisibleNodes();
     const size = this.getMaxSize(nodes);
+    return size;
+  }
+
+  public drawHull(graph: PIXI.Graphics, vertexPointsNumber: number[][]) {
+    const size = this.getNodesMaxSize();
     const polygonObject: any = new polygon(vertexPointsNumber);
     const rectVertexPoints = polygonObject.toArray();
     const hulls = this.getHulls(rectVertexPoints);
@@ -221,8 +243,7 @@ export class Group extends CommonElement {
   }
 
   public drawEllipseOutline(graph: PIXI.Graphics, vertexPointsNumber: number[][]) {
-    const nodes = this.getAllVisibleNodes();
-    const size = this.getMaxSize(nodes);
+    const size = this.getNodesMaxSize();
     const padding = size + this.defaultStyle.padding;
     const polygonObject: any = new polygon(vertexPointsNumber);
     const rect = polygonObject.aabb();
@@ -259,8 +280,44 @@ export class Group extends CommonElement {
     }
   }
 
+  public toggleShowEdges(visible: boolean) {
+    const edgeListGroup = this.analyzeEdges();
+    _.each(_.flatten(edgeListGroup), (edge: Edge) => {
+      edge.visible = visible;
+    });
+    return edgeListGroup;
+  }
+
+  public rmElements(elements: PIXI.DisplayObject[]) {
+    _.each(elements, (element: PIXI.DisplayObject) => {
+      element.destroy();
+    });
+    return _.remove(elements);
+  }
+
   public drawEdges() {
-    // todo
+    const edgesListGroup = this.toggleShowEdges(this.isExpanded);
+    const nodes = _.filter(this.children, (item) => {
+      return item instanceof Node;
+    });
+    _.each(edgesListGroup, (edges: Edge[]) => {
+      const edge = edges[0];
+      const srcNode = edge.getSrcNode();
+      const targetNode = edge.getTargetNode();
+      const srcNodeInGroup = _.includes(nodes, srcNode);
+      const targetNodeInGroup = _.includes(nodes, targetNode);
+      let groupEdge: GroupEdge | undefined = undefined; 
+      if (srcNodeInGroup && !targetNodeInGroup) {
+        groupEdge = new GroupEdge(this, targetNode, edges);
+      } 
+      if (!srcNodeInGroup && targetNodeInGroup) {
+        groupEdge = new GroupEdge(srcNode, this, edges)
+      }
+      if (groupEdge) {
+        this.groupEdges.push(groupEdge);
+        this.addChild(groupEdge);
+      }
+    });
   }
 
   public sortGraphicsIndex() {
@@ -272,6 +329,7 @@ export class Group extends CommonElement {
   }
 
   public draw() {
+    this.rmElements(this.groupEdges);
     this.clearDisplayObjects();
     if (!this.isExpanded) {
       this.drawGroupNode();
@@ -280,13 +338,24 @@ export class Group extends CommonElement {
       this.drawGroupExpandedOutline();
     }
     this.sortGraphicsIndex();
+    this.toggleGroupExpand();
+  }
+
+  public getChildEdges() {
+    const edges = _.filter(this.elements, (element: Edge | CommonElement) => {
+      return element instanceof Edge;
+    });
+    return edges;
   }
 
   private analyzeEdges() {
+    let edges: Edge[] = this.getChildEdges();
+
     const nodes = _.filter(this.children, (item) => {
       return item instanceof Node;
     });
-    const edges = _.filter(this.networkEdges, (edge: Edge) => {
+
+    edges = _.filter(edges, (edge: Edge) => {
       const srcNode = edge.getSrcNode();
       const targetNode = edge.getTargetNode();
       if (_.includes(nodes, srcNode) || (_.includes(nodes, targetNode))) {
@@ -295,11 +364,10 @@ export class Group extends CommonElement {
       return false;
     });
 
-    this.edgeListGroup = _.values(_.groupBy(edges, (edge: Edge) => {
+    return _.values(_.groupBy(edges, (edge: Edge) => {
       const srcNodeId = edge.getSrcNode().getUID();
       const targetNodeId = edge.getTargetNode().getUID();
       return _.join([srcNodeId, targetNodeId].sort());
     }));
   }
-
 }

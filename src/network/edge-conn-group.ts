@@ -6,128 +6,52 @@
  */
 
 import * as _ from 'lodash';
-import { CommonElement, IStyles } from './common-element';
 import { Group } from './group';
 import { Node } from './node';
+import { Edge } from './edge';
 
-const Point = PIXI.Point;
-
-export class Edge extends CommonElement {
+export class GroupEdge extends Edge {
   public startNode: any;
   public endNode: any;
-  public edge: PIXI.Graphics;
   public arrow: PIXI.Graphics;
   public srcNodePos: any;
   public endNodePos: any;
+  public edges: Edge[];
 
-  constructor(startNode: Node | Group, endNode: Node | Group) {
-    super();
-    this.edge = new PIXI.Graphics();
+  constructor(startNode: Node | Group, endNode: Node | Group, edges: Edge[]) {
+    super(startNode, endNode);
+    this.edges = edges;
     this.arrow = new PIXI.Graphics();
-    this.startNode = startNode;
-    this.endNode = endNode;
-    this.draw();
   }
 
-  public getSrcNode() {
-    return this.startNode;
-  }
+  public getLineNodePosition(node: Node | Group) {
+    let x: number = 0;
+    let y: number = 0;
+    if (node instanceof Node) {
+      x = node.x;
+      y = node.y;
+    }
 
-  public getTargetNode() {
-    return this.endNode;
-  }
+    if (node instanceof Group) {
+      const position = node.getGroupPosition();
+      if (position) {
+        x = position[0];
+        y = position[1];
+      } else {
+        x = 0;
+        y = 0;
+      }
+    }
 
-  public setStyle(styles: object) {
-    _.extend(this.defaultStyle, styles);
-    this.draw();
-  }
-
-  public setNodes(startNode: Node | Group, endNode: Node | Group) {
-    this.startNode = startNode;
-    this.endNode = endNode;
-  }
-
-  public setStartNode(node: Node | Group) {
-    this.startNode = node;
-  }
-
-  public setEndNode(node: Node | Group) {
-    this.endNode = node;
-  }
-
-  /**
-   * set arrow type
-   * @type
-   * :0 from --- to
-   * :1 from --> to
-   * :2 from <-- to
-   * :3 from <-> to
-   */
-  public setArrowStyle(type: number) {
-    this.defaultStyle.arrowType = type;
-  }
-
-  public getLineFromNodePos(startNode: any) {
-    const nodePos = {
-      x: startNode.x,
-      y: startNode.y,
-    };
-    return nodePos;
-  }
-
-  public getLineendNodePos(endNode: any) {
-    const nodePos = {
-      x: endNode.x,
-      y: endNode.y,
-    };
-    return nodePos;
-  }
-
-  public getAngle(startNode: any, endNode: any) {
-    return Math.atan2(startNode.x - endNode.x, startNode.y - endNode.y);
-  }
-
-  public getAdjustedLocation(node: any, n: number, angel: number, distanceRound: number) {
-    const location = {
-      x: node.x + n * distanceRound * Math.sin(angel),
-      y: node.y + n * distanceRound * Math.cos(angel),
-    };
-    return location;
-  }
-
-  public getArrowPints(pos: any, angle: number, direction: number) {
-    const arrowAngel = 20;
-    const middleLength = 10;
-    const angelT = angle + _.divide(arrowAngel * Math.PI, 180);
-    const angelB = angle - _.divide(arrowAngel * Math.PI, 180);
-    const x = pos.x;
-    const y = pos.y;
-    const t = direction;
-    const style = this.defaultStyle;
-    return {
-      p1: { x: x + 0, y: y + 0 },
-      p2: {
-        x: x + style.arrowLength * Math.sin(angelT) * t,
-        y: y + style.arrowLength * Math.cos(angelT) * t,
-      },
-      p3: {
-        x: x + middleLength * Math.sin(angle) * t,
-        y: y + middleLength * Math.cos(angle) * t,
-      },
-      p4: {
-        x: x + style.arrowLength * Math.sin(angelB) * t,
-        y: y + style.arrowLength * Math.cos(angelB) * t,
-      },
-      p5: { x: x + 0, y: y + 0 },
-    };
+    return { x: x, y: y };
   }
 
   public draw() {
     const style = this.defaultStyle;
     this.edge.clear();
     this.arrow.clear();
-    this.srcNodePos = this.getLineFromNodePos(this.startNode);
-    this.endNodePos = this.getLineendNodePos(this.endNode);
+    this.srcNodePos = this.getLineNodePosition(this.startNode);
+    this.endNodePos = this.getLineNodePosition(this.endNode);
     const angle = this.getAngle(this.srcNodePos, this.endNodePos);
     this.srcNodePos = this.getAdjustedLocation(
       this.srcNodePos, -1, angle, this.startNode.width * 0.5 + style.lineDistance);
@@ -189,4 +113,5 @@ export class Edge extends CommonElement {
         break;
     }
   }
+
 }

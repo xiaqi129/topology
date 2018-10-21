@@ -69,34 +69,7 @@ export class Network {
   }
 
   public syncView() {
-    this.app.clearContainer();
-    const elements = this.topo.getElements();
-    this.app.addElements(elements);
+    this.drawer.syncView();
   }
 
-  // public drawGroupLine(group: any) {
-  //   const elements = this.topo.getElements();
-  //   _.each(elements, (edge: any) => {
-  //     if (edge instanceof Edge) {
-  //       _.each(group.getChildrenNodes(), (childrenNodes) => {
-  //         if (edge.startNode.position === childrenNodes.position) {
-  //           group.setEdgeList(edge);
-  //           edge.alpha = 0;
-  //           const edgeGroup = this.createEdge(group, edge.endNode);
-  //           this.topo.addElements(edgeGroup);
-  //           edgeGroup.setStyle(edge.styles);
-  //           group.setGroupEdgeList(edgeGroup);
-  //         }
-  //         if (edge.endNode.position === childrenNodes.position) {
-  //           group.setEdgeList(edge);
-  //           edge.alpha = 0;
-  //           const edgeGroup = this.createEdge(edge.startNode, group);
-  //           this.topo.addElements(edgeGroup);
-  //           edgeGroup.setStyle(edge.styles);
-  //           group.setGroupEdgeList(edgeGroup);
-  //         }
-  //       });
-  //     }
-  //   });
-  // }
 }

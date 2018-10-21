@@ -51,10 +51,7 @@ export class Topo implements ITopo {
   }
 
   public createGroup(): Group {
-    const links = _.filter(this.elements, (element: CommonElement) => {
-      return element instanceof Edge;
-    });
-    return new Group(links);
+    return new Group(this.elements);
   }
 
   public createEdge(startNode: Node | Group, endNode: Node | Group): Edge {
