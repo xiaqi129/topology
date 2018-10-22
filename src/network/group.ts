@@ -242,6 +242,14 @@ export class Group extends CommonElement {
     }
   }
 
+  public getWidth() {
+    return this.defaultStyle.width + this.defaultStyle.padding;
+  }
+
+  public getHeight() {
+    return this.defaultStyle.height + this.defaultStyle.padding;
+  }
+
   public drawEllipseOutline(graph: PIXI.Graphics, vertexPointsNumber: number[][]) {
     const size = this.getNodesMaxSize();
     const padding = size + this.defaultStyle.padding;
@@ -315,6 +323,7 @@ export class Group extends CommonElement {
       }
       if (groupEdge) {
         this.groupEdges.push(groupEdge);
+        groupEdge.setStyle(edge.getStyle());
         this.addChild(groupEdge);
       }
     });

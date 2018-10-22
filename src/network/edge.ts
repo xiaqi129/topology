@@ -42,6 +42,10 @@ export class Edge extends CommonElement {
     this.draw();
   }
 
+  public getStyle() {
+    return this.defaultStyle;
+  }
+
   public setNodes(startNode: Node | Group, endNode: Node | Group) {
     this.startNode = startNode;
     this.endNode = endNode;

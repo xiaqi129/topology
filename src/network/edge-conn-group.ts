@@ -9,6 +9,7 @@ import * as _ from 'lodash';
 import { Edge } from './edge';
 import { Group } from './group';
 import { Node } from './node';
+import { CommonElement } from './common-element';
 
 export class GroupEdge extends Edge {
   public startNode: any;
@@ -42,71 +43,91 @@ export class GroupEdge extends Edge {
         y = 0;
       }
     }
-
     return { x, y };
   }
 
+  public getNodeSize(node: Node | Group) {
+    let width = 0;
+    let height = 0;
+    if (node instanceof Node) {
+      width = node.width;
+      height = node.height;
+    }
+
+    if (node instanceof Group) {
+      width = node.getWidth();
+      height = node.getHeight();
+    }
+
+    return { width, height };
+  }
+
   public draw() {
-    const style = this.defaultStyle;
     this.edge.clear();
     this.arrow.clear();
+    const style = this.defaultStyle;
+    const lineDistance = style.lineDistance;
     this.srcNodePos = this.getLineNodePosition(this.startNode);
     this.endNodePos = this.getLineNodePosition(this.endNode);
+    const srcNodeSize = this.getNodeSize(this.startNode);
+    const endNodeSize = this.getNodeSize(this.endNode);
     const angle = this.getAngle(this.srcNodePos, this.endNodePos);
     this.srcNodePos = this.getAdjustedLocation(
-      this.srcNodePos, -1, angle, this.startNode.width * 0.5 + style.lineDistance);
+      this.srcNodePos,
+      -1,
+      angle,
+      srcNodeSize.width * 0.5 + lineDistance,
+    );
     this.endNodePos = this.getAdjustedLocation(
-      this.endNodePos, 1, angle, this.endNode.width * 0.5 + style.lineDistance);
+      this.endNodePos,
+      1,
+      angle,
+      endNodeSize.width * 0.5 + lineDistance,
+    );
     this.edge.lineStyle(style.lineWidth, style.lineColor, 1);
+    const elGraph = new PIXI.Graphics();
+    elGraph.lineStyle(style.lineWidth, style.lineColor);
+    elGraph.beginFill(style.fillColor, style.fillOpacity);
+    this.addChild(elGraph);
+    this.edge.moveTo(this.srcNodePos.x, this.srcNodePos.y);
+    this.edge.lineTo(this.endNodePos.x, this.endNodePos.y);
+    this.addChild(this.edge);
+    let arrowPoints: any;
     switch (style.arrowType) {
-      case 0:
-        this.edge.moveTo(this.srcNodePos.x, this.srcNodePos.y);
-        this.edge.lineTo(this.endNodePos.x, this.endNodePos.y);
-        this.addChild(this.edge);
-        break;
       case 1:
         this.arrow.lineStyle(style.arrowWidth, style.arrowColor, 1);
-        const arrowPoints = this.getArrowPints(this.endNodePos, angle, 1);
+        arrowPoints = this.getArrowPints(this.endNodePos, angle, 1);
         if (style.fillArrow) {
           this.arrow.beginFill(style.arrowColor);
         }
         this.arrow.drawPolygon(_.flatMap(_.map(
           _.values(arrowPoints), o => ([o.x, o.y]))));
-        this.edge.moveTo(this.srcNodePos.x, this.srcNodePos.y);
-        this.edge.lineTo(arrowPoints.p3.x, arrowPoints.p3.y);
         this.arrow.endFill();
-        this.addChild(this.edge);
         this.addChild(this.arrow);
         break;
       case 2:
         this.arrow.lineStyle(style.arrowWidth, style.arrowColor, 1);
-        const arrowPoints1 = this.getArrowPints(this.srcNodePos, angle, -1);
+        arrowPoints = this.getArrowPints(this.srcNodePos, angle, -1);
         if (style.fillArrow) {
           this.arrow.beginFill(style.arrowColor);
         }
         this.arrow.drawPolygon(_.flatMap(_.map(
-          _.values(arrowPoints1), o => ([o.x, o.y]))));
-        this.edge.moveTo(this.endNodePos.x, this.endNodePos.y);
-        this.edge.lineTo(arrowPoints1.p3.x, arrowPoints1.p3.y);
+          _.values(arrowPoints), o => ([o.x, o.y]))));
         this.arrow.endFill();
-        this.addChild(this.edge);
         this.addChild(this.arrow);
         break;
       case 3:
         this.arrow.lineStyle(style.arrowWidth, style.arrowColor, 1);
-        const arrowPoints2 = this.getArrowPints(this.endNodePos, angle, 1);
+        arrowPoints = this.getArrowPints(this.endNodePos, angle, 1);
         if (style.fillArrow) {
           this.arrow.beginFill(style.arrowColor);
         }
         this.arrow.drawPolygon(_.flatMap(_.map(
-          _.values(arrowPoints2), o => ([o.x, o.y]))));
-        const arrowPoints3 = this.getArrowPints(this.srcNodePos, angle, -1);
+          _.values(arrowPoints), o => ([o.x, o.y]))));
+        arrowPoints = this.getArrowPints(this.srcNodePos, angle, -1);
         this.arrow.drawPolygon(_.flatMap(_.map(
-          _.values(arrowPoints3), o => ([o.x, o.y]))));
-        this.edge.moveTo(arrowPoints2.p3.x, arrowPoints2.p3.y);
-        this.edge.lineTo(arrowPoints3.p3.x, arrowPoints3.p3.y);
+          _.values(arrowPoints), o => ([o.x, o.y]))));
         this.arrow.endFill();
-        this.addChild(this.edge);
         this.addChild(this.arrow);
         break;
       default:
