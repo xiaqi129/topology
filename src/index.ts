@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import { Network } from './network/network';
 
 const network = new Network('div#network');
-const num = 20;
+const num = 50;
 
 for (let i: number = 0, len: number = num; i < len;) {
   i += 1;
@@ -37,6 +37,9 @@ const groupNodes = _.slice(_.shuffle(_.dropRight(nodes, (num / 2) + 1)), 0, 3);
 _.each(groupNodes, (node) => {
   node.setStyle({ lineColor: 0xf55d54 });
   group.addChildNodes(node);
+});
+group.events('click', (edges: any) => {
+  console.log(`${edges.length} link[s] referenced.`);
 });
 // group.setExpaned(false);
 network.syncView();

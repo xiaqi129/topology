@@ -14,10 +14,15 @@ import { CommonElement, IPosition } from './common-element';
 import { Edge } from './edge';
 import { GroupEdge } from './edge-conn-group';
 import ConvexHullGrahamScan from './lib/convex-hull';
-import Point from './lib/point';
+// import Point from './lib/point';
 import { Node } from './node';
 
+interface IEvent {
+  [event: string]: (edges: Edge[]) => {};
+}
+
 export class Group extends CommonElement {
+  public groupEdgesEvent?: IEvent = {};
   public isExpanded: boolean = true;
   private positionList: IPosition[] = [];
   private elements: Edge | CommonElement[];
@@ -38,7 +43,7 @@ export class Group extends CommonElement {
       event.stopPropagation();
       const currentTime = new Date().getTime();
       if (currentTime - this.lastClickTime < 500) {
-        this.isExpanded = ! this.isExpanded;
+        this.isExpanded = !this.isExpanded;
         this.draw();
         this.lastClickTime = 0;
         this.setExpaned(this.isExpanded);
@@ -188,7 +193,7 @@ export class Group extends CommonElement {
 
   public getMaxSize(nodes: Node[]) {
     const nodeSize = _.map(nodes, (node) => {
-      if (! node) {
+      if (!node) {
         return [0, 0];
       }
       return [node.getWidth(), node.getHeight()];
@@ -240,6 +245,12 @@ export class Group extends CommonElement {
         graph.drawEllipse(x, y, size, size);
       }
     }
+  }
+
+  public events(event: string, callback: any) {
+    const eventsMap: any = {};
+    eventsMap[event] = callback;
+    _.extend(this.groupEdgesEvent, eventsMap);
   }
 
   public getWidth() {
@@ -324,6 +335,15 @@ export class Group extends CommonElement {
       if (groupEdge) {
         this.groupEdges.push(groupEdge);
         groupEdge.setStyle(edge.getStyle());
+        const edgeGraphic = groupEdge.getEdge();
+        edgeGraphic.interactive = true;
+        edgeGraphic.buttonMode = true;
+        _.each(this.groupEdgesEvent, (call, event) => {
+          edgeGraphic.on(event, () => {
+            call(edges);
+          });
+
+        });
         this.addChild(groupEdge);
       }
     });

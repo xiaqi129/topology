@@ -29,6 +29,105 @@ export class Edge extends CommonElement {
     this.draw();
   }
 
+  public getEdge() {
+    return this.edge;
+  }
+
+  public getLineNodePosition(node: Node | Group) {
+    let x: number = 0;
+    let y: number = 0;
+    if (node instanceof Node) {
+      x = node.x;
+      y = node.y;
+    }
+
+    if (node instanceof Group) {
+      const position = node.getGroupPosition();
+      if (position) {
+        x = position[0];
+        y = position[1];
+      } else {
+        x = 0;
+        y = 0;
+      }
+    }
+    return { x, y };
+  }
+
+  public getNodeSize(node: Node | Group) {
+    let width = 0;
+    let height = 0;
+    if (node instanceof Node) {
+      width = node.width;
+      height = node.height;
+    }
+
+    if (node instanceof Group) {
+      width = node.getWidth();
+      height = node.getHeight();
+    }
+
+    return { width, height };
+  }
+
+  public calcEdgePoints(start: any, end: any, lineWidth: number) {
+    const half = lineWidth * 0.5;
+    let sLeft = {};
+    let sRight = {};
+    let eRight = {};
+    let eLeft = {};
+    const sX = start.x;
+    const sY = start.y;
+    const eX = end.x;
+    const eY = end.y;
+    const results: any = {};
+
+    if ((sX < eX && sY < eY) ||
+      (sX > eX && sY > eY)) {
+      sLeft = new Point(sX - half, sY + half);
+      sRight = new Point(sX + half, sY - half);
+      eRight = new Point(eX + half, eY - half);
+      eLeft = new Point(eX - half, eY + half);
+    } else if ((sX > eX && sY < eY) ||
+      (sX < eX && sY > eY)) {
+      sLeft = new Point(sX - half, sY - half);
+      sRight = new Point(sX + half, sY + half);
+      eRight = new Point(eX + half, eY + half);
+      eLeft = new Point(eX - half, eY - half);
+    } else if (sX === eX &&
+      (sY > eY || sY < eY)) {
+      sLeft = new Point(sX - half, sY);
+      sRight = new Point(sX + half, sY);
+      eRight = new Point(eX + half, eY);
+      eLeft = new Point(eX - half, eY);
+
+    } else if (sY === eY &&
+      (sX < eX || sX > eX)) {
+      sLeft = new Point(sX, sY + half);
+      sRight = new Point(sX, sY - half);
+      eRight = new Point(eX, eY - half);
+      eLeft = new Point(eX, eY + half);
+    }
+
+    results.sLeft = sLeft;
+    results.sRight = sRight;
+    results.eRight = eRight;
+    results.eLeft = eLeft;
+
+    return results;
+  }
+
+  public drawEdge(graph: any, points: any) {
+    const style = this.defaultStyle;
+    graph.lineStyle(style.lineWidth, style.lineColor);
+    graph.beginFill(style.fillColor, style.fillOpacity);
+    graph.moveTo(points.sLeft.x, points.sLeft.y);
+    graph.lineTo(points.sRight.x, points.sRight.y);
+    graph.lineTo(points.eRight.x, points.eRight.y);
+    graph.lineTo(points.eLeft.x, points.eLeft.y);
+    graph.endFill();
+  }
+
   public getSrcNode() {
     return this.startNode;
   }
@@ -127,66 +226,68 @@ export class Edge extends CommonElement {
   }
 
   public draw() {
-    const style = this.defaultStyle;
     this.edge.clear();
     this.arrow.clear();
-    this.srcNodePos = this.getLineFromNodePos(this.startNode);
-    this.endNodePos = this.getLineendNodePos(this.endNode);
+    const style = this.defaultStyle;
+    const lineDistance = style.lineDistance;
+    this.srcNodePos = this.getLineNodePosition(this.startNode);
+    this.endNodePos = this.getLineNodePosition(this.endNode);
+    const srcNodeSize = this.getNodeSize(this.startNode);
+    const endNodeSize = this.getNodeSize(this.endNode);
     const angle = this.getAngle(this.srcNodePos, this.endNodePos);
     this.srcNodePos = this.getAdjustedLocation(
-      this.srcNodePos, -1, angle, this.startNode.width * 0.5 + style.lineDistance);
+      this.srcNodePos,
+      -1,
+      angle,
+      srcNodeSize.width * 0.5 + lineDistance,
+    );
     this.endNodePos = this.getAdjustedLocation(
-      this.endNodePos, 1, angle, this.endNode.width * 0.5 + style.lineDistance);
-    this.edge.lineStyle(style.lineWidth, style.lineColor, 1);
+      this.endNodePos,
+      1,
+      angle,
+      endNodeSize.width * 0.5 + lineDistance,
+    );
+    // draw a rectangle line for interaction
+    const points = this.calcEdgePoints(
+      this.srcNodePos, this.endNodePos, this.defaultStyle.lineWidth);
+    this.drawEdge(this.edge, points);
+    this.addChild(this.edge);
+    let arrowPoints: any;
     switch (style.arrowType) {
-      case 0:
-        this.edge.moveTo(this.srcNodePos.x, this.srcNodePos.y);
-        this.edge.lineTo(this.endNodePos.x, this.endNodePos.y);
-        this.addChild(this.edge);
-        break;
       case 1:
         this.arrow.lineStyle(style.arrowWidth, style.arrowColor, 1);
-        const arrowPoints = this.getArrowPints(this.endNodePos, angle, 1);
+        arrowPoints = this.getArrowPints(this.endNodePos, angle, 1);
         if (style.fillArrow) {
           this.arrow.beginFill(style.arrowColor);
         }
         this.arrow.drawPolygon(_.flatMap(_.map(
           _.values(arrowPoints), o => ([o.x, o.y]))));
-        this.edge.moveTo(this.srcNodePos.x, this.srcNodePos.y);
-        this.edge.lineTo(arrowPoints.p3.x, arrowPoints.p3.y);
         this.arrow.endFill();
-        this.addChild(this.edge);
         this.addChild(this.arrow);
         break;
       case 2:
         this.arrow.lineStyle(style.arrowWidth, style.arrowColor, 1);
-        const arrowPoints1 = this.getArrowPints(this.srcNodePos, angle, -1);
+        arrowPoints = this.getArrowPints(this.srcNodePos, angle, -1);
         if (style.fillArrow) {
           this.arrow.beginFill(style.arrowColor);
         }
         this.arrow.drawPolygon(_.flatMap(_.map(
-          _.values(arrowPoints1), o => ([o.x, o.y]))));
-        this.edge.moveTo(this.endNodePos.x, this.endNodePos.y);
-        this.edge.lineTo(arrowPoints1.p3.x, arrowPoints1.p3.y);
+          _.values(arrowPoints), o => ([o.x, o.y]))));
         this.arrow.endFill();
-        this.addChild(this.edge);
         this.addChild(this.arrow);
         break;
       case 3:
         this.arrow.lineStyle(style.arrowWidth, style.arrowColor, 1);
-        const arrowPoints2 = this.getArrowPints(this.endNodePos, angle, 1);
+        arrowPoints = this.getArrowPints(this.endNodePos, angle, 1);
         if (style.fillArrow) {
           this.arrow.beginFill(style.arrowColor);
         }
         this.arrow.drawPolygon(_.flatMap(_.map(
-          _.values(arrowPoints2), o => ([o.x, o.y]))));
-        const arrowPoints3 = this.getArrowPints(this.srcNodePos, angle, -1);
+          _.values(arrowPoints), o => ([o.x, o.y]))));
+        arrowPoints = this.getArrowPints(this.srcNodePos, angle, -1);
         this.arrow.drawPolygon(_.flatMap(_.map(
-          _.values(arrowPoints3), o => ([o.x, o.y]))));
-        this.edge.moveTo(arrowPoints2.p3.x, arrowPoints2.p3.y);
-        this.edge.lineTo(arrowPoints3.p3.x, arrowPoints3.p3.y);
+          _.values(arrowPoints), o => ([o.x, o.y]))));
         this.arrow.endFill();
-        this.addChild(this.edge);
         this.addChild(this.arrow);
         break;
       default:
