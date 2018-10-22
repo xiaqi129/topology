@@ -9,7 +9,7 @@ import * as _ from 'lodash';
 import { Edge } from './edge';
 import { Group } from './group';
 import { Node } from './node';
-import { CommonElement } from './common-element';
+// import { CommonElement } from './common-element';
 
 export class GroupEdge extends Edge {
   public startNode: any;
