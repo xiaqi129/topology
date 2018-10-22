@@ -39,7 +39,7 @@ _.each(groupNodes, (node) => {
   group.addChildNodes(node);
 });
 group.events('click', (edges: any) => {
-  console.log(`${edges.length} link[s] referenced.`);
+  alert(`${edges.length} link[s] referenced.`);
 });
 // group.setExpaned(false);
 network.syncView();
