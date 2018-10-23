@@ -17,8 +17,6 @@ export class Edge extends CommonElement {
   public endNode: any;
   public edge: PIXI.Graphics;
   public arrow: PIXI.Graphics;
-  public srcNodePos: any;
-  public endNodePos: any;
 
   constructor(startNode: Node | Group, endNode: Node | Group) {
     super();
@@ -198,14 +196,14 @@ export class Edge extends CommonElement {
     return location;
   }
 
-  public getArrowPints(pos: any, angle: number, direction: number) {
+  public getArrowPints(pos: any, angle: number, direction: boolean = true) {
     const arrowAngel = 20;
     const middleLength = 10;
     const angelT = angle + _.divide(arrowAngel * Math.PI, 180);
     const angelB = angle - _.divide(arrowAngel * Math.PI, 180);
     const x = pos.x;
     const y = pos.y;
-    const t = direction;
+    const t = direction ? 1 : -1;
     const style = this.defaultStyle;
     return {
       p1: { x: x + 0, y: y + 0 },
@@ -225,73 +223,59 @@ export class Edge extends CommonElement {
     };
   }
 
-  public draw() {
+  public createArrow(position: any, angle: number, reverse: boolean = true) {
+    const style = this.defaultStyle;
+    this.arrow.lineStyle(style.arrowWidth, style.arrowColor, 1);
+    if (style.fillArrow) this.arrow.beginFill(style.arrowColor);
+    const arrowPoints = this.getArrowPints(position, angle, reverse);
+    this.arrow.drawPolygon(_.flatMap(_.map(
+      _.values(arrowPoints), o => ([o.x, o.y]))));
+    this.arrow.endFill();
+    return this.arrow;
+  }
+
+  public clearEdgeRelatedGraph() {
     this.edge.clear();
     this.arrow.clear();
+  }
+
+  public getDistance(size: any, lineDistance: number) {
+    return (_.max([size.width, size.height]) || 0) * 0.5 + lineDistance;
+  }
+
+  public draw() {
+    this.clearEdgeRelatedGraph();
     const style = this.defaultStyle;
     const lineDistance = style.lineDistance;
-    this.srcNodePos = this.getLineNodePosition(this.startNode);
-    this.endNodePos = this.getLineNodePosition(this.endNode);
+    let srcNodePos = this.getLineNodePosition(this.startNode);
+    let endNodePos = this.getLineNodePosition(this.endNode);
     const srcNodeSize = this.getNodeSize(this.startNode);
     const endNodeSize = this.getNodeSize(this.endNode);
-    const angle = this.getAngle(this.srcNodePos, this.endNodePos);
-    this.srcNodePos = this.getAdjustedLocation(
-      this.srcNodePos,
+    const angle = this.getAngle(srcNodePos, endNodePos);
+    srcNodePos = this.getAdjustedLocation(
+      srcNodePos,
       -1,
       angle,
-      srcNodeSize.width * 0.5 + lineDistance,
+      this.getDistance(srcNodeSize, lineDistance),
     );
-    this.endNodePos = this.getAdjustedLocation(
-      this.endNodePos,
+    endNodePos = this.getAdjustedLocation(
+      endNodePos,
       1,
       angle,
-      endNodeSize.width * 0.5 + lineDistance,
+      this.getDistance(endNodeSize, lineDistance),
     );
     // draw a rectangle line for interaction
     const points = this.calcEdgePoints(
-      this.srcNodePos, this.endNodePos, this.defaultStyle.lineWidth);
+      srcNodePos, endNodePos, this.defaultStyle.lineWidth);
     this.drawEdge(this.edge, points);
     this.addChild(this.edge);
-    let arrowPoints: any;
-    switch (style.arrowType) {
-      case 1:
-        this.arrow.lineStyle(style.arrowWidth, style.arrowColor, 1);
-        arrowPoints = this.getArrowPints(this.endNodePos, angle, 1);
-        if (style.fillArrow) {
-          this.arrow.beginFill(style.arrowColor);
-        }
-        this.arrow.drawPolygon(_.flatMap(_.map(
-          _.values(arrowPoints), o => ([o.x, o.y]))));
-        this.arrow.endFill();
-        this.addChild(this.arrow);
-        break;
-      case 2:
-        this.arrow.lineStyle(style.arrowWidth, style.arrowColor, 1);
-        arrowPoints = this.getArrowPints(this.srcNodePos, angle, -1);
-        if (style.fillArrow) {
-          this.arrow.beginFill(style.arrowColor);
-        }
-        this.arrow.drawPolygon(_.flatMap(_.map(
-          _.values(arrowPoints), o => ([o.x, o.y]))));
-        this.arrow.endFill();
-        this.addChild(this.arrow);
-        break;
-      case 3:
-        this.arrow.lineStyle(style.arrowWidth, style.arrowColor, 1);
-        arrowPoints = this.getArrowPints(this.endNodePos, angle, 1);
-        if (style.fillArrow) {
-          this.arrow.beginFill(style.arrowColor);
-        }
-        this.arrow.drawPolygon(_.flatMap(_.map(
-          _.values(arrowPoints), o => ([o.x, o.y]))));
-        arrowPoints = this.getArrowPints(this.srcNodePos, angle, -1);
-        this.arrow.drawPolygon(_.flatMap(_.map(
-          _.values(arrowPoints), o => ([o.x, o.y]))));
-        this.arrow.endFill();
-        this.addChild(this.arrow);
-        break;
-      default:
-        break;
-    }
+    // create arrows
+    const arrowsDirections = [[true], [false], [true, false]];
+    const directions = arrowsDirections[style.arrowType];
+    _.each(directions, (direction) => {
+      const position = direction ? endNodePos : srcNodePos;
+      this.createArrow(position, angle, direction);
+    });
+    this.addChild(this.arrow);
   }
 }

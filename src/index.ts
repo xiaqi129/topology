@@ -20,7 +20,7 @@ for (let i: number = 0, len: number = num; i < len;) {
   edge.setStyle({
     arrowColor: 0Xc71bd3,
     arrowLength: 15,
-    arrowType: 1,
+    arrowType: 0,
     arrowWidth: 1,
     fillArrow: true,
     lineColor: 0xC7254E,
