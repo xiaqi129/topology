@@ -76,4 +76,10 @@ export abstract class CommonElement extends PIXI.Container {
 
   public abstract draw(): void;
 
+  public addEventListener(...args: any[]) {
+    this.interactive = true;
+    this.buttonMode = true;
+    this.on.apply(this, args);
+  }
+
 }

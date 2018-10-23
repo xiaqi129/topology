@@ -27,6 +27,9 @@ for (let i: number = 0, len: number = num; i < len;) {
     lineDistance: 5,
     lineWidth: 0.8,
   });
+  edge.addEventListener('click', () => {
+    alert('edge clicked!!');
+  });
   network.addElement(edge);
 }
 
@@ -38,7 +41,7 @@ _.each(groupNodes, (node) => {
   node.setStyle({ lineColor: 0xf55d54 });
   group.addChildNodes(node);
 });
-group.events('click', (edges: any) => {
+group.addEventListener('click', (edges: any) => {
   alert(`${edges.length} link[s] referenced.`);
 });
 // group.setExpaned(false);

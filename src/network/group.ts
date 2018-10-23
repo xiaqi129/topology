@@ -247,7 +247,7 @@ export class Group extends CommonElement {
     }
   }
 
-  public events(event: string, callback: any) {
+  public addEventListener(event: string, callback: any) {
     const eventsMap: any = {};
     eventsMap[event] = callback;
     _.extend(this.groupEdgesEvent, eventsMap);
@@ -338,12 +338,12 @@ export class Group extends CommonElement {
         const edgeGraphic = groupEdge.getEdge();
         edgeGraphic.interactive = true;
         edgeGraphic.buttonMode = true;
-        _.each(this.groupEdgesEvent, (call, event) => {
+        _.each(this.groupEdgesEvent, ((call: any, event: any) => {
           edgeGraphic.on(event, () => {
-            call(edges);
+            call(edges, this);
           });
 
-        });
+        }).bind(this));
         this.addChild(groupEdge);
       }
     });
