@@ -15,22 +15,27 @@ const nodes = network.getElements();
 for (let i: number = 0, len: number = num; i < len;) {
   const srcNode = nodes[i];
   const destNode = nodes[i + 1];
-  const edge = network.createEdge(srcNode, destNode);
+  for (let j = 0; j < 2;) {
+    const edge = network.createEdge(srcNode, destNode);
+    edge.setStyle({
+      arrowColor: 0Xc71bd3,
+      arrowLength: 15,
+      arrowType: 0,
+      arrowWidth: 1,
+      fillArrow: true,
+      lineColor: 0xC7254E,
+      lineDistance: 5,
+      lineType: 1,
+      lineWidth: 0.8,
+    });
+    edge.addEventListener('click', () => {
+      alert('edge clicked!!');
+    });
+    network.addElement(edge);
+    j += 1;
+  }
   i += 2;
-  edge.setStyle({
-    arrowColor: 0Xc71bd3,
-    arrowLength: 15,
-    arrowType: 0,
-    arrowWidth: 1,
-    fillArrow: true,
-    lineColor: 0xC7254E,
-    lineDistance: 5,
-    lineWidth: 0.8,
-  });
-  edge.addEventListener('click', () => {
-    alert('edge clicked!!');
-  });
-  network.addElement(edge);
+
 }
 
 const group = network.createGroup();

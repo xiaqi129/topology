@@ -11,12 +11,17 @@ import * as PIXI from 'pixi.js';
 export interface IStyles {
   lineWidth: number;
   lineColor: number;
+  lineType: number;
+  bezierLineDistance: number;
+  bezierLineDegree: number;
   fillColor: any;
   fillOpacity: number;
   arrowColor: number;
   arrowLength: number;
   arrowType: number;
   arrowWidth: number;
+  arrowAngle: number;
+  arrowMiddleLength: number;
   fillArrow: boolean;
   lineDistance: number;
   padding: number;
@@ -35,12 +40,17 @@ export abstract class CommonElement extends PIXI.Container {
   public defaultStyle: IStyles = {
     lineWidth: 1,
     lineColor: 0xEEEEEE,
+    lineType: 0, // 0: line, 1: besizer
     fillColor: 0xDDDDDD,
     fillOpacity: 1,
     arrowColor: 0Xc71bd3,
     arrowLength: 15,
-    arrowType: 1,
+    arrowType: 1, // 0: src  to target, 1: target to src, 2: bidirection
     arrowWidth: 1,
+    arrowAngle: 20,
+    arrowMiddleLength: 10,
+    bezierLineDistance: 10,
+    bezierLineDegree: 50,
     fillArrow: true,
     lineDistance: 5,
     padding: 5,
@@ -52,6 +62,12 @@ export abstract class CommonElement extends PIXI.Container {
 
   constructor() {
     super();
+  }
+
+  public addChildren(elements: PIXI.DisplayObject[]) {
+    _.each(elements, (element: PIXI.DisplayObject) => {
+      this.addChild(element);
+    });
   }
 
   public clearDisplayObjects() {
@@ -67,7 +83,7 @@ export abstract class CommonElement extends PIXI.Container {
     return this.id;
   }
 
-  public setStyle(styles: object, draw: boolean = true) {
+  public setStyle(styles: any, draw: boolean = true) {
     _.extend(this.defaultStyle, styles);
     if (draw) {
       this.draw();

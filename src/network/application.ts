@@ -18,13 +18,14 @@ export class Application extends PIXI.Application {
 
   constructor(domRegex: string = '', options = null) {
     super(options || {
-      antialias: true
-      , autoResize: true
-      , height: 0
-      , powerPreference: 'high-performance'
-      , resolution: 2
-      , transparent: true
-      , width: 0,
+      antialias: true,
+      autoResize: true,
+      height: 0,
+      powerPreference: 'high-performance',
+      resolution: 2,
+      transparent: true,
+      width: 0,
+      forceFXAA: true,
     });
     this.container = new PIXI.Container();
     this.domRegex = domRegex;

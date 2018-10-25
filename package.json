@@ -53,12 +53,13 @@
     "webpack-dev-server": "^3.1.8"
   },
   "dependencies": {
+    "bezier-js": "^2.2.15",
+    "graham-scan-convex-hull": "^0.2.0",
     "lodash": "^4.17.10",
     "pixi.js": "^4.8.2",
     "polygon": "^1.0.2",
+    "polygon-offset": "^0.3.1",
     "pre-commit": "^1.2.2",
-    "rxjs": "^6.3.2",
-    "graham-scan-convex-hull": "^0.2.0",
-    "polygon-offset": "^0.3.1"
+    "rxjs": "^6.3.2"
   }
 }

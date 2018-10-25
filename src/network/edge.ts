@@ -5,7 +5,9 @@
  * Author: gsp-dalian-ued@cisco.com
  */
 
+import Bezier from 'bezier-js/lib/bezier';
 import * as _ from 'lodash';
+import { DisplayObject } from 'pixi.js';
 import { CommonElement, IStyles } from './common-element';
 import { Group } from './group';
 import { Node } from './node';
@@ -17,6 +19,8 @@ export class Edge extends CommonElement {
   public endNode: any;
   public edge: PIXI.Graphics;
   public arrow: PIXI.Graphics;
+  public bundleExplosion: boolean = false;
+  private brotherEdges: Edge[] = [];
 
   constructor(startNode: Node | Group, endNode: Node | Group) {
     super();
@@ -126,6 +130,54 @@ export class Edge extends CommonElement {
     graph.endFill();
   }
 
+  public edgeLength(sx: number, sy: number, ex: number, ey: number) {
+    return Math.pow(Math.pow(sx - ex, 2) + Math.pow(sy - ey, 2), 0.5);
+  }
+
+  public getAngle(
+    srcNodeLocation?: { [key: string]: number }, endNodeLocation?: { [key: string]: number }) {
+    const srcNodePos = srcNodeLocation || this.getLineNodePosition(this.startNode);
+    const endNodePos = endNodeLocation || this.getLineNodePosition(this.endNode);
+    return Math.atan2(srcNodePos.x - endNodePos.x, srcNodePos.y - endNodePos.y);
+  }
+
+  public getControlPoint(
+    srcNodePos: { [key: string]: number },
+    endNodePos: { [key: string]: number },
+    toLineEndDistance: number = - 0.3,
+  ) {
+    const sx: number = srcNodePos.x;
+    const sy: number = srcNodePos.y;
+    const ex: number = endNodePos.x;
+    const ey: number = endNodePos.y;
+    const linkAngle = Math.atan2(sx - ex, sy - ey);
+    const len = this.edgeLength(sx, sy, ex, ey) * 0.3;
+    const sxc = sx - len * Math.sin(linkAngle);
+    const syc = sy - len * Math.cos(linkAngle);
+    const exc = ex + len * Math.sin(linkAngle);
+    const eyc = ey + len * Math.cos(linkAngle);
+    return [sxc, syc, exc, eyc];
+  }
+
+  public drawBezierCurve(
+    graph: any, points: any, angle: number, curveDistance: number = 10, curveDegree: number = 50) {
+    const style = this.defaultStyle;
+    graph.lineStyle(style.lineWidth, style.lineColor);
+    const srcPointX = points.shift() + curveDistance * Math.cos(angle);
+    const srcPointY = points.shift() - curveDistance * Math.sin(angle);
+    graph.moveTo(srcPointX, srcPointY);
+    points.reverse();
+    points[1] = points[1] + curveDistance * Math.cos(angle);
+    points[0] = points[0] - curveDistance * Math.sin(angle);
+    points.reverse();
+    points[0] = points[0] + curveDegree * Math.cos(angle);
+    points[1] = points[1] - curveDegree * Math.sin(angle);
+    points[2] = points[2] + curveDegree * Math.cos(angle);
+    points[3] = points[3] - curveDegree * Math.sin(angle);
+    graph.bezierCurveTo.apply(graph, points);
+    return [srcPointX, srcPointY].concat(points);
+  }
+
   public getSrcNode() {
     return this.startNode;
   }
@@ -159,10 +211,9 @@ export class Edge extends CommonElement {
   /**
    * set arrow type
    * @type
-   * :0 from --- to
-   * :1 from --> to
-   * :2 from <-- to
-   * :3 from <-> to
+   * :0 from --> to
+   * :1 from <-- to
+   * :2 from <-> to
    */
   public setArrowStyle(type: number) {
     this.defaultStyle.arrowType = type;
@@ -184,10 +235,6 @@ export class Edge extends CommonElement {
     return nodePos;
   }
 
-  public getAngle(startNode: any, endNode: any) {
-    return Math.atan2(startNode.x - endNode.x, startNode.y - endNode.y);
-  }
-
   public getAdjustedLocation(node: any, n: number, angel: number, distanceRound: number) {
     const location = {
       x: node.x + n * distanceRound * Math.sin(angel),
@@ -197,8 +244,8 @@ export class Edge extends CommonElement {
   }
 
   public getArrowPints(pos: any, angle: number, direction: boolean = true) {
-    const arrowAngel = 20;
-    const middleLength = 10;
+    const arrowAngel = this.defaultStyle.arrowAngle;
+    const middleLength = this.defaultStyle.arrowMiddleLength;
     const angelT = angle + _.divide(arrowAngel * Math.PI, 180);
     const angelB = angle - _.divide(arrowAngel * Math.PI, 180);
     const x = pos.x;
@@ -243,14 +290,203 @@ export class Edge extends CommonElement {
     return (_.max([size.width, size.height]) || 0) * 0.5 + lineDistance;
   }
 
+  public createLinkEdge(srcNodePos: any, endNodePos: any, style: any) {
+    const points = this.calcEdgePoints(
+      srcNodePos, endNodePos, style.lineWidth);
+    this.drawEdge(this.edge, points);
+    return this.edge;
+  }
+
+  public createLinkArrows(
+    srcNodePos: any, endNodePos: any, angle: any, style: any) {
+    const arrowsDirections = [[true], [false], [true, false]];
+    const directions = arrowsDirections[style.arrowType];
+    _.each(directions, (direction) => {
+      const position = direction ? endNodePos : srcNodePos;
+      this.createArrow(position, angle, direction);
+    });
+    return this.arrow;
+  }
+
+  public getBrotherEdges() {
+    return this.brotherEdges;
+  }
+
+  public removeBrotherEdge(edge: Edge) {
+    const edges = _.remove(this.brotherEdges, (brotherEdge: Edge) => {
+      return brotherEdge === edge;
+    });
+    if (edges) {
+      this.draw();
+    }
+  }
+
+  public edgeNodesSortUIDStr(edge?: Edge) {
+    const edgeTmp = edge ? edge : this;
+    return [edgeTmp.getSrcNode().getUID(), edgeTmp.getTargetNode().getUID()].sort().join();
+  }
+
+  public addEdgesToBundle(edge: Edge) {
+    if (
+      edge instanceof Edge &&
+      edge.getBrotherEdges.length === 0
+      ) {
+      const edgeNodesIDStr = this.edgeNodesSortUIDStr(edge);
+      const currentEdgeNodesIDStr = this.edgeNodesSortUIDStr(this);
+      if (edgeNodesIDStr === currentEdgeNodesIDStr) {
+        this.brotherEdges.push(edge);
+      } else {
+        throw Error('Brother edges added, must drawn between same nodes.');
+      }
+    } else {
+      throw Error(
+        'The element must be intance of Edge and should be without other brother edges.');
+    }
+
+  }
+
+  public getChildEdges() {
+    const children = this.brotherEdges;
+    // _.filter()
+  }
+
+  public createBezierEdge(
+    srcNodePos: any,
+    endNodePos: any,
+    controlPoints: any,
+    style: any,
+  ) {
+    const curveDistance = style.bezierLineDistance;
+    const curveDegree = style.bezierLineDegree;
+    const angle = this.getAngle();
+    // const bezier = new Bezier(
+    //   srcNodePos.x, srcNodePos.y, srcNodePos.x, srcNodePos.y, endNodePos.x, endNodePos.y);
+    this.edge.lineStyle(style.lineWidth, style.lineColor);
+    const curveEnds = this.drawBezierCurve(
+      this.edge,
+      _.flatten(
+        [
+          [
+            srcNodePos.x,
+            srcNodePos.y,
+          ],
+          controlPoints,
+          [
+            endNodePos.x,
+            endNodePos.y,
+          ],
+        ],
+      ),
+      angle,
+      curveDistance,
+      curveDegree,
+    );
+    return [this.edge, curveEnds];
+  }
+
+  public bezierTangent(a: number, b: number, c: number, d: number, t: number) {
+    return 3 * t * t * (-a + 3 * b - 3 * c + d) + 6 * t * (a - 2 * b + c) + 3 * (-a + b);
+  }
+
+  public getTangentAngle(start: any, cps: any, end: any, t: any) {
+    const tx = this.bezierTangent(start.x, cps[0], cps[2], end.x, t);
+    const ty = this.bezierTangent(start.y, cps[1], cps[3], end.y, t);
+    return Math.atan2(tx, ty) + Math.PI;
+  }
+
+  public bezierArrowPoints(
+    pos: any,
+    angleLine: any,
+    endArrow: any,
+    arrowAngel: any,
+    arrowLength: any,
+    middleLength: any,
+  ) {
+    const angelT = angleLine + arrowAngel * Math.PI / 180;
+    const angelB = angleLine - arrowAngel * Math.PI / 180;
+    const x = pos.x;
+    const y = pos.y;
+    const t = endArrow ? 1 : -1;
+    return {
+      p1: { x, y },
+      p2: {
+        x: x + arrowLength * Math.sin(angelT) * t,
+        y: y + arrowLength * Math.cos(angelT) * t,
+      },
+      p3: {
+        x: x + middleLength * Math.sin(angleLine) * t,
+        y: y + middleLength * Math.cos(angleLine) * t,
+      },
+      p4: {
+        x: x + arrowLength * Math.sin(angelB) * t,
+        y: y + arrowLength * Math.cos(angelB) * t,
+      },
+    };
+  }
+
+  public createBezierArrows(
+    srcNodePos: any,
+    endNodePos: any,
+    controlPoints: any,
+    style: any,
+  ) {
+    this.arrow.lineStyle(style.arrowWidth, style.arrowColor, 1);
+    if (style.fillArrow) this.arrow.beginFill(style.arrowColor);
+    const tangenAngle =
+      this.getTangentAngle(srcNodePos, controlPoints, endNodePos, 1);
+    const arrowsPoints = this.bezierArrowPoints(
+      endNodePos,
+      tangenAngle,
+      1,
+      this.defaultStyle.arrowAngle,
+      this.defaultStyle.arrowLength,
+      this.defaultStyle.arrowMiddleLength,
+    );
+    this.arrow.drawPolygon(_.flatMap(_.map(_.values(arrowsPoints), o => ([o.x, o.y]))));
+    return this.arrow;
+  }
+
+  public drawLineEdge(
+    srcNodePos: { [key: string]: number },
+    endNodePos: { [key: string]: number },
+    angle: number,
+    style: IStyles) {
+    const edge = this.createLinkEdge(srcNodePos, endNodePos, style);
+    const arrow = this.createLinkArrows(srcNodePos, endNodePos, angle, style);
+    return [edge, arrow];
+  }
+
+  public drawBezierEdge(
+    srcNodePos: { [key: string]: number },
+    endNodePos: { [key: string]: number },
+    style: IStyles,
+  ) {
+    const controlPoints = this.getControlPoint(srcNodePos, endNodePos);
+    const edgeRelated: any =
+      this.createBezierEdge(
+        srcNodePos,
+        endNodePos,
+        controlPoints,
+        style,
+      );
+    const curveEnds = edgeRelated[1];
+    const arrow = this.createBezierArrows(
+      { x: curveEnds[0], y: curveEnds[1] },
+      { x: curveEnds[curveEnds.length - 2], y: curveEnds[curveEnds.length - 1] },
+      [curveEnds[2], curveEnds[3], curveEnds[4], curveEnds[5]],
+      style,
+    );
+    return [edgeRelated[0], arrow];
+  }
+
   public draw() {
     this.clearEdgeRelatedGraph();
     const style = this.defaultStyle;
     const lineDistance = style.lineDistance;
-    let srcNodePos = this.getLineNodePosition(this.startNode);
-    let endNodePos = this.getLineNodePosition(this.endNode);
     const srcNodeSize = this.getNodeSize(this.startNode);
     const endNodeSize = this.getNodeSize(this.endNode);
+    let srcNodePos = this.getLineNodePosition(this.startNode);
+    let endNodePos = this.getLineNodePosition(this.endNode);
     const angle = this.getAngle(srcNodePos, endNodePos);
     srcNodePos = this.getAdjustedLocation(
       srcNodePos,
@@ -264,18 +500,12 @@ export class Edge extends CommonElement {
       angle,
       this.getDistance(endNodeSize, lineDistance),
     );
-    // draw a rectangle line for interaction
-    const points = this.calcEdgePoints(
-      srcNodePos, endNodePos, this.defaultStyle.lineWidth);
-    this.drawEdge(this.edge, points);
-    this.addChild(this.edge);
-    // create arrows
-    const arrowsDirections = [[true], [false], [true, false]];
-    const directions = arrowsDirections[style.arrowType];
-    _.each(directions, (direction) => {
-      const position = direction ? endNodePos : srcNodePos;
-      this.createArrow(position, angle, direction);
-    });
-    this.addChild(this.arrow);
+    let elements: DisplayObject[] = [];
+    if (style.lineType === 0) {
+      elements = this.drawLineEdge(srcNodePos, endNodePos, angle, this.defaultStyle);
+    } else {
+      elements = this.drawBezierEdge(srcNodePos, endNodePos, this.defaultStyle);
+    }
+    this.addChildren(elements);
   }
 }

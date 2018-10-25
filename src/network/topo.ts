@@ -16,7 +16,9 @@ export interface ITopo {
 
   getElements(): PIXI.Container[];
 
-  addElements(node: PIXI.Container): void;
+  addElement(node: Node | Group | Edge): void;
+
+  addElements(node: Node[] | Group[] | Edge[]): void;
 
   createNode(): Node;
 
@@ -34,12 +36,61 @@ export class Topo implements ITopo {
 
   private elements: any [] = [];
 
+  private edgesGroupByNodes: {[key: string]: Edge[]} = {};
+
   constructor(loader: PIXI.loaders.Loader) {
     this.loader = loader;
   }
 
-  public addElements(element: Node | Group | Edge) {
-    this.elements.push(element);
+  public addElement(element: Node | Group | Edge) {
+    this.addElements([element]);
+  }
+
+  public addBrotherEdge(edge: Edge) {
+    const edgesFound: Edge[] = _.get(this.edgesGroupByNodes, edge.edgeNodesSortUIDStr());
+    if (edgesFound) {
+      const edgeFound: Edge | undefined = edgesFound.shift();
+      if (edgeFound) {
+        edgeFound.addEdgesToBundle(edge);
+      }
+      return true;
+    }
+    return false;
+  }
+
+  public addElements(elements: CommonElement[]) {
+    _.each(elements, (element) => {
+      if (element instanceof Edge) {
+        if (!this.addBrotherEdge(element)) {
+          this.elements.push(element);
+        }
+        this.refreshEdgesMaps();
+      } else {
+        this.elements.push(element);
+      }
+    });
+  }
+
+  public getSortNodesUID (edge: Edge) {
+    const nodes = [edge.getSrcNode(), edge.getTargetNode()];
+    return _.join([nodes[0].getUID(), nodes[1].getUID()].sort());
+  }
+
+  public refreshEdgesMaps() {
+    const edges: Edge[] = _.filter(this.elements, element => element instanceof Edge);
+    const edgesGroups = _.groupBy(edges, (edge) => {
+      return this.getSortNodesUID(edge);
+    });
+    _.each(edgesGroups, (edgesList: Edge[]) => {
+      const uid: string = this.getSortNodesUID(edgesList[0]);
+      _.extend(this.edgesGroupByNodes, {
+        [uid]: edgesList,
+      });
+    });
+  }
+
+  public getEdgesGroup() {
+    return this.edgesGroupByNodes;
   }
 
   public getElements() {

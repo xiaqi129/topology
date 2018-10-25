@@ -57,15 +57,23 @@ export class Network {
   }
 
   public addElement(element: Node | Group | Edge) {
-    this.topo.addElements(element);
+    this.topo.addElement(element);
+  }
+
+  public addElements(elements: Node[] | Group[] | Edge []) {
+    this.topo.addElements(elements);
   }
 
   public removeElements(element: PIXI.Container) {
-    element.destroy();
     const elements = this.topo.getElements();
-    _.remove(elements, (elem) => {
-      return element === elem;
-    });
+    _.remove(elements, elem => element === elem);
+    if (element instanceof Edge) {
+      const edgesGroupByNodesUID = this.topo.getEdgesGroup();
+      const uidStr = element.edgeNodesSortUIDStr();
+      const edge = _.get(edgesGroupByNodesUID, uidStr);
+      edge[0].removeBrotherEdge(element);
+    }
+    element.destroy();
   }
 
   public syncView() {
