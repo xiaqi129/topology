@@ -8,6 +8,7 @@
 import * as _ from 'lodash';
 import { Application } from './application';
 import { Edge } from './edge';
+import { EdgeBundle } from './edge-bundle';
 import { Group } from './group';
 import { Node } from './node';
 import { ITopo } from './topo';
@@ -47,35 +48,9 @@ export class Drawer {
   public syncView() {
     this.whiteBoard.clearContainer();
     const elements = this.topo.getElements();
-    // this.sortElements(elements);
-    elements.sort((a, b) => {
-      if (a instanceof Node) {
-        if (b instanceof Group) {
-          return 1;
-        }
-        if (b instanceof Edge) {
-          return 1;
-        }
-      }
-
-      if (a instanceof Group) {
-        if (b instanceof Node) {
-          return -1;
-        }
-        if (b instanceof Edge) {
-          return -1;
-        }
-      }
-
-      if (a instanceof Edge) {
-        if (b instanceof Node) {
-          return -1;
-        }
-        if (b instanceof Group) {
-          return 1;
-        }
-      }
-      return 0;
+    const objOrder = [Group, Edge, EdgeBundle, Node];
+    elements.sort((a: any, b: any) => {
+      return _.indexOf(objOrder, a.constructor) - _.indexOf(objOrder, b.constructor);
     });
     this.whiteBoard.addElements(elements);
   }

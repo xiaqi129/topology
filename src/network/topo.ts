@@ -9,6 +9,7 @@ import * as _ from 'lodash';
 import * as PIXI from 'pixi.js';
 import { CommonElement } from './common-element';
 import { Edge } from './edge';
+import { EdgeBundle } from './edge-bundle';
 import { Group } from './group';
 import { Node } from './node';
 
@@ -58,10 +59,54 @@ export class Topo implements ITopo {
     return false;
   }
 
+  public findBrotherEdge(edge: Edge) {
+    const edgesFound: Edge[] = _.get(this.edgesGroupByNodes, edge.edgeNodesSortUIDStr(), []);
+    return edgesFound;
+  }
+
+  public findEdgeBundleByID(bundleID: string) {
+    return _.find(this.elements, (element) => {
+      if (element instanceof EdgeBundle) {
+        if (bundleID === element.getBundleID()) {
+          return true;
+        }
+      }
+      return false;
+    });
+  }
+
+  // public addElements(elements: CommonElement[]) {
+  //   _.each(elements, (element) => {
+  //     if (element instanceof Edge) {
+  //       if (!this.addBrotherEdge(element)) {
+  //         this.elements.push(element);
+  //       }
+  //       this.refreshEdgesMaps();
+  //     } else {
+  //       this.elements.push(element);
+  //     }
+  //   });
+  // }
+
   public addElements(elements: CommonElement[]) {
-    _.each(elements, (element) => {
+    _.each(elements, (element, i) => {
       if (element instanceof Edge) {
-        if (!this.addBrotherEdge(element)) {
+        let edgeBundle: EdgeBundle;
+        const edges = this.findBrotherEdge(element);
+        if (edges.length > 0) {
+          edgeBundle = new EdgeBundle(element);
+          edgeBundle.addEdges(edges);
+          const rmEdges = _.remove(this.elements, (elem) => {
+            return _.indexOf(edges, elem) > -1;
+          });
+          this.elements.push(edgeBundle);
+        } else {
+          edgeBundle = this.findEdgeBundleByID(element.edgeNodesSortUIDStr());
+          if (edgeBundle) {
+            edgeBundle.addEdge(element);
+          }
+        }
+        if (!(edgeBundle instanceof EdgeBundle)) {
           this.elements.push(element);
         }
         this.refreshEdgesMaps();
@@ -76,7 +121,16 @@ export class Topo implements ITopo {
     return _.join([nodes[0].getUID(), nodes[1].getUID()].sort());
   }
 
+  public clearObject(obj: {[key: string]: any}) {
+    const keys = _.keys(obj);
+    _.each(keys, (key: string) => {
+      delete obj[key];
+    });
+    return obj;
+  }
+
   public refreshEdgesMaps() {
+    this.clearObject(this.edgesGroupByNodes);
     const edges: Edge[] = _.filter(this.elements, element => element instanceof Edge);
     const edgesGroups = _.groupBy(edges, (edge) => {
       return this.getSortNodesUID(edge);

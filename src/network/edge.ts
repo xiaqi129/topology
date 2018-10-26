@@ -22,6 +22,7 @@ export class Edge extends CommonElement {
   public bundleExplosion: boolean = false;
   private brotherEdges: Edge[] = [];
   private brotherEdgeName: string = 'BROTHER_EDGE';
+  private bundleStyle: number = 1; // 0: link style, 1: bezier style
 
   constructor(startNode: Node | Group, endNode: Node | Group) {
     super();
@@ -34,6 +35,16 @@ export class Edge extends CommonElement {
 
   public getEdge() {
     return this.edge;
+  }
+
+  public setBundleStyle(styleNumber: number) {
+    if (this.parent instanceof Edge) {
+      this.parent.bundleStyle = styleNumber;
+      this.parent.draw();
+    } else {
+      this.bundleStyle = styleNumber;
+      this.draw();
+    }
   }
 
   public getLineNodePosition(node: Node | Group) {
@@ -337,7 +348,6 @@ export class Edge extends CommonElement {
       const currentEdgeNodesIDStr = this.edgeNodesSortUIDStr(this);
       if (edgeNodesIDStr === currentEdgeNodesIDStr) {
         this.brotherEdges.push(edge);
-        this.setBundleEdgesPosition();
         this.draw();
       } else {
         throw Error('Brother edges added, must drawn between same nodes.');
@@ -346,27 +356,6 @@ export class Edge extends CommonElement {
       throw Error(
         'The element must be intance of Edge and should be without other brother edges.');
     }
-  }
-
-  public setBundleEdgesPosition() {
-    const edges = this.brotherEdges;
-    const distance = 5;
-    const degree = 20;
-    const step = 8;
-    const values: number[][] = [];
-    for (let i = 0, len = edges.length; i < len;) {
-      _.each([1, -1], (j) => {
-        values.push([(distance + i * step) * j, (degree + i * step) * j]);
-      });
-      i += 1;
-    }
-    values.shift();
-    _.each(edges, (edge, i) => {
-      edge.setStyle({
-        bezierLineDistance: values[i][0],
-        bezierLineDegree: values[i][1],
-      });
-    });
   }
 
   public getChildEdges() {
@@ -380,15 +369,9 @@ export class Edge extends CommonElement {
     controlPoints: any,
     style: any,
   ) {
-    let curveDistance = style.bezierLineDistance;
-    let curveDegree = style.bezierLineDegree;
+    const curveDistance = style.bezierLineDistance;
+    const curveDegree = style.bezierLineDegree;
     const angle = this.getAngle();
-    // const bezier = new Bezier(
-    //   srcNodePos.x, srcNodePos.y, srcNodePos.x, srcNodePos.y, endNodePos.x, endNodePos.y);
-    if (!this.parent && this.brotherEdges.length === 0) {
-      curveDistance = 0;
-      curveDegree = 0;
-    }
     this.edge.lineStyle(style.lineWidth, style.lineColor);
     const curveEnds = this.drawBezierCurve(
       this.edge,
@@ -484,20 +467,11 @@ export class Edge extends CommonElement {
     return [edge, arrow];
   }
 
-  public drawBrotherBezierEdges(edges: Edge[]) {
-    _.each(edges, (edge) => {
-      edge.name = this.brotherEdgeName;
-      this.addChild(edge);
-      edge.draw();
-    });
-  }
-
   public drawBezierEdge(
     srcNodePos: { [key: string]: number },
     endNodePos: { [key: string]: number },
     style: IStyles,
   ) {
-    this.drawBrotherBezierEdges(this.brotherEdges);
     const controlPoints = this.getControlPoint(srcNodePos, endNodePos);
     const edgeRelated: any =
       this.createBezierEdge(

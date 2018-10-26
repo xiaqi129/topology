@@ -15,7 +15,7 @@ const nodes = network.getElements();
 for (let i: number = 0, len: number = num; i < len;) {
   const srcNode = nodes[i];
   const destNode = nodes[i + 1];
-  for (let j = 0; j < 4;) {
+  for (let j = 0; j < 2;) {
     const edge = network.createEdge(srcNode, destNode);
     edge.setStyle({
       arrowColor: 0Xc71bd3,
@@ -32,6 +32,7 @@ for (let i: number = 0, len: number = num; i < len;) {
       alert('edge clicked!!');
     });
     network.addElement(edge);
+    // edge.setBundleStyle(1);
     j += 1;
   }
   i += 2;
@@ -45,6 +46,9 @@ const groupNodes = _.slice(_.shuffle(_.dropRight(nodes, (num / 2) + 1)), 0, 3);
 _.each(groupNodes, (node) => {
   node.setStyle({ lineColor: 0xf55d54 });
   group.addChildNodes(node);
+  group.setStyle({
+    fillOpacity: 1,
+  });
 });
 group.addEventListener('click', (edges: any) => {
   alert(`${edges.length} link[s] referenced.`);
