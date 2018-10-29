@@ -59,8 +59,12 @@ export class Topo implements ITopo {
     return false;
   }
 
+  // find brother edge not in edge bundle
   public findBrotherEdge(edge: Edge) {
     const edgesFound: Edge[] = _.get(this.edgesGroupByNodes, edge.edgeNodesSortUIDStr(), []);
+    _.remove(edgesFound, (edgeFound: Edge) => {
+      return edgeFound.parent && (edgeFound.parent instanceof EdgeBundle);
+    });
     return edgesFound;
   }
 
@@ -74,19 +78,6 @@ export class Topo implements ITopo {
       return false;
     });
   }
-
-  // public addElements(elements: CommonElement[]) {
-  //   _.each(elements, (element) => {
-  //     if (element instanceof Edge) {
-  //       if (!this.addBrotherEdge(element)) {
-  //         this.elements.push(element);
-  //       }
-  //       this.refreshEdgesMaps();
-  //     } else {
-  //       this.elements.push(element);
-  //     }
-  //   });
-  // }
 
   public addElements(elements: CommonElement[]) {
     _.each(elements, (element, i) => {
@@ -131,7 +122,19 @@ export class Topo implements ITopo {
 
   public refreshEdgesMaps() {
     this.clearObject(this.edgesGroupByNodes);
-    const edges: Edge[] = _.filter(this.elements, element => element instanceof Edge);
+    let edges: Edge[] = [];
+    _.each(this.elements, (element) => {
+      if (element instanceof Edge) {
+        edges.push(element);
+      }
+      if (element instanceof EdgeBundle) {
+        const childEges = element.children as Edge[];
+        edges = edges.concat(childEges);
+
+      }
+    });
+    // const edges: Edge[] = _.filter(this.elements, element => element instanceof Edge);
+    // const bundleEdges: EdgeBundle[] = _.
     const edgesGroups = _.groupBy(edges, (edge) => {
       return this.getSortNodesUID(edge);
     });

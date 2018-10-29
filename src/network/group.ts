@@ -16,6 +16,7 @@ import { GroupEdge } from './edge-conn-group';
 import ConvexHullGrahamScan from './lib/convex-hull';
 // import Point from './lib/point';
 import { Node } from './node';
+import { EdgeBundle } from './edge-bundle';
 
 interface IEvent {
   [event: string]: (edges: Edge[]) => {};
@@ -365,8 +366,15 @@ export class Group extends CommonElement {
   }
 
   public getChildEdges() {
-    const edges = _.filter(this.elements, (element: Edge | CommonElement) => {
-      return element instanceof Edge;
+    let edges: Edge[] = [];
+    _.each(this.elements, (element: CommonElement) => {
+      if (element instanceof Edge) {
+        edges.push(element);
+      }
+      if (element instanceof EdgeBundle) {
+        const childrenEdges = element.children as Edge[];
+        edges = edges.concat(childrenEdges);
+      }
     });
     return edges;
   }

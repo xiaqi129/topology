@@ -170,13 +170,24 @@ export class Edge extends CommonElement {
     return [sxc, syc, exc, eyc];
   }
 
+  public getParallelPoint(edge: { [key: string]: number }, lineSpace: number, angle: number) {
+    const x = _.get(edge, 'x', 0);
+    const y = _.get(edge, 'y', 0);
+    return {
+      x: x + lineSpace * Math.cos(angle),
+      y: y - lineSpace * Math.sin(angle),
+    };
+  }
+
   public drawBezierCurve(
     graph: any, points: any, angle: number, curveDistance: number = 10, curveDegree: number = 50) {
     const style = this.defaultStyle;
     graph.lineStyle(style.lineWidth, style.lineColor);
-    const srcPointX = points.shift() + curveDistance * Math.cos(angle);
-    const srcPointY = points.shift() - curveDistance * Math.sin(angle);
-    graph.moveTo(srcPointX, srcPointY);
+    // const srcPointX = points.shift() + curveDistance * Math.cos(angle);
+    // const srcPointY = points.shift() - curveDistance * Math.sin(angle);
+    const parallelPoint = this.getParallelPoint(
+      { x: points.shift(), y: points.shift() }, curveDistance, angle);
+    graph.moveTo(parallelPoint.x, parallelPoint.y);
     points.reverse();
     points[1] = points[1] + curveDistance * Math.cos(angle);
     points[0] = points[0] - curveDistance * Math.sin(angle);
@@ -186,7 +197,7 @@ export class Edge extends CommonElement {
     points[2] = points[2] + curveDegree * Math.cos(angle);
     points[3] = points[3] - curveDegree * Math.sin(angle);
     graph.bezierCurveTo.apply(graph, points);
-    return [srcPointX, srcPointY].concat(points);
+    return [parallelPoint.x, parallelPoint.y].concat(points);
   }
 
   public getSrcNode() {
@@ -462,8 +473,12 @@ export class Edge extends CommonElement {
     endNodePos: { [key: string]: number },
     angle: number,
     style: IStyles) {
-    const edge = this.createLinkEdge(srcNodePos, endNodePos, style);
-    const arrow = this.createLinkArrows(srcNodePos, endNodePos, angle, style);
+    const srcNodePosAdjusted =
+      this.getParallelPoint(srcNodePos, this.defaultStyle.bezierLineDistance, this.getAngle());
+    const endNodePosAdjusted =
+      this.getParallelPoint(endNodePos, this.defaultStyle.bezierLineDistance, this.getAngle());
+    const edge = this.createLinkEdge(srcNodePosAdjusted, endNodePosAdjusted, style);
+    const arrow = this.createLinkArrows(srcNodePosAdjusted, endNodePosAdjusted, angle, style);
     return [edge, arrow];
   }
 
