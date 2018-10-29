@@ -12,11 +12,11 @@ import polygon from 'polygon';
 import Offset from 'polygon-offset/dist/offset';
 import { CommonElement, IPosition } from './common-element';
 import { Edge } from './edge';
+import { EdgeBundle } from './edge-bundle';
 import { GroupEdge } from './edge-conn-group';
 import ConvexHullGrahamScan from './lib/convex-hull';
 // import Point from './lib/point';
 import { Node } from './node';
-import { EdgeBundle } from './edge-bundle';
 
 interface IEvent {
   [event: string]: (edges: Edge[]) => {};
