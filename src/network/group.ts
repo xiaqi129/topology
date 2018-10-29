@@ -315,32 +315,57 @@ export class Group extends CommonElement {
     return _.remove(elements);
   }
 
+  public setBundleEdgesPosition(edges: Edge[]) {
+    // const edges = this.children;
+    const distance = 5;
+    const degree = 20;
+    const step = 8;
+    const values: number[][] = [];
+    for (let i = 0, len = edges.length; i < len;) {
+      _.each([1, -1], (j) => {
+        values.push([(distance + i * step) * j, (degree + i * step) * j]);
+      });
+      i += 1;
+    }
+    _.each(this.children, (edge, i) => {
+      if (edge instanceof Edge) {
+        edge.setStyle({
+          bezierLineDistance: values[i][0],
+          bezierLineDegree: values[i][1],
+        });
+      }
+    });
+  }
+
   public drawEdges() {
     const edgesListGroup = this.toggleShowEdges(this.isExpanded);
     const nodes = _.filter(this.children, (item) => {
       return item instanceof Node;
     });
     _.each(edgesListGroup, (edges: Edge[]) => {
-      const edge = edges[0];
-      const srcNode = edge.getSrcNode();
-      const targetNode = edge.getTargetNode();
-      const srcNodeInGroup = _.includes(nodes, srcNode);
-      const targetNodeInGroup = _.includes(nodes, targetNode);
-      const groupEdgeParams =
-        (srcNodeInGroup && !targetNodeInGroup) ? [this, targetNode, edges] : [srcNode, this, edges];
-      const groupEdge: GroupEdge = new GroupEdge(
-        groupEdgeParams[0], groupEdgeParams[1], groupEdgeParams[2]);
-      groupEdge.setStyle(edge.getStyle());
-      this.groupEdges.push(groupEdge);
-      this.addChild(groupEdge);
-      const edgeGraphic = groupEdge.getEdge();
-      edgeGraphic.interactive = true;
-      edgeGraphic.buttonMode = true;
-      _.each(this.groupEdgesEvent, ((call: any, event: any) => {
-        edgeGraphic.on(event, () => {
-          call(edges, this);
-        });
-      }).bind(this));
+      _.each(edges, (edge: Edge) => {
+        // const edge = edges[0];
+        const srcNode = edge.getSrcNode();
+        const targetNode = edge.getTargetNode();
+        const srcNodeInGroup = _.includes(nodes, srcNode);
+        const targetNodeInGroup = _.includes(nodes, targetNode);
+        const groupEdgeParams =
+          (srcNodeInGroup && !targetNodeInGroup) ?
+            [this, targetNode, edges] : [srcNode, this, edges];
+        const groupEdge: GroupEdge = new GroupEdge(
+          groupEdgeParams[0], groupEdgeParams[1], groupEdgeParams[2]);
+        groupEdge.setStyle(edge.getStyle());
+        this.groupEdges.push(groupEdge);
+        this.addChild(groupEdge);
+        const edgeGraphic = groupEdge.getEdge();
+        edgeGraphic.interactive = true;
+        edgeGraphic.buttonMode = true;
+        _.each(this.groupEdgesEvent, ((call: any, event: any) => {
+          edgeGraphic.on(event, () => {
+            call(edges, this);
+          });
+        }).bind(this));
+      });
     });
   }
 
