@@ -37,7 +37,7 @@ export class Application extends PIXI.Application {
   public setup() {
     this.initApplication();
     this.fitWrapperSize();
-    this.dragContainer();
+    // this.dragContainer();
   }
 
   public initApplication() {
