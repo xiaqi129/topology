@@ -15,6 +15,7 @@ export class Application extends PIXI.Application {
   private domRegex: string = '';
   private viewWrapper: HTMLDivElement | null = null;
   private container: PIXI.Container;
+  private dragging: boolean;
 
   constructor(domRegex: string = '', options = null) {
     super(options || {
@@ -29,12 +30,14 @@ export class Application extends PIXI.Application {
     });
     this.container = new PIXI.Container();
     this.domRegex = domRegex;
+    this.dragging = false;
     this.setup();
   }
 
   public setup() {
     this.initApplication();
     this.fitWrapperSize();
+    this.dragContainer();
   }
 
   public initApplication() {
@@ -88,5 +91,24 @@ export class Application extends PIXI.Application {
         this.container.addChild(element);
       }
     });
+  }
+
+  public dragContainer() {
+    const canvas = document.querySelector('canvas');
+    const body = document.querySelector('body');
+    if (canvas && body != null) {
+      canvas.addEventListener('mousedown', (event) => {
+        this.dragging = true;
+      });
+      body.addEventListener('mouseup', () => {
+        this.dragging = false;
+      });
+      canvas.addEventListener('mousemove', (e) => {
+        if (this.dragging) {
+          this.container.position.x += e.movementX;
+          this.container.position.y += e.movementY;
+        }
+      });
+    }
   }
 }

@@ -187,6 +187,7 @@ export class Edge extends CommonElement {
     // const srcPointY = points.shift() - curveDistance * Math.sin(angle);
     const parallelPoint = this.getParallelPoint(
       { x: points.shift(), y: points.shift() }, curveDistance, angle);
+    graph.beginFill(style.fillColor, style.bezierOacity);
     graph.moveTo(parallelPoint.x, parallelPoint.y);
     points.reverse();
     points[1] = points[1] + curveDistance * Math.cos(angle);
@@ -197,6 +198,7 @@ export class Edge extends CommonElement {
     points[2] = points[2] + curveDegree * Math.cos(angle);
     points[3] = points[3] - curveDegree * Math.sin(angle);
     graph.bezierCurveTo.apply(graph, points);
+    graph.endFill();
     return [parallelPoint.x, parallelPoint.y].concat(points);
   }
 

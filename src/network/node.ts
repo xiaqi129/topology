@@ -10,15 +10,23 @@ import { CommonElement, IStyles } from './common-element';
 import { Group } from './group';
 
 export class Node extends CommonElement {
+  public dragging: boolean;
   private parentNode: Group | null = null;
+  private data: any;
 
   constructor() {
     super();
+    this.data = null;
+    this.dragging = false;
     this.draw();
   }
 
   public setParentNode(node: Group) {
     this.parentNode = node;
+  }
+
+  public getDragging() {
+    return this.dragging;
   }
 
   public getParentNode() {
@@ -35,10 +43,29 @@ export class Node extends CommonElement {
     graph.endFill();
     graph.interactive = true;
     graph.buttonMode = true;
-    graph.on('click', (event: any) => {
-      // console.log(this);
-    });
+    graph
+        .on('mousedown', this.onDragStart)
+        .on('mouseup', this.onDragEnd)
+        .on('mousemove', this.onDragMove);
     this.addChild(graph);
+  }
+
+  public onDragStart(event: PIXI.interaction.InteractionEvent) {
+    this.dragging = true;
+    this.data = event.data;
+  }
+
+  public onDragEnd() {
+    this.dragging = false;
+    this.data = null;
+  }
+
+  public onDragMove() {
+    if (this.dragging) {
+      const newPosition = this.data.getLocalPosition(this.parent);
+      this.position.x = newPosition.x;
+      this.position.y = newPosition.y;
+    }
   }
 
   public createSprite() {

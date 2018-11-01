@@ -25,7 +25,7 @@ for (let i: number = 0, len: number = num; i < len;) {
       fillArrow: true,
       lineColor: 0xC7254E,
       lineDistance: 5,
-      lineType: 0,
+      lineType: 1,
       lineWidth: 0.8,
     });
     edge.addEventListener('click', () => {
