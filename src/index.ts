@@ -28,9 +28,7 @@ for (let i: number = 0, len: number = num; i < len;) {
       lineType: 1,
       lineWidth: 0.8,
     });
-    edge.addEventListener('click', () => {
-      alert('edge clicked!!');
-    });
+    edge.clickListener(edge);
     network.addElement(edge);
     // edge.setBundleStyle(1);
     j += 1;

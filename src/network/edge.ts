@@ -190,15 +190,23 @@ export class Edge extends CommonElement {
     graph.beginFill(style.fillColor, style.bezierOacity);
     graph.moveTo(parallelPoint.x, parallelPoint.y);
     points.reverse();
-    points[1] = points[1] + curveDistance * Math.cos(angle);
-    points[0] = points[0] - curveDistance * Math.sin(angle);
+    points[1] = points[1] + curveDistance * Math.cos(angle);  // end.x
+    points[0] = points[0] - curveDistance * Math.sin(angle);  // end.y
     points.reverse();
-    points[0] = points[0] + curveDegree * Math.cos(angle);
-    points[1] = points[1] - curveDegree * Math.sin(angle);
-    points[2] = points[2] + curveDegree * Math.cos(angle);
-    points[3] = points[3] - curveDegree * Math.sin(angle);
+    points[0] = points[0] + curveDegree * Math.cos(angle);  // sc.x
+    points[1] = points[1] - curveDegree * Math.sin(angle);  // sc.y
+    points[2] = points[2] + curveDegree * Math.cos(angle);  // ec.x
+    points[3] = points[3] - curveDegree * Math.sin(angle);  // ec.y
     graph.bezierCurveTo.apply(graph, points);
     graph.endFill();
+
+    const curve = new Bezier(_.flatten([
+      parallelPoint.x,
+      parallelPoint.y,
+      points,
+    ]));
+    graph.bezier = curve;
+
     return [parallelPoint.x, parallelPoint.y].concat(points);
   }
 
@@ -535,5 +543,25 @@ export class Edge extends CommonElement {
       elements = this.drawBezierEdge(srcNodePos, endNodePos, this.defaultStyle);
     }
     this.addChildren(elements);
+  }
+
+  /**
+   * add listener of click event
+   */
+  public clickListener(element: any) {
+    element.addEventListener('click', (event: any) => {
+
+      const eventX = event.data.global.x;
+      const eventY = event.data.global.y;
+
+      const dis = element.edge.bezier.project({
+        x: eventX,
+        y: eventY,
+      }).d;
+
+      if (dis < 4) {
+        alert('edge clicked!!!');
+      }
+    });
   }
 }
