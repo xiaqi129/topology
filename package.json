@@ -7,7 +7,7 @@
     "start": "webpack-dev-server --open",
     "test": "mocha -r ts-node/register -r jsdom-global/register test/**/*.ts",
     "precommit-msg": "echo 'Pre-commit checks...' && exit 0",
-    "tslint": "tslint 'src/**/*.ts' 'src/**/*.tsx' --project tsconfig.json && exit 0"
+    "tslint": "tslint src/**/*.ts src/**/*.tsx --project tsconfig.json && exit 0"
   },
   "pre-commit": [
     "precommit-msg",
