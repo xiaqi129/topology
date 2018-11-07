@@ -7,17 +7,22 @@
 
 import * as _ from 'lodash';
 import { CommonElement, IStyles } from './common-element';
+import { Edge } from './edge';
 import { Group } from './group';
 
 export class Node extends CommonElement {
-  public dragging: boolean;
   private parentNode: Group | null = null;
+  private dragging: boolean;
   private data: any;
+  private edgesGroupByNodes: {[key: string]: Edge[]};
+  private elements: Edge | CommonElement[];
 
-  constructor() {
+  constructor(edgesGroupByNodes: {[key: string]: Edge[]}, elements: Edge | CommonElement[]) {
     super();
+    this.edgesGroupByNodes = edgesGroupByNodes;
     this.data = null;
     this.dragging = false;
+    this.elements = elements;
     this.draw();
   }
 
@@ -25,8 +30,8 @@ export class Node extends CommonElement {
     this.parentNode = node;
   }
 
-  public getDragging() {
-    return this.dragging;
+  public getChildNode() {
+    return this.children[0];
   }
 
   public getParentNode() {
@@ -44,13 +49,14 @@ export class Node extends CommonElement {
     graph.interactive = true;
     graph.buttonMode = true;
     graph
-        .on('mousedown', this.onDragStart)
-        .on('mouseup', this.onDragEnd)
-        .on('mousemove', this.onDragMove);
+        .on('mousedown', this.onDragStart.bind(this))
+        .on('mouseup', this.onDragEnd.bind(this))
+        .on('mousemove', this.onDragMove.bind(this));
     this.addChild(graph);
   }
 
   public onDragStart(event: PIXI.interaction.InteractionEvent) {
+    event.stopPropagation();
     this.dragging = true;
     this.data = event.data;
   }
@@ -65,6 +71,26 @@ export class Node extends CommonElement {
       const newPosition = this.data.getLocalPosition(this.parent);
       this.position.x = newPosition.x;
       this.position.y = newPosition.y;
+      _.each(this.elements, (element: any) => {
+        const groupEdges = element.groupEdges;
+        const isExpanded = element.isExpanded;
+        if (element instanceof Node && element.parent instanceof Group) {
+          if (element.parent.isExpanded) {
+            element.parent.draw();
+          }
+        }
+        if (element instanceof Group && !isExpanded) {
+          element.rmElements(groupEdges);
+          element.drawEdges();
+        }
+      });
+      _.each(this.edgesGroupByNodes, (edgesGroup, key) => {
+        if (_.includes(key, this.getUID())) {
+          _.each(edgesGroup, (edge: Edge) => {
+            edge.draw();
+          });
+        }
+      });
     }
   }
 

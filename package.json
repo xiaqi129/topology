@@ -10,8 +10,7 @@
     "tslint": "tslint 'src/**/*.ts?(x)' --project tsconfig.json && exit 0"
   },
   "pre-commit": [
-    "precommit-msg",
-    "tslint"
+    "precommit-msg"
   ],
   "repository": {
     "type": "git",

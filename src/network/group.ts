@@ -25,16 +25,20 @@ interface IEvent {
 export class Group extends CommonElement {
   public groupEdgesEvent?: IEvent = {};
   public isExpanded: boolean = true;
+  public groupEdges: GroupEdge[] = [];
   private positionList: IPosition[] = [];
   private elements: Edge | CommonElement[];
   private polygonHullOutlineName: string = _.uniqueId('hull_outline_');
   private outLineStyleType: number = 1;
   private lastClickTime: number = 0;
-  private groupEdges: GroupEdge[] = [];
+  private dragging: boolean;
+  private data: any;
+  private dragPoint: any;
 
   constructor(elements: Edge | CommonElement[]) {
     super();
     this.elements = elements;
+    this.dragging = false;
     this.draw();
   }
 
@@ -45,7 +49,7 @@ export class Group extends CommonElement {
       const currentTime = new Date().getTime();
       if (currentTime - this.lastClickTime < 500) {
         this.isExpanded = !this.isExpanded;
-        this.draw();
+        // this.draw();
         this.lastClickTime = 0;
         this.setExpaned(this.isExpanded);
       } else {
@@ -96,10 +100,6 @@ export class Group extends CommonElement {
     return [center.x, center.y];
   }
 
-  // public setGroupEdgeList(element: any) {
-  //   this.groupEdgeList.push(element);
-  // }
-
   public getEdgeList() {
     return _.flatten(this.analyzeEdges());
   }
@@ -137,11 +137,67 @@ export class Group extends CommonElement {
     graph.name = this.polygonHullOutlineName;
     graph.lineStyle(style.lineWidth, style.lineWidth);
     graph.beginFill(style.fillColor, style.fillOpacity);
-    graph.drawCircle(position[0], position[1], style.width);
+    graph.drawCircle(0, 0, style.width);
+    graph.position.set(position[0], position[1]);
     graph.endFill();
     graph.interactive = true;
     graph.buttonMode = true;
     this.addChild(graph);
+  }
+
+  public onDragStart(event: PIXI.interaction.InteractionEvent) {
+    event.stopPropagation();
+    const graph = this.getChildByName(this.polygonHullOutlineName);
+    this.dragging = true;
+    this.data = event.data;
+    this.dragPoint = event.data.getLocalPosition(this.parent);
+    this.dragPoint.x -= graph.x;
+    this.dragPoint.y -= graph.y;
+  }
+
+  public onDragEnd() {
+    this.dragging = false;
+    this.data = null;
+  }
+
+  public onDragMove() {
+    if (this.dragging) {
+      const edges = this.filterEdge();
+      const newPosition = this.data.getLocalPosition(this.parent);
+      _.each(edges, (edge: Edge) => {
+        edge.draw();
+      });
+      // if (this.isExpanded) {
+      //   _.each(this.children, (element) => {
+      //     if (element instanceof Node && element.parent instanceof Group) {
+      //       element.position.x += this.data.originalEvent.movementX;
+      //       element.position.y += this.data.originalEvent.movementY;
+      //     }
+      //   });
+      // } else {
+      //   _.each(this.children, (element) => {
+      //     if (element instanceof Node && element.parent instanceof Group) {
+      //       element.position.x = newPosition.x - this.dragPoint.x;
+      //       element.position.y = newPosition.y - this.dragPoint.y;
+      //     }
+      //   });
+      // }
+      _.each(this.children, (element) => {
+        if (element instanceof Node && element.parent instanceof Group) {
+          element.position.x += this.data.originalEvent.movementX;
+          element.position.y += this.data.originalEvent.movementY;
+        }
+      });
+      this.draw();
+    }
+  }
+
+  public dragGroup() {
+    const graph = this.getChildByName(this.polygonHullOutlineName);
+    graph
+      .on('mousedown', this.onDragStart.bind(this))
+      .on('mouseup', this.onDragEnd.bind(this))
+      .on('mousemove', this.onDragMove.bind(this));
   }
 
   /**
@@ -355,8 +411,8 @@ export class Group extends CommonElement {
         const groupEdge: GroupEdge = new GroupEdge(
           groupEdgeParams[0], groupEdgeParams[1], groupEdgeParams[2]);
         groupEdge.setStyle(edge.getStyle());
-        this.groupEdges.push(groupEdge);
         this.addChild(groupEdge);
+        this.groupEdges.push(groupEdge);
         const edgeGraphic = groupEdge.getEdge();
         edgeGraphic.interactive = true;
         edgeGraphic.buttonMode = true;
@@ -388,6 +444,7 @@ export class Group extends CommonElement {
     }
     this.sortGraphicsIndex();
     this.toggleGroupExpand();
+    this.dragGroup();
   }
 
   public getChildEdges() {
@@ -404,7 +461,7 @@ export class Group extends CommonElement {
     return edges;
   }
 
-  private analyzeEdges() {
+  public filterEdge() {
     let edges: Edge[] = this.getChildEdges();
 
     const nodes = _.filter(this.children, (item) => {
@@ -419,7 +476,11 @@ export class Group extends CommonElement {
       }
       return false;
     });
+    return edges;
+  }
 
+  private analyzeEdges() {
+    const edges = this.filterEdge();
     return _.values(_.groupBy(edges, (edge: Edge) => {
       const srcNodeId = edge.getSrcNode().getUID();
       const targetNodeId = edge.getTargetNode().getUID();
