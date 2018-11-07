@@ -27,9 +27,11 @@ for (let i: number = 0, len: number = num; i < len;) {
       fillColor: 0xC7254E,
       lineDistance: 5,
       lineType: 1,
-      lineWidth: 0,
+      lineWidth: 0.8,
     });
-    edge.clickListener(edge);
+    edge.addEventListener('click', () => {
+      alert('click!!');
+    });
     network.addElement(edge);
     // edge.setBundleStyle(1);
     j += 1;

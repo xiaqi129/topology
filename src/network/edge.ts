@@ -182,7 +182,7 @@ export class Edge extends CommonElement {
   public drawBezierCurve(
     graph: any, points: any, angle: number, curveDistance: number = 10, curveDegree: number = 50) {
     const style = this.defaultStyle;
-    graph.lineStyle(style.lineWidth, style.lineColor);
+    graph.lineStyle(0, style.lineColor);
     // const srcPointX = points.shift() + curveDistance * Math.cos(angle);
     // const srcPointY = points.shift() - curveDistance * Math.sin(angle);
     const parallelPoint = this.getParallelPoint(
@@ -199,7 +199,7 @@ export class Edge extends CommonElement {
     points[3] = points[3] - curveDegree * Math.sin(angle);  // ec.y
     graph.bezierCurveTo.apply(graph, points);
 
-    const echoDistance = 1.5; // curve width
+    const echoDistance = style.lineWidth * 1.5; // curve width
     const echoPoints = [];
     const echoSrc = this.getParallelPoint(
       { x: parallelPoint.x, y: parallelPoint.y },
@@ -559,12 +559,4 @@ export class Edge extends CommonElement {
     this.addChildren(elements);
   }
 
-  /**
-   * add listener of click event
-   */
-  public clickListener(element: any) {
-    element.addEventListener('click', () => {
-      alert('clicked!!!');
-    });
-  }
 }
