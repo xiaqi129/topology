@@ -15,7 +15,7 @@ const nodes = network.getElements();
 for (let i: number = 0, len: number = num; i < len;) {
   const srcNode = nodes[i];
   const destNode = nodes[i + 1];
-  for (let j = 0; j < 3;) {
+  for (let j = 0; j < 4;) {
     const edge = network.createEdge(srcNode, destNode);
     edge.setStyle({
       arrowColor: 0Xc71bd3,
@@ -24,9 +24,10 @@ for (let i: number = 0, len: number = num; i < len;) {
       arrowWidth: 1,
       fillArrow: true,
       lineColor: 0xC7254E,
+      fillColor: 0xC7254E,
       lineDistance: 5,
       lineType: 1,
-      lineWidth: 0.8,
+      lineWidth: 0,
     });
     edge.clickListener(edge);
     network.addElement(edge);

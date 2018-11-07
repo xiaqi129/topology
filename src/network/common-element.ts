@@ -43,7 +43,7 @@ export abstract class CommonElement extends PIXI.Container {
     lineColor: 0xEEEEEE,
     lineType: 0, // 0: line, 1: besizer
     fillColor: 0xDDDDDD,
-    bezierOacity: 0,
+    bezierOacity: 1,
     fillOpacity: 1,
     arrowColor: 0Xc71bd3,
     arrowLength: 15,

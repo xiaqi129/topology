@@ -198,14 +198,28 @@ export class Edge extends CommonElement {
     points[2] = points[2] + curveDegree * Math.cos(angle);  // ec.x
     points[3] = points[3] - curveDegree * Math.sin(angle);  // ec.y
     graph.bezierCurveTo.apply(graph, points);
-    graph.endFill();
 
-    const curve = new Bezier(_.flatten([
-      parallelPoint.x,
-      parallelPoint.y,
-      points,
-    ]));
-    graph.bezier = curve;
+    const echoDistance = 1.5; // curve width
+    const echoPoints = [];
+    const echoSrc = this.getParallelPoint(
+      { x: parallelPoint.x, y: parallelPoint.y },
+      echoDistance,
+      angle,
+    );
+    echoPoints.push(echoSrc.y, echoSrc.x);
+    for (let i: number = 0, len: number = points.length; i < len; i += 2) {
+      const tmp = this.getParallelPoint(
+        { x: points[i], y: points[i + 1] },
+        echoDistance,
+        angle,
+      );
+      echoPoints.push(tmp.y, tmp.x);
+    }
+    echoPoints.reverse();
+    graph.lineTo(echoPoints.shift(), echoPoints.shift());
+    graph.bezierCurveTo.apply(graph, echoPoints);
+
+    graph.endFill();
 
     return [parallelPoint.x, parallelPoint.y].concat(points);
   }
@@ -436,8 +450,8 @@ export class Edge extends CommonElement {
   ) {
     const angelT = angleLine + arrowAngel * Math.PI / 180;
     const angelB = angleLine - arrowAngel * Math.PI / 180;
-    const x = pos.x;
-    const y = pos.y;
+    const x = pos.x - 3 * Math.sin(angleLine);
+    const y = pos.y - 3 * Math.cos(angleLine);
     const t = endArrow ? 1 : -1;
     return {
       p1: { x, y },
@@ -549,19 +563,8 @@ export class Edge extends CommonElement {
    * add listener of click event
    */
   public clickListener(element: any) {
-    element.addEventListener('click', (event: any) => {
-
-      const eventX = event.data.global.x;
-      const eventY = event.data.global.y;
-
-      const dis = element.edge.bezier.project({
-        x: eventX,
-        y: eventY,
-      }).d;
-
-      if (dis < 4) {
-        alert('edge clicked!!!');
-      }
+    element.addEventListener('click', () => {
+      alert('clicked!!!');
     });
   }
 }
