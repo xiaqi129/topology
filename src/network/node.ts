@@ -100,6 +100,10 @@ export class Node extends CommonElement {
     node.width = this.defaultStyle.width;
     node.height = this.defaultStyle.height;
     node.interactive = true;
+    node
+    .on('mousedown', this.onDragStart.bind(this))
+    .on('mouseup', this.onDragEnd.bind(this))
+    .on('mousemove', this.onDragMove.bind(this));
     this.addChild(node);
   }
 

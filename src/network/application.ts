@@ -92,7 +92,7 @@ export class Application extends PIXI.Application {
         this.container.addChild(element);
       }
     });
-    // this.dragContainer();
+    this.dragContainer();
   }
 
   public dragContainer() {
