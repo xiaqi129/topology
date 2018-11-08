@@ -21,8 +21,9 @@ export class Label extends PIXI.Text {
       _.extend(defaultStyles, style);
     }
     super(text, defaultStyles, canvas);
-    this.setPosition(2);
+    this.setPosition(1);
     this.interactive = true;
+    this.buttonMode = true;
     this.addListener('click', () => {
       alert(this.text);
     });
