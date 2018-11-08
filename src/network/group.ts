@@ -150,7 +150,7 @@ export class Group extends CommonElement {
     const graph = this.getChildByName(this.polygonHullOutlineName);
     this.dragging = true;
     this.data = event.data;
-    this.dragPoint = event.data.getLocalPosition(this.parent);
+    this.dragPoint = event.data.getLocalPosition(graph.parent);
     this.dragPoint.x -= graph.x;
     this.dragPoint.y -= graph.y;
   }
@@ -163,25 +163,9 @@ export class Group extends CommonElement {
   public onDragMove() {
     if (this.dragging) {
       const edges = this.filterEdge();
-      const newPosition = this.data.getLocalPosition(this.parent);
       _.each(edges, (edge: Edge) => {
         edge.draw();
       });
-      // if (this.isExpanded) {
-      //   _.each(this.children, (element) => {
-      //     if (element instanceof Node && element.parent instanceof Group) {
-      //       element.position.x += this.data.originalEvent.movementX;
-      //       element.position.y += this.data.originalEvent.movementY;
-      //     }
-      //   });
-      // } else {
-      //   _.each(this.children, (element) => {
-      //     if (element instanceof Node && element.parent instanceof Group) {
-      //       element.position.x = newPosition.x - this.dragPoint.x;
-      //       element.position.y = newPosition.y - this.dragPoint.y;
-      //     }
-      //   });
-      // }
       _.each(this.children, (element) => {
         if (element instanceof Node && element.parent instanceof Group) {
           element.position.x += this.data.originalEvent.movementX;

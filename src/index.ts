@@ -55,3 +55,27 @@ group.addEventListener('click', (edges: any) => {
 });
 // group.setExpaned(false);
 network.syncView();
+
+const zoomIn = document.querySelector('button.btn_zoomIn');
+const zoomOut = document.querySelector('button.btn_zoomOut');
+const canvas = document.querySelector('canvas');
+if (zoomIn) {
+  zoomIn.addEventListener('click', () => {
+    network.setZoom(0.05);
+  });
+}
+if (zoomOut) {
+  zoomOut.addEventListener('click', () => {
+    network.setZoom(-0.05);
+  });
+}
+if (canvas) {
+  canvas.addEventListener('mousewheel', (e: any) => {
+    const zoom = 0.02;
+    if (e.wheelDelta > 0 || e.detail < 0) {
+      network.setZoom(zoom);
+    } else {
+      network.setZoom(-zoom);
+    }
+  });
+}

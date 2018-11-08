@@ -76,6 +76,17 @@ export class Network {
     element.destroy();
   }
 
+  public setZoom(num: number) {
+    if (num) {
+      const zoom = num;
+      const appContainer = this.app.getContainer();
+      const scale = appContainer.scale;
+      if (scale.x + zoom > 0) {
+        appContainer.setTransform(0, 0, scale.x + zoom, scale.y + zoom, 0, 0, 0, 0, 0);
+      }
+    }
+  }
+
   public syncView() {
     this.drawer.syncView();
   }
