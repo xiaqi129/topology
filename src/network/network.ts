@@ -44,6 +44,10 @@ export class Network {
     return this.topo.createEdge(startNode, endNode);
   }
 
+  public createLabel(text?: string, style?: PIXI.TextStyleOptions, canvas?: HTMLCanvasElement) {
+    return this.topo.createLabel(text, style, canvas);
+  }
+
   public clear() {
     const elements = this.topo.getElements();
     _.each(elements, (element) => {

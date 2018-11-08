@@ -10,6 +10,13 @@ for (let i: number = 0, len: number = num; i < len;) {
   network.addElement(node);
   node.x = Math.random() * 1200;
   node.y = Math.random() * 900;
+  // add label
+  const labelStyleOptions = {
+    fontSize: 10,
+    fontWeight: 'bold',
+  };
+  const label = network.createLabel(node.getUID(), labelStyleOptions);
+  node.addChild(label);
 }
 const nodes = network.getElements();
 for (let i: number = 0, len: number = num; i < len;) {
@@ -24,14 +31,22 @@ for (let i: number = 0, len: number = num; i < len;) {
       arrowWidth: 1,
       fillArrow: true,
       lineColor: 0xC7254E,
+      fillColor: 0xC7254E,
       lineDistance: 5,
       lineType: 1,
       lineWidth: 0.8,
     });
     edge.addEventListener('click', () => {
-      alert('edge clicked!!');
+      alert('click!!');
     });
     network.addElement(edge);
+    // TODO 线的label定位需要修改
+    // const lineLabel = network.createLabel('lineLabel');
+    // const linePoints = edge.edge.currentPath.shape.points;
+    // lineLabel.x = linePoints[20];
+    // lineLabel.y = linePoints[21];
+    // edge.addChild(lineLabel);
+
     // edge.setBundleStyle(1);
     j += 1;
   }

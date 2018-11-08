@@ -182,7 +182,7 @@ export class Edge extends CommonElement {
   public drawBezierCurve(
     graph: any, points: any, angle: number, curveDistance: number = 10, curveDegree: number = 50) {
     const style = this.defaultStyle;
-    graph.lineStyle(style.lineWidth, style.lineColor);
+    graph.lineStyle(0, style.lineColor);
     // const srcPointX = points.shift() + curveDistance * Math.cos(angle);
     // const srcPointY = points.shift() - curveDistance * Math.sin(angle);
     const parallelPoint = this.getParallelPoint(
@@ -198,6 +198,27 @@ export class Edge extends CommonElement {
     points[2] = points[2] + curveDegree * Math.cos(angle);
     points[3] = points[3] - curveDegree * Math.sin(angle);
     graph.bezierCurveTo.apply(graph, points);
+
+    const echoDistance = style.lineWidth * 1.5; // curve width
+    const echoPoints = [];
+    const echoSrc = this.getParallelPoint(
+      { x: parallelPoint.x, y: parallelPoint.y },
+      echoDistance,
+      angle,
+    );
+    echoPoints.push(echoSrc.y, echoSrc.x);
+    for (let i: number = 0, len: number = points.length; i < len; i += 2) {
+      const tmp = this.getParallelPoint(
+        { x: points[i], y: points[i + 1] },
+        echoDistance,
+        angle,
+      );
+      echoPoints.push(tmp.y, tmp.x);
+    }
+    echoPoints.reverse();
+    graph.lineTo(echoPoints.shift(), echoPoints.shift());
+    graph.bezierCurveTo.apply(graph, echoPoints);
+
     graph.endFill();
     return [parallelPoint.x, parallelPoint.y].concat(points);
   }
