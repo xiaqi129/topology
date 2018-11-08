@@ -102,6 +102,7 @@ export class Application extends PIXI.Application {
     this.container
       .on('mousedown', this.onDragStart.bind(this))
       .on('mouseup', this.onDragEnd.bind(this))
+      .on('mouseout', this.onDragEnd.bind(this))
       .on('mousemove', this.onDragMove.bind(this));
   }
 

@@ -181,6 +181,7 @@ export class Group extends CommonElement {
     graph
       .on('mousedown', this.onDragStart.bind(this))
       .on('mouseup', this.onDragEnd.bind(this))
+      .on('mouseout', this.onDragEnd.bind(this))
       .on('mousemove', this.onDragMove.bind(this));
   }
 
