@@ -33,12 +33,6 @@ for (let i: number = 0, len: number = num; i < len;) {
       alert('click!!');
     });
     network.addElement(edge);
-    // TODO 线的label定位需要修改
-    // const lineLabel = network.createLabel('lineLabel');
-    // const linePoints = edge.edge.currentPath.shape.points;
-    // lineLabel.x = linePoints[20];
-    // lineLabel.y = linePoints[21];
-    // edge.addChild(lineLabel);
 
     // edge.setBundleStyle(1);
     j += 1;
