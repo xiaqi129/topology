@@ -15,7 +15,7 @@ const nodes = network.getElements();
 for (let i: number = 0, len: number = num; i < len;) {
   const srcNode = nodes[i];
   const destNode = nodes[i + 1];
-  for (let j = 0; j < 4;) {
+  for (let j = 0; j < 3;) {
     const edge = network.createEdge(srcNode, destNode);
     edge.setStyle({
       arrowColor: 0Xc71bd3,
@@ -33,12 +33,6 @@ for (let i: number = 0, len: number = num; i < len;) {
       alert('click!!');
     });
     network.addElement(edge);
-    // TODO 线的label定位需要修改
-    // const lineLabel = network.createLabel('lineLabel');
-    // const linePoints = edge.edge.currentPath.shape.points;
-    // lineLabel.x = linePoints[20];
-    // lineLabel.y = linePoints[21];
-    // edge.addChild(lineLabel);
 
     // edge.setBundleStyle(1);
     j += 1;
@@ -73,3 +67,27 @@ for (const node of nodes) {
 }
 
 network.syncView();
+
+const zoomIn = document.querySelector('button.btn_zoomIn');
+const zoomOut = document.querySelector('button.btn_zoomOut');
+const canvas = document.querySelector('canvas');
+if (zoomIn) {
+  zoomIn.addEventListener('click', () => {
+    network.setZoom(0.05);
+  });
+}
+if (zoomOut) {
+  zoomOut.addEventListener('click', () => {
+    network.setZoom(-0.05);
+  });
+}
+if (canvas) {
+  canvas.addEventListener('mousewheel', (e: any) => {
+    const zoom = 0.02;
+    if (e.wheelDelta > 0 || e.detail < 0) {
+      network.setZoom(zoom);
+    } else {
+      network.setZoom(-zoom);
+    }
+  });
+}

@@ -190,13 +190,13 @@ export class Edge extends CommonElement {
     graph.beginFill(style.fillColor, style.bezierOacity);
     graph.moveTo(parallelPoint.x, parallelPoint.y);
     points.reverse();
-    points[1] = points[1] + curveDistance * Math.cos(angle);  // end.x
-    points[0] = points[0] - curveDistance * Math.sin(angle);  // end.y
+    points[1] = points[1] + curveDistance * Math.cos(angle);
+    points[0] = points[0] - curveDistance * Math.sin(angle);
     points.reverse();
-    points[0] = points[0] + curveDegree * Math.cos(angle);  // sc.x
-    points[1] = points[1] - curveDegree * Math.sin(angle);  // sc.y
-    points[2] = points[2] + curveDegree * Math.cos(angle);  // ec.x
-    points[3] = points[3] - curveDegree * Math.sin(angle);  // ec.y
+    points[0] = points[0] + curveDegree * Math.cos(angle);
+    points[1] = points[1] - curveDegree * Math.sin(angle);
+    points[2] = points[2] + curveDegree * Math.cos(angle);
+    points[3] = points[3] - curveDegree * Math.sin(angle);
     graph.bezierCurveTo.apply(graph, points);
 
     const echoDistance = style.lineWidth * 1.5; // curve width
@@ -220,7 +220,6 @@ export class Edge extends CommonElement {
     graph.bezierCurveTo.apply(graph, echoPoints);
 
     graph.endFill();
-
     return [parallelPoint.x, parallelPoint.y].concat(points);
   }
 
@@ -450,8 +449,8 @@ export class Edge extends CommonElement {
   ) {
     const angelT = angleLine + arrowAngel * Math.PI / 180;
     const angelB = angleLine - arrowAngel * Math.PI / 180;
-    const x = pos.x - 3 * Math.sin(angleLine);
-    const y = pos.y - 3 * Math.cos(angleLine);
+    const x = pos.x;
+    const y = pos.y;
     const t = endArrow ? 1 : -1;
     return {
       p1: { x, y },
@@ -558,5 +557,4 @@ export class Edge extends CommonElement {
     }
     this.addChildren(elements);
   }
-
 }
