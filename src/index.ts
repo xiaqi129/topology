@@ -10,6 +10,13 @@ for (let i: number = 0, len: number = num; i < len;) {
   network.addElement(node);
   node.x = Math.random() * 1200;
   node.y = Math.random() * 900;
+
+  const labelStyleOptions = {
+    fontSize: 10,
+    fontWeight: 'bold',
+  };
+  const label = network.createLabel(node.getUID(), labelStyleOptions);
+  node.addChild(label);
 }
 const nodes = network.getElements();
 for (let i: number = 0, len: number = num; i < len;) {
@@ -56,15 +63,6 @@ group.addEventListener('click', (edges: any) => {
   alert(`${edges.length} link[s] referenced.`);
 });
 // group.setExpaned(false);
-
-for (const node of nodes) {
-  const labelStyleOptions = {
-    fontSize: 10,
-    fontWeight: 'bold',
-  };
-  const label = network.createLabel(node.getUID(), labelStyleOptions);
-  node.addChild(label);
-}
 
 network.syncView();
 
