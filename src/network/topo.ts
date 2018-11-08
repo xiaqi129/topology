@@ -11,6 +11,7 @@ import { CommonElement } from './common-element';
 import { Edge } from './edge';
 import { EdgeBundle } from './edge-bundle';
 import { Group } from './group';
+import { Label } from './label';
 import { Node } from './node';
 
 export interface ITopo {
@@ -164,6 +165,10 @@ export class Topo implements ITopo {
 
   public createEdge(startNode: Node | Group, endNode: Node | Group): Edge {
     return new Edge(startNode, endNode);
+  }
+
+  public createLabel(text?: string, style?: PIXI.TextStyleOptions, canvas?: HTMLCanvasElement) {
+    return new Label(text, style, canvas);
   }
 
   public clear() {

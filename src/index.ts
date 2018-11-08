@@ -10,6 +10,13 @@ for (let i: number = 0, len: number = num; i < len;) {
   network.addElement(node);
   node.x = Math.random() * 1200;
   node.y = Math.random() * 900;
+  // add label
+  const labelStyleOptions = {
+    fontSize: 10,
+    fontWeight: 'bold',
+  };
+  const label = network.createLabel(node.getUID(), labelStyleOptions);
+  node.addChild(label);
 }
 const nodes = network.getElements();
 for (let i: number = 0, len: number = num; i < len;) {
@@ -33,6 +40,13 @@ for (let i: number = 0, len: number = num; i < len;) {
       alert('click!!');
     });
     network.addElement(edge);
+    // TODO 线的label定位需要修改
+    // const lineLabel = network.createLabel('lineLabel');
+    // const linePoints = edge.edge.currentPath.shape.points;
+    // lineLabel.x = linePoints[20];
+    // lineLabel.y = linePoints[21];
+    // edge.addChild(lineLabel);
+
     // edge.setBundleStyle(1);
     j += 1;
   }
