@@ -14,16 +14,20 @@ export class Node extends CommonElement {
   private parentNode: Group | null = null;
   private dragging: boolean;
   private data: any;
-  private edgesGroupByNodes: {[key: string]: Edge[]};
+  private edgesGroupByNodes: { [key: string]: Edge[] };
   private elements: Edge | CommonElement[];
 
-  constructor(edgesGroupByNodes: {[key: string]: Edge[]}, elements: Edge | CommonElement[]) {
+  constructor(
+    edgesGroupByNodes: { [key: string]: Edge[] },
+    elements: Edge | CommonElement[],
+    resourceName?: string) {
     super();
     this.edgesGroupByNodes = edgesGroupByNodes;
     this.data = null;
     this.dragging = false;
     this.elements = elements;
-    this.draw();
+    // this.draw();  // 圆点
+    this.createSprite(resourceName || 'switch');  // 从loader中加载icon, 默认switch
   }
 
   public setParentNode(node: Group) {
@@ -49,9 +53,9 @@ export class Node extends CommonElement {
     graph.interactive = true;
     graph.buttonMode = true;
     graph
-        .on('mousedown', this.onDragStart.bind(this))
-        .on('mouseup', this.onDragEnd.bind(this))
-        .on('mousemove', this.onDragMove.bind(this));
+      .on('mousedown', this.onDragStart.bind(this))
+      .on('mouseup', this.onDragEnd.bind(this))
+      .on('mousemove', this.onDragMove.bind(this));
     this.addChild(graph);
   }
 
@@ -94,17 +98,31 @@ export class Node extends CommonElement {
     }
   }
 
-  public createSprite() {
-    const texture = PIXI.Texture.fromImage('/pic/point.png');
-    const node = new PIXI.Sprite(texture);
-    node.width = this.defaultStyle.width;
-    node.height = this.defaultStyle.height;
-    node.interactive = true;
-    node
-    .on('mousedown', this.onDragStart.bind(this))
-    .on('mouseup', this.onDragEnd.bind(this))
-    .on('mousemove', this.onDragMove.bind(this));
-    this.addChild(node);
+  public createSprite(resourceName: string) {
+    let nodeSprite: PIXI.Sprite = new PIXI.Sprite();
+    const loader = PIXI.loader;
+    loader
+      .load((load: any, resources: any) => {
+        const resource = resources[resourceName];
+        if (resource) {
+          nodeSprite = new PIXI.Sprite(resource.texture);
+        } else {
+          nodeSprite = new PIXI.Sprite(resources.switch.texture);
+        }
+
+      }).onComplete.add(() => {
+        const node = nodeSprite;
+        node.width = 40;
+        node.height = 40;
+        node.anchor.set(0.5, 0.5);
+        node.interactive = true;
+        node
+          .on('mousedown', this.onDragStart.bind(this))
+          .on('mouseup', this.onDragEnd.bind(this))
+          .on('mouseupoutside', this.onDragEnd.bind(this))
+          .on('mousemove', this.onDragMove.bind(this));
+        this.addChild(node);
+      });
   }
 
   public getWidth() {

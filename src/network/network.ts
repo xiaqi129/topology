@@ -32,8 +32,8 @@ export class Network {
     return this.loader;
   }
 
-  public createNode() {
-    return this.topo.createNode();
+  public createNode(resourceName?: string) {
+    return this.topo.createNode(resourceName);
   }
 
   public createGroup() {

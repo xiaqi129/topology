@@ -155,8 +155,8 @@ export class Topo implements ITopo {
     return this.elements;
   }
 
-  public createNode(): Node {
-    return new Node(this.edgesGroupByNodes, this.elements);
+  public createNode(resourceName?: string): Node {
+    return new Node(this.edgesGroupByNodes, this.elements, resourceName);
   }
 
   public createGroup(): Group {
