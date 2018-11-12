@@ -80,13 +80,20 @@ export class Network {
     element.destroy();
   }
 
-  public setZoom(num: number) {
-    if (num) {
-      const zoom = num;
-      const appContainer = this.app.getContainer();
-      const scale = appContainer.scale;
-      if (scale.x + zoom > 0) {
-        appContainer.setTransform(0, 0, scale.x + zoom, scale.y + zoom, 0, 0, 0, 0, 0);
+  public setZoom(num: number, event?: any) {
+    const appContainer = this.app.getContainer();
+    const scale = appContainer.scale;
+    if (event) {
+      const zoom = (event.deltaY < 0 ? 1 : -1) * num;
+      if (scale.x + zoom > 0.3 && scale.x + zoom < 3) {
+        const scaleChange = scale.x + zoom - 1;
+        const offsetX = -(event.clientX * scaleChange);
+        const offsetY = -(event.clientY * scaleChange);
+        appContainer.setTransform(offsetX, offsetY, scale.x + zoom, scale.y + zoom, 0, 0, 0, 0, 0);
+      }
+    } else {
+      if (scale.x + num > 0.3 && scale.x + num < 3) {
+        appContainer.setTransform(0, 0, scale.x + num, scale.y + num, 0, 0, 0, 0, 0);
       }
     }
   }

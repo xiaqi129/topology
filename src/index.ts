@@ -9,7 +9,7 @@ for (let i: number = 0, len: number = num; i < len;) {
   const node = network.createNode();
   network.addElement(node);
   node.x = Math.random() * 1200;
-  node.y = Math.random() * 900;
+  node.y = Math.random() * 500;
 
   const labelStyleOptions = {
     fontSize: 10,
@@ -68,24 +68,20 @@ network.syncView();
 
 const zoomIn = document.querySelector('button.btn_zoomIn');
 const zoomOut = document.querySelector('button.btn_zoomOut');
-const canvas = document.querySelector('canvas');
+const canvas = document.querySelector('div#network');
 if (zoomIn) {
   zoomIn.addEventListener('click', () => {
-    network.setZoom(0.05);
+    network.setZoom(0.3);
   });
 }
 if (zoomOut) {
   zoomOut.addEventListener('click', () => {
-    network.setZoom(-0.05);
+    network.setZoom(-0.3);
   });
 }
 if (canvas) {
   canvas.addEventListener('mousewheel', (e: any) => {
-    const zoom = 0.02;
-    if (e.wheelDelta > 0 || e.detail < 0) {
-      network.setZoom(zoom);
-    } else {
-      network.setZoom(-zoom);
-    }
+    const zoom = 0.2;
+    network.setZoom(zoom, e);
   });
 }
