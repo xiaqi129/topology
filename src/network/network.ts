@@ -20,6 +20,7 @@ export class Network {
   private topo: Topo;
   private drawer: Drawer;
   private app: Application;
+  private mouseMoveList: any = [];
 
   constructor(domRegex: string) {
     this.topo = new Topo(this.loader);
@@ -64,7 +65,7 @@ export class Network {
     this.topo.addElement(element);
   }
 
-  public addElements(elements: Node[] | Group[] | Edge []) {
+  public addElements(elements: Node[] | Group[] | Edge[]) {
     this.topo.addElements(elements);
   }
 
@@ -86,14 +87,37 @@ export class Network {
     if (event) {
       const zoom = (event.deltaY < 0 ? 1 : -1) * num;
       if (scale.x + zoom > 0.3 && scale.x + zoom < 3) {
+        this.setMouseList(event.clientX, event.clientY);
+        const beforeWheel = this.mouseMoveList[0];
+        const afterWheel = this.mouseMoveList[1];
         const scaleChange = scale.x + zoom - 1;
-        const offsetX = -(event.clientX * scaleChange);
-        const offsetY = -(event.clientY * scaleChange);
+        let offsetX = 0;
+        let offsetY = 0;
+        if (beforeWheel && afterWheel) {
+          const wheelX = (afterWheel.x - beforeWheel.x) * (scaleChange - zoom);
+          const wheelY = (afterWheel.y - beforeWheel.y) * (scaleChange - zoom);
+          offsetX = -(event.clientX * scaleChange) + wheelX;
+          offsetY = -(event.clientY * scaleChange) + wheelY;
+        } else {
+          offsetX = -(event.clientX * scaleChange);
+          offsetY = -(event.clientY * scaleChange);
+        }
         appContainer.setTransform(offsetX, offsetY, scale.x + zoom, scale.y + zoom, 0, 0, 0, 0, 0);
       }
     } else {
       if (scale.x + num > 0.3 && scale.x + num < 3) {
         appContainer.setTransform(0, 0, scale.x + num, scale.y + num, 0, 0, 0, 0, 0);
+      }
+    }
+  }
+
+  public setMouseList(cx: number, cy: number) {
+    if (this.mouseMoveList.length < 2) {
+      this.mouseMoveList.push({ x:cx, y:cy });
+    } else {
+      if (cx !== this.mouseMoveList[1].x && Math.abs(cx - this.mouseMoveList[1].x) > 50) {
+        this.mouseMoveList.shift();
+        this.mouseMoveList.push({ x:cx, y:cy });
       }
     }
   }
