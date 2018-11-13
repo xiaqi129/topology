@@ -95,6 +95,14 @@ export class Network {
     this.action.zoomOver();
   }
 
+  public zoomReset() {
+    this.action.zoomReset();
+  }
+
+  public addDrag() {
+    this.action.dragContainer();
+  }
+
   public syncView() {
     this.drawer.syncView();
   }

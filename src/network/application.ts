@@ -15,8 +15,6 @@ export class Application extends PIXI.Application {
   private domRegex: string = '';
   private viewWrapper: HTMLDivElement | null = null;
   private container: PIXI.Container;
-  private dragging: boolean;
-  private data: any;
 
   constructor(domRegex: string = '', options = null) {
     super(options || {
@@ -31,8 +29,6 @@ export class Application extends PIXI.Application {
     });
     this.container = new PIXI.Container();
     this.domRegex = domRegex;
-    this.dragging = false;
-    this.data = null;
     this.setup();
   }
 
@@ -92,36 +88,6 @@ export class Application extends PIXI.Application {
         this.container.addChild(element);
       }
     });
-    this.dragContainer();
-  }
-
-  public dragContainer() {
-    this.container.hitArea = new PIXI.Rectangle(0, 0, this.container.width, this.container.height);
-    this.container.interactive = true;
-    this.container.buttonMode = true;
-    this.container
-      .on('mousedown', this.onDragStart.bind(this))
-      .on('mouseup', this.onDragEnd.bind(this))
-      .on('mouseout', this.onDragEnd.bind(this))
-      .on('mousemove', this.onDragMove.bind(this));
-  }
-
-  public onDragStart(event: PIXI.interaction.InteractionEvent) {
-    event.stopPropagation();
-    this.dragging = true;
-    this.data = event.data;
-  }
-
-  public onDragEnd() {
-    this.dragging = false;
-  }
-
-  public onDragMove(event: PIXI.interaction.InteractionEvent) {
-    if (this.dragging) {
-      event.stopPropagation();
-      this.container.position.x += this.data.originalEvent.movementX;
-      this.container.position.y += this.data.originalEvent.movementY;
-    }
   }
 
 }

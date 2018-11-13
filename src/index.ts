@@ -9,7 +9,7 @@ network.addResourceCache('router', './pic/cisco-18.png');
 
 for (let i: number = 0, len: number = num; i < len;) {
   i += 1;
-  const node = network.createNode('switchLayer3');
+  const node = network.createNode('switch');
   network.addElement(node);
   node.x = Math.random() * 1200;
   node.y = Math.random() * 900;
@@ -68,6 +68,7 @@ group.addEventListener('click', (edges: any) => {
 // group.setExpaned(false);
 
 network.syncView();
+network.addDrag();
 
 const zoomIn = document.querySelector('button.btn_zoomIn');
 const zoomOut = document.querySelector('button.btn_zoomOut');
@@ -90,7 +91,13 @@ if (canvas) {
   });
 }
 if (zoomOver) {
+  let isZoom = true;
   zoomOver.addEventListener('click', () => {
-    network.zoomOver();
+    if (isZoom) {
+      network.zoomOver();
+    } else {
+      network.zoomReset();
+    }
+    isZoom = !isZoom;
   });
 }

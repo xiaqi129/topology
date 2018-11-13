@@ -1,15 +1,25 @@
+import * as _ from 'lodash';
+import * as PIXI from 'pixi.js';
 import { Application } from './application';
 
 export class CommonAction {
   private mouseMoveList: any = [];
+  private positionList: any = [];
   private app: Application;
+  private container: PIXI.Container;
+  private dragging: boolean;
+  private data: any;
   constructor(app: any) {
     this.app = app;
+    this.container = app.getContainer();
+    this.dragging = false;
+    this.data = null;
   }
 
   public setZoom(num: number, event?: any) {
-    const appContainer = this.app.getContainer();
+    const appContainer = this.container;
     const scale = appContainer.scale;
+    const movePosition = this.positionList.pop();
     if (event) {
       const zoom = (event.deltaY < 0 ? 1 : -1) * num;
       if (scale.x + zoom > 0.3 && scale.x + zoom < 3) {
@@ -28,10 +38,18 @@ export class CommonAction {
           offsetX = -(event.clientX * scaleChange);
           offsetY = -(event.clientY * scaleChange);
         }
-        appContainer.setTransform(offsetX, offsetY, scale.x + zoom, scale.y + zoom, 0, 0, 0, 0, 0);
+        if (movePosition) {
+          const x = movePosition.x;
+          const y = movePosition.y;
+          appContainer.
+          setTransform(offsetX + x, offsetY + y, scale.x + zoom, scale.y + zoom, 0, 0, 0, 0, 0);
+        } else {
+          appContainer.
+          setTransform(offsetX, offsetY, scale.x + zoom, scale.y + zoom, 0, 0, 0, 0, 0);
+        }
       }
     } else {
-      if (scale.x + num > 0.3 && scale.x + num < 3) {
+      if (scale.x + num > 0.3 && scale.x + num < 2) {
         appContainer.setTransform(0, 0, scale.x + num, scale.y + num, 0, 0, 0, 0, 0);
       }
     }
@@ -39,17 +57,17 @@ export class CommonAction {
 
   public setMouseList(cx: number, cy: number) {
     if (this.mouseMoveList.length < 2) {
-      this.mouseMoveList.push({ x:cx, y:cy });
+      this.mouseMoveList.push({ x: cx, y: cy });
     } else {
       if (cx !== this.mouseMoveList[1].x && Math.abs(cx - this.mouseMoveList[1].x) > 50) {
         this.mouseMoveList.shift();
-        this.mouseMoveList.push({ x:cx, y:cy });
+        this.mouseMoveList.push({ x: cx, y: cy });
       }
     }
   }
 
   public zoomOver() {
-    const appContainer = this.app.getContainer();
+    const appContainer = this.container;
     const wrapperContainr = this.app.getWrapperBoundings();
     const containerWidth = appContainer.width;
     const containerHeight = appContainer.height;
@@ -57,5 +75,39 @@ export class CommonAction {
     const scaleY = wrapperContainr[1] / containerHeight;
     const scale = scaleX > scaleY ? scaleY : scaleX;
     appContainer.setTransform(0, 0, scale, scale, 0, 0, 0, 0, 0);
+  }
+
+  public zoomReset() {
+    this.container.setTransform(0, 0, 1, 1, 0, 0, 0, 0, 0);
+  }
+
+  public dragContainer() {
+    this.container.hitArea = new PIXI.Rectangle(0, 0, this.container.width, this.container.height);
+    this.container.interactive = true;
+    this.container.buttonMode = true;
+    this.container
+      .on('mousedown', this.onDragStart.bind(this))
+      .on('mouseup', this.onDragEnd.bind(this))
+      .on('mouseout', this.onDragEnd.bind(this))
+      .on('mousemove', this.onDragMove.bind(this));
+  }
+
+  public onDragStart(event: PIXI.interaction.InteractionEvent) {
+    event.stopPropagation();
+    this.dragging = true;
+    this.data = event.data;
+  }
+
+  public onDragEnd() {
+    this.dragging = false;
+  }
+
+  public onDragMove(event: PIXI.interaction.InteractionEvent) {
+    if (this.dragging) {
+      event.stopPropagation();
+      this.container.position.x += this.data.originalEvent.movementX;
+      this.container.position.y += this.data.originalEvent.movementY;
+      this.positionList.push({ x: this.container.position.x, y: this.container.position.y });
+    }
   }
 }
