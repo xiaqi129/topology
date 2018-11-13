@@ -3,6 +3,9 @@ import { Network } from './network/network';
 
 const network = new Network('div#network');
 const num = 50;
+network.addResourceCache('switch', './pic/cisco-WS-C49.png');
+network.addResourceCache('switchLayer3', './pic/cisco-WS-C68.png');
+network.addResourceCache('router', './pic/cisco-18.png');
 
 for (let i: number = 0, len: number = num; i < len;) {
   i += 1;
