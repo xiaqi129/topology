@@ -21,17 +21,19 @@ export class CommonAction {
     const scale = appContainer.scale;
     const movePosition = this.positionList.pop();
     if (event) {
-      const zoom = (event.deltaY < 0 ? 1 : -1) * num;
-      if (scale.x + zoom > 0.3 && scale.x + zoom < 3) {
+      const direction = event.deltaY < 0 ? 1 : -1;
+      const zoom = 1 + (direction * num);
+      if (scale.x * zoom > 0.3 && scale.x * zoom < 3) {
         this.setMouseList(event.clientX, event.clientY);
         const beforeWheel = this.mouseMoveList[0];
         const afterWheel = this.mouseMoveList[1];
-        const scaleChange = scale.x + zoom - 1;
+        const zoomChange = scale.x * zoom;
+        const scaleChange = zoomChange - 1;
         let offsetX = 0;
         let offsetY = 0;
         if (beforeWheel && afterWheel) {
-          const wheelX = (afterWheel.x - beforeWheel.x) * (scaleChange - zoom);
-          const wheelY = (afterWheel.y - beforeWheel.y) * (scaleChange - zoom);
+          const wheelX = (afterWheel.x - beforeWheel.x) * (scaleChange / zoom);
+          const wheelY = (afterWheel.y - beforeWheel.y) * (scaleChange / zoom);
           offsetX = -(event.clientX * scaleChange) + wheelX;
           offsetY = -(event.clientY * scaleChange) + wheelY;
         } else {
@@ -42,15 +44,15 @@ export class CommonAction {
           const x = movePosition.x;
           const y = movePosition.y;
           appContainer.
-          setTransform(offsetX + x, offsetY + y, scale.x + zoom, scale.y + zoom, 0, 0, 0, 0, 0);
+          setTransform(offsetX + x, offsetY + y, scale.x * zoom, scale.y * zoom, 0, 0, 0, 0, 0);
         } else {
           appContainer.
-          setTransform(offsetX, offsetY, scale.x + zoom, scale.y + zoom, 0, 0, 0, 0, 0);
+          setTransform(offsetX, offsetY, scale.x * zoom, scale.y * zoom, 0, 0, 0, 0, 0);
         }
       }
     } else {
-      if (scale.x + num > 0.3 && scale.x + num < 2) {
-        appContainer.setTransform(0, 0, scale.x + num, scale.y + num, 0, 0, 0, 0, 0);
+      if (scale.x * (num + 1) > 0.3 && scale.x * (num + 1) < 2) {
+        appContainer.setTransform(0, 0, scale.x * (num + 1), scale.y * (num + 1), 0, 0, 0, 0, 0);
       }
     }
   }
