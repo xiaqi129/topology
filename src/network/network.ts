@@ -8,6 +8,7 @@
 import * as _ from 'lodash';
 import * as PIXI from 'pixi.js';
 import { Application } from './application';
+import { CommonAction } from './common-action';
 import { Drawer } from './drawer';
 import { Edge } from './edge';
 import { Group } from './group';
@@ -20,11 +21,13 @@ export class Network {
   private topo: Topo;
   private drawer: Drawer;
   private app: Application;
+  private action: CommonAction;
 
   constructor(domRegex: string) {
     this.topo = new Topo(this.loader);
     this.drawer = new Drawer(domRegex, this.topo);
     this.app = this.drawer.getWhiteBoard();
+    this.action = new CommonAction(this.app);
   }
 
   public addResourceCache(key: string, image: string) {
@@ -64,7 +67,7 @@ export class Network {
     this.topo.addElement(element);
   }
 
-  public addElements(elements: Node[] | Group[] | Edge []) {
+  public addElements(elements: Node[] | Group[] | Edge[]) {
     this.topo.addElements(elements);
   }
 
@@ -80,15 +83,24 @@ export class Network {
     element.destroy();
   }
 
-  public setZoom(num: number) {
-    if (num) {
-      const zoom = num;
-      const appContainer = this.app.getContainer();
-      const scale = appContainer.scale;
-      if (scale.x + zoom > 0) {
-        appContainer.setTransform(0, 0, scale.x + zoom, scale.y + zoom, 0, 0, 0, 0, 0);
-      }
+  public setZoom(num: number, event?: any) {
+    if (event) {
+      this.action.setZoom(num, event);
+    } else {
+      this.action.setZoom(num);
     }
+  }
+
+  public zoomOver() {
+    this.action.zoomOver();
+  }
+
+  public zoomReset() {
+    this.action.zoomReset();
+  }
+
+  public addDrag() {
+    this.action.dragContainer();
   }
 
   public syncView() {

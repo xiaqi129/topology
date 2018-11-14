@@ -9,7 +9,7 @@ network.addResourceCache('router', './pic/cisco-18.png');
 
 for (let i: number = 0, len: number = num; i < len;) {
   i += 1;
-  const node = network.createNode();
+  const node = network.createNode('switch');
   network.addElement(node);
   node.x = Math.random() * 1200;
   node.y = Math.random() * 900;
@@ -68,27 +68,36 @@ group.addEventListener('click', (edges: any) => {
 // group.setExpaned(false);
 
 network.syncView();
+network.addDrag();
 
 const zoomIn = document.querySelector('button.btn_zoomIn');
 const zoomOut = document.querySelector('button.btn_zoomOut');
-const canvas = document.querySelector('canvas');
+const zoomOver = document.querySelector('button.btn_zoomOver');
+const canvas = document.querySelector('div#network');
 if (zoomIn) {
   zoomIn.addEventListener('click', () => {
-    network.setZoom(0.05);
+    network.setZoom(0.3);
   });
 }
 if (zoomOut) {
   zoomOut.addEventListener('click', () => {
-    network.setZoom(-0.05);
+    network.setZoom(-0.3);
   });
 }
 if (canvas) {
   canvas.addEventListener('mousewheel', (e: any) => {
-    const zoom = 0.02;
-    if (e.wheelDelta > 0 || e.detail < 0) {
-      network.setZoom(zoom);
+    const zoom = 0.2;
+    network.setZoom(zoom, e);
+  });
+}
+if (zoomOver) {
+  let isZoom = true;
+  zoomOver.addEventListener('click', () => {
+    if (isZoom) {
+      network.zoomOver();
     } else {
-      network.setZoom(-zoom);
+      network.zoomReset();
     }
+    isZoom = !isZoom;
   });
 }

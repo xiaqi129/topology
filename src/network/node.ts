@@ -53,9 +53,10 @@ export class Node extends CommonElement {
     graph.interactive = true;
     graph.buttonMode = true;
     graph
-      .on('mousedown', this.onDragStart.bind(this))
-      .on('mouseup', this.onDragEnd.bind(this))
-      .on('mousemove', this.onDragMove.bind(this));
+        .on('mousedown', this.onDragStart.bind(this))
+        .on('mouseup', this.onDragEnd.bind(this))
+        .on('mouseupoutside', this.onDragEnd.bind(this))
+        .on('mousemove', this.onDragMove.bind(this));
     this.addChild(graph);
   }
 
