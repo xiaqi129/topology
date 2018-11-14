@@ -121,6 +121,9 @@ export class Node extends CommonElement {
           .on('mouseup', this.onDragEnd.bind(this))
           .on('mouseupoutside', this.onDragEnd.bind(this))
           .on('mousemove', this.onDragMove.bind(this));
+        node
+          .on('mouseover', this.tooltipOn.bind(this))
+          .on('mouseout', this.tooltipOff.bind(this));
         this.addChild(node);
       });
   }
@@ -133,4 +136,23 @@ export class Node extends CommonElement {
     return this.defaultStyle.height;
   }
 
+  public tooltipOn() {
+    // TODO 将tooltip抽成公共部分
+    const tooltip = PIXI.Sprite.fromImage('../pic/tooltip.png');
+    tooltip.y = 20;
+    tooltip.name = 'tooltip';
+    const text = new PIXI.Text(this.getUID(), {
+      fontSize: 12,
+      fill: '0xffffff',
+      fontWeight: 'bold',
+    });
+    text.x = 8;
+    text.y = 2;
+    tooltip.addChild(text);
+    this.addChild(tooltip);
+  }
+
+  public tooltipOff() {
+    this.removeChild(this.getChildByName('tooltip'));
+  }
 }
