@@ -491,6 +491,14 @@ export class Edge extends CommonElement {
     return this.arrow;
   }
 
+  public selcteOn() {
+    this.setStyle(
+      {
+        fillColor: 0X024997,
+        lineColor: 0X024997,
+      });
+  }
+
   public drawLineEdge(
     srcNodePos: { [key: string]: number },
     endNodePos: { [key: string]: number },

@@ -105,6 +105,11 @@ export class Network {
 
   public syncView() {
     this.drawer.syncView();
+    this.setClick();
+  }
+
+  public setClick(color?: any) {
+    this.action.setClick(color);
   }
 
 }

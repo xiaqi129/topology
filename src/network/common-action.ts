@@ -1,6 +1,11 @@
 import * as _ from 'lodash';
 import * as PIXI from 'pixi.js';
 import { Application } from './application';
+import { Node } from './node';
+
+import { Edge } from './edge';
+import { EdgeBundle } from './edge-bundle';
+import { Group } from './group';
 
 export class CommonAction {
   private mouseMoveList: any = [];
@@ -44,10 +49,10 @@ export class CommonAction {
           const x = movePosition.x;
           const y = movePosition.y;
           appContainer.
-          setTransform(offsetX + x, offsetY + y, scale.x * zoom, scale.y * zoom, 0, 0, 0, 0, 0);
+            setTransform(offsetX + x, offsetY + y, scale.x * zoom, scale.y * zoom, 0, 0, 0, 0, 0);
         } else {
           appContainer.
-          setTransform(offsetX, offsetY, scale.x * zoom, scale.y * zoom, 0, 0, 0, 0, 0);
+            setTransform(offsetX, offsetY, scale.x * zoom, scale.y * zoom, 0, 0, 0, 0, 0);
         }
       }
     } else {
@@ -83,10 +88,14 @@ export class CommonAction {
     this.container.setTransform(0, 0, 1, 1, 0, 0, 0, 0, 0);
   }
 
-  public dragContainer() {
+  public hitContainer() {
     this.container.hitArea = new PIXI.Rectangle(0, 0, this.container.width, this.container.height);
     this.container.interactive = true;
-    this.container.buttonMode = true;
+  }
+
+  public dragContainer() {
+    this.hitContainer();
+    // this.container.buttonMode = true;
     this.container
       .on('mousedown', this.onDragStart.bind(this))
       .on('mouseup', this.onDragEnd.bind(this))
@@ -95,7 +104,6 @@ export class CommonAction {
   }
 
   public onDragStart(event: PIXI.interaction.InteractionEvent) {
-    event.stopPropagation();
     this.dragging = true;
     this.data = event.data;
   }
@@ -104,12 +112,77 @@ export class CommonAction {
     this.dragging = false;
   }
 
-  public onDragMove(event: PIXI.interaction.InteractionEvent) {
+  public onDragMove() {
     if (this.dragging) {
-      event.stopPropagation();
       this.container.position.x += this.data.originalEvent.movementX;
       this.container.position.y += this.data.originalEvent.movementY;
       this.positionList.push({ x: this.container.position.x, y: this.container.position.y });
     }
+  }
+
+  public setClick(color?: any) {
+    let defaultFillColor: number;
+    _.each(this.container.children, (element) => {
+      if (element instanceof Node) {
+        element.addEventListener('mousedown', (event: PIXI.interaction.InteractionEvent) => {
+          event.stopPropagation();
+          element.selcteOn(color);
+        });
+      } else if (element instanceof Edge) {
+        defaultFillColor = element.defaultStyle.fillColor;
+        element.addEventListener('click', (event: PIXI.interaction.InteractionEvent) => {
+          event.stopPropagation();
+          event.stopped = false;
+          element.selcteOn();
+        });
+      } else if (element instanceof EdgeBundle) {
+        _.each(element.children, (edges: any) => {
+          defaultFillColor = edges.defaultStyle.fillColor;
+          edges.addEventListener('click', (event: PIXI.interaction.InteractionEvent) => {
+            event.stopPropagation();
+            event.stopped = false;
+            edges.selcteOn();
+          });
+        });
+      } else if (element instanceof Group) {
+        _.each(element.children, (node) => {
+          if (node instanceof Node && node.parent instanceof Group) {
+            node.addEventListener('mousedown', (event: PIXI.interaction.InteractionEvent) => {
+              event.stopPropagation();
+              node.selcteOn();
+            });
+          }
+        });
+      }
+    });
+    this.hitContainer();
+    this.container.on('mousedown', () => {
+      _.each(this.container.children, (element) => {
+        if (element instanceof Node) {
+          element.clearDisplayObjects();
+        }
+        if (element instanceof Edge) {
+          element.setStyle({
+            fillColor: defaultFillColor,
+            lineColor: defaultFillColor,
+          });
+        }
+        if (element instanceof EdgeBundle) {
+          _.each(element.children, (edges: any) => {
+            edges.setStyle({
+              fillColor: defaultFillColor,
+              lineColor: defaultFillColor,
+            });
+          });
+        }
+        if (element instanceof Group) {
+          _.each(element.children, (node) => {
+            if (node instanceof Node && node.parent instanceof Group) {
+              node.clearDisplayObjects();
+            }
+          });
+        }
+      });
+    });
   }
 }

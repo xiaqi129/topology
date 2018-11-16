@@ -8,6 +8,7 @@
 import * as _ from 'lodash';
 import { CommonElement, IStyles } from './common-element';
 import { Edge } from './edge';
+import { EdgeBundle } from './edge-bundle';
 import { Group } from './group';
 
 export class Node extends CommonElement {
@@ -61,7 +62,6 @@ export class Node extends CommonElement {
   }
 
   public onDragStart(event: PIXI.interaction.InteractionEvent) {
-    event.stopPropagation();
     this.dragging = true;
     this.data = event.data;
   }
@@ -79,16 +79,19 @@ export class Node extends CommonElement {
       _.each(this.elements, (element: any) => {
         const groupEdges = element.groupEdges;
         const isExpanded = element.isExpanded;
+        // when the group is Expanded redraw it
         if (element instanceof Node && element.parent instanceof Group) {
           if (element.parent.isExpanded) {
             element.parent.draw();
           }
         }
+        // when the groip is close on redraw groupEdges
         if (element instanceof Group && !isExpanded) {
           element.rmElements(groupEdges);
           element.drawEdges();
         }
       });
+      // redraw all of the EdgeBundle
       _.each(this.edgesGroupByNodes, (edgesGroup, key) => {
         if (_.includes(key, this.getUID())) {
           _.each(edgesGroup, (edge: Edge) => {
@@ -117,14 +120,15 @@ export class Node extends CommonElement {
         node.height = 40;
         node.anchor.set(0.5, 0.5);
         node.interactive = true;
+        node.buttonMode = true;
         node
           .on('mousedown', this.onDragStart.bind(this))
           .on('mouseup', this.onDragEnd.bind(this))
           .on('mouseupoutside', this.onDragEnd.bind(this))
           .on('mousemove', this.onDragMove.bind(this));
-        node
-          .on('mouseover', this.tooltipOn.bind(this))
-          .on('mouseout', this.tooltipOff.bind(this));
+        // node
+        //   .on('mouseover', this.tooltipOn.bind(this))
+        //   .on('mouseout', this.tooltipOff.bind(this));
         this.addChild(node);
       });
   }
@@ -155,5 +159,20 @@ export class Node extends CommonElement {
 
   public tooltipOff() {
     this.removeChild(this.getChildByName('tooltip'));
+  }
+
+  public selcteOn(color?: any) {
+    _.each(this.elements, (element: any) => {
+      if (element instanceof Node) {
+        element.clearDisplayObjects();
+      }
+    });
+    this.tooltipOff();
+    this.clearDisplayObjects();
+    const border = new PIXI.Graphics();
+    border.lineStyle(1, color || 0X024997, 1);
+    border.drawRoundedRect(-this.width / 2, -this.height / 2, this.width, this.height, 10);
+    border.name = 'node_border';
+    this.addChild(border);
   }
 }

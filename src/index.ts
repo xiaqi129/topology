@@ -9,7 +9,7 @@ network.addResourceCache('router', './pic/cisco-18.png');
 
 for (let i: number = 0, len: number = num; i < len;) {
   i += 1;
-  const node = network.createNode('switch');
+  const node = network.createNode('router');
   network.addElement(node);
   node.x = Math.random() * 1200;
   node.y = Math.random() * 900;
@@ -37,11 +37,11 @@ for (let i: number = 0, len: number = num; i < len;) {
       fillColor: 0xC7254E,
       lineDistance: 5,
       lineType: 1,
-      lineWidth: 0.8,
+      lineWidth: 1,
     });
-    edge.addEventListener('click', () => {
-      alert('click!!');
-    });
+    // edge.addEventListener('click', () => {
+    //   alert('click!!');
+    // });
     network.addElement(edge);
 
     // edge.setBundleStyle(1);
@@ -68,6 +68,7 @@ group.addEventListener('click', (edges: any) => {
 // group.setExpaned(false);
 
 network.syncView();
+// network.setClick(0XFF0000);
 network.addDrag();
 
 const zoomIn = document.querySelector('button.btn_zoomIn');
