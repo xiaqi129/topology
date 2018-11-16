@@ -83,12 +83,8 @@ export class Network {
     element.destroy();
   }
 
-  public setZoom(num: number, event?: any) {
-    if (event) {
-      this.action.setZoom(num, event);
-    } else {
-      this.action.setZoom(num);
-    }
+  public setZoom(num: number) {
+    this.action.setZoom(num);
   }
 
   public zoomOver() {
@@ -97,10 +93,6 @@ export class Network {
 
   public zoomReset() {
     this.action.zoomReset();
-  }
-
-  public addDrag() {
-    this.action.dragContainer();
   }
 
   public syncView() {

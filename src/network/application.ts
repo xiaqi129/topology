@@ -6,15 +6,17 @@
  */
 
 import * as _ from 'lodash';
+import Viewport from 'pixi-viewport';
 import * as PIXI from 'pixi.js';
 import * as Rx from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
+import { debounceTime, windowWhen } from 'rxjs/operators';
 import { Group } from './group';
 
 export class Application extends PIXI.Application {
   private domRegex: string = '';
   private viewWrapper: HTMLDivElement | null = null;
-  private container: PIXI.Container;
+  private container: Viewport;
+  // private viewport: Viewport;
 
   constructor(domRegex: string = '', options = null) {
     super(options || {
@@ -27,7 +29,11 @@ export class Application extends PIXI.Application {
       width: 0,
       forceFXAA: true,
     });
-    this.container = new PIXI.Container();
+    this.container = new Viewport({
+      screenWidth: window.innerWidth,
+      screenHeight: window.innerHeight,
+      interaction: this.renderer.plugins.interaction,
+    });
     this.domRegex = domRegex;
     this.setup();
   }
@@ -43,6 +49,12 @@ export class Application extends PIXI.Application {
       this.viewWrapper.appendChild(this.view);
     }
     this.stage.addChild(this.container);
+    this.container
+      .clamp()
+      .drag()
+      .pinch()
+      .wheel()
+      .decelerate();
   }
 
   public fitWrapperSize() {

@@ -69,7 +69,6 @@ group.addEventListener('click', (edges: any) => {
 
 network.syncView();
 // network.setClick(0XFF0000);
-network.addDrag();
 
 const zoomIn = document.querySelector('button.btn_zoomIn');
 const zoomOut = document.querySelector('button.btn_zoomOut');
@@ -83,12 +82,6 @@ if (zoomIn) {
 if (zoomOut) {
   zoomOut.addEventListener('click', () => {
     network.setZoom(-0.3);
-  });
-}
-if (canvas) {
-  canvas.addEventListener('mousewheel', (e: any) => {
-    const zoom = 0.2;
-    network.setZoom(zoom, e);
   });
 }
 if (zoomOver) {
