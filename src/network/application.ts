@@ -15,8 +15,7 @@ import { Group } from './group';
 export class Application extends PIXI.Application {
   private domRegex: string = '';
   private viewWrapper: HTMLDivElement | null = null;
-  private container: Viewport;
-  // private viewport: Viewport;
+  private container: Viewport | undefined = undefined;
 
   constructor(domRegex: string = '', options = null) {
     super(options || {
@@ -28,11 +27,6 @@ export class Application extends PIXI.Application {
       transparent: true,
       width: 0,
       forceFXAA: true,
-    });
-    this.container = new Viewport({
-      screenWidth: window.innerWidth,
-      screenHeight: window.innerHeight,
-      interaction: this.renderer.plugins.interaction,
     });
     this.domRegex = domRegex;
     this.setup();
@@ -46,15 +40,22 @@ export class Application extends PIXI.Application {
   public initApplication() {
     this.viewWrapper = document.querySelector(this.domRegex);
     if (this.viewWrapper) {
+      this.container = new Viewport({
+        screenWidth: window.innerWidth,
+        screenHeight: window.innerHeight,
+        interaction: this.renderer.plugins.interaction,
+        divWheel: this.viewWrapper,
+      });
       this.viewWrapper.appendChild(this.view);
     }
-    this.stage.addChild(this.container);
-    this.container
-      .clamp()
-      .drag()
-      .pinch()
-      .wheel()
-      .decelerate();
+    if (this.container) {
+      this.stage.addChild(this.container);
+      this.container
+        .clamp()
+        .pinch()
+        .wheel()
+        .decelerate();
+    }
   }
 
   public fitWrapperSize() {
@@ -83,20 +84,26 @@ export class Application extends PIXI.Application {
   }
 
   public getContainer() {
-    return this.container;
+    if (this.container) {
+      return this.container;
+    }
   }
 
   public clearContainer() {
-    this.container.removeChildren(0, this.container.children.length);
+    if (this.container) {
+      this.container.removeChildren(0, this.container.children.length);
+    }
   }
 
   public addElement(element: PIXI.Container) {
-    this.container.addChild(element);
+    if (this.container) {
+      this.container.addChild(element);
+    }
   }
 
   public addElements(elements: PIXI.Container[]) {
     _.each(elements, (element) => {
-      if (!(element.parent instanceof Group)) {
+      if (!(element.parent instanceof Group) && this.container) {
         this.container.addChild(element);
       }
     });

@@ -83,6 +83,14 @@ export class Network {
     element.destroy();
   }
 
+  public setDrag() {
+    this.action.dragContainer();
+  }
+
+  public setSelect() {
+    this.action.setSelect();
+  }
+
   public setZoom(num: number) {
     this.action.setZoom(num);
   }

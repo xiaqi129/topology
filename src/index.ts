@@ -68,11 +68,13 @@ group.addEventListener('click', (edges: any) => {
 // group.setExpaned(false);
 
 network.syncView();
+network.setDrag();
 // network.setClick(0XFF0000);
 
 const zoomIn = document.querySelector('button.btn_zoomIn');
 const zoomOut = document.querySelector('button.btn_zoomOut');
 const zoomOver = document.querySelector('button.btn_zoomOver');
+const dragOrSelect = document.querySelector('button.btn_dragOrSelect');
 const canvas = document.querySelector('div#network');
 if (zoomIn) {
   zoomIn.addEventListener('click', () => {
@@ -93,5 +95,16 @@ if (zoomOver) {
       network.zoomReset();
     }
     isZoom = !isZoom;
+  });
+}
+if (dragOrSelect) {
+  let isDrag = false;
+  dragOrSelect.addEventListener('click', () => {
+    if (isDrag) {
+      network.setDrag();
+    } else {
+      network.setSelect();
+    }
+    isDrag = !isDrag;
   });
 }

@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import Viewport from 'pixi-viewport';
 import * as PIXI from 'pixi.js';
 import { Application } from './application';
 import { Node } from './node';
@@ -8,20 +9,16 @@ import { EdgeBundle } from './edge-bundle';
 import { Group } from './group';
 
 export class CommonAction {
+  public selectNode: any = [];
   private app: Application;
-  private container: PIXI.Container;
+  private container: Viewport;
   constructor(app: any) {
     this.app = app;
     this.container = app.getContainer();
   }
 
   public setZoom(num: number) {
-    const appContainer = this.container;
-    const scale = appContainer.scale;
-    if (scale.x * (num + 1) > 0.3 && scale.x * (num + 1) < 2) {
-      appContainer.setTransform(0, 0, scale.x * (num + 1), scale.y * (num + 1), 0, 0, 0, 0, 0);
-    }
-
+    this.container.zoomPercent(num);
   }
 
   public zoomOver() {
@@ -39,9 +36,66 @@ export class CommonAction {
     this.container.setTransform(0, 0, 1, 1, 0, 0, 0, 0, 0);
   }
 
-  public hitContainer() {
-    this.container.hitArea = new PIXI.Rectangle(0, 0, this.container.width, this.container.height);
-    this.container.interactive = true;
+  public dragContainer() {
+    this.container.removeAllListeners('mousemove');
+    this.container.removeAllListeners('mouseup');
+    this.container.drag();
+  }
+
+  public setSelect() {
+    this.container.removePlugin('drag');
+    this.moveSelect();
+  }
+
+  public moveSelect() {
+    const rectangle = new PIXI.Graphics();
+    const elements = this.container.children;
+    let flag = false;
+    let oldLeft = 0;
+    let oldTop = 0;
+    let hitAreaX = 0;
+    let hitAreaY = 0;
+    let width = 0;
+    let height = 0;
+    this.container.on('mousedown', (event: any) => {
+      if (this.container.hitArea instanceof PIXI.Rectangle) {
+        flag = true;
+        hitAreaX = this.container.hitArea.x;
+        hitAreaY = this.container.hitArea.y;
+        oldLeft = (event.data.global.x / this.container.scale.x) + hitAreaX;
+        oldTop = (event.data.global.y / this.container.scale.y) + hitAreaY;
+      }
+    });
+    this.container.on('mousemove', (event: any) => {
+      if (flag) {
+        this.selectNode = [];
+        rectangle.clear();
+        width = (event.data.global.x / this.container.scale.x) + hitAreaX - oldLeft;
+        height = (event.data.global.y / this.container.scale.y) + hitAreaY - oldTop;
+        rectangle.lineStyle(1, 0X024997, 1);
+        rectangle.alpha = 0.8;
+        rectangle.drawRect(oldLeft, oldTop, width, height);
+        this.app.addElement(rectangle);
+      }
+    });
+    this.container.on('mouseup', (event: any) => {
+      flag = false;
+      const bounds = rectangle.getLocalBounds();
+      _.each(elements, (element) => {
+        if (element instanceof Node) {
+          const nodeTop = element.y - (element.height / 2);
+          const nodeLeft = element.x - (element.width / 2);
+          const nodeRight = element.x + (element.width / 2);
+          const nodeBottom = element.y + (element.height / 2);
+          if ((nodeTop >= bounds.top) && (nodeRight <= bounds.right) &&
+          (nodeBottom <= bounds.bottom) && (nodeLeft >= bounds.left)) {
+            element.selectOn();
+            this.selectNode.push(element);
+          }
+        }
+      });
+      rectangle.clear();
+    });
   }
 
   public setClick(color?: any) {
@@ -50,7 +104,7 @@ export class CommonAction {
       if (element instanceof Node) {
         element.addEventListener('mousedown', (event: PIXI.interaction.InteractionEvent) => {
           event.stopPropagation();
-          element.selcteOn(color);
+          element.selectOne(color);
         });
       } else if (element instanceof Edge) {
         defaultFillColor = element.defaultStyle.fillColor;
@@ -73,13 +127,12 @@ export class CommonAction {
           if (node instanceof Node && node.parent instanceof Group) {
             node.addEventListener('mousedown', (event: PIXI.interaction.InteractionEvent) => {
               event.stopPropagation();
-              node.selcteOn();
+              node.selectOne();
             });
           }
         });
       }
     });
-    this.hitContainer();
     this.container.on('mousedown', () => {
       _.each(this.container.children, (element) => {
         if (element instanceof Node) {

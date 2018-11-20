@@ -161,12 +161,16 @@ export class Node extends CommonElement {
     this.removeChild(this.getChildByName('tooltip'));
   }
 
-  public selcteOn(color?: any) {
+  public selectOne(color?: any) {
     _.each(this.elements, (element: any) => {
       if (element instanceof Node) {
         element.clearDisplayObjects();
       }
     });
+    this.selectOn(color);
+  }
+
+  public selectOn(color?: any) {
     this.tooltipOff();
     this.clearDisplayObjects();
     const border = new PIXI.Graphics();
