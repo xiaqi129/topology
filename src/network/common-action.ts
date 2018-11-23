@@ -107,29 +107,6 @@ export class CommonAction {
     });
   }
 
-  // public selectNodeDrag() {
-  //   let dragging = false;
-  //   let data: any;
-  //   _.each(this.selectNode, (node: Node) => {
-  //     node.selectOn();
-  //     node.on('mousedown', (event: PIXI.interaction.InteractionEvent) => {
-  //       dragging = true;
-  //       data = event.data;
-  //     });
-  //     node.on('mousemove', () => {
-  //       if (dragging) {
-  //         node.position.x += data.originalEvent.movementX;
-  //         node.position.y += data.originalEvent.movementY;
-  //         node.redrawEdge();
-  //       }
-  //     });
-  //     node.on('mouseup', () => {
-  //       dragging = false;
-  //       data = null;
-  //     });
-  //   });
-  // }
-
   public getZoom() {
     return this.container.scale;
   }
