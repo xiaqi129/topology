@@ -53,10 +53,10 @@ export class Node extends CommonElement {
     graph.interactive = true;
     graph.buttonMode = true;
     graph
-        .on('mousedown', this.onDragStart.bind(this))
-        .on('mouseup', this.onDragEnd.bind(this))
-        .on('mouseupoutside', this.onDragEnd.bind(this))
-        .on('mousemove', this.onDragMove.bind(this));
+      .on('mousedown', this.onDragStart.bind(this))
+      .on('mouseup', this.onDragEnd.bind(this))
+      .on('mouseupoutside', this.onDragEnd.bind(this))
+      .on('mousemove', this.onDragMove.bind(this));
     this.addChild(graph);
   }
 
@@ -122,9 +122,6 @@ export class Node extends CommonElement {
           .on('mouseup', this.onDragEnd.bind(this))
           .on('mouseupoutside', this.onDragEnd.bind(this))
           .on('mousemove', this.onDragMove.bind(this));
-        node
-          .on('mouseover', this.tooltipOn.bind(this))
-          .on('mouseout', this.tooltipOff.bind(this));
         this.addChild(node);
       });
   }
@@ -137,16 +134,27 @@ export class Node extends CommonElement {
     return this.defaultStyle.height;
   }
 
-  public tooltipOn() {
-    // TODO 将tooltip抽成公共部分
-    const tooltip = PIXI.Sprite.fromImage('../pic/tooltip.png');
-    tooltip.y = 20;
-    tooltip.name = 'tooltip';
-    const text = new PIXI.Text(this.getUID(), {
+  /**
+   * 显示tooltip
+   * @param event 事件保留参数
+   * @param content tooltip内容
+   * @param textStyle tooltip文字样式
+   * @param shape tooltip背景形状
+   */
+  public tooltipOn(event: any, content?: string, textStyle?: any, shape?: string) {
+
+    const tooltipShape = shape || 'rect-sm';  // pic resource of shape
+    const tooltipContent = content || this.getUID();  // content
+    const tooltipStyle = textStyle || {
       fontSize: 12,
       fill: '0xffffff',
       fontWeight: 'bold',
-    });
+    };  // styles
+
+    const tooltip = PIXI.Sprite.fromImage(`../pic/${tooltipShape}.png`);  // tooltip main
+    tooltip.y = 20;
+    tooltip.name = 'nodeTooltip';
+    const text = new PIXI.Text(tooltipContent, tooltipStyle);
     text.x = 8;
     text.y = 2;
     tooltip.addChild(text);
@@ -154,6 +162,6 @@ export class Node extends CommonElement {
   }
 
   public tooltipOff() {
-    this.removeChild(this.getChildByName('tooltip'));
+    this.removeChild(this.getChildByName('nodeTooltip'));
   }
 }

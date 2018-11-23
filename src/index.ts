@@ -20,6 +20,9 @@ for (let i: number = 0, len: number = num; i < len;) {
   };
   const label = network.createLabel(node.getUID(), labelStyleOptions);
   node.addChild(label);
+  // network.addTooltip(node);
+  node.addEventListener('mouseover', node.tooltipOn.bind(node));
+  node.addEventListener('mouseout', node.tooltipOff.bind(node));
 }
 const nodes = network.getElements();
 for (let i: number = 0, len: number = num; i < len;) {
@@ -42,6 +45,9 @@ for (let i: number = 0, len: number = num; i < len;) {
     edge.addEventListener('click', () => {
       alert('click!!');
     });
+    network.addTooltip(edge);
+    // edge.addEventListener('mouseover', edge.tooltipOn.bind(edge));
+    // edge.addEventListener('mouseout', edge.tooltipOff.bind(edge));
     network.addElement(edge);
 
     // edge.setBundleStyle(1);
