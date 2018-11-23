@@ -1,19 +1,28 @@
+/**
+ * @license
+ * Copyright Cisco Inc. All Rights Reserved.
+ *
+ * Author: gsp-dalian-ued@cisco.com
+ */
+
 import * as _ from 'lodash';
 import Viewport from 'pixi-viewport';
 import * as PIXI from 'pixi.js';
 import { Application } from './application';
 import { Node } from './node';
+import { ITopo } from './topo';
 
 import { Edge } from './edge';
 import { EdgeBundle } from './edge-bundle';
 import { Group } from './group';
 
 export class CommonAction {
-  public selectNode: any = [];
   private app: Application;
   private container: Viewport;
-  constructor(app: any) {
+  private topo: ITopo;
+  constructor(app: any, topo: ITopo) {
     this.app = app;
+    this.topo = topo;
     this.container = app.getContainer();
   }
 
@@ -59,6 +68,7 @@ export class CommonAction {
     let height = 0;
     this.container.on('mousedown', (event: any) => {
       if (this.container.hitArea instanceof PIXI.Rectangle) {
+        this.topo.removeSelectedNodes();
         flag = true;
         hitAreaX = this.container.hitArea.x;
         hitAreaY = this.container.hitArea.y;
@@ -68,7 +78,6 @@ export class CommonAction {
     });
     this.container.on('mousemove', (event: any) => {
       if (flag) {
-        this.selectNode = [];
         rectangle.clear();
         width = (event.data.global.x / this.container.scale.x) + hitAreaX - oldLeft;
         height = (event.data.global.y / this.container.scale.y) + hitAreaY - oldTop;
@@ -88,14 +97,41 @@ export class CommonAction {
           const nodeRight = element.x + (element.width / 2);
           const nodeBottom = element.y + (element.height / 2);
           if ((nodeTop >= bounds.top) && (nodeRight <= bounds.right) &&
-          (nodeBottom <= bounds.bottom) && (nodeLeft >= bounds.left)) {
+            (nodeBottom <= bounds.bottom) && (nodeLeft >= bounds.left)) {
             element.selectOn();
-            this.selectNode.push(element);
+            this.topo.setSelectedNodes(element);
           }
         }
       });
       rectangle.clear();
     });
+  }
+
+  // public selectNodeDrag() {
+  //   let dragging = false;
+  //   let data: any;
+  //   _.each(this.selectNode, (node: Node) => {
+  //     node.selectOn();
+  //     node.on('mousedown', (event: PIXI.interaction.InteractionEvent) => {
+  //       dragging = true;
+  //       data = event.data;
+  //     });
+  //     node.on('mousemove', () => {
+  //       if (dragging) {
+  //         node.position.x += data.originalEvent.movementX;
+  //         node.position.y += data.originalEvent.movementY;
+  //         node.redrawEdge();
+  //       }
+  //     });
+  //     node.on('mouseup', () => {
+  //       dragging = false;
+  //       data = null;
+  //     });
+  //   });
+  // }
+
+  public getZoom() {
+    return this.container.scale;
   }
 
   public setClick(color?: any) {

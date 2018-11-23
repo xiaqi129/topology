@@ -27,7 +27,7 @@ export class Network {
     this.topo = new Topo(this.loader);
     this.drawer = new Drawer(domRegex, this.topo);
     this.app = this.drawer.getWhiteBoard();
-    this.action = new CommonAction(this.app);
+    this.action = new CommonAction(this.app, this.topo);
   }
 
   public addResourceCache(key: string, image: string) {

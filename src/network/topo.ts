@@ -30,11 +30,19 @@ export interface ITopo {
 
   clear(): void;
 
+  setSelectedNodes(element: CommonElement): void;
+
+  getSelectedNodes(): any[];
+
+  removeSelectedNodes(): void;
+
 }
 
 export class Topo implements ITopo {
 
   public loader: PIXI.loaders.Loader | null = null;
+
+  private selectedNodes: any [] = [];
 
   private elements: any [] = [];
 
@@ -156,7 +164,7 @@ export class Topo implements ITopo {
   }
 
   public createNode(resourceName?: string): Node {
-    return new Node(this.edgesGroupByNodes, this.elements, resourceName);
+    return new Node(this.edgesGroupByNodes, this.elements, this.selectedNodes, resourceName);
   }
 
   public createGroup(): Group {
@@ -180,4 +188,15 @@ export class Topo implements ITopo {
     });
   }
 
+  public setSelectedNodes(element: CommonElement) {
+    this.selectedNodes.push(element);
+  }
+
+  public getSelectedNodes() {
+    return this.selectedNodes;
+  }
+
+  public removeSelectedNodes() {
+    return _.remove(this.selectedNodes);
+  }
 }

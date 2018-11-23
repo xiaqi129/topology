@@ -17,16 +17,19 @@ export class Node extends CommonElement {
   private data: any;
   private edgesGroupByNodes: { [key: string]: Edge[] };
   private elements: Edge | CommonElement[];
+  private selectedNodes: any [] = [];
 
   constructor(
     edgesGroupByNodes: { [key: string]: Edge[] },
     elements: Edge | CommonElement[],
+    selectedNodes: any [] = [],
     resourceName?: string) {
     super();
     this.edgesGroupByNodes = edgesGroupByNodes;
     this.data = null;
     this.dragging = false;
     this.elements = elements;
+    this.selectedNodes = selectedNodes;
     // this.draw();  // 圆点
     this.createSprite(resourceName || 'switch');  // 从loader中加载icon, 默认switch
   }
@@ -76,30 +79,34 @@ export class Node extends CommonElement {
       const newPosition = this.data.getLocalPosition(this.parent);
       this.position.x = newPosition.x;
       this.position.y = newPosition.y;
-      _.each(this.elements, (element: any) => {
-        const groupEdges = element.groupEdges;
-        const isExpanded = element.isExpanded;
-        // when the group is Expanded redraw it
-        if (element instanceof Node && element.parent instanceof Group) {
-          if (element.parent.isExpanded) {
-            element.parent.draw();
-          }
-        }
-        // when the groip is close on redraw groupEdges
-        if (element instanceof Group && !isExpanded) {
-          element.rmElements(groupEdges);
-          element.drawEdges();
-        }
-      });
-      // redraw all of the EdgeBundle
-      _.each(this.edgesGroupByNodes, (edgesGroup, key) => {
-        if (_.includes(key, this.getUID())) {
-          _.each(edgesGroup, (edge: Edge) => {
-            edge.draw();
-          });
-        }
-      });
+      this.redrawEdge();
     }
+  }
+
+  public redrawEdge() {
+    _.each(this.elements, (element: any) => {
+      const groupEdges = element.groupEdges;
+      const isExpanded = element.isExpanded;
+      // when the group is Expanded redraw it
+      if (element instanceof Node && element.parent instanceof Group) {
+        if (element.parent.isExpanded) {
+          element.parent.draw();
+        }
+      }
+      // when the groip is close on redraw groupEdges
+      if (element instanceof Group && !isExpanded) {
+        element.rmElements(groupEdges);
+        element.drawEdges();
+      }
+    });
+    // redraw all of the EdgeBundle
+    _.each(this.edgesGroupByNodes, (edgesGroup, key) => {
+      if (_.includes(key, this.getUID())) {
+        _.each(edgesGroup, (edge: Edge) => {
+          edge.draw();
+        });
+      }
+    });
   }
 
   public createSprite(resourceName: string) {
@@ -171,7 +178,6 @@ export class Node extends CommonElement {
   }
 
   public selectOn(color?: any) {
-    this.tooltipOff();
     this.clearDisplayObjects();
     const border = new PIXI.Graphics();
     border.lineStyle(1, color || 0X024997, 1);
