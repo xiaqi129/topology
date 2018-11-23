@@ -145,37 +145,6 @@ export class Node extends CommonElement {
     return this.defaultStyle.height;
   }
 
-  /**
-   * 显示tooltip
-   * @param event 事件保留参数
-   * @param content tooltip内容
-   * @param textStyle tooltip文字样式
-   * @param shape tooltip背景形状
-   */
-  public tooltipOn(event: any, content?: string, textStyle?: any, shape?: string) {
-
-    const tooltipShape = shape || 'rect-sm';  // pic resource of shape
-    const tooltipContent = content || this.getUID();  // content
-    const tooltipStyle = textStyle || {
-      fontSize: 12,
-      fill: '0xffffff',
-      fontWeight: 'bold',
-    };  // styles
-
-    const tooltip = PIXI.Sprite.fromImage(`../pic/${tooltipShape}.png`);  // tooltip main
-    tooltip.y = 20;
-    tooltip.name = 'nodeTooltip';
-    const text = new PIXI.Text(tooltipContent, tooltipStyle);
-    text.x = 8;
-    text.y = 2;
-    tooltip.addChild(text);
-    this.addChild(tooltip);
-  }
-
-  public tooltipOff() {
-    this.removeChild(this.getChildByName('nodeTooltip'));
-  }
-
   public selectOne(color?: any) {
     _.each(this.elements, (element: any) => {
       if (element instanceof Node) {
