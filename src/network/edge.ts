@@ -565,4 +565,29 @@ export class Edge extends CommonElement {
     }
     this.addChildren(elements);
   }
+
+  public tooltipOn(event: any, content?: string, textStyle?: any, shape?: string) {
+
+    const tooltipShape = shape || 'rect-lg';  // pic resource of shape
+    const tooltipContent = content || `${this.startNode.id}  >>>>  ${this.endNode.id}`;  // content
+    const tooltipStyle = textStyle || {
+      fontSize: 12,
+      fill: '0x00ff00',
+      fontWeight: 'bold',
+    };  // styles
+
+    const tooltip = PIXI.Sprite.fromImage(`../pic/${tooltipShape}.png`);  // tooltip main
+    tooltip.x = event.data.global.x + 10;
+    tooltip.y = event.data.global.y;
+    tooltip.name = 'edgeTooltip';
+    const text = new PIXI.Text(tooltipContent, tooltipStyle);
+    text.x = 8;
+    text.y = 2;
+    tooltip.addChild(text);
+    this.addChild(tooltip);
+  }
+
+  public tooltipOff() {
+    this.removeChild(this.getChildByName('edgeTooltip'));
+  }
 }

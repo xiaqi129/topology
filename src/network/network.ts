@@ -13,6 +13,7 @@ import { Drawer } from './drawer';
 import { Edge } from './edge';
 import { Group } from './group';
 import { Node } from './node';
+import { Tooltip } from './tooltip';
 
 import { Topo } from './topo';
 
@@ -22,12 +23,14 @@ export class Network {
   private drawer: Drawer;
   private app: Application;
   private action: CommonAction;
+  private tooltip: Tooltip;
 
   constructor(domRegex: string) {
     this.topo = new Topo(this.loader);
     this.drawer = new Drawer(domRegex, this.topo);
     this.app = this.drawer.getWhiteBoard();
     this.action = new CommonAction(this.app, this.topo);
+    this.tooltip = new Tooltip();
   }
 
   public addResourceCache(key: string, image: string) {
@@ -110,6 +113,10 @@ export class Network {
 
   public setClick(color?: any) {
     this.action.setClick(color);
+  }
+
+  public addTooltip(element: any) {
+    this.tooltip.addTooltip(element);
   }
 
 }
