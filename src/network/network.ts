@@ -119,4 +119,8 @@ export class Network {
     this.tooltip.addTooltip(element);
   }
 
+  public setTooltipDisplay(isDisplay: any) {
+    this.tooltip.setTooltipDisplay(isDisplay);
+  }
+
 }

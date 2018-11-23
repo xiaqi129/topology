@@ -5,7 +5,8 @@ import { Edge } from './edge';
 import { Node } from './node';
 
 export class Tooltip {
-  private commonStyles = {
+  public commonStyles = {
+    display: 'block',
     position: 'fixed',
     backgroundColor: 'black',
     color: 'white',
@@ -27,6 +28,14 @@ export class Tooltip {
     }
     ele.addEventListener('mouseout', this.tooltipOff);
     ele.addEventListener('mousemove', this.tooltipMove);
+  }
+
+  public setTooltipDisplay(isDisplay: any) {
+    if (isDisplay) {
+      this.commonStyles.display = 'block';
+    } else {
+      this.commonStyles.display = 'none';
+    }
   }
 
   private nodeTooltipOn(event: any, content?: string, customStyle?: any) {
