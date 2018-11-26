@@ -74,6 +74,7 @@ const zoomIn = document.querySelector('button.btn_zoomIn');
 const zoomOut = document.querySelector('button.btn_zoomOut');
 const zoomOver = document.querySelector('button.btn_zoomOver');
 const dragOrSelect = document.querySelector('button.btn_dragOrSelect');
+const tooltipToggle = document.querySelector('button.btn_tooltipToggle');
 const canvas = document.querySelector('div#network');
 if (zoomIn) {
   zoomIn.addEventListener('click', () => {
@@ -105,5 +106,12 @@ if (dragOrSelect) {
       network.setSelect();
     }
     isDrag = !isDrag;
+  });
+}
+if (tooltipToggle) {
+  let isDisplay = true;
+  tooltipToggle.addEventListener('click', () => {
+    isDisplay = !isDisplay;
+    network.setTooltipDisplay(isDisplay);
   });
 }
