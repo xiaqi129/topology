@@ -17,12 +17,12 @@ export class Node extends CommonElement {
   private data: any;
   private edgesGroupByNodes: { [key: string]: Edge[] };
   private elements: Edge | CommonElement[];
-  private selectedNodes: any [] = [];
+  private selectedNodes: any[] = [];
 
   constructor(
     edgesGroupByNodes: { [key: string]: Edge[] },
     elements: Edge | CommonElement[],
-    selectedNodes: any [] = [],
+    selectedNodes: any[] = [],
     resourceName?: string) {
     super();
     this.edgesGroupByNodes = edgesGroupByNodes;
@@ -135,6 +135,20 @@ export class Node extends CommonElement {
           .on('mousemove', this.onDragMove.bind(this));
         this.addChild(node);
       });
+    if (!loader.loading) {
+      const node = nodeSprite;
+      node.width = 40;
+      node.height = 40;
+      node.anchor.set(0.5, 0.5);
+      node.interactive = true;
+      node.buttonMode = true;
+      node
+        .on('mousedown', this.onDragStart.bind(this))
+        .on('mouseup', this.onDragEnd.bind(this))
+        .on('mouseupoutside', this.onDragEnd.bind(this))
+        .on('mousemove', this.onDragMove.bind(this));
+      this.addChild(node);
+    }
   }
 
   public getWidth() {
