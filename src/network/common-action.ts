@@ -21,6 +21,7 @@ export class CommonAction {
   private app: Application;
   private container: Viewport;
   private topo: ITopo;
+  private clickColor: any;
   constructor(app: any, topo: ITopo) {
     this.app = app;
     this.topo = topo;
@@ -99,7 +100,7 @@ export class CommonAction {
           const nodeBottom = element.y + (element.height / 2);
           if ((nodeTop >= bounds.top) && (nodeRight <= bounds.right) &&
             (nodeBottom <= bounds.bottom) && (nodeLeft >= bounds.left)) {
-            element.selectOn();
+            element.selectOn(this.clickColor);
             this.topo.setSelectedNodes(element);
           }
         }
@@ -112,7 +113,7 @@ export class CommonAction {
               const nodeBottom = node.y + (node.height / 2);
               if ((nodeTop >= bounds.top) && (nodeRight <= bounds.right) &&
                 (nodeBottom <= bounds.bottom) && (nodeLeft >= bounds.left)) {
-                node.selectOn();
+                node.selectOn(this.clickColor);
                 this.topo.setSelectedNodes(node);
               }
             }
@@ -129,6 +130,7 @@ export class CommonAction {
   }
 
   public setClick(color?: any) {
+    this.clickColor = color;
     let defaultLineColor: number;
     _.each(this.container.children, (element) => {
       if (element instanceof Node) {
@@ -161,7 +163,7 @@ export class CommonAction {
             node.addEventListener('mousedown', (event: PIXI.interaction.InteractionEvent) => {
               event.stopPropagation();
               this.cleanEdge(defaultLineColor);
-              node.selectOne();
+              node.selectOne(color);
             });
           }
           if (node instanceof GroupEdge) {
@@ -178,7 +180,7 @@ export class CommonAction {
     this.container.on('mousedown', () => {
       _.each(this.container.children, (element) => {
         if (element instanceof Node) {
-          element.clearDisplayObjects();
+          element.clearBorder();
         }
         if (element instanceof Edge) {
           element.setStyle({
@@ -197,7 +199,7 @@ export class CommonAction {
         if (element instanceof Group) {
           _.each(element.children, (node) => {
             if (node instanceof Node && node.parent instanceof Group) {
-              node.clearDisplayObjects();
+              node.clearBorder();
             }
             if (node instanceof GroupEdge) {
               node.setStyle({
@@ -243,7 +245,7 @@ export class CommonAction {
   public cleanNode() {
     _.each(this.container.children, (ele) => {
       if (ele instanceof Node) {
-        ele.clearDisplayObjects();
+        ele.clearBorder();
       }
     });
   }

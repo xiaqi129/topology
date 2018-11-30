@@ -172,7 +172,7 @@ export class Node extends CommonElement {
     } else {
       _.each(this.elements, (element: any) => {
         if (element instanceof Node) {
-          element.clearDisplayObjects();
+          element.clearBorder();
         }
       });
       this.selectOn(color);
@@ -180,10 +180,10 @@ export class Node extends CommonElement {
   }
 
   public selectOn(color?: any) {
-    this.clearDisplayObjects();
+    this.clearBorder();
     const border = new PIXI.Graphics();
     border.lineStyle(1, color || 0X024997, 1);
-    border.drawRoundedRect(-this.width / 2, -this.height / 2, this.width, this.height, 10);
+    border.drawRoundedRect(-this.width / 2, -this.height / 2, this.width, this.height, 5);
     border.name = 'node_border';
     this.addChild(border);
   }

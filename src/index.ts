@@ -60,14 +60,12 @@ _.each(groupNodes, (node) => {
     fillOpacity: 1,
   });
 });
-group.addEventListener('click', (edges: any) => {
-  alert(`${edges.length} link[s] referenced.`);
-});
+
 // group.setExpaned(false);
 
 network.syncView();
 network.setDrag();
-// network.setClick(0XFF0000);
+network.setClick(0XFF0000);
 
 const zoomIn = document.querySelector('button.btn_zoomIn');
 const zoomOut = document.querySelector('button.btn_zoomOut');
