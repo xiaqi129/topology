@@ -147,12 +147,8 @@ export class Group extends CommonElement {
 
   public onDragStart(event: PIXI.interaction.InteractionEvent) {
     event.stopPropagation();
-    const graph = this.getChildByName(this.polygonHullOutlineName);
     this.dragging = true;
     this.data = event.data;
-    this.dragPoint = event.data.getLocalPosition(graph.parent);
-    this.dragPoint.x -= graph.x;
-    this.dragPoint.y -= graph.y;
   }
 
   public onDragEnd() {

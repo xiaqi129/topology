@@ -134,7 +134,7 @@ export class Edge extends CommonElement {
   public drawEdge(graph: any, points: any) {
     const style = this.defaultStyle;
     graph.lineStyle(style.lineWidth, style.lineColor);
-    graph.beginFill(style.fillColor, style.fillOpacity);
+    graph.beginFill(style.lineColor, style.fillOpacity);
     graph.moveTo(points.sLeft.x, points.sLeft.y);
     graph.lineTo(points.sRight.x, points.sRight.y);
     graph.lineTo(points.eRight.x, points.eRight.y);
@@ -187,7 +187,7 @@ export class Edge extends CommonElement {
     // const srcPointY = points.shift() - curveDistance * Math.sin(angle);
     const parallelPoint = this.getParallelPoint(
       { x: points.shift(), y: points.shift() }, curveDistance, angle);
-    graph.beginFill(style.fillColor, style.bezierOacity);
+    graph.beginFill(style.lineColor, style.bezierOacity);
     graph.moveTo(parallelPoint.x, parallelPoint.y);
     points.reverse();
     points[1] = points[1] + curveDistance * Math.cos(angle);

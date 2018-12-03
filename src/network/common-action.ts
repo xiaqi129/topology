@@ -14,12 +14,14 @@ import { ITopo } from './topo';
 
 import { Edge } from './edge';
 import { EdgeBundle } from './edge-bundle';
+import { GroupEdge } from './edge-conn-group';
 import { Group } from './group';
 
 export class CommonAction {
   private app: Application;
   private container: Viewport;
   private topo: ITopo;
+  private clickColor: any;
   constructor(app: any, topo: ITopo) {
     this.app = app;
     this.topo = topo;
@@ -98,63 +100,60 @@ export class CommonAction {
           const nodeBottom = element.y + (element.height / 2);
           if ((nodeTop >= bounds.top) && (nodeRight <= bounds.right) &&
             (nodeBottom <= bounds.bottom) && (nodeLeft >= bounds.left)) {
-            element.selectOn();
+            element.selectOn(this.clickColor);
             this.topo.setSelectedNodes(element);
           }
+        }
+        if (element instanceof Group) {
+          _.each(element.children, (node) => {
+            if (node instanceof Node && node.parent instanceof Group) {
+              const nodeTop = node.y - (node.height / 2);
+              const nodeLeft = node.x - (node.width / 2);
+              const nodeRight = node.x + (node.width / 2);
+              const nodeBottom = node.y + (node.height / 2);
+              if ((nodeTop >= bounds.top) && (nodeRight <= bounds.right) &&
+                (nodeBottom <= bounds.bottom) && (nodeLeft >= bounds.left)) {
+                node.selectOn(this.clickColor);
+                this.topo.setSelectedNodes(node);
+              }
+            }
+          });
+          element.draw();
         }
       });
       rectangle.clear();
     });
   }
 
-  // public selectNodeDrag() {
-  //   let dragging = false;
-  //   let data: any;
-  //   _.each(this.selectNode, (node: Node) => {
-  //     node.selectOn();
-  //     node.on('mousedown', (event: PIXI.interaction.InteractionEvent) => {
-  //       dragging = true;
-  //       data = event.data;
-  //     });
-  //     node.on('mousemove', () => {
-  //       if (dragging) {
-  //         node.position.x += data.originalEvent.movementX;
-  //         node.position.y += data.originalEvent.movementY;
-  //         node.redrawEdge();
-  //       }
-  //     });
-  //     node.on('mouseup', () => {
-  //       dragging = false;
-  //       data = null;
-  //     });
-  //   });
-  // }
-
   public getZoom() {
     return this.container.scale;
   }
 
   public setClick(color?: any) {
-    let defaultFillColor: number;
+    this.clickColor = color;
+    let defaultLineColor: number;
     _.each(this.container.children, (element) => {
       if (element instanceof Node) {
         element.addEventListener('mousedown', (event: PIXI.interaction.InteractionEvent) => {
           event.stopPropagation();
+          this.cleanEdge(defaultLineColor);
           element.selectOne(color);
         });
       } else if (element instanceof Edge) {
-        defaultFillColor = element.defaultStyle.fillColor;
-        element.addEventListener('click', (event: PIXI.interaction.InteractionEvent) => {
+        defaultLineColor = element.defaultStyle.lineColor;
+        element.addEventListener('mousedown', (event: PIXI.interaction.InteractionEvent) => {
+          this.cleanEdge(defaultLineColor);
+          this.cleanNode();
           event.stopPropagation();
-          event.stopped = false;
           element.selcteOn();
         });
       } else if (element instanceof EdgeBundle) {
         _.each(element.children, (edges: any) => {
-          defaultFillColor = edges.defaultStyle.fillColor;
-          edges.addEventListener('click', (event: PIXI.interaction.InteractionEvent) => {
+          defaultLineColor = edges.defaultStyle.lineColor;
+          edges.addEventListener('mousedown', (event: PIXI.interaction.InteractionEvent) => {
+            this.cleanEdge(defaultLineColor);
+            this.cleanNode();
             event.stopPropagation();
-            event.stopped = false;
             edges.selcteOn();
           });
         });
@@ -163,7 +162,16 @@ export class CommonAction {
           if (node instanceof Node && node.parent instanceof Group) {
             node.addEventListener('mousedown', (event: PIXI.interaction.InteractionEvent) => {
               event.stopPropagation();
-              node.selectOne();
+              this.cleanEdge(defaultLineColor);
+              node.selectOne(color);
+            });
+          }
+          if (node instanceof GroupEdge) {
+            node.addEventListener('mousedown', (event: PIXI.interaction.InteractionEvent) => {
+              event.stopPropagation();
+              this.cleanEdge(defaultLineColor);
+              this.cleanNode();
+              node.selcteOn();
             });
           }
         });
@@ -172,30 +180,74 @@ export class CommonAction {
     this.container.on('mousedown', () => {
       _.each(this.container.children, (element) => {
         if (element instanceof Node) {
-          element.clearDisplayObjects();
+          element.clearBorder();
         }
         if (element instanceof Edge) {
           element.setStyle({
-            fillColor: defaultFillColor,
-            lineColor: defaultFillColor,
+            fillColor: defaultLineColor,
+            lineColor: defaultLineColor,
           });
         }
         if (element instanceof EdgeBundle) {
           _.each(element.children, (edges: any) => {
             edges.setStyle({
-              fillColor: defaultFillColor,
-              lineColor: defaultFillColor,
+              fillColor: defaultLineColor,
+              lineColor: defaultLineColor,
             });
           });
         }
         if (element instanceof Group) {
           _.each(element.children, (node) => {
             if (node instanceof Node && node.parent instanceof Group) {
-              node.clearDisplayObjects();
+              node.clearBorder();
+            }
+            if (node instanceof GroupEdge) {
+              node.setStyle({
+                fillColor: defaultLineColor,
+                lineColor: defaultLineColor,
+              });
             }
           });
         }
       });
     });
   }
+
+  public cleanEdge(defaultLineColor: number) {
+    _.each(this.container.children, (ele) => {
+      if (ele instanceof Edge) {
+        ele.setStyle({
+          fillColor: defaultLineColor,
+          lineColor: defaultLineColor,
+        });
+      }
+      if (ele instanceof EdgeBundle) {
+        _.each(ele.children, (edge: any) => {
+          edge.setStyle({
+            fillColor: defaultLineColor,
+            lineColor: defaultLineColor,
+          });
+        });
+      }
+      if (ele instanceof Group) {
+        _.each(ele.children, (groupedge) => {
+          if (groupedge instanceof GroupEdge) {
+            groupedge.setStyle({
+              fillColor: defaultLineColor,
+              lineColor: defaultLineColor,
+            });
+          }
+        });
+      }
+    });
+  }
+
+  public cleanNode() {
+    _.each(this.container.children, (ele) => {
+      if (ele instanceof Node) {
+        ele.clearBorder();
+      }
+    });
+  }
+
 }

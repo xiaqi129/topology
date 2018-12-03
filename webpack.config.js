@@ -3,10 +3,12 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 var CopyWebpackPlugin = require('copy-webpack-plugin');
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
 module.exports = {
     mode: 'development',
     entry: './src/index.ts',
-    devtool: "inline-source-map",
+    // devtool: "inline-source-map",
+    devtool: false,
     resolve: {
         extensions: ['.ts', '.js', '.json']
     },

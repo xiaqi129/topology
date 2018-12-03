@@ -11,7 +11,7 @@ for (let i: number = 0, len: number = num; i < len;) {
   i += 1;
   const node = network.createNode('router');
   network.addElement(node);
-  node.x = Math.random() * 1200;
+  node.x = Math.random() * 1800;
   node.y = Math.random() * 900;
 
   const labelStyleOptions = {
@@ -26,7 +26,7 @@ const nodes = network.getElements();
 for (let i: number = 0, len: number = num; i < len;) {
   const srcNode = nodes[i];
   const destNode = nodes[i + 1];
-  for (let j = 0; j < 3;) {
+  for (let j = 0; j < 4;) {
     const edge = network.createEdge(srcNode, destNode);
     edge.setStyle({
       arrowColor: 0Xc71bd3,
@@ -35,7 +35,6 @@ for (let i: number = 0, len: number = num; i < len;) {
       arrowWidth: 1,
       fillArrow: true,
       lineColor: 0xC7254E,
-      fillColor: 0xC7254E,
       lineDistance: 5,
       lineType: 1,
       lineWidth: 1,
@@ -61,14 +60,12 @@ _.each(groupNodes, (node) => {
     fillOpacity: 1,
   });
 });
-group.addEventListener('click', (edges: any) => {
-  alert(`${edges.length} link[s] referenced.`);
-});
+
 // group.setExpaned(false);
 
 network.syncView();
 network.setDrag();
-// network.setClick(0XFF0000);
+network.setClick(0XFF0000);
 
 const zoomIn = document.querySelector('button.btn_zoomIn');
 const zoomOut = document.querySelector('button.btn_zoomOut');
