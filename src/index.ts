@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import { Network } from './network/network';
 
 const network = new Network('div#network');
-const num = 50;
+const num = 10;
 network.addResourceCache('switch', './pic/cisco-WS-C49.png');
 network.addResourceCache('switchLayer3', './pic/cisco-WS-C68.png');
 network.addResourceCache('router', './pic/cisco-18.png');
@@ -11,8 +11,8 @@ for (let i: number = 0, len: number = num; i < len;) {
   i += 1;
   const node = network.createNode('router');
   network.addElement(node);
-  node.x = Math.random() * 1800;
-  node.y = Math.random() * 900;
+  node.x = Math.random() * 1000;
+  node.y = Math.random() * 500;
 
   const labelStyleOptions = {
     fontSize: 10,
@@ -22,7 +22,7 @@ for (let i: number = 0, len: number = num; i < len;) {
   node.addChild(label);
   network.addTooltip(node);
 }
-const nodes = network.getElements();
+const nodes = network.getNodes();
 for (let i: number = 0, len: number = num; i < len;) {
   const srcNode = nodes[i];
   const destNode = nodes[i + 1];
@@ -41,8 +41,6 @@ for (let i: number = 0, len: number = num; i < len;) {
     });
     network.addTooltip(edge);
     network.addElement(edge);
-
-    // edge.setBundleStyle(1);
     j += 1;
   }
   i += 2;
@@ -56,9 +54,9 @@ const groupNodes = _.slice(_.shuffle(_.dropRight(nodes, (num / 2) + 1)), 0, 3);
 _.each(groupNodes, (node) => {
   node.setStyle({ lineColor: 0xf55d54 });
   group.addChildNodes(node);
-  group.setStyle({
-    fillOpacity: 1,
-  });
+});
+group.setStyle({
+  fillOpacity: 1,
 });
 
 // group.setExpaned(false);

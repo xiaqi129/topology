@@ -6,7 +6,7 @@
  */
 
 import * as _ from 'lodash';
-import Viewport from 'pixi-viewport';
+import * as Viewport from 'pixi-viewport';
 import * as PIXI from 'pixi.js';
 import { Application } from './application';
 import { Node } from './node';

@@ -81,8 +81,9 @@ export class Node extends CommonElement {
     this.data = null;
   }
 
-  public onDragMove() {
+  public onDragMove(event: PIXI.interaction.InteractionEvent) {
     if (this.dragging) {
+      event.stopPropagation();
       const isInSelect = _.find(this.selectedNodes, (node) => {
         return node === this;
       });
@@ -168,7 +169,7 @@ export class Node extends CommonElement {
       return node === this;
     });
     if (this.selectedNodes.length > 0 && isInSelect) {
-      this.selectOn();
+      this.selectOn(color);
     } else {
       _.each(this.elements, (element: any) => {
         if (element instanceof Node) {

@@ -66,6 +66,14 @@ export class Network {
     return this.topo.getElements();
   }
 
+  public getNodes() {
+    const elements = this.topo.getElements();
+    const nodes = _.filter(elements, (node) => {
+      return node instanceof Node;
+    });
+    return nodes;
+  }
+
   public addElement(element: Node | Group | Edge) {
     this.topo.addElement(element);
   }
@@ -108,7 +116,6 @@ export class Network {
 
   public syncView() {
     this.drawer.syncView();
-    this.setClick();
   }
 
   public setClick(color?: any) {
