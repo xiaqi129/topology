@@ -73,7 +73,7 @@ const zoomOut = document.querySelector('button.btn_zoomOut');
 const zoomOver = document.querySelector('button.btn_zoomOver');
 const dragOrSelect = document.querySelector('button.btn_dragOrSelect');
 const tooltipToggle = document.querySelector('button.btn_tooltipToggle');
-const bundleLabelToggle = document.querySelector('button.btn_bundleToggle');
+const bundleLabelToggle = document.querySelector('button.btn_bundleLabelToggle');
 const nodeLabelToggle = document.querySelector('button.btn_nodeLabelToggle');
 const canvas = document.querySelector('div#network');
 if (zoomIn) {
