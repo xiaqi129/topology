@@ -37,7 +37,7 @@ export interface ITopo {
 
   removeSelectedNodes(): void;
 
-  removeEdgeBundleByID(bundleID: string): void;
+  removeEdgeBundleByName(name: string): void;
 
 }
 
@@ -91,11 +91,11 @@ export class Topo implements ITopo {
     });
   }
 
-  public removeEdgeBundleByID(bundleID: string) {
+  public removeEdgeBundleByName(name: string) {
     const elements = this.getElements();
     return _.find(elements, (element) => {
       if (element instanceof EdgeBundle) {
-        if (bundleID === element.getBundleID()) {
+        if (name === element.name) {
           this.getElements().splice(elements.indexOf(element), 1);
           return true;
         }

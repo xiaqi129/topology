@@ -298,6 +298,9 @@ export class CommonAction {
             afterBundle.addChild(label);
           }
           this.setBundle(afterBundle);
+          // add Edge to EdgeBundle
+          const tmpBundle = new EdgeBundle(afterBundle);
+          tmpBundle.name = `tmpBundle_${parent.getBundleID()}`;
           // add to elements
           this.topo.addElement(afterBundle);
           parent.addChild(afterBundle);
@@ -307,13 +310,9 @@ export class CommonAction {
           // expand
           parent.removeChildren(0, parent.children.length);
           // remove from elements
-          this.topo.removeEdgeBundleByID(parent.getBundleID());
+          this.topo.removeEdgeBundleByName(`tmpBundle_${parent.getBundleID()}`);
           const edges = this.bundleData[parent.getBundleID()];
           for (const newEdge of edges) {
-            newEdge.setStyle({
-              lineColor: color,
-              fillColor: color,
-            });
             parent.addChild(newEdge);
           }
           this.bundleData[parent.getBundleID()] = undefined;
