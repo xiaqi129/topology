@@ -6,14 +6,22 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Network</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        .toolbar {
+            user-select: none;
+        }
+    </style>
 </head>
 
 <body>
-    <button class="btn_zoomIn">Zoom +</button>
-    <button class="btn_zoomOut">Zoom -</button>
-    <button class="btn_zoomOver">Zoom Over/Reset</button>
-    <button class="btn_tooltipToggle">Tooltip On/Off</button>
-    <button class="btn_dragOrSelect" style="float: right;">Drag / Select</button>
+    <div class="toolbar">
+        <button class="btn_zoomIn">Zoom +</button>
+        <button class="btn_zoomOut">Zoom -</button>
+        <button class="btn_zoomOver">Zoom Over/Reset</button>
+        <button class="btn_tooltipToggle">Tooltip On/Off</button>
+        <button class="btn_bundleToggle">BundleLabel On/Off</button>
+        <button class="btn_dragOrSelect" style="float: right;">Drag / Select</button>
+    </div>
     <div id="network" style=" height: 500px; border: 1px solid;">
     </div>
 </body>

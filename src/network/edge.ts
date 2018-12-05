@@ -564,5 +564,9 @@ export class Edge extends CommonElement {
       elements = this.drawBezierEdge(srcNodePos, endNodePos, this.defaultStyle);
     }
     this.addChildren(elements);
+    if (this.getChildByName('bundle_label')) {
+      this.getChildByName('bundle_label').x = (this.startNode.x + this.endNode.x) / 2;
+      this.getChildByName('bundle_label').y = (this.startNode.y + this.endNode.y) / 2;
+    }
   }
 }

@@ -5,6 +5,7 @@ import { Edge } from './edge';
 import { Node } from './node';
 
 export class Tooltip {
+
   public commonStyles = {
     display: 'block',
     position: 'fixed',
@@ -12,6 +13,7 @@ export class Tooltip {
     color: 'white',
     padding: '5px 20px',
     fontSize: '12px',
+    userSelect: 'none',
   };
 
   public addTooltip(ele: CommonElement) {
@@ -35,6 +37,14 @@ export class Tooltip {
       this.commonStyles.display = 'block';
     } else {
       this.commonStyles.display = 'none';
+    }
+  }
+
+  public tooltipOff() {
+    const network = document.getElementById('network');
+    const tooltip = document.getElementById('tooltip');
+    if (network && tooltip) {
+      network.removeChild(tooltip);
     }
   }
 
@@ -72,14 +82,6 @@ export class Tooltip {
     if (tooltip) {
       tooltip.style.left = `${event.data.originalEvent.clientX + 20}px`;
       tooltip.style.top = `${event.data.originalEvent.clientY + 20}px`;
-    }
-  }
-
-  private tooltipOff() {
-    const network = document.getElementById('network');
-    const tooltip = document.getElementById('tooltip');
-    if (network && tooltip) {
-      network.removeChild(tooltip);
     }
   }
 

@@ -29,8 +29,8 @@ export class Network {
     this.topo = new Topo(this.loader);
     this.drawer = new Drawer(domRegex, this.topo);
     this.app = this.drawer.getWhiteBoard();
-    this.action = new CommonAction(this.app, this.topo);
     this.tooltip = new Tooltip();
+    this.action = new CommonAction(this.app, this.topo, this.tooltip);
   }
 
   public addResourceCache(key: string, image: string) {
@@ -121,6 +121,14 @@ export class Network {
 
   public setTooltipDisplay(isDisplay: any) {
     this.tooltip.setTooltipDisplay(isDisplay);
+  }
+
+  public setBundle(edge: any) {
+    this.action.setBundle(edge);
+  }
+
+  public bundleLabelToggle() {
+    this.action.bundleLabelToggle();
   }
 
 }
