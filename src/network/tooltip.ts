@@ -16,15 +16,15 @@ export class Tooltip {
     userSelect: 'none',
   };
 
-  public addTooltip(ele: CommonElement) {
+  public addTooltip(ele: CommonElement, content?: string) {
     if (ele instanceof Node) {
       ele.addEventListener('mouseover', (event: any) => {
-        this.nodeTooltipOn(event, ele.getUID());
+        this.nodeTooltipOn(event, content || ele.getUID());
       });
     } else if (ele instanceof Edge) {
       ele.addEventListener('mouseover', (event: any) => {
         this.edgeTooltipOn(
-          event,
+          event, content ||
           `${ele.startNode.id}  >>>>  ${ele.endNode.id}`);
       });
     }

@@ -115,8 +115,8 @@ export class Network {
     this.action.setClick(color);
   }
 
-  public addTooltip(element: any) {
-    this.tooltip.addTooltip(element);
+  public addTooltip(element: any, content?: string) {
+    this.tooltip.addTooltip(element, content);
   }
 
   public setTooltipDisplay(isDisplay: any) {
