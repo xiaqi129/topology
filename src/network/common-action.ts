@@ -27,6 +27,7 @@ export class CommonAction {
   private lastClickTime: number = 0;
   private bundleLabelFlag: boolean = true;
   private bundleData: any = {};
+  private bundledEdge: any = [];
   private tooltip: Tooltip;
 
   constructor(app: any, topo: ITopo, tooltip: Tooltip) {
@@ -300,6 +301,8 @@ export class CommonAction {
           // add to elements
           this.topo.addElement(afterBundle);
           parent.addChild(afterBundle);
+
+          this.bundledEdge.push(afterBundle);
         } else {
           // expand
           parent.removeChildren(0, parent.children.length);
@@ -326,6 +329,23 @@ export class CommonAction {
 
   public bundleLabelToggle() {
     this.bundleLabelFlag = !this.bundleLabelFlag;
+
+    if (this.bundleLabelFlag) {
+      _.each(this.bundledEdge, (edge) => {
+        const label = this.topo.createLabel(
+          `(${this.bundleData[edge.parent.getBundleID()].length})`);
+        label.name = 'bundle_label';
+        label.setPosition(4);
+        label.x = (edge.startNode.x + edge.endNode.x) / 2;
+        label.y = (edge.startNode.y + edge.endNode.y) / 2;
+        edge.addChild(label);
+      });
+    } else {
+      _.each(this.bundledEdge, (edge) => {
+        edge.removeChild(edge.getChildByName('bundle_label'));
+      });
+    }
+
   }
 
 }
