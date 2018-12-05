@@ -74,6 +74,7 @@ const zoomOver = document.querySelector('button.btn_zoomOver');
 const dragOrSelect = document.querySelector('button.btn_dragOrSelect');
 const tooltipToggle = document.querySelector('button.btn_tooltipToggle');
 const bundleLabelToggle = document.querySelector('button.btn_bundleToggle');
+const nodeLabelToggle = document.querySelector('button.btn_nodeLabelToggle');
 const canvas = document.querySelector('div#network');
 if (zoomIn) {
   zoomIn.addEventListener('click', () => {
@@ -117,5 +118,11 @@ if (tooltipToggle) {
 if (bundleLabelToggle) {
   bundleLabelToggle.addEventListener('click', () => {
     network.bundleLabelToggle();
+  });
+}
+
+if (nodeLabelToggle) {
+  nodeLabelToggle.addEventListener('click', () => {
+    network.nodeLabelToggle();
   });
 }

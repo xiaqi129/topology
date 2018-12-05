@@ -28,6 +28,7 @@ export class CommonAction {
   private bundleLabelFlag: boolean = true;
   private bundleData: any = {};
   private bundledEdge: any = [];
+  private nodeLabelFlag: boolean = true;
   private tooltip: Tooltip;
 
   constructor(app: any, topo: ITopo, tooltip: Tooltip) {
@@ -345,7 +346,48 @@ export class CommonAction {
         edge.removeChild(edge.getChildByName('bundle_label'));
       });
     }
+  }
 
+  public nodeLabelToggle() {
+    this.nodeLabelFlag = !this.nodeLabelFlag;
+
+    if (this.nodeLabelFlag) {
+      _.each(this.container.children, (element) => {
+        if (element instanceof Node) {
+          const labelStyleOptions = {
+            fontSize: 10,
+            fontWeight: 'bold',
+          };
+          const label = this.topo.createLabel(element.getUID(), labelStyleOptions);
+          element.addChild(label);
+        }
+        if (element instanceof Group) {
+          _.each(element.children, (e) => {
+            if (e instanceof Node) {
+              const labelStyleOptions = {
+                fontSize: 10,
+                fontWeight: 'bold',
+              };
+              const label = this.topo.createLabel(e.getUID(), labelStyleOptions);
+              e.addChild(label);
+            }
+          });
+        }
+      });
+    } else {
+      _.each(this.container.children, (element) => {
+        if (element instanceof Node) {
+          element.removeChild(element.getChildByName('label'));
+        }
+        if (element instanceof Group) {
+          _.each(element.children, (e) => {
+            if (e instanceof Node) {
+              e.removeChild(e.getChildByName('label'));
+            }
+          });
+        }
+      });
+    }
   }
 
 }

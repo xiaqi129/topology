@@ -131,4 +131,8 @@ export class Network {
     this.action.bundleLabelToggle();
   }
 
+  public nodeLabelToggle() {
+    this.action.nodeLabelToggle();
+  }
+
 }

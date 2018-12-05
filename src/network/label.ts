@@ -28,6 +28,7 @@ export class Label extends PIXI.Text {
     this.addListener('click', () => {
       alert(this.text);
     });
+    this.name = 'label';
   }
 
   public setText(label: string) {
