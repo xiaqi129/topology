@@ -6,7 +6,6 @@
  */
 
 import * as _ from 'lodash';
-import * as PIXI from 'pixi.js';
 import { Application } from './application';
 import { CommonAction } from './common-action';
 import { Drawer } from './drawer';

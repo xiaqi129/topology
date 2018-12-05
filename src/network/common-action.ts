@@ -7,7 +7,6 @@
 
 import * as _ from 'lodash';
 import * as Viewport from 'pixi-viewport';
-import * as PIXI from 'pixi.js';
 import { Application } from './application';
 import { Node } from './node';
 import { ITopo } from './topo';

@@ -7,7 +7,6 @@
 
 import * as _ from 'lodash';
 import Viewport from 'pixi-viewport';
-import * as PIXI from 'pixi.js';
 import * as Rx from 'rxjs';
 import { debounceTime, windowWhen } from 'rxjs/operators';
 import { Group } from './group';

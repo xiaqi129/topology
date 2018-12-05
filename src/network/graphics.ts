@@ -6,7 +6,6 @@
  */
 
 import * as _ from 'lodash';
-import * as PIXI from 'pixi.js';
 
 class Graphics extends PIXI.Graphics {
 

@@ -89,8 +89,8 @@ export class Node extends CommonElement {
       });
       if (this.selectedNodes.length > 0 && isInSelect) {
         _.each(this.selectedNodes, (node) => {
-          node.position.x += this.data.originalEvent.movementX;
-          node.position.y += this.data.originalEvent.movementY;
+          node.position.x += this.data.originalEvent.movementX / this.parent.scale.x;
+          node.position.y += this.data.originalEvent.movementY / this.parent.scale.y;
           node.redrawEdge();
         });
       } else {

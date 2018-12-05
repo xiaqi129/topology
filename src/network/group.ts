@@ -7,7 +7,6 @@
 
 // import convexHull from 'graham-scan-convex-hull/src/convex-hull';
 import * as _ from 'lodash';
-import * as PIXI from 'pixi.js';
 import polygon from 'polygon';
 import Offset from 'polygon-offset/dist/offset';
 import { CommonElement, IPosition } from './common-element';
@@ -32,7 +31,8 @@ export class Group extends CommonElement {
   private outLineStyleType: number = 1;
   private lastClickTime: number = 0;
   private dragging: boolean;
-  private data: any;
+  private last: any;
+  private current: any;
 
   constructor(elements: Edge | CommonElement[]) {
     super();
@@ -144,29 +144,35 @@ export class Group extends CommonElement {
     this.addChild(graph);
   }
 
-  public onDragStart(event: PIXI.interaction.InteractionEvent) {
+  public onDragStart(event: any) {
     event.stopPropagation();
+    const parent = this.parent.toLocal(event.data.global);
     this.dragging = true;
-    this.data = event.data;
+    this.last = { parents: parent, x: event.data.global.x, y: event.data.global.y };
+    this.current = event.data.pointerId;
   }
 
   public onDragEnd() {
     this.dragging = false;
-    this.data = null;
+    this.last = null;
   }
 
   public onDragMove(event: any) {
-    if (this.dragging) {
+    if (this.dragging && this.last && this.current === event.data.pointerId) {
+      const newPosition = this.toLocal(event.data.global);
       const edges = this.filterEdge();
       _.each(edges, (edge: Edge) => {
         edge.draw();
       });
+      const distX = event.data.global.x;
+      const distY = event.data.global.y;
       _.each(this.children, (element) => {
         if (element instanceof Node && element.parent instanceof Group) {
-          element.position.x += event.data.originalEvent.movementX / this.parent.scale.x;
-          element.position.y += event.data.originalEvent.movementY / this.parent.scale.y;
+          element.position.x += (newPosition.x - this.last.parents.x);
+          element.position.y += (newPosition.y - this.last.parents.y);
         }
       });
+      this.last = {  parents: newPosition, x: distX, y: distY };
       this.draw();
     }
   }

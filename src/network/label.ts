@@ -6,7 +6,6 @@
  */
 
 import * as _ from 'lodash';
-import * as PIXI from 'pixi.js';
 
 export class Label extends PIXI.Text {
   constructor(text?: string, style?: PIXI.TextStyleOptions, canvas?: HTMLCanvasElement) {
