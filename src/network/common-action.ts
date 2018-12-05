@@ -15,16 +15,26 @@ import { Edge } from './edge';
 import { EdgeBundle } from './edge-bundle';
 import { GroupEdge } from './edge-conn-group';
 import { Group } from './group';
+import { Tooltip } from './tooltip';
 
 export class CommonAction {
   private app: Application;
   private container: Viewport;
   private topo: ITopo;
   private clickColor: any;
-  constructor(app: any, topo: ITopo) {
+  // bundle
+  private lastClickTime: number = 0;
+  private bundleLabelFlag: boolean = true;
+  private bundleData: any = {};
+  private bundledEdge: any = [];
+  private nodeLabelFlag: boolean = true;
+  private tooltip: Tooltip;
+
+  constructor(app: any, topo: ITopo, tooltip: Tooltip) {
     this.app = app;
     this.topo = topo;
     this.container = app.getContainer();
+    this.tooltip = tooltip;
   }
 
   public setZoom(num: number) {
@@ -247,6 +257,136 @@ export class CommonAction {
         ele.clearBorder();
       }
     });
+  }
+
+  public setBundle(edge: any) {
+    edge.addEventListener('mousedown', (event: PIXI.interaction.InteractionEvent) => {
+      event.stopPropagation();
+      const currentTime = new Date().getTime();
+      // double click
+      if (currentTime - this.lastClickTime < 500) {
+        const parent = edge.parent;
+        const color = edge.defaultStyle.lineColor;
+        if (!this.bundleData[parent.getBundleID()]) {
+          // collapse
+          this.bundleData[parent.getBundleID()] = [];
+          const children = parent.children;
+          for (const child of children) {
+            this.bundleData[parent.getBundleID()].push(child);
+          }
+          parent.removeChildren(0, parent.children.length);
+          const afterBundle = new Edge(edge.startNode, edge.endNode);
+          afterBundle.setStyle({
+            arrowColor: 0Xc71bd3,
+            arrowLength: 15,
+            arrowType: 0,
+            arrowWidth: 1,
+            fillArrow: true,
+            lineColor: 0xC7254E,
+            lineDistance: 5,
+            lineType: 0,
+            lineWidth: 1,
+          });
+          this.tooltip.addTooltip(afterBundle);
+          if (this.bundleLabelFlag) {
+            const label = this.topo.createLabel(
+              `(${this.bundleData[parent.getBundleID()].length})`);
+            label.name = 'bundle_label';
+            label.setPosition(4);
+            label.x = (edge.startNode.x + edge.endNode.x) / 2;
+            label.y = (edge.startNode.y + edge.endNode.y) / 2;
+            afterBundle.addChild(label);
+          }
+          this.setBundle(afterBundle);
+          // add to elements
+          this.topo.addElement(afterBundle);
+          parent.addChild(afterBundle);
+
+          this.bundledEdge.push(afterBundle);
+        } else {
+          // expand
+          parent.removeChildren(0, parent.children.length);
+          // remove from elements
+          this.topo.removeEdgeBundleByID(parent.getBundleID());
+          const edges = this.bundleData[parent.getBundleID()];
+          for (const newEdge of edges) {
+            newEdge.setStyle({
+              lineColor: color,
+              fillColor: color,
+            });
+            parent.addChild(newEdge);
+          }
+          this.bundleData[parent.getBundleID()] = undefined;
+        }
+        this.tooltip.tooltipOff();
+        this.setClick();
+      } else {
+        this.lastClickTime = currentTime;
+      }
+
+    });
+  }
+
+  public bundleLabelToggle() {
+    this.bundleLabelFlag = !this.bundleLabelFlag;
+
+    if (this.bundleLabelFlag) {
+      _.each(this.bundledEdge, (edge) => {
+        const label = this.topo.createLabel(
+          `(${this.bundleData[edge.parent.getBundleID()].length})`);
+        label.name = 'bundle_label';
+        label.setPosition(4);
+        label.x = (edge.startNode.x + edge.endNode.x) / 2;
+        label.y = (edge.startNode.y + edge.endNode.y) / 2;
+        edge.addChild(label);
+      });
+    } else {
+      _.each(this.bundledEdge, (edge) => {
+        edge.removeChild(edge.getChildByName('bundle_label'));
+      });
+    }
+  }
+
+  public nodeLabelToggle() {
+    this.nodeLabelFlag = !this.nodeLabelFlag;
+
+    if (this.nodeLabelFlag) {
+      _.each(this.container.children, (element) => {
+        if (element instanceof Node) {
+          const labelStyleOptions = {
+            fontSize: 10,
+            fontWeight: 'bold',
+          };
+          const label = this.topo.createLabel(element.getUID(), labelStyleOptions);
+          element.addChild(label);
+        }
+        if (element instanceof Group) {
+          _.each(element.children, (e) => {
+            if (e instanceof Node) {
+              const labelStyleOptions = {
+                fontSize: 10,
+                fontWeight: 'bold',
+              };
+              const label = this.topo.createLabel(e.getUID(), labelStyleOptions);
+              e.addChild(label);
+            }
+          });
+        }
+      });
+    } else {
+      _.each(this.container.children, (element) => {
+        if (element instanceof Node) {
+          element.removeChild(element.getChildByName('label'));
+        }
+        if (element instanceof Group) {
+          _.each(element.children, (e) => {
+            if (e instanceof Node) {
+              e.removeChild(e.getChildByName('label'));
+            }
+          });
+        }
+      });
+    }
   }
 
 }

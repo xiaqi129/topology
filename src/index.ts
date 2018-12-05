@@ -41,6 +41,9 @@ for (let i: number = 0, len: number = num; i < len;) {
     });
     network.addTooltip(edge);
     network.addElement(edge);
+    network.setBundle(edge);
+
+    // edge.setBundleStyle(1);
     j += 1;
   }
   i += 2;
@@ -63,13 +66,15 @@ group.setStyle({
 
 network.syncView();
 network.setDrag();
-network.setClick(0XFF0000);
+network.setClick();
 
 const zoomIn = document.querySelector('button.btn_zoomIn');
 const zoomOut = document.querySelector('button.btn_zoomOut');
 const zoomOver = document.querySelector('button.btn_zoomOver');
 const dragOrSelect = document.querySelector('button.btn_dragOrSelect');
 const tooltipToggle = document.querySelector('button.btn_tooltipToggle');
+const bundleLabelToggle = document.querySelector('button.btn_bundleLabelToggle');
+const nodeLabelToggle = document.querySelector('button.btn_nodeLabelToggle');
 const canvas = document.querySelector('div#network');
 if (zoomIn) {
   zoomIn.addEventListener('click', () => {
@@ -108,5 +113,16 @@ if (tooltipToggle) {
   tooltipToggle.addEventListener('click', () => {
     isDisplay = !isDisplay;
     network.setTooltipDisplay(isDisplay);
+  });
+}
+if (bundleLabelToggle) {
+  bundleLabelToggle.addEventListener('click', () => {
+    network.bundleLabelToggle();
+  });
+}
+
+if (nodeLabelToggle) {
+  nodeLabelToggle.addEventListener('click', () => {
+    network.nodeLabelToggle();
   });
 }

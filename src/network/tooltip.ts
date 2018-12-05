@@ -4,6 +4,7 @@ import { Edge } from './edge';
 import { Node } from './node';
 
 export class Tooltip {
+
   public commonStyles = {
     display: 'block',
     position: 'fixed',
@@ -11,17 +12,18 @@ export class Tooltip {
     color: 'white',
     padding: '5px 20px',
     fontSize: '12px',
+    userSelect: 'none',
   };
 
-  public addTooltip(ele: CommonElement) {
+  public addTooltip(ele: CommonElement, content?: string) {
     if (ele instanceof Node) {
       ele.addEventListener('mouseover', (event: any) => {
-        this.nodeTooltipOn(event, ele.getUID());
+        this.nodeTooltipOn(event, content || ele.getUID());
       });
     } else if (ele instanceof Edge) {
       ele.addEventListener('mouseover', (event: any) => {
         this.edgeTooltipOn(
-          event,
+          event, content ||
           `${ele.startNode.id}  >>>>  ${ele.endNode.id}`);
       });
     }
@@ -34,6 +36,14 @@ export class Tooltip {
       this.commonStyles.display = 'block';
     } else {
       this.commonStyles.display = 'none';
+    }
+  }
+
+  public tooltipOff() {
+    const network = document.getElementById('network');
+    const tooltip = document.getElementById('tooltip');
+    if (network && tooltip) {
+      network.removeChild(tooltip);
     }
   }
 
@@ -69,18 +79,8 @@ export class Tooltip {
   private tooltipMove(event: any) {
     const tooltip = document.getElementById('tooltip');
     if (tooltip) {
-      // tooltip.style.left = `${event.data.global.x + 30}px`;
-      // tooltip.style.top = `${event.data.global.y + 30}px`;
       tooltip.style.left = `${event.data.originalEvent.clientX + 20}px`;
       tooltip.style.top = `${event.data.originalEvent.clientY + 20}px`;
-    }
-  }
-
-  private tooltipOff() {
-    const network = document.getElementById('network');
-    const tooltip = document.getElementById('tooltip');
-    if (network && tooltip) {
-      network.removeChild(tooltip);
     }
   }
 

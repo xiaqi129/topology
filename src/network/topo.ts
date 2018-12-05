@@ -27,6 +27,8 @@ export interface ITopo {
 
   createEdge(startNode: Node | Group, endNode: Node | Group): Edge;
 
+  createLabel(text?: string, style?: PIXI.TextStyleOptions, canvas?: HTMLCanvasElement): Label;
+
   clear(): void;
 
   setSelectedNodes(element: CommonElement): void;
@@ -35,17 +37,19 @@ export interface ITopo {
 
   removeSelectedNodes(): void;
 
+  removeEdgeBundleByID(bundleID: string): void;
+
 }
 
 export class Topo implements ITopo {
 
   public loader: PIXI.loaders.Loader | null = null;
 
-  private selectedNodes: any [] = [];
+  private selectedNodes: any[] = [];
 
-  private elements: any [] = [];
+  private elements: any[] = [];
 
-  private edgesGroupByNodes: {[key: string]: Edge[]} = {};
+  private edgesGroupByNodes: { [key: string]: Edge[] } = {};
 
   constructor(loader: PIXI.loaders.Loader) {
     this.loader = loader;
@@ -87,6 +91,19 @@ export class Topo implements ITopo {
     });
   }
 
+  public removeEdgeBundleByID(bundleID: string) {
+    const elements = this.getElements();
+    return _.find(elements, (element) => {
+      if (element instanceof EdgeBundle) {
+        if (bundleID === element.getBundleID()) {
+          this.getElements().splice(elements.indexOf(element), 1);
+          return true;
+        }
+      }
+      return false;
+    });
+  }
+
   public addElements(elements: CommonElement[]) {
     _.each(elements, (element, i) => {
       if (element instanceof Edge) {
@@ -115,12 +132,12 @@ export class Topo implements ITopo {
     });
   }
 
-  public getSortNodesUID (edge: Edge) {
+  public getSortNodesUID(edge: Edge) {
     const nodes = [edge.getSrcNode(), edge.getTargetNode()];
     return _.join([nodes[0].getUID(), nodes[1].getUID()].sort());
   }
 
-  public clearObject(obj: {[key: string]: any}) {
+  public clearObject(obj: { [key: string]: any }) {
     const keys = _.keys(obj);
     _.each(keys, (key: string) => {
       delete obj[key];
