@@ -11,6 +11,7 @@ import { DisplayObject } from 'pixi.js';
 import { CommonElement, IStyles } from './common-element';
 import { Group } from './group';
 import { Node } from './node';
+import { Tooltip } from './tooltip';
 
 const Point = PIXI.Point;
 
@@ -23,6 +24,7 @@ export class Edge extends CommonElement {
   private brotherEdges: Edge[] = [];
   private brotherEdgeName: string = 'BROTHER_EDGE';
   private bundleStyle: number = 1; // 0: link style, 1: bezier style
+  private tooltip: Tooltip;
 
   constructor(startNode: Node | Group, endNode: Node | Group) {
     super();
@@ -31,6 +33,8 @@ export class Edge extends CommonElement {
     this.startNode = startNode;
     this.endNode = endNode;
     this.draw();
+    this.tooltip = new Tooltip();
+    this.setTooltip();
   }
 
   public getEdge() {
@@ -568,5 +572,10 @@ export class Edge extends CommonElement {
       this.getChildByName('bundle_label').x = (this.startNode.x + this.endNode.x) / 2;
       this.getChildByName('bundle_label').y = (this.startNode.y + this.endNode.y) / 2;
     }
+  }
+
+  public setTooltip(content?: string) {
+    this.removeAllListeners();
+    this.tooltip.addTooltip(this, content || this.getUID());
   }
 }

@@ -14,13 +14,8 @@ for (let i: number = 0, len: number = num; i < len;) {
   node.x = Math.random() * 1000;
   node.y = Math.random() * 500;
 
-  const labelStyleOptions = {
-    fontSize: 10,
-    fontWeight: 'bold',
-  };
-  const label = network.createLabel(node.getUID(), labelStyleOptions);
-  node.addChild(label);
-  network.addTooltip(node);
+  node.setLabel(`node_${i}`);
+  // console.log(node);
 }
 const nodes = network.getNodes();
 for (let i: number = 0, len: number = num; i < len;) {
@@ -39,7 +34,6 @@ for (let i: number = 0, len: number = num; i < len;) {
       lineType: 1,
       lineWidth: 1,
     });
-    network.addTooltip(edge);
     network.addElement(edge);
     network.setBundle(edge);
 

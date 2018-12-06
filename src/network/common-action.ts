@@ -352,22 +352,12 @@ export class CommonAction {
     if (this.nodeLabelFlag) {
       _.each(this.container.children, (element) => {
         if (element instanceof Node) {
-          const labelStyleOptions = {
-            fontSize: 10,
-            fontWeight: 'bold',
-          };
-          const label = this.topo.createLabel(element.getUID(), labelStyleOptions);
-          element.addChild(label);
+          element.setLabel(element.getLabelContent());
         }
         if (element instanceof Group) {
           _.each(element.children, (e) => {
             if (e instanceof Node) {
-              const labelStyleOptions = {
-                fontSize: 10,
-                fontWeight: 'bold',
-              };
-              const label = this.topo.createLabel(e.getUID(), labelStyleOptions);
-              e.addChild(label);
+              e.setLabel(e.getLabelContent());
             }
           });
         }
@@ -375,12 +365,12 @@ export class CommonAction {
     } else {
       _.each(this.container.children, (element) => {
         if (element instanceof Node) {
-          element.removeChild(element.getChildByName('label'));
+          element.removeChild(element.getChildByName('node_label'));
         }
         if (element instanceof Group) {
           _.each(element.children, (e) => {
             if (e instanceof Node) {
-              e.removeChild(e.getChildByName('label'));
+              e.removeChild(e.getChildByName('node_label'));
             }
           });
         }
