@@ -7,7 +7,7 @@ export class Tooltip {
 
   public static tooltipCarrier: string = '';
 
-  public commonStyles = {
+  public static commonStyles = {
     display: 'block',
     position: 'fixed',
     backgroundColor: 'black',
@@ -35,9 +35,9 @@ export class Tooltip {
 
   public setTooltipDisplay(isDisplay: any) {
     if (isDisplay) {
-      this.commonStyles.display = 'block';
+      Tooltip.commonStyles.display = 'block';
     } else {
-      this.commonStyles.display = 'none';
+      Tooltip.commonStyles.display = 'none';
     }
   }
 
@@ -63,7 +63,7 @@ export class Tooltip {
     if (!tooltip) {
       const tooltipContent = content || 'node tooltip';
       const tooltipStyles: any = {};
-      _.assign(tooltipStyles, this.commonStyles, customStyle);
+      _.assign(tooltipStyles, Tooltip.commonStyles, customStyle);
       this.createTooltip(tooltipContent, tooltipStyles);
       Tooltip.tooltipCarrier = event.currentTarget.getUID();
     }
@@ -75,7 +75,7 @@ export class Tooltip {
     if (!tooltip) {
       const tooltipContent = content || 'edge tooltip';
       const tooltipStyles: any = {};
-      _.assign(tooltipStyles, this.commonStyles, customStyle);
+      _.assign(tooltipStyles, Tooltip.commonStyles, customStyle);
       this.createTooltip(tooltipContent, tooltipStyles);
       Tooltip.tooltipCarrier = event.currentTarget.getUID();
     }
