@@ -317,7 +317,7 @@ export class CommonAction {
           }
           this.bundleData[parent.getBundleID()] = undefined;
         }
-        this.tooltip.tooltipOff();
+        this.tooltip.clearTooltip();
         this.setClick();
       } else {
         this.lastClickTime = currentTime;

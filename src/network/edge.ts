@@ -576,6 +576,6 @@ export class Edge extends CommonElement {
 
   public setTooltip(content?: string) {
     this.removeAllListeners();
-    this.tooltip.addTooltip(this, content || this.getUID());
+    this.tooltip.addTooltip(this, content || `${this.startNode.id}  >>>>  ${this.endNode.id}`);
   }
 }

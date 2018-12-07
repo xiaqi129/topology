@@ -5,6 +5,8 @@ import { Node } from './node';
 
 export class Tooltip {
 
+  public static tooltipCarrier: string = '';
+
   public commonStyles = {
     display: 'block',
     position: 'fixed',
@@ -18,16 +20,16 @@ export class Tooltip {
   public addTooltip(ele: CommonElement, content?: string) {
     if (ele instanceof Node) {
       ele.addEventListener('mouseover', (event: any) => {
-        this.nodeTooltipOn(event, content || ele.getUID());
+        this.nodeTooltipOn(event, content);
       });
     } else if (ele instanceof Edge) {
       ele.addEventListener('mouseover', (event: any) => {
-        this.edgeTooltipOn(
-          event, content ||
-          `${ele.startNode.id}  >>>>  ${ele.endNode.id}`);
+        this.edgeTooltipOn(event, content);
       });
     }
-    ele.addEventListener('mouseout', this.tooltipOff);
+    ele.addEventListener('mouseout', (event: any) => {
+      this.tooltipOff(event);
+    });
     ele.addEventListener('mousemove', this.tooltipMove);
   }
 
@@ -39,7 +41,16 @@ export class Tooltip {
     }
   }
 
-  public tooltipOff() {
+  public tooltipOff(event?: any) {
+    if (event) {
+      if (event.currentTarget.getUID() === Tooltip.tooltipCarrier) {
+        this.clearTooltip();
+      }
+    }
+
+  }
+
+  public clearTooltip() {
     const network = document.getElementById('network');
     const tooltip = document.getElementById('tooltip');
     if (network && tooltip) {
@@ -48,18 +59,26 @@ export class Tooltip {
   }
 
   private nodeTooltipOn(event: any, content?: string, customStyle?: any) {
-    const tooltipContent = content || 'node tooltip';
-    const tooltipStyles: any = {};
-    _.assign(tooltipStyles, this.commonStyles, customStyle);
-    this.createTooltip(tooltipContent, tooltipStyles);
+    const tooltip = document.getElementById('tooltip');
+    if (!tooltip) {
+      const tooltipContent = content || 'node tooltip';
+      const tooltipStyles: any = {};
+      _.assign(tooltipStyles, this.commonStyles, customStyle);
+      this.createTooltip(tooltipContent, tooltipStyles);
+      Tooltip.tooltipCarrier = event.target.parent.getUID();
+    }
+
   }
 
   private edgeTooltipOn(event: any, content?: string, customStyle?: any) {
-
-    const tooltipContent = content || 'edge tooltip';
-    const tooltipStyles: any = {};
-    _.assign(tooltipStyles, this.commonStyles, customStyle);
-    this.createTooltip(tooltipContent, tooltipStyles);
+    const tooltip = document.getElementById('tooltip');
+    if (!tooltip) {
+      const tooltipContent = content || 'edge tooltip';
+      const tooltipStyles: any = {};
+      _.assign(tooltipStyles, this.commonStyles, customStyle);
+      this.createTooltip(tooltipContent, tooltipStyles);
+      Tooltip.tooltipCarrier = event.target.getUID();
+    }
   }
 
   private createTooltip(content: any, styles: any) {
