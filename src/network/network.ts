@@ -73,6 +73,20 @@ export class Network {
     return nodes;
   }
 
+  public getNodeObj() {
+    const nodeObj = {};
+    const elements = this.topo.getElements();
+    _.each(elements, (node) => {
+      if (node instanceof Node && node.name) {
+        const name: string = node.name;
+        _.extend(nodeObj, {
+          [name]: node,
+        });
+      }
+    });
+    return nodeObj;
+  }
+
   public addElement(element: Node | Group | Edge) {
     this.topo.addElement(element);
   }
