@@ -47,7 +47,7 @@ export abstract class CommonElement extends PIXI.Container {
     fillOpacity: 1,
     arrowColor: 0Xc71bd3,
     arrowLength: 15,
-    arrowType: 1, // 0: src  to target, 1: target to src, 2: bidirection
+    arrowType: 0, // 0: src  to target, 1: target to src, 2: bidirection
     arrowWidth: 1,
     arrowAngle: 20,
     arrowMiddleLength: 10,

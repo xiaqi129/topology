@@ -286,7 +286,6 @@ export class CommonAction {
             lineType: 0,
             lineWidth: 1,
           });
-          this.tooltip.addTooltip(afterBundle);
           if (this.bundleLabelFlag) {
             const label = this.topo.createLabel(
               `(${this.bundleData[parent.getBundleID()].length})`);
@@ -297,6 +296,9 @@ export class CommonAction {
             afterBundle.addChild(label);
           }
           this.setBundle(afterBundle);
+          // add Edge to EdgeBundle
+          const tmpBundle = new EdgeBundle(afterBundle);
+          tmpBundle.name = `tmpBundle_${parent.getBundleID()}`;
           // add to elements
           this.topo.addElement(afterBundle);
           parent.addChild(afterBundle);
@@ -306,18 +308,14 @@ export class CommonAction {
           // expand
           parent.removeChildren(0, parent.children.length);
           // remove from elements
-          this.topo.removeEdgeBundleByID(parent.getBundleID());
+          this.topo.removeEdgeBundleByName(`tmpBundle_${parent.getBundleID()}`);
           const edges = this.bundleData[parent.getBundleID()];
           for (const newEdge of edges) {
-            newEdge.setStyle({
-              lineColor: color,
-              fillColor: color,
-            });
             parent.addChild(newEdge);
           }
           this.bundleData[parent.getBundleID()] = undefined;
         }
-        this.tooltip.tooltipOff();
+        this.tooltip.clearTooltip();
         this.setClick();
       } else {
         this.lastClickTime = currentTime;
@@ -352,22 +350,12 @@ export class CommonAction {
     if (this.nodeLabelFlag) {
       _.each(this.container.children, (element) => {
         if (element instanceof Node) {
-          const labelStyleOptions = {
-            fontSize: 10,
-            fontWeight: 'bold',
-          };
-          const label = this.topo.createLabel(element.getUID(), labelStyleOptions);
-          element.addChild(label);
+          element.setLabel(element.getLabelContent());
         }
         if (element instanceof Group) {
           _.each(element.children, (e) => {
             if (e instanceof Node) {
-              const labelStyleOptions = {
-                fontSize: 10,
-                fontWeight: 'bold',
-              };
-              const label = this.topo.createLabel(e.getUID(), labelStyleOptions);
-              e.addChild(label);
+              e.setLabel(e.getLabelContent());
             }
           });
         }
@@ -375,12 +363,12 @@ export class CommonAction {
     } else {
       _.each(this.container.children, (element) => {
         if (element instanceof Node) {
-          element.removeChild(element.getChildByName('label'));
+          element.removeChild(element.getChildByName('node_label'));
         }
         if (element instanceof Group) {
           _.each(element.children, (e) => {
             if (e instanceof Node) {
-              e.removeChild(e.getChildByName('label'));
+              e.removeChild(e.getChildByName('node_label'));
             }
           });
         }

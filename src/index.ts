@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import { Network } from './network/network';
 
 const network = new Network('div#network');
-const num = 10;
+const num = 6;
 network.addResourceCache('switch', './pic/cisco-WS-C49.png');
 network.addResourceCache('switchLayer3', './pic/cisco-WS-C68.png');
 network.addResourceCache('router', './pic/cisco-18.png');
@@ -14,13 +14,8 @@ for (let i: number = 0, len: number = num; i < len;) {
   node.x = Math.random() * 1000;
   node.y = Math.random() * 500;
 
-  const labelStyleOptions = {
-    fontSize: 10,
-    fontWeight: 'bold',
-  };
-  const label = network.createLabel(node.getUID(), labelStyleOptions);
-  node.addChild(label);
-  network.addTooltip(node);
+  // node.setLabel(`node_${i}`);
+  // console.log(node);
 }
 const nodes = network.getNodes();
 for (let i: number = 0, len: number = num; i < len;) {
@@ -39,7 +34,6 @@ for (let i: number = 0, len: number = num; i < len;) {
       lineType: 1,
       lineWidth: 1,
     });
-    network.addTooltip(edge);
     network.addElement(edge);
     network.setBundle(edge);
 

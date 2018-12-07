@@ -49,10 +49,6 @@ export class Network {
     return this.topo.createEdge(startNode, endNode);
   }
 
-  public createLabel(text?: string, style?: PIXI.TextStyleOptions, canvas?: HTMLCanvasElement) {
-    return this.topo.createLabel(text, style, canvas);
-  }
-
   public clear() {
     const elements = this.topo.getElements();
     _.each(elements, (element) => {
@@ -133,10 +129,6 @@ export class Network {
 
   public setClick(color?: any) {
     this.action.setClick(color);
-  }
-
-  public addTooltip(element: any, content?: string) {
-    this.tooltip.addTooltip(element, content);
   }
 
   public setTooltipDisplay(isDisplay: any) {
