@@ -5,8 +5,6 @@ import { Node } from './node';
 
 export class Tooltip {
 
-  public static tooltipCarrier: string = '';
-
   public static commonStyles = {
     display: 'block',
     position: 'fixed',
@@ -30,7 +28,9 @@ export class Tooltip {
     ele.addEventListener('mouseout', (event: any) => {
       this.tooltipOff(event);
     });
-    ele.addEventListener('mousemove', this.tooltipMove);
+    ele.addEventListener('mousemove', (event: any) => {
+      this.tooltipMove(event);
+    });
   }
 
   public setTooltipDisplay(isDisplay: any) {
@@ -42,12 +42,7 @@ export class Tooltip {
   }
 
   public tooltipOff(event?: any) {
-    if (event) {
-      if (event.currentTarget.getUID() === Tooltip.tooltipCarrier) {
-        this.clearTooltip();
-      }
-    }
-
+    this.clearTooltip();
   }
 
   public clearTooltip() {
@@ -59,26 +54,17 @@ export class Tooltip {
   }
 
   private nodeTooltipOn(event: any, content?: string, customStyle?: any) {
-    const tooltip = document.getElementById('tooltip');
-    if (!tooltip) {
-      const tooltipContent = content || 'node tooltip';
-      const tooltipStyles: any = {};
-      _.assign(tooltipStyles, Tooltip.commonStyles, customStyle);
-      this.createTooltip(tooltipContent, tooltipStyles);
-      Tooltip.tooltipCarrier = event.currentTarget.getUID();
-    }
-
+    const tooltipContent = content || 'node tooltip';
+    const tooltipStyles: any = {};
+    _.assign(tooltipStyles, Tooltip.commonStyles, customStyle);
+    this.createTooltip(tooltipContent, tooltipStyles);
   }
 
   private edgeTooltipOn(event: any, content?: string, customStyle?: any) {
-    const tooltip = document.getElementById('tooltip');
-    if (!tooltip) {
-      const tooltipContent = content || 'edge tooltip';
-      const tooltipStyles: any = {};
-      _.assign(tooltipStyles, Tooltip.commonStyles, customStyle);
-      this.createTooltip(tooltipContent, tooltipStyles);
-      Tooltip.tooltipCarrier = event.currentTarget.getUID();
-    }
+    const tooltipContent = content || 'edge tooltip';
+    const tooltipStyles: any = {};
+    _.assign(tooltipStyles, Tooltip.commonStyles, customStyle);
+    this.createTooltip(tooltipContent, tooltipStyles);
   }
 
   private createTooltip(content: any, styles: any) {

@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import { Network } from './network/network';
 
 const network = new Network('div#network');
-const num = 6;
+const num = 10;
 network.addResourceCache('switch', './pic/cisco-WS-C49.png');
 network.addResourceCache('switchLayer3', './pic/cisco-WS-C68.png');
 network.addResourceCache('router', './pic/cisco-18.png');
@@ -13,9 +13,6 @@ for (let i: number = 0, len: number = num; i < len;) {
   network.addElement(node);
   node.x = Math.random() * 1000;
   node.y = Math.random() * 500;
-
-  // node.setLabel(`node_${i}`);
-  // console.log(node);
 }
 const nodes = network.getNodes();
 for (let i: number = 0, len: number = num; i < len;) {

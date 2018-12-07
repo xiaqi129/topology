@@ -94,7 +94,7 @@ export class Node extends CommonElement {
 
   public onDragMove(event: PIXI.interaction.InteractionEvent) {
     if (this.dragging) {
-      event.stopPropagation();
+      // event.stopPropagation();
       const newPosition = this.data.getLocalPosition(this.parent);
       const isInSelect = _.find(this.selectedNodes, (node) => {
         return node === this;
