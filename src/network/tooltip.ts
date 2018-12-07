@@ -65,7 +65,7 @@ export class Tooltip {
       const tooltipStyles: any = {};
       _.assign(tooltipStyles, this.commonStyles, customStyle);
       this.createTooltip(tooltipContent, tooltipStyles);
-      Tooltip.tooltipCarrier = event.target.parent.getUID();
+      Tooltip.tooltipCarrier = event.currentTarget.getUID();
     }
 
   }
@@ -77,7 +77,7 @@ export class Tooltip {
       const tooltipStyles: any = {};
       _.assign(tooltipStyles, this.commonStyles, customStyle);
       this.createTooltip(tooltipContent, tooltipStyles);
-      Tooltip.tooltipCarrier = event.target.getUID();
+      Tooltip.tooltipCarrier = event.currentTarget.getUID();
     }
   }
 

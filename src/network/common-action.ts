@@ -287,7 +287,6 @@ export class CommonAction {
             lineType: 0,
             lineWidth: 1,
           });
-          this.tooltip.addTooltip(afterBundle);
           if (this.bundleLabelFlag) {
             const label = this.topo.createLabel(
               `(${this.bundleData[parent.getBundleID()].length})`);
