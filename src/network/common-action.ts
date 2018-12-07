@@ -127,7 +127,6 @@ export class CommonAction {
               }
             }
           });
-          element.draw();
         }
       });
       rectangle.clear();

@@ -94,6 +94,10 @@ export abstract class CommonElement extends PIXI.Container {
     return this.id;
   }
 
+  public getName() {
+    return this.name;
+  }
+
   public setStyle(styles: any, draw: boolean = true) {
     _.extend(this.defaultStyle, styles);
     if (draw) {
