@@ -25,6 +25,7 @@ export class Network {
   private tooltip: Tooltip;
 
   constructor(domRegex: string) {
+    PIXI.utils.skipHello();
     this.topo = new Topo(this.loader);
     this.drawer = new Drawer(domRegex, this.topo);
     this.app = this.drawer.getWhiteBoard();

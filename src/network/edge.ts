@@ -261,7 +261,6 @@ export class Edge extends CommonElement {
 
   /**
    * set arrow type
-   * @type
    * :0 from --> to
    * :1 from <-- to
    * :2 from <-> to
@@ -324,7 +323,9 @@ export class Edge extends CommonElement {
   public createArrow(position: any, angle: number, reverse: boolean = true) {
     const style = this.defaultStyle;
     this.arrow.lineStyle(style.arrowWidth, style.arrowColor, 1);
-    if (style.fillArrow) this.arrow.beginFill(style.arrowColor);
+    if (style.fillArrow) {
+      this.arrow.beginFill(style.arrowColor);
+    }
     const arrowPoints = this.getArrowPints(position, angle, reverse);
     this.arrow.drawPolygon(_.flatMap(_.map(
       _.values(arrowPoints), o => ([o.x, o.y]))));
@@ -480,7 +481,9 @@ export class Edge extends CommonElement {
     style: any,
   ) {
     this.arrow.lineStyle(style.arrowWidth, style.arrowColor, 1);
-    if (style.fillArrow) this.arrow.beginFill(style.arrowColor);
+    if (style.fillArrow) {
+      this.arrow.beginFill(style.arrowColor);
+    }
     const tangenAngle =
       this.getTangentAngle(srcNodePos, controlPoints, endNodePos, 1);
     const arrowsPoints = this.bezierArrowPoints(
