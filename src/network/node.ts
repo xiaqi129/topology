@@ -59,6 +59,7 @@ export class Node extends CommonElement {
     this.clearDisplayObjects();
     const style = this.defaultStyle;
     const graph = new PIXI.Graphics();
+    graph.name = 'node_graph';
     graph.lineStyle(style.lineWidth, style.lineColor);
     graph.beginFill(style.fillColor, style.fillOpacity);
     graph.drawCircle(0, 0, 5);
@@ -167,6 +168,7 @@ export class Node extends CommonElement {
           .on('mouseup', this.onDragEnd.bind(this))
           .on('mouseupoutside', this.onDragEnd.bind(this))
           .on('mousemove', this.onDragMove.bind(this));
+        node.name = 'node_sprite';
         this.addChild(node);
       });
     if (!loader.loading) {
@@ -181,6 +183,7 @@ export class Node extends CommonElement {
         .on('mouseup', this.onDragEnd.bind(this))
         .on('mouseupoutside', this.onDragEnd.bind(this))
         .on('mousemove', this.onDragMove.bind(this));
+      node.name = 'node_sprite';
       this.addChild(node);
     }
   }
@@ -202,7 +205,8 @@ export class Node extends CommonElement {
     } else {
       _.each(this.elements, (element: any) => {
         if (element instanceof Node) {
-          element.clearBorder();
+          // element.clearBorder();
+          element.selectOff();
         }
       });
       this.selectOn(color);
@@ -210,12 +214,47 @@ export class Node extends CommonElement {
   }
 
   public selectOn(color?: any) {
-    this.clearBorder();
-    const border = new PIXI.Graphics();
-    border.lineStyle(1, color || 0X024997, 1);
-    border.drawRoundedRect(-this.width / 2, -this.height / 2, this.width, this.height, 5);
-    border.name = 'node_border';
-    this.addChild(border);
+    // this.clearBorder();
+    this.selectOff();
+
+    const children = this.children;
+    _.each(children, (child) => {
+      if (child.name === 'node_sprite') {
+        const border = new PIXI.Graphics();
+        border.lineStyle(2, color || 0X024997, 1);
+        border.drawRoundedRect(
+          -(child as any).texture.width / 2,
+          -(child as any).texture.height / 2,
+          (child as any).texture.width,
+          (child as any).texture.height,
+          5,
+        );
+        border.name = 'node_border';
+        (child as any).addChild(border);
+      }
+      if (child.name === 'node_graph') {
+        const border = new PIXI.Graphics();
+        border.lineStyle(2, color || 0X024997, 1);
+        border.drawRoundedRect(
+          -(child as any).width / 2,
+          -(child as any).height / 2,
+          (child as any).width,
+          (child as any).height,
+          5,
+        );
+        border.name = 'node_border';
+        (child as any).addChild(border);
+      }
+    });
+  }
+
+  public selectOff() {
+    const children = this.children;
+    _.each(children, (child) => {
+      if (child instanceof PIXI.Sprite || child.name === 'node_graph') {
+        (child as any).removeChild((child as any).getChildByName('node_border'));
+      }
+    });
   }
 
   public setTooltip(content?: string) {

@@ -188,7 +188,8 @@ export class CommonAction {
     this.container.on('mousedown', () => {
       _.each(this.container.children, (element) => {
         if (element instanceof Node) {
-          element.clearBorder();
+          // element.clearBorder();
+          element.selectOff();
         }
         if (element instanceof Edge) {
           element.setStyle({
@@ -207,7 +208,8 @@ export class CommonAction {
         if (element instanceof Group) {
           _.each(element.children, (node) => {
             if (node instanceof Node && node.parent instanceof Group) {
-              node.clearBorder();
+              // node.clearBorder();
+              node.selectOff();
             }
             if (node instanceof GroupEdge) {
               node.setStyle({
