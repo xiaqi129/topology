@@ -29,7 +29,7 @@ export class Node extends CommonElement {
     edgesGroupByNodes: { [key: string]: Edge[] },
     elements: Edge | CommonElement[],
     selectedNodes: any[] = [],
-    resourceName?: string) {
+    icon: any) {
     super();
     this.edgesGroupByNodes = edgesGroupByNodes;
     this.data = null;
@@ -37,7 +37,8 @@ export class Node extends CommonElement {
     this.elements = elements;
     this.selectedNodes = selectedNodes;
     // this.draw();  // 圆点
-    this.createSprite(resourceName || 'switch');  // 从loader中加载icon, 默认switch
+    // this.createSprite(resourceName || 'switch');  // 从loader中加载icon, 默认switch
+    this.draw(icon);
     this.tooltip = new Tooltip();
     this.setTooltip();
     this.setLabel();
@@ -55,10 +56,19 @@ export class Node extends CommonElement {
     return this.parentNode;
   }
 
-  public draw() {
+  public draw(icon?: any) {
+    if (icon) {
+      this.drawSprite(icon);
+    } else {
+      this.drawGraph();
+    }
+  }
+
+  public drawGraph() {
     this.clearDisplayObjects();
     const style = this.defaultStyle;
     const graph = new PIXI.Graphics();
+    graph.name = 'node_graph';
     graph.lineStyle(style.lineWidth, style.lineColor);
     graph.beginFill(style.fillColor, style.fillOpacity);
     graph.drawCircle(0, 0, 5);
@@ -94,7 +104,7 @@ export class Node extends CommonElement {
 
   public onDragMove(event: PIXI.interaction.InteractionEvent) {
     if (this.dragging) {
-      event.stopPropagation();
+      // event.stopPropagation();
       const newPosition = this.data.getLocalPosition(this.parent);
       const isInSelect = _.find(this.selectedNodes, (node) => {
         return node === this;
@@ -141,46 +151,62 @@ export class Node extends CommonElement {
     });
   }
 
-  public createSprite(resourceName: string) {
-    let nodeSprite: PIXI.Sprite = new PIXI.Sprite();
-    const loader = PIXI.loader;
-    loader
-      .load((load: any, resources: any) => {
-        const resource = resources[resourceName];
-        if (resource) {
-          nodeSprite = new PIXI.Sprite(resource.texture);
-        } else {
-          nodeSprite = new PIXI.Sprite(resources.switch.texture);
-        }
-
-      }).onComplete.add(() => {
-        const node = nodeSprite;
-        node.width = 40;
-        node.height = 40;
-        node.anchor.set(0.5, 0.5);
-        node.interactive = true;
-        node.buttonMode = true;
-        node
-          .on('mousedown', this.onDragStart.bind(this))
-          .on('mouseup', this.onDragEnd.bind(this))
-          .on('mouseupoutside', this.onDragEnd.bind(this))
-          .on('mousemove', this.onDragMove.bind(this));
-        this.addChild(node);
-      });
-    if (!loader.loading) {
-      const node = nodeSprite;
-      node.width = 40;
-      node.height = 40;
-      node.anchor.set(0.5, 0.5);
-      node.interactive = true;
-      node.buttonMode = true;
-      node
-        .on('mousedown', this.onDragStart.bind(this))
-        .on('mouseup', this.onDragEnd.bind(this))
-        .on('mouseupoutside', this.onDragEnd.bind(this))
-        .on('mousemove', this.onDragMove.bind(this));
-      this.addChild(node);
-    }
+  public drawSprite(icon: any) {
+    // let nodeSprite: PIXI.Sprite = new PIXI.Sprite();
+    // const loader = PIXI.loader;
+    // loader
+    //   .load((load: any, resources: any) => {
+    //     console.log('load', load);
+    //     console.log('res', resources);
+    //     const resource = resources[resourceName];
+    //     if (resource) {
+    //       nodeSprite = new PIXI.Sprite(resource.texture);
+    //     } else {
+    //       nodeSprite = new PIXI.Sprite(resources.switch.texture);
+    //     }
+    //   }).onComplete.add(() => {
+    //     const node = nodeSprite;
+    //     node.width = 40;
+    //     node.height = 40;
+    //     node.anchor.set(0.5, 0.5);
+    //     node.interactive = true;
+    //     node.buttonMode = true;
+    //     node
+    //       .on('mousedown', this.onDragStart.bind(this))
+    //       .on('mouseup', this.onDragEnd.bind(this))
+    //       .on('mouseupoutside', this.onDragEnd.bind(this))
+    //       .on('mousemove', this.onDragMove.bind(this));
+    //     node.name = 'node_sprite';
+    //     this.addChild(node);
+    //   });
+    // if (!loader.loading) {
+    //   const node = nodeSprite;
+    //   node.width = 40;
+    //   node.height = 40;
+    //   node.anchor.set(0.5, 0.5);
+    //   node.interactive = true;
+    //   node.buttonMode = true;
+    //   node
+    //     .on('mousedown', this.onDragStart.bind(this))
+    //     .on('mouseup', this.onDragEnd.bind(this))
+    //     .on('mouseupoutside', this.onDragEnd.bind(this))
+    //     .on('mousemove', this.onDragMove.bind(this));
+    //   node.name = 'node_sprite';
+    //   this.addChild(node);
+    // }
+    const node = new PIXI.Sprite(icon.texture);
+    node.width = icon.width;
+    node.height = icon.height;
+    node.anchor.set(0.5, 0.5);
+    node.interactive = true;
+    node.buttonMode = true;
+    node
+      .on('mousedown', this.onDragStart.bind(this))
+      .on('mouseup', this.onDragEnd.bind(this))
+      .on('mouseupoutside', this.onDragEnd.bind(this))
+      .on('mousemove', this.onDragMove.bind(this));
+    node.name = 'node_sprite';
+    this.addChild(node);
   }
 
   public getWidth() {
@@ -200,7 +226,8 @@ export class Node extends CommonElement {
     } else {
       _.each(this.elements, (element: any) => {
         if (element instanceof Node) {
-          element.clearBorder();
+          // element.clearBorder();
+          element.selectOff();
         }
       });
       this.selectOn(color);
@@ -208,12 +235,49 @@ export class Node extends CommonElement {
   }
 
   public selectOn(color?: any) {
-    this.clearBorder();
-    const border = new PIXI.Graphics();
-    border.lineStyle(1, color || 0X024997, 1);
-    border.drawRoundedRect(-this.width / 2, -this.height / 2, this.width, this.height, 5);
-    border.name = 'node_border';
-    this.addChild(border);
+    // this.clearBorder();
+    this.selectOff();
+
+    const children = this.children;
+    _.each(children, (child) => {
+      if (child.name === 'node_sprite') {
+        const border = new PIXI.Graphics();
+        const lineWidth = 8;
+        border.lineStyle(lineWidth, color || 0X00e5ff, 1);
+        border.drawRoundedRect(
+          -((child as any).texture.width + lineWidth) / 2,
+          -((child as any).texture.height + lineWidth) / 2,
+          (child as any).texture.width + lineWidth,
+          (child as any).texture.height + lineWidth,
+          5,
+        );
+        border.name = 'node_border';
+        (child as any).addChild(border);
+      }
+      if (child.name === 'node_graph') {
+        const border = new PIXI.Graphics();
+        const lineWidth = 2;
+        border.lineStyle(lineWidth, color || 0X00e5ff, 1);
+        border.drawRoundedRect(
+          -((child as any).width + lineWidth) / 2,
+          -((child as any).height + lineWidth) / 2,
+          (child as any).width + lineWidth,
+          (child as any).height + lineWidth,
+          7,
+        );
+        border.name = 'node_border';
+        (child as any).addChild(border);
+      }
+    });
+  }
+
+  public selectOff() {
+    const children = this.children;
+    _.each(children, (child) => {
+      if (child instanceof PIXI.Sprite || child.name === 'node_graph') {
+        (child as any).removeChild((child as any).getChildByName('node_border'));
+      }
+    });
   }
 
   public setTooltip(content?: string) {

@@ -21,7 +21,7 @@ export interface ITopo {
 
   addElements(node: Node[] | Group[] | Edge[]): void;
 
-  createNode(): Node;
+  createNode(texture: string): Node;
 
   createGroup(): Group;
 
@@ -179,8 +179,12 @@ export class Topo implements ITopo {
     return this.elements;
   }
 
-  public createNode(resourceName?: string): Node {
-    return new Node(this.edgesGroupByNodes, this.elements, this.selectedNodes, resourceName);
+  // public createNode(resourceName?: string): Node {
+  //   return new Node(this.edgesGroupByNodes, this.elements, this.selectedNodes, resourceName);
+  // }
+
+  public createNode(icon: any): Node {
+    return new Node(this.edgesGroupByNodes, this.elements, this.selectedNodes, icon);
   }
 
   public createGroup(): Group {
