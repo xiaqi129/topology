@@ -17,6 +17,8 @@ import { Tooltip } from './tooltip';
 import { Topo } from './topo';
 
 export class Network {
+  public icons: any = {};
+  public callback: any;
   private loader = PIXI.loader;
   private topo: Topo;
   private drawer: Drawer;
@@ -32,13 +34,34 @@ export class Network {
     this.action = new CommonAction(this.app, this.topo, this.tooltip);
   }
 
-  public addResourceCache(key: string, image: string) {
-    this.loader.add(key, image);
-    return this.loader;
+  public addIconResource(iconList: any) {
+    // this.loader.add(key, image);
+    // return this.loader;
+    _.each(iconList, (icon) => {
+      PIXI.loader.add(icon.name, icon.url);
+    });
+    PIXI.loader
+      .load((loader: any, resources: any) => {
+        _.each(resources, (resource) => {
+          this.icons[resource.name] = {
+            texture: resource.texture,
+            width: iconList[resource.name].width,
+            height: iconList[resource.name].height,
+          };
+        });
+      }).onComplete.add(() => {
+        this.callback();
+      });
   }
 
-  public createNode(resourceName?: string) {
-    return this.topo.createNode(resourceName);
+  // public createNode(resourceName?: string) {
+  //   return this.topo.createNode(resourceName);
+  // }
+
+  public createNode(iconName?: string) {
+    const name = iconName || 'switch';
+    const icon = this.icons[name];
+    return this.topo.createNode(icon);
   }
 
   public createGroup() {
