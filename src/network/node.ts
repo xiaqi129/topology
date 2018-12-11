@@ -221,12 +221,13 @@ export class Node extends CommonElement {
     _.each(children, (child) => {
       if (child.name === 'node_sprite') {
         const border = new PIXI.Graphics();
-        border.lineStyle(2, color || 0X024997, 1);
+        const lineWidth = 8;
+        border.lineStyle(lineWidth, color || 0X00e5ff, 1);
         border.drawRoundedRect(
-          -(child as any).texture.width / 2,
-          -(child as any).texture.height / 2,
-          (child as any).texture.width,
-          (child as any).texture.height,
+          -((child as any).texture.width + lineWidth) / 2,
+          -((child as any).texture.height + lineWidth) / 2,
+          (child as any).texture.width + lineWidth,
+          (child as any).texture.height + lineWidth,
           5,
         );
         border.name = 'node_border';
@@ -234,13 +235,14 @@ export class Node extends CommonElement {
       }
       if (child.name === 'node_graph') {
         const border = new PIXI.Graphics();
-        border.lineStyle(2, color || 0X024997, 1);
+        const lineWidth = 2;
+        border.lineStyle(lineWidth, color || 0X00e5ff, 1);
         border.drawRoundedRect(
-          -(child as any).width / 2,
-          -(child as any).height / 2,
-          (child as any).width,
-          (child as any).height,
-          5,
+          -((child as any).width + lineWidth) / 2,
+          -((child as any).height + lineWidth) / 2,
+          (child as any).width + lineWidth,
+          (child as any).height + lineWidth,
+          7,
         );
         border.name = 'node_border';
         (child as any).addChild(border);
