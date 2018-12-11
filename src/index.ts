@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import { Network } from './network/network';
 
 const network = new Network('div#network');
-const num = 50;
+const num = 20;
 network.addResourceCache('switch', './pic/cisco-WS-C49.png');
 network.addResourceCache('switchLayer3', './pic/cisco-WS-C68.png');
 network.addResourceCache('router', './pic/cisco-18.png');
@@ -54,6 +54,19 @@ _.each(groupNodes, (node) => {
 });
 group.setStyle({
   fillOpacity: 1,
+});
+
+const group1 = network.createGroup();
+network.addElement(group1);
+
+const groupNodes1 = _.slice(_.shuffle(_.dropRight(nodes, (num / 2) + 1)), 0, 3);
+_.each(groupNodes1, (node) => {
+  node.setStyle({ lineColor: 0xf55d54 });
+  group1.addChildNodes(node);
+});
+group1.setStyle({
+  fillOpacity: 1,
+  fillColor: 0xcddc39,
 });
 
 // group.setExpaned(false);

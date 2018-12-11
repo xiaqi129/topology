@@ -70,7 +70,7 @@ export class Node extends CommonElement {
       .on('mouseup', this.onDragEnd.bind(this))
       .on('mouseupoutside', this.onDragEnd.bind(this))
       .on('mousemove', this.onDragMove.bind(this));
-    this.addChild(graph);
+    // this.addChild(graph);
   }
 
   public onDragStart(event: PIXI.interaction.InteractionEvent) {
@@ -122,18 +122,16 @@ export class Node extends CommonElement {
       const groupEdges = element.groupEdges;
       const isExpanded = element.isExpanded;
       // when the group is Expanded redraw it
-      if (element instanceof Node && element.parent instanceof Group) {
-        if (element.parent.isExpanded) {
-          element.parent.draw();
-        }
+      if (element instanceof Group && element.isExpanded) {
+        element.draw();
       }
-      // when the groip is close on redraw groupEdges
+      // when the group is close on redraw groupEdges
       if (element instanceof Group && !isExpanded) {
         element.rmElements(groupEdges);
         element.drawEdges();
       }
     });
-    // redraw all of the EdgeBundle
+    // redraw all of the EdgeBundle and Edge
     _.each(this.edgesGroupByNodes, (edgesGroup, key) => {
       if (_.includes(key, this.getUID())) {
         _.each(edgesGroup, (edge: Edge) => {

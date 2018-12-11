@@ -113,21 +113,6 @@ export class CommonAction {
             this.topo.setSelectedNodes(element);
           }
         }
-        if (element instanceof Group) {
-          _.each(element.children, (node) => {
-            if (node instanceof Node && node.parent instanceof Group) {
-              const nodeTop = node.y - (node.height / 2);
-              const nodeLeft = node.x - (node.width / 2);
-              const nodeRight = node.x + (node.width / 2);
-              const nodeBottom = node.y + (node.height / 2);
-              if ((nodeTop >= bounds.top) && (nodeRight <= bounds.right) &&
-                (nodeBottom <= bounds.bottom) && (nodeLeft >= bounds.left)) {
-                node.selectOn(this.clickColor);
-                this.topo.setSelectedNodes(node);
-              }
-            }
-          });
-        }
       });
       rectangle.clear();
     });
@@ -167,13 +152,6 @@ export class CommonAction {
         });
       } else if (element instanceof Group) {
         _.each(element.children, (node) => {
-          if (node instanceof Node && node.parent instanceof Group) {
-            node.addEventListener('mousedown', (event: PIXI.interaction.InteractionEvent) => {
-              event.stopPropagation();
-              this.cleanEdge(defaultLineColor);
-              node.selectOne(color);
-            });
-          }
           if (node instanceof GroupEdge) {
             node.addEventListener('mousedown', (event: PIXI.interaction.InteractionEvent) => {
               event.stopPropagation();
@@ -206,9 +184,6 @@ export class CommonAction {
         }
         if (element instanceof Group) {
           _.each(element.children, (node) => {
-            if (node instanceof Node && node.parent instanceof Group) {
-              node.clearBorder();
-            }
             if (node instanceof GroupEdge) {
               node.setStyle({
                 fillColor: defaultLineColor,
