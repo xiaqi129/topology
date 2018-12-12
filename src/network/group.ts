@@ -213,11 +213,7 @@ export class Group extends CommonElement {
 
   public marginPolygon(rectVertexPoints: number[], margin: number) {
     const offset = new Offset();
-    try {
-      return offset.data(rectVertexPoints).margin(margin || 10);
-    } catch (err) {
-      return offset.data(rectVertexPoints).margin(margin || 10);
-    }
+    return offset.data(rectVertexPoints).margin(margin || 10);
   }
 
   public getHulls(rectVertexPoints: number[][]) {
@@ -326,18 +322,26 @@ export class Group extends CommonElement {
   public drawEllipseOutline(graph: PIXI.Graphics, vertexPointsNumber: number[][]) {
     const size = this.getNodesMaxSize();
     const padding = size + this.defaultStyle.padding;
-    const polygonObject: any = new polygon(vertexPointsNumber);
-    const rect = polygonObject.aabb();
-    const x = rect.x - padding;
-    const y = rect.y - padding;
-    const width = rect.w + padding;
-    const height = rect.h + padding;
-    const centerX = x + width * 0.5;
-    const centerY = y + height * 0.5;
-    const ellipseWidth = width / Math.sqrt(2);
-    const ellipseHeight = height / Math.sqrt(2);
-    graph.drawEllipse(centerX, centerY, ellipseWidth, ellipseHeight);
-    graph.endFill();
+    if (vertexPointsNumber.length > 1) {
+      const polygonObject: any = new polygon(vertexPointsNumber);
+      const rect = polygonObject.aabb();
+      const x = rect.x - padding / 2;
+      const y = rect.y - padding / 2;
+      const width = rect.w + padding;
+      const height = rect.h + padding;
+      const centerX = x + width * 0.5;
+      const centerY = y + height * 0.5;
+      const ellipseWidth = width / Math.sqrt(2);
+      const ellipseHeight = height / Math.sqrt(2);
+      graph.drawEllipse(centerX, centerY, ellipseWidth, ellipseHeight);
+      graph.endFill();
+    } else {
+      const x = vertexPointsNumber[0][0];
+      const y = vertexPointsNumber[0][1];
+      const radius = size;
+      graph.drawCircle(x, y, radius);
+      graph.endFill();
+    }
   }
 
   // draw polygon background outline

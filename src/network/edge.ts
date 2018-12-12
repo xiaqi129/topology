@@ -354,11 +354,13 @@ export class Edge extends CommonElement {
 
   public createLinkArrows(
     srcNodePos: any, endNodePos: any, angle: any, style: any) {
-    const arrowsDirections = [[true], [false], [true, false]];
+    const arrowsDirections = [[true], [false], [true, false], [undefined]];
     const directions = arrowsDirections[style.arrowType];
     _.each(directions, (direction) => {
-      const position = direction ? endNodePos : srcNodePos;
-      this.createArrow(position, angle, direction);
+      if (direction) {
+        const position = direction ? endNodePos : srcNodePos;
+        this.createArrow(position, angle, direction);
+      }
     });
     return this.arrow;
   }

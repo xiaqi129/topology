@@ -4,7 +4,7 @@ import { Network } from './network/network';
 const iconResource = {
   switch: { name: 'switch', url: './pic/cisco-WS-C49.png', width: '40', height: '40' },
   switchLayer3: { name: 'switchLayer3', url: './pic/cisco-WS-C68.png', width: '40', height: '40' },
-  router: { name: 'router', url: './pic/cisco-18.png', width: '40', height: '40' },
+  router: { name: 'router', url: './pic/cisco-18.png', width: '30', height: '30' },
 };
 
 const network = new Network('div#network');
@@ -55,6 +55,7 @@ network.callback = () => {
     fillOpacity: 1,
     fillColor: 0xcddc39,
   });
+  group1.setOutlineStyle(2);
 
   // group.setExpaned(false);
 
@@ -63,7 +64,6 @@ network.callback = () => {
 
   const groupNodes = _.slice(_.shuffle(_.dropRight(nodes, (num / 2) + 1)), 0, 3);
   _.each(groupNodes, (node) => {
-    node.setStyle({ lineColor: 0xf55d54 });
     group.addChildNodes(node);
   });
   group.setStyle({

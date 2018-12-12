@@ -80,7 +80,7 @@ export class Node extends CommonElement {
       .on('mouseup', this.onDragEnd.bind(this))
       .on('mouseupoutside', this.onDragEnd.bind(this))
       .on('mousemove', this.onDragMove.bind(this));
-    // this.addChild(graph);
+    this.addChild(graph);
   }
 
   public onDragStart(event: PIXI.interaction.InteractionEvent) {
@@ -152,48 +152,6 @@ export class Node extends CommonElement {
   }
 
   public drawSprite(icon: any) {
-    // let nodeSprite: PIXI.Sprite = new PIXI.Sprite();
-    // const loader = PIXI.loader;
-    // loader
-    //   .load((load: any, resources: any) => {
-    //     console.log('load', load);
-    //     console.log('res', resources);
-    //     const resource = resources[resourceName];
-    //     if (resource) {
-    //       nodeSprite = new PIXI.Sprite(resource.texture);
-    //     } else {
-    //       nodeSprite = new PIXI.Sprite(resources.switch.texture);
-    //     }
-    //   }).onComplete.add(() => {
-    //     const node = nodeSprite;
-    //     node.width = 40;
-    //     node.height = 40;
-    //     node.anchor.set(0.5, 0.5);
-    //     node.interactive = true;
-    //     node.buttonMode = true;
-    //     node
-    //       .on('mousedown', this.onDragStart.bind(this))
-    //       .on('mouseup', this.onDragEnd.bind(this))
-    //       .on('mouseupoutside', this.onDragEnd.bind(this))
-    //       .on('mousemove', this.onDragMove.bind(this));
-    //     node.name = 'node_sprite';
-    //     this.addChild(node);
-    //   });
-    // if (!loader.loading) {
-    //   const node = nodeSprite;
-    //   node.width = 40;
-    //   node.height = 40;
-    //   node.anchor.set(0.5, 0.5);
-    //   node.interactive = true;
-    //   node.buttonMode = true;
-    //   node
-    //     .on('mousedown', this.onDragStart.bind(this))
-    //     .on('mouseup', this.onDragEnd.bind(this))
-    //     .on('mouseupoutside', this.onDragEnd.bind(this))
-    //     .on('mousemove', this.onDragMove.bind(this));
-    //   node.name = 'node_sprite';
-    //   this.addChild(node);
-    // }
     const node = new PIXI.Sprite(icon.texture);
     node.width = icon.width;
     node.height = icon.height;
@@ -210,11 +168,11 @@ export class Node extends CommonElement {
   }
 
   public getWidth() {
-    return this.defaultStyle.width;
+    return this.width;
   }
 
   public getHeight() {
-    return this.defaultStyle.height;
+    return this.height;
   }
 
   public selectOne(color?: any) {
