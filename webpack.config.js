@@ -16,6 +16,7 @@ module.exports = {
         path: path.resolve(__dirname, 'dist'),
         filename: 'main.bundle.js'
     },
+    performance: { hints: false },
     module: {
         rules: [{
             // use : 'babel-loader',
