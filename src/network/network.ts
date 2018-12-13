@@ -52,6 +52,7 @@ export class Network {
         });
       }).onComplete.add(() => {
         this.callback();
+        this.callback = Function();
       });
   }
 
@@ -169,6 +170,14 @@ export class Network {
 
   public nodeLabelToggle() {
     this.action.nodeLabelToggle();
+  }
+
+  public searchNode(inputValue: string) {
+    _.each(this.getNodes(), (node) => {
+      if (node.getUID() === `element_${inputValue}`) {
+        this.action.searchNode(node);
+      }
+    });
   }
 
 }

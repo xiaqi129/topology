@@ -356,4 +356,9 @@ export class CommonAction {
     }
   }
 
+  public searchNode(node: Node) {
+    this.container.moveCenter(node.x, node.y);
+    node.selectOn(this.clickColor);
+  }
+
 }

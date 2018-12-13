@@ -81,6 +81,7 @@ network.callback = () => {
   const tooltipToggle = document.querySelector('button.btn_tooltipToggle');
   const bundleLabelToggle = document.querySelector('button.btn_bundleLabelToggle');
   const nodeLabelToggle = document.querySelector('button.btn_nodeLabelToggle');
+  const searchNode = document.querySelector('button.btn_search_node');
   const canvas = document.querySelector('div#network');
   if (zoomIn) {
     zoomIn.addEventListener('click', () => {
@@ -130,6 +131,13 @@ network.callback = () => {
   if (nodeLabelToggle) {
     nodeLabelToggle.addEventListener('click', () => {
       network.nodeLabelToggle();
+    });
+  }
+
+  if (searchNode) {
+    searchNode.addEventListener('click', () => {
+      const searchInput = document.querySelector('input.input_search_node') as HTMLInputElement;
+      network.searchNode(searchInput.value);
     });
   }
 };
