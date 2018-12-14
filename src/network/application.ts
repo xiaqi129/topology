@@ -13,7 +13,7 @@ import { Group } from './group';
 
 export class Application extends PIXI.Application {
   private domRegex: string = '';
-  private viewWrapper: HTMLDivElement | null = null;
+  private viewWrapper: HTMLElement | null = null;
   private container: Viewport | undefined = undefined;
 
   constructor(domRegex: string = '', options = null) {
@@ -37,7 +37,7 @@ export class Application extends PIXI.Application {
   }
 
   public initApplication() {
-    this.viewWrapper = document.querySelector(this.domRegex);
+    this.viewWrapper = document.getElementById(this.domRegex);
     if (this.viewWrapper) {
       this.container = new Viewport({
         screenWidth: this.viewWrapper.clientWidth,
@@ -75,7 +75,7 @@ export class Application extends PIXI.Application {
   }
 
   public getWrapperBoundings() {
-    const domNode = document.querySelector(this.domRegex);
+    const domNode = document.getElementById(this.domRegex);
     const boundingRect = domNode ? domNode.getBoundingClientRect() : { width: 0, height: 0 };
     const width = boundingRect.width;
     const height = boundingRect.height;

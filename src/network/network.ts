@@ -38,6 +38,7 @@ export class Network {
   public addIconResource(iconList: any) {
     // this.loader.add(key, image);
     // return this.loader;
+    PIXI.loader.reset();
     _.each(iconList, (icon) => {
       PIXI.loader.add(icon.name, icon.url);
     });
@@ -50,19 +51,19 @@ export class Network {
             height: iconList[resource.name].height,
           };
         });
-      }).onComplete.add(() => {
         this.callback();
         this.callback = Function();
       });
   }
 
-  // public createNode(resourceName?: string) {
-  //   return this.topo.createNode(resourceName);
-  // }
-
   public createNode(iconName?: string) {
-    const name = iconName || 'switch';
-    const icon = this.icons[name];
+    const name = iconName;
+    let icon: any;
+    if (name) {
+      icon = this.icons[name];
+    } else {
+      icon = undefined;
+    }
     return this.topo.createNode(icon);
   }
 

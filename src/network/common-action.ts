@@ -332,25 +332,11 @@ export class CommonAction {
         if (element instanceof Node) {
           element.setLabel(element.getLabelContent());
         }
-        if (element instanceof Group) {
-          _.each(element.children, (e) => {
-            if (e instanceof Node) {
-              e.setLabel(e.getLabelContent());
-            }
-          });
-        }
       });
     } else {
       _.each(this.container.children, (element) => {
         if (element instanceof Node) {
           element.removeChild(element.getChildByName('node_label'));
-        }
-        if (element instanceof Group) {
-          _.each(element.children, (e) => {
-            if (e instanceof Node) {
-              e.removeChild(e.getChildByName('node_label'));
-            }
-          });
         }
       });
     }
