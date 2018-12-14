@@ -7,15 +7,25 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 module.exports = {
     mode: 'development',
     entry: './src/index.ts',
-    devtool: "inline-source-map",
-    // devtool: false,
+    // devtool: "inline-source-map",
+    devtool: false,
     resolve: {
         extensions: ['.ts', '.js', '.json']
     },
     output: {
         path: path.resolve(__dirname, 'dist'),
-        filename: 'main.bundle.js'
+        filename: 'network.js',
+        library: 'network',
+        libraryTarget: 'umd'
     },
+    // externals: {
+    //     lodash: {
+    //         commonjs: 'lodash',
+    //         commonjs2: 'lodash',
+    //         amd: 'lodash',
+    //         root: '_'
+    //     }
+    // },
     performance: { hints: false },
     module: {
         rules: [{

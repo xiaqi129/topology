@@ -7,7 +7,7 @@ const iconResource = {
   router: { name: 'router', url: './pic/cisco-18.png', width: '30', height: '30' },
 };
 
-const network = new Network('div#network');
+const network = new Network('network');
 network.addIconResource(iconResource);
 
 network.callback = () => {

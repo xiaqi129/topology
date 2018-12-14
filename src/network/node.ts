@@ -41,7 +41,7 @@ export class Node extends CommonElement {
     this.draw(icon);
     this.tooltip = new Tooltip();
     this.setTooltip();
-    this.setLabel();
+    // this.setLabel();
   }
 
   public setParentNode(node: Group) {
