@@ -40,8 +40,8 @@ export class Application extends PIXI.Application {
     this.viewWrapper = document.getElementById(this.domRegex);
     if (this.viewWrapper) {
       this.container = new Viewport({
-        screenWidth: window.innerWidth,
-        screenHeight: window.innerHeight,
+        screenWidth: this.viewWrapper.clientWidth,
+        screenHeight: this.viewWrapper.clientHeight,
         interaction: this.renderer.plugins.interaction,
         divWheel: this.viewWrapper,
       });
