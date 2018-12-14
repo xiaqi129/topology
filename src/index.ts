@@ -137,7 +137,11 @@ network.callback = () => {
   if (searchNode) {
     searchNode.addEventListener('click', () => {
       const searchInput = document.querySelector('input.input_search_node') as HTMLInputElement;
-      network.searchNode(searchInput.value);
+      _.each(network.getNodes(), (node) => {
+        if (node.getUID() === `element_${searchInput.value}`) {
+          network .searchNode(node);
+        }
+      });
     });
   }
 };

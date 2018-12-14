@@ -173,12 +173,8 @@ export class Network {
     this.action.nodeLabelToggle();
   }
 
-  public searchNode(inputValue: string) {
-    _.each(this.getNodes(), (node) => {
-      if (node.getUID() === `element_${inputValue}`) {
-        this.action.searchNode(node);
-      }
-    });
+  public searchNode(node: Node) {
+    this.action.searchNode(node);
   }
 
 }
