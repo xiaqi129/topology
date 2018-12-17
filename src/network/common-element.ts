@@ -51,7 +51,7 @@ export abstract class CommonElement extends PIXI.Container {
     arrowWidth: 1,
     arrowAngle: 20,
     arrowMiddleLength: 10,
-    bezierLineDistance: 5,
+    bezierLineDistance: 0,
     bezierLineDegree: 20,
     fillArrow: true,
     lineDistance: 0,

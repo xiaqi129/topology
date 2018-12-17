@@ -5,7 +5,7 @@ import { data as topoData } from './simpleData';
 const iconResource = {
   switch: { name: 'switch', url: './pic/cisco-WS-C49.png', width: '40', height: '40' },
   switchLayer3: { name: 'switchLayer3', url: './pic/cisco-WS-C68.png', width: '40', height: '40' },
-  router: { name: 'router', url: './pic/cisco-18.png', width: '20', height: '20' },
+  router: { name: 'router', url: './pic/cisco-18.png', width: '10', height: '10' },
 };
 
 const network = new Network('network');
@@ -209,7 +209,7 @@ network.callback = () => {
     });
     newGroup.setStyle({
       fillOpacity: 0.3,
-      fillColor: rgb2hex(bgColor)
+      fillColor: rgb2hex(bgColor),
     });
   });
   // console.log(network.getElements());
@@ -223,6 +223,7 @@ network.callback = () => {
   const zoomOver = document.querySelector('button.btn_zoomOver');
   const dragOrSelect = document.querySelector('button.btn_dragOrSelect');
   const tooltipToggle = document.querySelector('button.btn_tooltipToggle');
+  const nodeLabelToggle = document.querySelector('button.btn_nodeLabelToggle');
   if (zoomIn) {
     zoomIn.addEventListener('click', () => {
       network.setZoom(0.3);
@@ -262,13 +263,25 @@ network.callback = () => {
       network.setTooltipDisplay(isDisplay);
     });
   }
+  if (nodeLabelToggle) {
+    nodeLabelToggle.addEventListener('click', () => {
+      network.nodeLabelToggle();
+    });
+  }
 };
 
 const rgb2hex = (rgb: any) => {
-  return (rgb && rgb.length === 4) ? '0X' +
-    ('0' + parseInt(rgb[0], 10).toString(16)).slice(-2) +
-    ('0' + parseInt(rgb[1], 10).toString(16)).slice(-2) +
-    ('0' + parseInt(rgb[2], 10).toString(16)).slice(-2) : '';
+  const hexR = (`0${parseInt(rgb[0], 10).toString(16)}`).slice(-2);
+  const hexG = (`0${parseInt(rgb[1], 10).toString(16)}`).slice(-2);
+  const hexB = (`0${parseInt(rgb[2], 10).toString(16)}`).slice(-2);
+
+  return (rgb && rgb.length === 4) ? `0X${hexR}${hexG}${hexB}` : '';
+
+  // return (rgb && rgb.length === 4) ? '0X' +
+  //   ('0' + parseInt(rgb[0], 10).toString(16)).slice(-2) +
+  //   ('0' + parseInt(rgb[1], 10).toString(16)).slice(-2) +
+  //   ('0' + parseInt(rgb[2], 10).toString(16)).slice(-2) : '';
+
 };
 
 const keySort = (obj: any) => {
@@ -281,5 +294,4 @@ const keySort = (obj: any) => {
     }
   }
   return sortedObj;
-}
-
+};
