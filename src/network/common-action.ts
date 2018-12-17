@@ -185,10 +185,6 @@ export class CommonAction {
         }
         if (element instanceof Group) {
           _.each(element.children, (node) => {
-            if (node instanceof Node && node.parent instanceof Group) {
-              // node.clearBorder();
-              node.selectOff();
-            }
             if (node instanceof GroupEdge) {
               node.setStyle({
                 fillColor: defaultLineColor,
@@ -233,7 +229,7 @@ export class CommonAction {
   public cleanNode() {
     _.each(this.container.children, (ele) => {
       if (ele instanceof Node) {
-        ele.clearBorder();
+        ele.selectOff();
       }
     });
   }
@@ -343,6 +339,7 @@ export class CommonAction {
   }
 
   public searchNode(node: Node) {
+    this.cleanNode();
     this.container.moveCenter(node.x, node.y);
     node.selectOn(this.clickColor);
   }

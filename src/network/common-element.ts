@@ -110,7 +110,7 @@ export abstract class CommonElement extends PIXI.Container {
   public addEventListener(...args: any[]) {
     this.interactive = true;
     this.buttonMode = true;
-    this.on.apply(this, args);
+    this.on.apply(this, args as any);
   }
 
 }

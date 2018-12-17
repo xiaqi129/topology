@@ -139,7 +139,7 @@ network.callback = () => {
       const searchInput = document.querySelector('input.input_search_node') as HTMLInputElement;
       _.each(network.getNodes(), (node) => {
         if (node.getUID() === `element_${searchInput.value}`) {
-          network .searchNode(node);
+          network.searchNode(node);
         }
       });
     });

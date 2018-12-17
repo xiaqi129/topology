@@ -357,7 +357,7 @@ export class Edge extends CommonElement {
     const arrowsDirections = [[true], [false], [true, false], [undefined]];
     const directions = arrowsDirections[style.arrowType];
     _.each(directions, (direction) => {
-      if (direction) {
+      if (direction !== undefined) {
         const position = direction ? endNodePos : srcNodePos;
         this.createArrow(position, angle, direction);
       }
