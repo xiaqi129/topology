@@ -335,12 +335,14 @@ export class Group extends CommonElement {
       const ellipseHeight = height / Math.sqrt(2);
       graph.drawEllipse(centerX, centerY, ellipseWidth, ellipseHeight);
       graph.endFill();
+      this.hitArea = new PIXI.Ellipse(centerX, centerY, ellipseWidth, ellipseHeight);
     } else {
       const x = vertexPointsNumber[0][0];
       const y = vertexPointsNumber[0][1];
       const radius = size;
       graph.drawCircle(x, y, radius);
       graph.endFill();
+      this.hitArea = new PIXI.Circle(x, y, radius);
     }
   }
 
@@ -349,6 +351,7 @@ export class Group extends CommonElement {
     const vertexPointsNumber = this.getGroupVertexNumber();
     const pointsCount = vertexPointsNumber.length;
     const graph = this.createOutlineGraphic();
+    this.interactive = true;
     this.setOutlineGraphicStyle(graph);
     if (pointsCount === 0) {
       return false;

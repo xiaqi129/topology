@@ -12,12 +12,14 @@ import { Drawer } from './drawer';
 import { Edge } from './edge';
 import { Group } from './group';
 import { Node } from './node';
+import { PopMenu } from './pop-menu';
 import { Tooltip } from './tooltip';
 
 import { Topo } from './topo';
 
 export class Network {
   public icons: any = {};
+  public menu: PopMenu;
   public callback: any;
   private loader = PIXI.loader;
   private topo: Topo;
@@ -33,6 +35,7 @@ export class Network {
     this.app = this.drawer.getWhiteBoard();
     this.tooltip = new Tooltip();
     this.action = new CommonAction(this.app, this.topo, this.tooltip);
+    this.menu = new PopMenu(domRegex, this.app);
   }
 
   public addIconResource(iconList: any) {
@@ -117,6 +120,10 @@ export class Network {
     this.topo.addElements(elements);
   }
 
+  public getSelectedNodes() {
+    this.topo.getSelectedNodes();
+  }
+
   public removeElements(element: PIXI.Container) {
     const elements = this.topo.getElements();
     _.remove(elements, elem => element === elem);
@@ -143,6 +150,10 @@ export class Network {
 
   public zoomOver() {
     this.action.zoomOver();
+  }
+
+  public getZoom() {
+    this.action.getZoom();
   }
 
   public zoomReset() {
@@ -176,5 +187,4 @@ export class Network {
   public searchNode(node: Node) {
     this.action.searchNode(node);
   }
-
 }

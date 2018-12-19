@@ -119,7 +119,7 @@ export class CommonAction {
   }
 
   public getZoom() {
-    return this.container.scale;
+    return this.container.scale.x;
   }
 
   public setClick(color?: any) {
