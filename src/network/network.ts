@@ -121,6 +121,20 @@ export class Network {
     return edgeObj;
   }
 
+  public getGroupObj() {
+    const groupObj = {};
+    const elements = this.topo.getElements();
+    _.each(elements, (element) => {
+      if (element instanceof Group && element.name) {
+        const name: string = element.name;
+        _.extend(groupObj, {
+          [name]: element,
+        });
+      }
+    });
+    return groupObj;
+  }
+
   public addElement(element: Node | Group | Edge) {
     this.topo.addElement(element);
   }
@@ -195,5 +209,36 @@ export class Network {
 
   public searchNode(node: Node) {
     this.action.searchNode(node);
+  }
+
+  public hideElement(element: any) {
+    if (element instanceof Edge) {
+      element.visible = false;
+    }
+    if (element instanceof Node) {
+      element.visible = false;
+      const nodeName = element.name;
+      _.each(this.getEdgeObj(), (value: any, key: string) => {
+        // if key contain nodeName, then set value's visible to false
+        if (nodeName && key.indexOf(nodeName) !== -1) {
+          value.visible = false;
+        }
+      });
+    }
+  }
+
+  public showElement(element: any) {
+    if (element instanceof Edge) {
+      element.visible = true;
+    }
+    if (element instanceof Node) {
+      element.visible = true;
+      const nodeName = element.name;
+      _.each(this.getEdgeObj(), (value: any, key: string) => {
+        if (nodeName && key.indexOf(nodeName) !== -1) {
+          value.visible = true;
+        }
+      });
+    }
   }
 }

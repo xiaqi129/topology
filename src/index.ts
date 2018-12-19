@@ -235,7 +235,6 @@ network.callback = () => {
       network.menu.showMenu(event);
     });
   });
-  // console.log(network.getElements());
 
   network.syncView();
   network.setDrag();
