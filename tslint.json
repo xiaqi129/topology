@@ -8,7 +8,8 @@
     "linterOptions": {
         "project": "tsconfig.json",
         "exclude": [
-            "node_modules"
+            "node_modules",
+            "src/simpleData.ts"
         ]
     },
     "jsRules": {},
