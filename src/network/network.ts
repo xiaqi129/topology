@@ -39,9 +39,8 @@ export class Network {
   }
 
   public addIconResource(iconList: any) {
-    // this.loader.add(key, image);
-    // return this.loader;
     PIXI.loader.reset();
+    PIXI.utils.clearTextureCache();
     _.each(iconList, (icon) => {
       PIXI.loader.add(icon.name, icon.url);
     });
@@ -60,14 +59,10 @@ export class Network {
   }
 
   public createNode(iconName?: string) {
-    const name = iconName;
-    let icon: any;
-    if (name) {
-      icon = this.icons[name];
-    } else {
-      icon = undefined;
+    if (iconName) {
+      return this.topo.createNode(this.icons[iconName]);
     }
-    return this.topo.createNode(icon);
+    return this.topo.createNode();
   }
 
   public createGroup() {

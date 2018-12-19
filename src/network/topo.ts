@@ -179,11 +179,7 @@ export class Topo implements ITopo {
     return this.elements;
   }
 
-  // public createNode(resourceName?: string): Node {
-  //   return new Node(this.edgesGroupByNodes, this.elements, this.selectedNodes, resourceName);
-  // }
-
-  public createNode(icon: any): Node {
+  public createNode(icon?: any): Node {
     return new Node(this.edgesGroupByNodes, this.elements, this.selectedNodes, icon);
   }
 

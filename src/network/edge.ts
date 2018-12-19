@@ -517,9 +517,9 @@ export class Edge extends CommonElement {
     angle: number,
     style: IStyles) {
     const srcNodePosAdjusted =
-      this.getParallelPoint(srcNodePos, this.defaultStyle.bezierLineDistance, this.getAngle());
+      this.getParallelPoint(srcNodePos, this.defaultStyle.lineDistance, this.getAngle());
     const endNodePosAdjusted =
-      this.getParallelPoint(endNodePos, this.defaultStyle.bezierLineDistance, this.getAngle());
+      this.getParallelPoint(endNodePos, this.defaultStyle.lineDistance, this.getAngle());
     const edge = this.createLinkEdge(srcNodePosAdjusted, endNodePosAdjusted, style);
     const arrow = this.createLinkArrows(srcNodePosAdjusted, endNodePosAdjusted, angle, style);
     return [edge, arrow];

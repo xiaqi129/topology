@@ -46,7 +46,7 @@ export class Tooltip {
   }
 
   public clearTooltip() {
-    const network = document.getElementById('network');
+    const network = document.getElementsByTagName('body')[0];
     const tooltip = document.getElementById('tooltip');
     if (network && tooltip) {
       network.removeChild(tooltip);
@@ -68,7 +68,7 @@ export class Tooltip {
   }
 
   private createTooltip(content: any, styles: any) {
-    const network = document.getElementById('network');
+    const network = document.getElementsByTagName('body')[0];
     const tooltip = document.createElement('div');
     const text = document.createTextNode(content);
     tooltip.id = 'tooltip';
