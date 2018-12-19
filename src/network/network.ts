@@ -107,6 +107,20 @@ export class Network {
     return nodeObj;
   }
 
+  public getEdgeObj() {
+    const edgeObj = {};
+    const elements = this.topo.getElements();
+    _.each(elements, (element) => {
+      if (element instanceof Edge) {
+        const name: string = `${element.startNode.name}=>${element.endNode.name}`;
+        _.extend(edgeObj, {
+          [name]: element,
+        });
+      }
+    });
+    return edgeObj;
+  }
+
   public addElement(element: Node | Group | Edge) {
     this.topo.addElement(element);
   }

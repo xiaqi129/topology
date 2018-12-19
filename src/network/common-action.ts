@@ -340,6 +340,8 @@ export class CommonAction {
 
   public searchNode(node: Node) {
     this.cleanNode();
+    this.zoomReset();
+    this.setZoom(2);
     this.container.moveCenter(node.x, node.y);
     node.selectOn(this.clickColor);
   }
