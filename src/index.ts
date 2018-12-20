@@ -168,8 +168,33 @@ network.callback = () => {
       node.on('rightclick', (event: any) => {
         network.menu.setMenuItems([
           { label: 'Aggregated as a group', id: '0' },
-          // { label: 'Disaggregate selected group', id: '0' },
+          { label: 'Disaggregate selected group', id: '1' },
         ]);
+        network.menu.menuOnAction = (id) => {
+          if (id === '0') {
+            const selectedNodes = network.getSelectedNodes();
+            const group = network.createGroup();
+            network.addElement(group);
+            group.setOutlineStyle(2);
+            _.each(selectedNodes, (selectedNode) => {
+              group.addChildNodes(selectedNode);
+            });
+            group.on('rightclick', (groupevent: any) => {
+              network.menu.setMenuItems([
+                // { label: 'Aggregated as a group', id: '0' },
+                { label: 'Disaggregate selected group', id: '0' },
+              ]);
+              network.menu.menuOnAction = (groupid) => {
+                if (groupid === '0') {
+                  group.removeChildNodes();
+                }
+              };
+              network.menu.setClass('popMenu');
+              network.menu.showMenu(groupevent);
+            });
+            network.syncView();
+          }
+        };
         network.menu.setClass('popMenu');
         network.menu.showMenu(event);
       });
@@ -194,14 +219,19 @@ network.callback = () => {
         lineColor: 0xC7254E,
         lineDistance: 0,
         lineType: 0,
-        lineWidth: 0.1,
+        lineWidth: 0.3,
       });
       network.addElement(edge);
-      edge.on('rightclick', (event: any) => {
+      edge.edge.on('rightclick', (event: any) => {
         network.menu.setMenuItems([
-          // { label: 'Aggregated as a group', id: '0' },
-          { label: 'Edge Click!!!!!!', id: '0' },
+          { label: 'Select its neighbors', id: '0' },
+          { label: 'Hide/Unhide this links', id: '1' },
+          { label: 'Print line Info', id: '2' },
         ]);
+        network.menu.menuOnAction = (id) => {
+          // tslint:disable-next-line:no-console
+          console.log(id);
+        };
         network.menu.setClass('popMenu');
         network.menu.showMenu(event);
       });
@@ -231,11 +261,15 @@ network.callback = () => {
         // { label: 'Aggregated as a group', id: '0' },
         { label: 'Disaggregate selected group', id: '0' },
       ]);
+      network.menu.menuOnAction = (id) => {
+        if (id === '0') {
+          newGroup.removeChildNodes();
+        }
+      };
       network.menu.setClass('popMenu');
       network.menu.showMenu(event);
     });
   });
-  // console.log(network.getElements());
 
   network.syncView();
   network.setDrag();

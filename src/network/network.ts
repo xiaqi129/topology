@@ -35,7 +35,7 @@ export class Network {
     this.app = this.drawer.getWhiteBoard();
     this.tooltip = new Tooltip();
     this.action = new CommonAction(this.app, this.topo, this.tooltip);
-    this.menu = new PopMenu(domRegex, this.app);
+    this.menu = new PopMenu(domRegex, this.app, this.action);
   }
 
   public addIconResource(iconList: any) {
@@ -116,7 +116,8 @@ export class Network {
   }
 
   public getSelectedNodes() {
-    this.topo.getSelectedNodes();
+    const selectedNodes = this.topo.getSelectedNodes();
+    return selectedNodes;
   }
 
   public removeElements(element: PIXI.Container) {
@@ -182,4 +183,5 @@ export class Network {
   public searchNode(node: Node) {
     this.action.searchNode(node);
   }
+
 }

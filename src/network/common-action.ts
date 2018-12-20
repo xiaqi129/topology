@@ -18,6 +18,7 @@ import { Group } from './group';
 import { Tooltip } from './tooltip';
 
 export class CommonAction {
+  public defaultLineColor: number = 0;
   private app: Application;
   private container: Viewport;
   private topo: ITopo;
@@ -65,6 +66,15 @@ export class CommonAction {
   public setSelect() {
     this.container.removePlugin('drag');
     this.moveSelect();
+  }
+
+  public getSelectNodes() {
+    const selectNodes = this.topo.getSelectedNodes();
+    return selectNodes;
+  }
+
+  public removeSelectNodes() {
+    this.topo.removeSelectedNodes();
   }
 
   public moveSelect() {
@@ -124,27 +134,26 @@ export class CommonAction {
 
   public setClick(color?: any) {
     this.clickColor = color;
-    let defaultLineColor: number;
     _.each(this.container.children, (element) => {
       if (element instanceof Node) {
         element.addEventListener('mousedown', (event: PIXI.interaction.InteractionEvent) => {
           event.stopPropagation();
-          this.cleanEdge(defaultLineColor);
+          this.cleanEdge();
           element.selectOne(color);
         });
       } else if (element instanceof Edge) {
-        defaultLineColor = element.defaultStyle.lineColor;
+        this.defaultLineColor = element.defaultStyle.lineColor;
         element.addEventListener('mousedown', (event: PIXI.interaction.InteractionEvent) => {
-          this.cleanEdge(defaultLineColor);
+          this.cleanEdge();
           this.cleanNode();
           event.stopPropagation();
-          element.selcteOn();
+          element.selectOn();
         });
       } else if (element instanceof EdgeBundle) {
         _.each(element.children, (edges: any) => {
-          defaultLineColor = edges.defaultStyle.lineColor;
+          this.defaultLineColor = edges.defaultStyle.lineColor;
           edges.addEventListener('mousedown', (event: PIXI.interaction.InteractionEvent) => {
-            this.cleanEdge(defaultLineColor);
+            this.cleanEdge();
             this.cleanNode();
             event.stopPropagation();
             edges.selcteOn();
@@ -155,9 +164,9 @@ export class CommonAction {
           if (node instanceof GroupEdge) {
             node.addEventListener('mousedown', (event: PIXI.interaction.InteractionEvent) => {
               event.stopPropagation();
-              this.cleanEdge(defaultLineColor);
+              this.cleanEdge();
               this.cleanNode();
-              node.selcteOn();
+              node.selectOn();
             });
           }
         });
@@ -171,15 +180,15 @@ export class CommonAction {
         }
         if (element instanceof Edge) {
           element.setStyle({
-            fillColor: defaultLineColor,
-            lineColor: defaultLineColor,
+            fillColor: this.defaultLineColor,
+            lineColor: this.defaultLineColor,
           });
         }
         if (element instanceof EdgeBundle) {
           _.each(element.children, (edges: any) => {
             edges.setStyle({
-              fillColor: defaultLineColor,
-              lineColor: defaultLineColor,
+              fillColor: this.defaultLineColor,
+              lineColor: this.defaultLineColor,
             });
           });
         }
@@ -187,8 +196,8 @@ export class CommonAction {
           _.each(element.children, (node) => {
             if (node instanceof GroupEdge) {
               node.setStyle({
-                fillColor: defaultLineColor,
-                lineColor: defaultLineColor,
+                fillColor: this.defaultLineColor,
+                lineColor: this.defaultLineColor,
               });
             }
           });
@@ -197,19 +206,19 @@ export class CommonAction {
     });
   }
 
-  public cleanEdge(defaultLineColor: number) {
+  public cleanEdge() {
     _.each(this.container.children, (ele) => {
       if (ele instanceof Edge) {
         ele.setStyle({
-          fillColor: defaultLineColor,
-          lineColor: defaultLineColor,
+          fillColor: this.defaultLineColor,
+          lineColor: this.defaultLineColor,
         });
       }
       if (ele instanceof EdgeBundle) {
         _.each(ele.children, (edge: any) => {
           edge.setStyle({
-            fillColor: defaultLineColor,
-            lineColor: defaultLineColor,
+            fillColor: this.defaultLineColor,
+            lineColor: this.defaultLineColor,
           });
         });
       }
@@ -217,8 +226,8 @@ export class CommonAction {
         _.each(ele.children, (groupedge) => {
           if (groupedge instanceof GroupEdge) {
             groupedge.setStyle({
-              fillColor: defaultLineColor,
-              lineColor: defaultLineColor,
+              fillColor: this.defaultLineColor,
+              lineColor: this.defaultLineColor,
             });
           }
         });

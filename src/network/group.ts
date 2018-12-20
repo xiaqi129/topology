@@ -31,14 +31,13 @@ export class Group extends CommonElement {
   private childrenNode: Node[] = [];
   private outLineStyleType: number = 1;
   private lastClickTime: number = 0;
-  private dragging: boolean;
+  private dragging!: boolean;
   private last: any;
-  private current: any;
+  private data: any;
 
   constructor(elements: Edge | CommonElement[]) {
     super();
     this.elements = elements;
-    this.dragging = false;
     this.draw();
   }
 
@@ -70,11 +69,16 @@ export class Group extends CommonElement {
   public addChildNodes(element: Node, preventDraw: boolean = false) {
     this.childrenNode.push(element);
     // this.addChild(element);
-    this.toggleChildNodesVisible(this.isExpanded, element);
-    // if (!preventDraw) {
-    //   this.draw();
-    // }
+    // this.toggleChildNodesVisible(this.isExpanded, element);
+    if (!preventDraw) {
+      this.draw();
+    }
     // this.analyzeEdges();
+  }
+
+  public removeChildNodes() {
+    _.remove(this.childrenNode);
+    this.parent.removeChild(this);
   }
 
   public toggleChildNodesVisible(visible: boolean, element?: Node | Group) {
@@ -148,22 +152,23 @@ export class Group extends CommonElement {
     this.addChild(graph);
   }
 
-  public onDragStart(event: any) {
+  public onDragStart(event: PIXI.interaction.InteractionEvent) {
     event.stopPropagation();
     const parent = this.parent.toLocal(event.data.global);
     this.dragging = true;
+    this.data = event.data;
     this.last = { parents: parent, x: event.data.global.x, y: event.data.global.y };
-    this.current = event.data.pointerId;
   }
 
   public onDragEnd() {
     this.dragging = false;
+    this.data = null;
     this.last = null;
   }
 
-  public onDragMove(event: any) {
-    if (this.dragging && this.last && this.current === event.data.pointerId) {
-      const newPosition = this.toLocal(event.data.global);
+  public onDragMove(event: PIXI.interaction.InteractionEvent) {
+    if (this.dragging && this.last) {
+      const newPosition =  this.data.getLocalPosition(this.parent);
       const edges = this.filterEdge();
       const intersectionNodes = this.intersection()[0];
       const intersectionGroup = this.intersection()[1];
@@ -188,15 +193,6 @@ export class Group extends CommonElement {
         this.draw();
       }
     }
-  }
-
-  public dragGroup() {
-    const graph = this.getChildByName(this.polygonHullOutlineName);
-    graph
-      .on('mousedown', this.onDragStart.bind(this))
-      .on('mouseup', this.onDragEnd.bind(this))
-      .on('mouseupoutside', this.onDragEnd.bind(this))
-      .on('mousemove', this.onDragMove.bind(this));
   }
 
   /**
@@ -444,6 +440,12 @@ export class Group extends CommonElement {
     // const children = this.children;
     if (graphic) {
       this.setChildIndex(graphic, 0);
+      graphic
+      .on('mousedown', this.onDragStart.bind(this))
+      .on('mouseup', this.onDragEnd.bind(this))
+      .on('mouseout', this.onDragEnd.bind(this))
+      .on('mouseupoutside', this.onDragEnd.bind(this))
+      .on('mousemove', this.onDragMove.bind(this));
     }
   }
 
@@ -458,7 +460,6 @@ export class Group extends CommonElement {
     }
     this.sortGraphicsIndex();
     this.toggleGroupExpand();
-    this.dragGroup();
   }
 
   public getChildEdges() {

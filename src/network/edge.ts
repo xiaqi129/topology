@@ -140,6 +140,7 @@ export class Edge extends CommonElement {
 
   public drawEdge(graph: any, points: any) {
     const style = this.defaultStyle;
+    graph.interactive = true;
     graph.lineStyle(style.lineWidth, style.lineColor);
     graph.beginFill(style.lineColor, style.fillOpacity);
     graph.moveTo(points.sLeft.x, points.sLeft.y);
@@ -194,6 +195,7 @@ export class Edge extends CommonElement {
     // const srcPointY = points.shift() - curveDistance * Math.sin(angle);
     const parallelPoint = this.getParallelPoint(
       { x: points.shift(), y: points.shift() }, curveDistance, angle);
+    graph.interactive = true;
     graph.beginFill(style.lineColor, style.bezierOacity);
     graph.moveTo(parallelPoint.x, parallelPoint.y);
     points.reverse();
@@ -503,7 +505,7 @@ export class Edge extends CommonElement {
     return this.arrow;
   }
 
-  public selcteOn() {
+  public selectOn() {
     this.setStyle(
       {
         fillColor: 0X024997,

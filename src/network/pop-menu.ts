@@ -1,5 +1,8 @@
 import * as _ from 'lodash';
 import * as Viewport from 'pixi-viewport';
+import { CommonAction } from './common-action';
+import { Edge } from './edge';
+import { Group } from './group';
 
 /**
  * @license
@@ -9,20 +12,22 @@ import * as Viewport from 'pixi-viewport';
  */
 
 export class PopMenu {
-  public menuOnAction: any;
+  public menuOnAction!: (id: string) => void;
   private menu: HTMLElement;
   private isVisible: boolean;
   private menuClass: string | null;
   private menuItems: [] = [];
   private domId: string;
   private container: Viewport;
-  constructor(domRegex: string, app: any) {
+  private action: CommonAction;
+  constructor(domRegex: string, app: any, action: CommonAction) {
     this.domId = domRegex;
     this.container = app.getContainer();
     this.menu = this.createMenu();
     this.isVisible = true;
     this.menuItems = [];
     this.menuClass = null;
+    this.action = action;
   }
 
   public createMenu() {
@@ -56,6 +61,22 @@ export class PopMenu {
     if (this.isVisible) {
       const network = document.getElementById(this.domId);
       const idList: any = [];
+      const selectElement = event.target.parent;
+      const selectedNodes = this.action.getSelectNodes();
+      let isInSelect;
+      if (selectedNodes.length > 0) {
+        isInSelect = _.find(selectedNodes, (node) => {
+          return node === selectElement;
+        });
+      }
+      if (isInSelect) {
+        selectElement.selectOn();
+      } else if (!(selectElement instanceof Group)) {
+        this.action.cleanNode();
+        this.action.cleanEdge();
+        this.action.removeSelectNodes();
+        selectElement.selectOn();
+      }
       _.each(this.menuItems, (menu: any) => {
         idList.push(menu.id);
       });
@@ -139,10 +160,17 @@ export class PopMenu {
         });
         if (network) {
           network.appendChild(this.menu);
-          this.disableContextMenu(network);
+          const networkHeight = network.clientHeight;
+          const y = event.data.global.y + 30;
+          const menuHeight = this.menuItems.length * 30 + 5;
           this.menu.style.display = 'block';
-          this.menu.style.left = `${event.data.global.x}px`;
-          this.menu.style.top = `${event.data.global.y}px`;
+          this.menu.style.left = `${event.data.global.x + 10}px`;
+          if (networkHeight - y > menuHeight) {
+            this.menu.style.top = `${y}px`;
+          } else {
+            this.menu.style.top = `${(y - menuHeight)}px`;
+          }
+          this.disableContextMenu(network);
           network.addEventListener('click', () => {
             this.hideMenu();
           });
