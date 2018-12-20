@@ -160,6 +160,11 @@ export class CommonAction {
           });
         });
       } else if (element instanceof Group) {
+        element.on('click', (event: PIXI.interaction.InteractionEvent) => {
+          this.cleanEdge();
+          this.cleanNode();
+          event.stopPropagation();
+        });
         _.each(element.children, (node) => {
           if (node instanceof GroupEdge) {
             node.addEventListener('mousedown', (event: PIXI.interaction.InteractionEvent) => {

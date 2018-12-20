@@ -9,6 +9,7 @@
 import * as _ from 'lodash';
 import polygon from 'polygon';
 import Offset from 'polygon-offset/dist/offset';
+import { CommonAction } from './common-action';
 import { CommonElement, IPosition } from './common-element';
 import { Edge } from './edge';
 import { EdgeBundle } from './edge-bundle';
@@ -34,6 +35,7 @@ export class Group extends CommonElement {
   private dragging!: boolean;
   private last: any;
   private data: any;
+  private action!: CommonAction;
 
   constructor(elements: Edge | CommonElement[]) {
     super();
@@ -44,7 +46,7 @@ export class Group extends CommonElement {
   public toggleGroupExpand() {
     const graph = this.getChildByName(this.polygonHullOutlineName);
     graph.on('click', (event) => {
-      event.stopPropagation();
+      // event.stopPropagation();
       const currentTime = new Date().getTime();
       if (this.intersection()[0].length === 0) {
         if (currentTime - this.lastClickTime < 500) {

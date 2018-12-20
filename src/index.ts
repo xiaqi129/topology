@@ -281,6 +281,7 @@ network.callback = () => {
   const dragOrSelect = document.querySelector('button.btn_dragOrSelect');
   const tooltipToggle = document.querySelector('button.btn_tooltipToggle');
   const nodeLabelToggle = document.querySelector('button.btn_nodeLabelToggle');
+  const searchNode = document.querySelector('button.btn_search_node');
   if (zoomIn) {
     zoomIn.addEventListener('click', () => {
       network.setZoom(0.3);
@@ -323,6 +324,16 @@ network.callback = () => {
   if (nodeLabelToggle) {
     nodeLabelToggle.addEventListener('click', () => {
       network.nodeLabelToggle();
+    });
+  }
+  if (searchNode) {
+    searchNode.addEventListener('click', () => {
+      const searchInput = document.querySelector('input.input_search_node') as HTMLInputElement;
+      _.each(network.getNodes(), (node) => {
+        if (node.getUID() === `element_${searchInput.value}`) {
+          network.searchNode(node);
+        }
+      });
     });
   }
 };

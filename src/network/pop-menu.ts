@@ -152,6 +152,9 @@ export class PopMenu {
                 }
                 this.menuOnAction(element.id);
                 this.menu.style.display = 'none';
+                this.action.cleanNode();
+                this.action.cleanEdge();
+                this.action.removeSelectNodes();
               });
             }
             ul.appendChild(li);
