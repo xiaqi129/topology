@@ -225,6 +225,9 @@ export class Network {
         }
       });
     }
+    if (element instanceof Group) {
+      element.visible = false;
+    }
   }
 
   public showElement(element: any) {
@@ -239,6 +242,9 @@ export class Network {
           value.visible = true;
         }
       });
+    }
+    if (element instanceof Group) {
+      element.visible = true;
     }
   }
 }
