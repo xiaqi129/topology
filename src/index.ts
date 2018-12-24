@@ -168,7 +168,7 @@ network.callback = () => {
       node.on('rightclick', (event: any) => {
         network.menu.setMenuItems([
           { label: 'Aggregated as a group', id: '0' },
-          { label: 'Disaggregate selected group', id: '1' },
+          { label: 'Hide the Node', id: '1' },
         ]);
         network.menu.menuOnAction = (id) => {
           if (id === '0') {
@@ -193,6 +193,8 @@ network.callback = () => {
               network.menu.showMenu(groupevent);
             });
             network.syncView();
+          } else if (id === '1') {
+            network.hideElement(node);
           }
         };
         network.menu.setClass('popMenu');

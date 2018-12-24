@@ -186,6 +186,7 @@ export class Network {
 
   public syncView() {
     this.drawer.syncView();
+    this.action.setClick();
   }
 
   public setClick(color?: any) {

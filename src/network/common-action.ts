@@ -163,7 +163,6 @@ export class CommonAction {
         element.on('click', (event: PIXI.interaction.InteractionEvent) => {
           this.cleanEdge();
           this.cleanNode();
-          event.stopPropagation();
         });
         _.each(element.children, (node) => {
           if (node instanceof GroupEdge) {
@@ -354,6 +353,7 @@ export class CommonAction {
 
   public searchNode(node: Node) {
     this.cleanNode();
+    this.setZoom(2);
     this.container.moveCenter(node.x, node.y);
     node.selectOn(this.clickColor);
   }
