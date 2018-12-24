@@ -38,7 +38,7 @@ export class Group extends CommonElement {
   private data: any;
   private hideNodes: Node[] = [];
   private hideEdges: Edge[] = [];
-  private labelPosition: string = 'top';
+  private labelPosition: string = 'center';
 
   constructor(elements: Edge | CommonElement[]) {
     super();
