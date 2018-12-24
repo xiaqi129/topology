@@ -156,7 +156,7 @@ export class CommonAction {
             this.cleanEdge();
             this.cleanNode();
             event.stopPropagation();
-            edges.selcteOn();
+            edges.selectOn();
           });
         });
       } else if (element instanceof Group) {
