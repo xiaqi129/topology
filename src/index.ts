@@ -258,6 +258,10 @@ network.callback = () => {
       fillOpacity: 0.3,
       fillColor: rgb2hex(bgColor),
     });
+
+    const nameArr = _.split(newGroup.name as string, '#@');
+    newGroup.setLabel(nameArr[nameArr.length - 1]);
+
     newGroup.on('rightclick', (event: any) => {
       network.menu.setMenuItems([
         // { label: 'Aggregated as a group', id: '0' },

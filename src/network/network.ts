@@ -227,6 +227,13 @@ export class Network {
         }
       });
     }
+    if (element instanceof Group) {
+      element.visible = false;
+      const intersectionGroup = element.intersection()[1];
+      _.each(intersectionGroup, (group) => {
+        group.visible = false;
+      });
+    }
   }
 
   public showElement(element: any) {
@@ -240,6 +247,13 @@ export class Network {
         if (nodeName && key.indexOf(nodeName) !== -1) {
           value.visible = true;
         }
+      });
+    }
+    if (element instanceof Group) {
+      element.visible = true;
+      const intersectionGroup = element.intersection()[1];
+      _.each(intersectionGroup, (group) => {
+        group.visible = true;
       });
     }
   }
