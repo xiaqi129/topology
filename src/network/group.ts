@@ -27,7 +27,7 @@ export class Group extends CommonElement {
   public groupEdgesEvent?: IEvent = {};
   public isExpanded: boolean = true;
   public groupEdges: GroupEdge[] = [];
-  private positionList: IPosition[] = [];
+  public positionList: IPosition[] = [];
   private elements: Edge | CommonElement[];
   private polygonHullOutlineName: string = _.uniqueId('hull_outline_');
   private childrenNode: Node[] = [];
