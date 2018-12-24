@@ -227,6 +227,10 @@ export class Network {
     }
     if (element instanceof Group) {
       element.visible = false;
+      const intersectionGroup = element.intersection()[1];
+      _.each(intersectionGroup, (group) => {
+        group.visible = false;
+      });
     }
   }
 
@@ -245,6 +249,10 @@ export class Network {
     }
     if (element instanceof Group) {
       element.visible = true;
+      const intersectionGroup = element.intersection()[1];
+      _.each(intersectionGroup, (group) => {
+        group.visible = true;
+      });
     }
   }
 }

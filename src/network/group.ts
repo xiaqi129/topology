@@ -13,6 +13,7 @@ import { CommonElement, IPosition } from './common-element';
 import { Edge } from './edge';
 import { EdgeBundle } from './edge-bundle';
 import { GroupEdge } from './edge-conn-group';
+import { Label } from './label';
 import ConvexHullGrahamScan from './lib/convex-hull';
 // import Point from './lib/point';
 import { Node } from './node';
@@ -34,6 +35,7 @@ export class Group extends CommonElement {
   private dragging: boolean;
   private last: any;
   private current: any;
+  private labelPosition: string = 'top';
 
   constructor(elements: Edge | CommonElement[]) {
     super();
@@ -183,10 +185,9 @@ export class Group extends CommonElement {
         _.each(intersectionGroup, (group) => {
           group.draw();
         });
-        this.draw();
-      } else {
-        this.draw();
+
       }
+      this.draw();
     }
   }
 
@@ -459,6 +460,8 @@ export class Group extends CommonElement {
     this.sortGraphicsIndex();
     this.toggleGroupExpand();
     this.dragGroup();
+    this.updateLabelPos();
+    this.updateLabelSize();
   }
 
   public getChildEdges() {
@@ -505,6 +508,68 @@ export class Group extends CommonElement {
       }
     });
     return [intersectionNode, intersectionGroup];
+  }
+
+  public getLabelPos() {
+    const labelPositionData: any = {
+      center: {
+        x: 0,
+        y: 0,
+      },
+      top: {
+        x: 0,
+        y: -(this.height / 2),
+      },
+      bottom: {
+        x: 0,
+        y: (this.height / 2) * 1,
+      },
+    };
+    const labelPos = { x: 0, y: 0 };
+    const centerPoint = this.getGroupPosition();
+    labelPos.x = centerPoint[0] + labelPositionData[this.labelPosition].x;
+    labelPos.y = centerPoint[1] + labelPositionData[this.labelPosition].y;
+
+    return labelPos;
+  }
+
+  public setLabel(content?: string, style?: PIXI.TextStyleOptions, position?: string) {
+    if (this.width !== 0 && this.childrenNode.length > 1) {
+      const size = _.floor(this.width / 25) + 1;
+      const labelStyleOptions = {
+        fontSize: size,
+        fontWeight: 'bold',
+      };
+      const label = new Label(content || 'group', style || labelStyleOptions);
+      label.setPosition(4);
+      label.name = 'group_label';
+      label.alpha = 0.8;
+      if (position) {
+        this.labelPosition = position;
+      }
+      const labelPos = this.getLabelPos();
+      label.x = labelPos.x;
+      label.y = labelPos.y;
+      this.addChild(label);
+    }
+  }
+
+  public updateLabelPos() {
+    const label = this.getChildByName('group_label');
+    if (label) {
+      const labelPos = this.getLabelPos();
+      label.x = labelPos.x;
+      label.y = labelPos.y;
+    }
+  }
+
+  public updateLabelSize() {
+    const label = this.getChildByName('group_label');
+    if (label) {
+      if (this.width !== 0) {
+        (label as PIXI.Text).style.fontSize = _.floor(this.width / 25) + 1;
+      }
+    }
   }
 
   private analyzeEdges() {
