@@ -173,7 +173,6 @@ export class PopMenu {
           } else {
             this.menu.style.top = `${(y - menuHeight)}px`;
           }
-          this.disableContextMenu(network);
           network.addEventListener('click', () => {
             this.hideMenu();
           });
@@ -184,14 +183,6 @@ export class PopMenu {
       }
     } else {
       this.hideMenu();
-    }
-  }
-
-  public disableContextMenu(html: HTMLElement) {
-    if (html) {
-      html.addEventListener('contextmenu', (e: any) => {
-        e.preventDefault();
-      });
     }
   }
 

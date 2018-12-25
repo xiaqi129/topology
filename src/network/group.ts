@@ -24,6 +24,7 @@ interface IEvent {
 }
 
 export class Group extends CommonElement {
+  [x: string]: any;
   public groupEdgesEvent?: IEvent = {};
   public isExpanded: boolean = true;
   public groupEdges: GroupEdge[] = [];
@@ -196,8 +197,8 @@ export class Group extends CommonElement {
       _.each(edges, (edge: Edge) => {
         edge.draw();
       });
-      const distX = event.data.global.x;
-      const distY = event.data.global.y;
+      const distX = event.data.global.x - this.last.x;
+      const distY = event.data.global.y - this.last.y;
       _.each(this.childrenNode, (element) => {
         if (element instanceof Node) {
           element.position.x += (newPosition.x - this.last.parents.x);
@@ -209,9 +210,10 @@ export class Group extends CommonElement {
         _.each(intersectionGroup, (group) => {
           group.draw();
         });
-
       }
       this.draw();
+    } else {
+      this.dragging = false;
     }
   }
 
@@ -462,7 +464,7 @@ export class Group extends CommonElement {
         .on('mousedown', this.onDragStart.bind(this))
         .on('mouseup', this.onDragEnd.bind(this))
         // .on('mouseout', this.onDragEnd.bind(this))
-        .on('mouseupoutside', this.onDragEnd.bind(this))
+        // .on('mouseupoutside', this.onDragEnd.bind(this))
         .on('mousemove', this.onDragMove.bind(this));
     }
   }

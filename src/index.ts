@@ -3,13 +3,13 @@ import { Network } from './network/network';
 import { data as topoData } from './simpleData';
 
 const iconResource = {
-  switch: { name: 'switch', url: './pic/cisco-WS-C49.png', width: '40', height: '40' },
+  switch: { name: 'switch', url: './pic/cisco-WS-C49.png', width: '10', height: '10' },
   switchLayer3: { name: 'switchLayer3', url: './pic/cisco-WS-C68.png', width: '40', height: '40' },
   router: { name: 'router', url: './pic/cisco-18.png', width: '10', height: '10' },
 };
 
 const network = new Network('network');
-network.addIconResource(iconResource);
+network.initIconResource(iconResource);
 
 network.callback = () => {
 
@@ -169,6 +169,7 @@ network.callback = () => {
         network.menu.setMenuItems([
           { label: 'Aggregated as a group', id: '0' },
           { label: 'Hide the Node', id: '1' },
+          { label: 'Change Switch Icon', id: '2' },
         ]);
         network.menu.menuOnAction = (id) => {
           if (id === '0') {
@@ -195,6 +196,8 @@ network.callback = () => {
             network.syncView();
           } else if (id === '1') {
             network.hideElement(node);
+          } else if (id === '2') {
+            node.changeIcon('switch');
           }
         };
         network.menu.setClass('popMenu');
@@ -240,25 +243,18 @@ network.callback = () => {
       edge.setTooltip(`${edge.startNode.name} >>> ${edge.endNode.name}`);
     }
   });
-
+  const groupList: any[] = [];
   _.each(groupsList, (group) => {
     const bgColor = group.style.bgColor;
     const newGroup = network.createGroup();
-    const children = group.children;
-    network.addElement(newGroup);
+    newGroup.cccc = group.children;
     newGroup.name = group.id;
     newGroup.setOutlineStyle(2);
-    _.each(children, (node) => {
-      const groupNode = _.get(nodes, node);
-      if (groupNode) {
-        newGroup.addChildNodes(groupNode);
-      }
-    });
+    groupList.push(newGroup);
     newGroup.setStyle({
       fillOpacity: 0.3,
       fillColor: rgb2hex(bgColor),
     });
-
     const nameArr = _.split(newGroup.name as string, '#@');
     newGroup.setLabel(nameArr[nameArr.length - 1]);
 
@@ -275,6 +271,15 @@ network.callback = () => {
       network.menu.setClass('popMenu');
       network.menu.showMenu(event);
     });
+  });
+  _.each(groupList, (g) => {
+    _.remove(g.childrenNode);
+    const children = g.cccc;
+    _.each(children, (nodeName: any) => {
+      const node = _.get(nodes, nodeName);
+      g.addChildNodes(node);
+    });
+    network.addElement(g);
   });
 
   network.syncView();
