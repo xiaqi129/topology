@@ -154,9 +154,10 @@ export class Node extends CommonElement {
   }
 
   public drawSprite(icon: any) {
-    const node = new PIXI.Sprite(icon.texture);
-    node.width = icon.width;
-    node.height = icon.height;
+    const texture = PIXI.Texture.fromImage(icon);
+    const node = new PIXI.Sprite(texture);
+    node.width = (texture as any).iconWidth;
+    node.height = (texture as any).iconHeight;
     node.anchor.set(0.5, 0.5);
     node.interactive = true;
     node.buttonMode = true;
@@ -273,5 +274,10 @@ export class Node extends CommonElement {
 
   public getLabelContent() {
     return this.labelContent;
+  }
+
+  public changeIcon(icon: string) {
+    this.removeChild(this.getChildByName('node_sprite'));
+    this.drawSprite(icon);
   }
 }

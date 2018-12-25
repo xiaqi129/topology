@@ -48,11 +48,8 @@ export class Network {
     PIXI.loader
       .load((loader: any, resources: any) => {
         _.each(resources, (resource) => {
-          this.icons[resource.name] = {
-            texture: resource.texture,
-            width: iconList[resource.name].width,
-            height: iconList[resource.name].height,
-          };
+          resource.texture.iconWidth = iconList[resource.name].width;
+          resource.texture.iconHeight = iconList[resource.name].height;
         });
         this.callback();
         this.callback = Function();
@@ -61,7 +58,7 @@ export class Network {
 
   public createNode(iconName?: string) {
     if (iconName) {
-      return this.topo.createNode(this.icons[iconName]);
+      return this.topo.createNode(iconName);
     }
     return this.topo.createNode();
   }
