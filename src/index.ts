@@ -243,17 +243,22 @@ network.callback = () => {
       edge.setTooltip(`${edge.startNode.name} >>> ${edge.endNode.name}`);
     }
   });
-  const groupList: any[] = [];
   _.each(groupsList, (group) => {
     const bgColor = group.style.bgColor;
     const newGroup = network.createGroup();
-    newGroup.cccc = group.children;
+    const children = group.children;
     newGroup.name = group.id;
+    network.addElement(newGroup);
     newGroup.setOutlineStyle(2);
-    groupList.push(newGroup);
     newGroup.setStyle({
       fillOpacity: 0.3,
       fillColor: rgb2hex(bgColor),
+    });
+    _.each(children, (child) => {
+      const node = _.get(nodes, child);
+      if (node) {
+        newGroup.addChildNodes(node);
+      }
     });
     const nameArr = _.split(newGroup.name as string, '#@');
     newGroup.setLabel(nameArr[nameArr.length - 1]);
@@ -272,19 +277,11 @@ network.callback = () => {
       network.menu.showMenu(event);
     });
   });
-  _.each(groupList, (g) => {
-    _.remove(g.childrenNode);
-    const children = g.cccc;
-    _.each(children, (nodeName: any) => {
-      const node = _.get(nodes, nodeName);
-      g.addChildNodes(node);
-    });
-    network.addElement(g);
-  });
 
   network.syncView();
   network.setDrag();
   network.setClick();
+  network.setZoom(0.7);
 
   const zoomIn = document.querySelector('button.btn_zoomIn');
   const zoomOut = document.querySelector('button.btn_zoomOut');

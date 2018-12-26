@@ -24,11 +24,11 @@ interface IEvent {
 }
 
 export class Group extends CommonElement {
-  [x: string]: any;
   public groupEdgesEvent?: IEvent = {};
   public isExpanded: boolean = true;
   public groupEdges: GroupEdge[] = [];
-  public positionList: IPosition[] = [];
+  public centerPoint: IPosition[] = [];
+  private positionList: IPosition[] = [];
   private elements: Edge | CommonElement[];
   private polygonHullOutlineName: string = _.uniqueId('hull_outline_');
   private childrenNode: Node[] = [];
@@ -174,16 +174,21 @@ export class Group extends CommonElement {
   }
 
   public onDragStart(event: PIXI.interaction.InteractionEvent) {
-    event.stopPropagation();
-    const parent = this.parent.toLocal(event.data.global);
-    this.dragging = true;
-    this.data = event.data;
-    this.last = { parents: parent, x: event.data.global.x, y: event.data.global.y };
+    if (event.type === 'mousedown') {
+      event.stopPropagation();
+      const parent = this.parent.toLocal(event.data.global);
+      this.dragging = true;
+      this.data = event.data;
+      this.last = { parents: parent, x: event.data.global.x, y: event.data.global.y };
+    } else {
+      this.last = null;
+    }
   }
 
   public onDragEnd() {
     if (this.dragging) {
-      this.dragging = this.last = false;
+      this.dragging = false;
+      this.last = null;
       this.data = null;
     }
   }
@@ -367,6 +372,7 @@ export class Group extends CommonElement {
   // draw polygon background outline
   public drawGroupExpandedOutline() {
     const vertexPointsNumber = this.getGroupVertexNumber();
+    this.centerPoint = this.getGroupPosition();
     const pointsCount = vertexPointsNumber.length;
     const graph = this.createOutlineGraphic();
     this.interactive = true;

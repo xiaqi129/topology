@@ -38,8 +38,16 @@ export class CommonAction {
     this.tooltip = tooltip;
   }
 
-  public setZoom(num: number) {
-    this.container.zoomPercent(num);
+  public setZoom(num: number, center?: boolean) {
+    let percent: number = 0;
+    if (num > 0 && num < 1) {
+      percent = -(1 - num);
+    } else if (num > 1) {
+      percent = num;
+    } else {
+      throw Error('Zoom percent must greater than 0 !');
+    }
+    this.container.zoomPercent(percent, center || true);
   }
 
   public zoomOver() {

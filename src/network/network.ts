@@ -186,8 +186,8 @@ export class Network {
     this.action.setSelect();
   }
 
-  public setZoom(num: number) {
-    this.action.setZoom(num);
+  public setZoom(num: number, center?: boolean) {
+    this.action.setZoom(num, center);
   }
 
   public zoomOver() {
