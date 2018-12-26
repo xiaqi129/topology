@@ -111,7 +111,7 @@ export class Network {
     _.each(elements, (element) => {
       if (element instanceof EdgeBundle) {
         _.each(element.children, (edge, index) => {
-          const name: string = `${(edge as Edge).startNode.name}-${index + 1}=>${(edge as Edge).endNode.name}`;
+          const name: string = `${(edge as Edge).startNode.name}=>${(edge as Edge).endNode.name}-${index + 1}ofBundle`;
           _.extend(edgeObj, {
             [name]: edge,
           });

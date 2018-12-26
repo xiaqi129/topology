@@ -21,7 +21,7 @@ export class EdgeBundle extends CommonElement {
   }
 
   public draw() {
-    // this.setBundleEdgesPosition();
+    this.setBundleEdgesPosition();
   }
 
   public addEdge(edge: Edge) {
@@ -50,6 +50,8 @@ export class EdgeBundle extends CommonElement {
         edge.setStyle({
           bezierLineDistance: values[i][0],
           bezierLineDegree: values[i][1],
+          lineType: 1,
+          arrowType: 3,
         });
       }
     });
