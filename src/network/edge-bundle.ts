@@ -35,13 +35,14 @@ export class EdgeBundle extends CommonElement {
 
   public setBundleEdgesPosition() {
     const edges = this.children;
-    const distance = 5;
-    const degree = 20;
-    const step = 8;
+    const distance = 0;
+    const degree = 5;
+    const distanceStep = 1;
+    const degreeStep = 2;
     const values: number[][] = [];
     for (let i = 0, len = edges.length; i < len;) {
       _.each([1, -1], (j) => {
-        values.push([(distance + i * step) * j, (degree + i * step) * j]);
+        values.push([(distance + i * distanceStep) * j, (degree + i * degreeStep) * j]);
       });
       i += 1;
     }
