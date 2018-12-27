@@ -282,7 +282,7 @@ export class CommonAction {
           afterBundle.setStyle({
             arrowColor: 0Xc71bd3,
             arrowLength: 15,
-            arrowType: 0,
+            arrowType: 3,
             arrowWidth: 1,
             fillArrow: true,
             lineColor: 0xC7254E,

@@ -75,13 +75,13 @@ export class Edge extends CommonElement {
   public getNodeSize(node: Node | Group) {
     let width = 0;
     let height = 0;
-    if (node instanceof Node) {
-      const sprite = node.getChildByName('node_sprite');
-      if (sprite) {
-        width = (sprite as any).width;
-        height = (sprite as any).height;
-      }
-    }
+    // if (node instanceof Node) {
+    //   const sprite = node.getChildByName('node_sprite');
+    //   if (sprite) {
+    //     width = (sprite as any).width;
+    //     height = (sprite as any).height;
+    //   }
+    // }
 
     if (node instanceof Group) {
       width = node.getWidth();
@@ -541,6 +541,9 @@ export class Edge extends CommonElement {
         style,
       );
     const curveEnds = edgeRelated[1];
+    if (style.arrowType === 3) {
+      return [edgeRelated[0]];
+    }
     const arrow = this.createBezierArrows(
       { x: curveEnds[0], y: curveEnds[1] },
       { x: curveEnds[curveEnds.length - 2], y: curveEnds[curveEnds.length - 1] },
