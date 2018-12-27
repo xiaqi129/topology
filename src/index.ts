@@ -281,8 +281,9 @@ network.callback = () => {
   network.syncView();
   network.setDrag();
   network.setClick();
+  network.setZoom(1);
   network.setZoom(0.7);
-
+  network.setZoom(0.6);
   const zoomIn = document.querySelector('button.btn_zoomIn');
   const zoomOut = document.querySelector('button.btn_zoomOut');
   const zoomOver = document.querySelector('button.btn_zoomOver');
@@ -292,12 +293,12 @@ network.callback = () => {
   const searchNode = document.querySelector('button.btn_search_node');
   if (zoomIn) {
     zoomIn.addEventListener('click', () => {
-      network.setZoom(0.3);
+      network.setZoom(1.3);
     });
   }
   if (zoomOut) {
     zoomOut.addEventListener('click', () => {
-      network.setZoom(-0.3);
+      network.setZoom(0.7);
     });
   }
   if (zoomOver) {

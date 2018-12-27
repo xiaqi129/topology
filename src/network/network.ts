@@ -195,11 +195,15 @@ export class Network {
   }
 
   public getZoom() {
-    this.action.getZoom();
+    return this.action.getZoom();
   }
 
   public zoomReset() {
     this.action.zoomReset();
+  }
+
+  public getCenter() {
+    return this.action.getCenter();
   }
 
   public syncView() {

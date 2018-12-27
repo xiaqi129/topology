@@ -40,14 +40,21 @@ export class CommonAction {
 
   public setZoom(num: number, center?: boolean) {
     let percent: number = 0;
-    if (num > 0 && num < 1) {
-      percent = -(1 - num);
-    } else if (num > 1) {
+    const save: any = this.getCenter();
+    this.container.scale.set(1);
+    this.container.moveCenter(save);
+    if (num > 0 && num < 2) {
+      percent = num - 1;
+    } else if (num >= 2) {
       percent = num;
     } else {
       throw Error('Zoom percent must greater than 0 !');
     }
     this.container.zoomPercent(percent, center || true);
+  }
+
+  public getCenter() {
+    return this.container.center;
   }
 
   public zoomOver() {

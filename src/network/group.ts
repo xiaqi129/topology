@@ -34,9 +34,11 @@ export class Group extends CommonElement {
   private childrenNode: Node[] = [];
   private outLineStyleType: number = 1;
   private lastClickTime: number = 0;
+  // drag
   private dragging!: boolean;
   private last: any;
   private data: any;
+  private current: number | undefined;
   private hideNodes: Node[] = [];
   private hideEdges: Edge[] = [];
   private labelPosition: string = 'center';
@@ -173,13 +175,14 @@ export class Group extends CommonElement {
     this.addChild(graph);
   }
 
-  public onDragStart(event: PIXI.interaction.InteractionEvent) {
+  public onDragStart(event: any) {
     if (event.type === 'mousedown') {
       event.stopPropagation();
       const parent = this.parent.toLocal(event.data.global);
       this.dragging = true;
       this.data = event.data;
       this.last = { parents: parent, x: event.data.global.x, y: event.data.global.y };
+      this.current = event.data.pointerId;
     } else {
       this.last = null;
     }
@@ -193,33 +196,43 @@ export class Group extends CommonElement {
     }
   }
 
-  public onDragMove(event: PIXI.interaction.InteractionEvent) {
-    if (this.dragging && this.last) {
-      const newPosition = this.data.getLocalPosition(this.parent);
-      const edges = this.filterEdge();
-      const intersectionNodes = this.intersection()[0];
-      const intersectionGroup = this.intersection()[1];
-      _.each(edges, (edge: Edge) => {
-        edge.draw();
-      });
+  public onDragMove(event: any) {
+    if (this.last && this.current === event.data.pointerId) {
       const distX = event.data.global.x - this.last.x;
       const distY = event.data.global.y - this.last.y;
-      _.each(this.childrenNode, (element) => {
-        if (element instanceof Node) {
-          element.position.x += (newPosition.x - this.last.parents.x);
-          element.position.y += (newPosition.y - this.last.parents.y);
-        }
-      });
-      this.last = { parents: newPosition, x: distX, y: distY };
-      if (intersectionNodes) {
-        _.each(intersectionGroup, (group) => {
-          group.draw();
+      if (this.dragging && this.checkThreshold(distX) && this.checkThreshold(distY)) {
+        const newPosition = this.parent.toLocal(event.data.global);
+        const edges = this.filterEdge();
+        const intersectionNodes = this.intersection()[0];
+        const intersectionGroup = this.intersection()[1];
+        _.each(edges, (edge: Edge) => {
+          edge.draw();
         });
+        _.each(this.childrenNode, (element) => {
+          if (element instanceof Node) {
+            element.position.x += (newPosition.x - this.last.parents.x);
+            element.position.y += (newPosition.y - this.last.parents.y);
+          }
+        });
+        this.last = { parents: newPosition, x: distX, y: distY };
+        if (intersectionNodes) {
+          _.each(intersectionGroup, (group) => {
+            group.draw();
+          });
+        }
       }
       this.draw();
     } else {
       this.dragging = false;
     }
+  }
+
+  public checkThreshold(change: number) {
+    const threshold = 5;
+    if (Math.abs(change) >= threshold) {
+      return true;
+    }
+    return false;
   }
 
   /**
@@ -479,8 +492,8 @@ export class Group extends CommonElement {
     this.rmElements(this.groupEdges);
     this.clearDisplayObjects();
     if (!this.isExpanded) {
-      this.drawGroupNode();
       this.drawEdges();
+      this.drawGroupNode();
     } else {
       this.drawGroupExpandedOutline();
     }
@@ -591,9 +604,13 @@ export class Group extends CommonElement {
 
   public updateLabelSize() {
     const label = this.getChildByName('group_label');
+    const nodeWidth = this.defaultStyle.width;
     if (label) {
-      if (this.width !== 0) {
+      if (this.width !== 0 && this.isExpanded) {
         (label as PIXI.Text).style.fontSize = _.floor(this.width / 25) + 1;
+      } else {
+        const textLength = _.ceil((label as PIXI.Text).text.length / 2);
+        (label as PIXI.Text).style.fontSize = nodeWidth / textLength;
       }
     }
   }
