@@ -208,43 +208,47 @@ export class Node extends CommonElement {
     this.selectOff();
 
     const children = this.children;
-    _.each(children, (child) => {
+    _.each(children, (child: any) => {
       if (child.name === 'node_sprite') {
         const border = new PIXI.Graphics();
         const lineWidth = 8;
+        child.width = child.width * 1.5;
+        child.height = child.height * 1.5;
         border.lineStyle(lineWidth, color || 0X00e5ff, 1);
         border.drawRoundedRect(
-          -((child as any).texture.width + lineWidth) / 2,
-          -((child as any).texture.height + lineWidth) / 2,
-          (child as any).texture.width + lineWidth,
-          (child as any).texture.height + lineWidth,
+          -(child.texture.width + lineWidth) / 2,
+          -(child.texture.height + lineWidth) / 2,
+          child.texture.width + lineWidth,
+          child.texture.height + lineWidth,
           5,
         );
         border.name = 'node_border';
-        (child as any).addChild(border);
+        child.addChild(border);
       }
       if (child.name === 'node_graph') {
         const border = new PIXI.Graphics();
         const lineWidth = 2;
         border.lineStyle(lineWidth, color || 0X00e5ff, 1);
         border.drawRoundedRect(
-          -((child as any).width + lineWidth) / 2,
-          -((child as any).height + lineWidth) / 2,
-          (child as any).width + lineWidth,
-          (child as any).height + lineWidth,
+          -(child.width + lineWidth) / 2,
+          -(child.height + lineWidth) / 2,
+          child.width + lineWidth,
+          child.height + lineWidth,
           7,
         );
         border.name = 'node_border';
-        (child as any).addChild(border);
+        child.addChild(border);
       }
     });
   }
 
   public selectOff() {
     const children = this.children;
-    _.each(children, (child) => {
-      if (child instanceof PIXI.Sprite || child.name === 'node_graph') {
-        (child as any).removeChild((child as any).getChildByName('node_border'));
+    _.each(children, (child: any) => {
+      if (child.name === 'node_sprite' || child.name === 'node_graph') {
+        child.width = child._texture.iconWidth;
+        child.height = child._texture.iconHeight;
+        child.removeChild(child.getChildByName('node_border'));
       }
     });
   }

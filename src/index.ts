@@ -195,7 +195,11 @@ network.callback = () => {
             });
             network.syncView();
           } else if (id === '1') {
+            const groupList = network.getGroupObj();
             network.hideElement(node);
+            _.each(groupList, (group: any) => {
+              group.draw();
+            });
           } else if (id === '2') {
             node.changeIcon('switch');
           }
@@ -261,7 +265,7 @@ network.callback = () => {
       }
     });
     const nameArr = _.split(newGroup.name as string, '#@');
-    newGroup.setLabel(nameArr[nameArr.length - 1]);
+    newGroup.setLabel(nameArr[nameArr.length - 1], 'Above');
 
     newGroup.on('rightclick', (event: any) => {
       network.menu.setMenuItems([
