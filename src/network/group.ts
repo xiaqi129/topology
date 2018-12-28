@@ -137,7 +137,7 @@ export class Group extends CommonElement {
   public getAllVisibleNodes(children?: PIXI.DisplayObject[]) {
     const nodes: Node[] = [];
     _.each(children || this.childrenNode, (node) => {
-      if (node instanceof Node && node.visible === true) {
+      if (node instanceof Node && node.visible) {
         nodes.push(node);
       } else if (node instanceof Group && node.children.length > 0) {
         this.getAllVisibleNodes(node.children);
@@ -148,7 +148,7 @@ export class Group extends CommonElement {
 
   public vertexPoints(children: PIXI.DisplayObject[]) {
     _.each(children, (node) => {
-      if (node instanceof Node && node.visible === true) {
+      if (node instanceof Node && node.visible) {
         this.positionList.push({
           x: node.x,
           y: node.y,
