@@ -238,6 +238,7 @@ network.callback = () => {
         network.menu.showMenu(event);
       });
       edge.setTooltip(`${edge.startNode.name} >>> ${edge.endNode.name}`);
+      network.setBundle(edge);
     }
   });
 

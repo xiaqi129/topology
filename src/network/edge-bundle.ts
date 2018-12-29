@@ -21,7 +21,7 @@ export class EdgeBundle extends CommonElement {
   }
 
   public draw() {
-    this.setBundleEdgesPosition();
+    // this.setBundleEdgesPosition();
   }
 
   public addEdge(edge: Edge) {
