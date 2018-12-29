@@ -536,6 +536,12 @@ export class Group extends CommonElement {
   }
 
   public getLabelPos() {
+    let height = 0;
+    _.each(this.children, (child: any) => {
+      if (child.name && child.name.indexOf('hull_outline') !== -1) {
+        height = child.height;
+      }
+    });
     const labelPositionData: any = {
       Center: {
         x: 0,
@@ -543,11 +549,11 @@ export class Group extends CommonElement {
       },
       Above: {
         x: 0,
-        y: -(this.height / 2),
+        y: -(height / 2),
       },
       Below: {
         x: 0,
-        y: (this.height / 2) * 1,
+        y: (height / 2),
       },
     };
     const labelPos = { x: 0, y: 0 };
