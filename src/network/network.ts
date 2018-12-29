@@ -19,7 +19,6 @@ import { EdgeBundle } from './edge-bundle';
 import { Topo } from './topo';
 
 export class Network {
-  public icons: any = {};
   public menu: PopMenu;
   public callback: any;
   private loader = PIXI.loader;
@@ -37,9 +36,10 @@ export class Network {
     this.tooltip = new Tooltip();
     this.action = new CommonAction(this.app, this.topo, this.tooltip);
     this.menu = new PopMenu(domRegex, this.app, this.action);
+    this.disableContextMenu(domRegex);
   }
 
-  public addIconResource(iconList: any) {
+  public initIconResource(iconList: any) {
     PIXI.loader.reset();
     PIXI.utils.clearTextureCache();
     _.each(iconList, (icon) => {
@@ -54,6 +54,18 @@ export class Network {
         this.callback();
         this.callback = Function();
       });
+  }
+
+  public addIconResource(iconList: any) {
+    _.each(iconList, (icon) => {
+      PIXI.loader.add(icon.name, icon.url);
+      PIXI.loader
+        .load((loader: any, resources: any) => {
+          const resource = _.get(resources, icon.name);
+          resource.texture.iconWidth = icon.width;
+          resource.texture.iconHeight = icon.height;
+        });
+    });
   }
 
   public createNode(iconName?: string) {
@@ -174,8 +186,8 @@ export class Network {
     this.action.setSelect();
   }
 
-  public setZoom(num: number) {
-    this.action.setZoom(num);
+  public setZoom(num: number, center?: boolean) {
+    this.action.setZoom(num, center);
   }
 
   public zoomOver() {
@@ -183,11 +195,15 @@ export class Network {
   }
 
   public getZoom() {
-    this.action.getZoom();
+    return this.action.getZoom();
   }
 
   public zoomReset() {
     this.action.zoomReset();
+  }
+
+  public getCenter() {
+    return this.action.getCenter();
   }
 
   public syncView() {
@@ -260,6 +276,15 @@ export class Network {
       const intersectionGroup = element.intersection()[1];
       _.each(intersectionGroup, (group) => {
         group.visible = true;
+      });
+    }
+  }
+
+  private disableContextMenu(domRegex: string) {
+    const html = document.getElementById(domRegex);
+    if (html) {
+      html.addEventListener('contextmenu', (e: any) => {
+        e.preventDefault();
       });
     }
   }

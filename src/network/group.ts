@@ -27,18 +27,21 @@ export class Group extends CommonElement {
   public groupEdgesEvent?: IEvent = {};
   public isExpanded: boolean = true;
   public groupEdges: GroupEdge[] = [];
+  public centerPoint: IPosition[] = [];
   private positionList: IPosition[] = [];
   private elements: Edge | CommonElement[];
   private polygonHullOutlineName: string = _.uniqueId('hull_outline_');
   private childrenNode: Node[] = [];
   private outLineStyleType: number = 1;
   private lastClickTime: number = 0;
-  private dragging!: boolean;
+  // drag
+  private dragging: boolean = false;
   private last: any;
-  private data: any;
+  private current: number | undefined;
+  private leftDown: boolean | undefined;
   private hideNodes: Node[] = [];
   private hideEdges: Edge[] = [];
-  private labelPosition: string = 'center';
+  private labelPosition: string = 'Center';
 
   constructor(elements: Edge | CommonElement[]) {
     super();
@@ -134,7 +137,7 @@ export class Group extends CommonElement {
   public getAllVisibleNodes(children?: PIXI.DisplayObject[]) {
     const nodes: Node[] = [];
     _.each(children || this.childrenNode, (node) => {
-      if (node instanceof Node) {
+      if (node instanceof Node && node.visible) {
         nodes.push(node);
       } else if (node instanceof Group && node.children.length > 0) {
         this.getAllVisibleNodes(node.children);
@@ -145,14 +148,11 @@ export class Group extends CommonElement {
 
   public vertexPoints(children: PIXI.DisplayObject[]) {
     _.each(children, (node) => {
-      if (node instanceof Node || node instanceof Group) {
+      if (node instanceof Node && node.visible) {
         this.positionList.push({
           x: node.x,
           y: node.y,
         });
-        if (node instanceof Group && node.children.length > 0) {
-          this.vertexPoints(node.children);
-        }
       }
     });
   }
@@ -172,46 +172,53 @@ export class Group extends CommonElement {
     this.addChild(graph);
   }
 
-  public onDragStart(event: PIXI.interaction.InteractionEvent) {
+  public onDragStart(event: any) {
     event.stopPropagation();
-    const parent = this.parent.toLocal(event.data.global);
-    this.dragging = true;
-    this.data = event.data;
-    this.last = { parents: parent, x: event.data.global.x, y: event.data.global.y };
-  }
-
-  public onDragEnd() {
-    if (this.dragging) {
-      this.dragging = this.last = false;
-      this.data = null;
+    if (event.data.originalEvent.button === 0) {
+      this.leftDown = true;
+      const parent = this.parent.toLocal(event.data.global);
+      this.dragging = true;
+      this.last = { parents: parent };
+      this.current = event.data.pointerId;
     }
   }
 
-  public onDragMove(event: PIXI.interaction.InteractionEvent) {
-    if (this.dragging && this.last) {
-      const newPosition = this.data.getLocalPosition(this.parent);
-      const edges = this.filterEdge();
-      const intersectionNodes = this.intersection()[0];
-      const intersectionGroup = this.intersection()[1];
-      _.each(edges, (edge: Edge) => {
-        edge.draw();
-      });
-      const distX = event.data.global.x;
-      const distY = event.data.global.y;
-      _.each(this.childrenNode, (element) => {
-        if (element instanceof Node) {
-          element.position.x += (newPosition.x - this.last.parents.x);
-          element.position.y += (newPosition.y - this.last.parents.y);
-        }
-      });
-      this.last = { parents: newPosition, x: distX, y: distY };
-      if (intersectionNodes) {
-        _.each(intersectionGroup, (group) => {
-          group.draw();
-        });
-
+  public onDragEnd(event: any) {
+    if (event.data.originalEvent.button === 0) {
+      this.leftDown = false;
+      if (this.dragging) {
+        this.dragging = false;
+        this.last = null;
       }
-      this.draw();
+    }
+  }
+
+  public onDragMove(event: any) {
+    if (this.last && this.current === event.data.pointerId) {
+      if (this.dragging) {
+        const newPosition = this.parent.toLocal(event.data.global);
+        const edges = this.filterEdge();
+        const intersectionNodes = this.intersection()[0];
+        const intersectionGroup = this.intersection()[1];
+        _.each(this.childrenNode, (element) => {
+          if (element instanceof Node) {
+            element.position.x += newPosition.x - this.last.parents.x;
+            element.position.y += newPosition.y - this.last.parents.y;
+          }
+        });
+        _.each(edges, (edge: Edge) => {
+          edge.draw();
+        });
+        if (intersectionNodes) {
+          _.each(intersectionGroup, (group) => {
+            group.draw();
+          });
+        }
+        this.draw();
+        this.last = { parents: newPosition };
+      } else {
+        this.dragging = false;
+      }
     }
   }
 
@@ -365,6 +372,7 @@ export class Group extends CommonElement {
   // draw polygon background outline
   public drawGroupExpandedOutline() {
     const vertexPointsNumber = this.getGroupVertexNumber();
+    this.centerPoint = this.getGroupPosition();
     const pointsCount = vertexPointsNumber.length;
     const graph = this.createOutlineGraphic();
     this.interactive = true;
@@ -460,10 +468,9 @@ export class Group extends CommonElement {
       this.setChildIndex(graphic, 0);
       graphic
         .on('mousedown', this.onDragStart.bind(this))
-        .on('mouseup', this.onDragEnd.bind(this))
-        // .on('mouseout', this.onDragEnd.bind(this))
-        .on('mouseupoutside', this.onDragEnd.bind(this))
-        .on('mousemove', this.onDragMove.bind(this));
+        .on('mousemove', this.onDragMove.bind(this))
+        .on('mouseup', this.onDragEnd.bind(this));
+      // .on('mouseupoutside', this.onDragEnd.bind(this));
     }
   }
 
@@ -471,8 +478,8 @@ export class Group extends CommonElement {
     this.rmElements(this.groupEdges);
     this.clearDisplayObjects();
     if (!this.isExpanded) {
-      this.drawGroupNode();
       this.drawEdges();
+      this.drawGroupNode();
     } else {
       this.drawGroupExpandedOutline();
     }
@@ -530,15 +537,15 @@ export class Group extends CommonElement {
 
   public getLabelPos() {
     const labelPositionData: any = {
-      center: {
+      Center: {
         x: 0,
         y: 0,
       },
-      top: {
+      Above: {
         x: 0,
         y: -(this.height / 2),
       },
-      bottom: {
+      Below: {
         x: 0,
         y: (this.height / 2) * 1,
       },
@@ -551,8 +558,9 @@ export class Group extends CommonElement {
     return labelPos;
   }
 
-  public setLabel(content?: string, style?: PIXI.TextStyleOptions, position?: string) {
-    if (this.width !== 0 && this.childrenNode.length > 1) {
+  public setLabel(content?: string, position?: string, style?: PIXI.TextStyleOptions) {
+    const vertexPointsNumber = this.getGroupVertexNumber();
+    if (this.width !== 0 && vertexPointsNumber.length > 1) {
       const size = _.floor(this.width / 25) + 1;
       const labelStyleOptions = {
         fontSize: size,
@@ -573,8 +581,14 @@ export class Group extends CommonElement {
   }
 
   public updateLabelPos() {
+    const vertexPointsNumber = this.getGroupVertexNumber();
     const label = this.getChildByName('group_label');
     if (label) {
+      if (vertexPointsNumber.length > 1) {
+        label.visible = true;
+      } else {
+        label.visible = false;
+      }
       const labelPos = this.getLabelPos();
       label.x = labelPos.x;
       label.y = labelPos.y;
@@ -583,9 +597,13 @@ export class Group extends CommonElement {
 
   public updateLabelSize() {
     const label = this.getChildByName('group_label');
+    const nodeWidth = this.defaultStyle.width;
     if (label) {
-      if (this.width !== 0) {
+      if (this.width !== 0 && this.isExpanded) {
         (label as PIXI.Text).style.fontSize = _.floor(this.width / 25) + 1;
+      } else {
+        const textLength = _.ceil((label as PIXI.Text).text.length / 2);
+        (label as PIXI.Text).style.fontSize = nodeWidth / textLength;
       }
     }
   }

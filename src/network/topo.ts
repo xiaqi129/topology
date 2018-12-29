@@ -112,9 +112,6 @@ export class Topo implements ITopo {
         if (edges.length > 0) {
           edgeBundle = new EdgeBundle(element);
           edgeBundle.addEdges(edges);
-          const rmEdges = _.remove(this.elements, (elem) => {
-            return _.indexOf(edges, elem) > -1;
-          });
           this.elements.push(edgeBundle);
         } else {
           edgeBundle = this.findEdgeBundleByID(element.edgeNodesSortUIDStr());

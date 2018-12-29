@@ -3,13 +3,13 @@ import { Network } from './network/network';
 import { data as topoData } from './simpleData';
 
 const iconResource = {
-  switch: { name: 'switch', url: './pic/cisco-WS-C49.png', width: '40', height: '40' },
+  switch: { name: 'switch', url: './pic/cisco-WS-C49.png', width: '10', height: '10' },
   switchLayer3: { name: 'switchLayer3', url: './pic/cisco-WS-C68.png', width: '40', height: '40' },
   router: { name: 'router', url: './pic/cisco-18.png', width: '10', height: '10' },
 };
 
 const network = new Network('network');
-network.addIconResource(iconResource);
+network.initIconResource(iconResource);
 
 network.callback = () => {
 
@@ -169,6 +169,7 @@ network.callback = () => {
         network.menu.setMenuItems([
           { label: 'Aggregated as a group', id: '0' },
           { label: 'Hide the Node', id: '1' },
+          { label: 'Change Switch Icon', id: '2' },
         ]);
         network.menu.menuOnAction = (id) => {
           if (id === '0') {
@@ -194,7 +195,13 @@ network.callback = () => {
             });
             network.syncView();
           } else if (id === '1') {
+            const groupList = network.getGroupObj();
             network.hideElement(node);
+            _.each(groupList, (group: any) => {
+              group.draw();
+            });
+          } else if (id === '2') {
+            node.changeIcon('switch');
           }
         };
         network.menu.setClass('popMenu');
@@ -241,27 +248,25 @@ network.callback = () => {
       network.setBundle(edge);
     }
   });
-
   _.each(groupsList, (group) => {
     const bgColor = group.style.bgColor;
     const newGroup = network.createGroup();
     const children = group.children;
-    network.addElement(newGroup);
     newGroup.name = group.id;
+    network.addElement(newGroup);
     newGroup.setOutlineStyle(2);
-    _.each(children, (node) => {
-      const groupNode = _.get(nodes, node);
-      if (groupNode) {
-        newGroup.addChildNodes(groupNode);
-      }
-    });
     newGroup.setStyle({
       fillOpacity: 0.3,
       fillColor: rgb2hex(bgColor),
     });
-
+    _.each(children, (child) => {
+      const node = _.get(nodes, child);
+      if (node) {
+        newGroup.addChildNodes(node);
+      }
+    });
     const nameArr = _.split(newGroup.name as string, '#@');
-    newGroup.setLabel(nameArr[nameArr.length - 1]);
+    newGroup.setLabel(nameArr[nameArr.length - 1], 'Above');
 
     newGroup.on('rightclick', (event: any) => {
       network.menu.setMenuItems([
@@ -281,7 +286,9 @@ network.callback = () => {
   network.syncView();
   network.setDrag();
   network.setClick();
-
+  network.setZoom(1);
+  network.setZoom(0.7);
+  network.setZoom(0.6);
   const zoomIn = document.querySelector('button.btn_zoomIn');
   const zoomOut = document.querySelector('button.btn_zoomOut');
   const zoomOver = document.querySelector('button.btn_zoomOver');
@@ -291,12 +298,12 @@ network.callback = () => {
   const searchNode = document.querySelector('button.btn_search_node');
   if (zoomIn) {
     zoomIn.addEventListener('click', () => {
-      network.setZoom(0.3);
+      network.setZoom(1.3);
     });
   }
   if (zoomOut) {
     zoomOut.addEventListener('click', () => {
-      network.setZoom(-0.3);
+      network.setZoom(0.7);
     });
   }
   if (zoomOver) {
