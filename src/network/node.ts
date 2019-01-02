@@ -252,9 +252,9 @@ export class Node extends CommonElement {
     });
   }
 
-  public setTooltip(content?: string) {
+  public setTooltip(content?: string, style?: any) {
     this.removeAllListeners();
-    this.tooltip.addTooltip(this, content || this.getUID());
+    this.tooltip.addTooltip(this, content || this.getUID(), style);
   }
 
   public setLabel(content?: string, style?: PIXI.TextStyleOptions) {

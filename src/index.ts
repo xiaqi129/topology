@@ -159,12 +159,33 @@ network.callback = () => {
     const client = device.clients.User_Mark;
     if (!(client === 'Hidden')) {
       const node = network.createNode('router');
+      node.name = device.name;
+      const tooltipContent = `
+        <table border = "1">
+          <tr class="dog">
+          <th>Name</th>
+          <th>Country</th>
+          </tr>
+          <tr>
+          <td>${node.name}</td>
+          <td>${node.height}</td>
+          </tr>
+          </table>`;
+      const commonStyles = {
+        position: 'absolute',
+        top: '0px',
+        left: '0px',
+        backgroundColor: 'white',
+        color: 'black',
+        padding: '5px 20px',
+        fontSize: '12px',
+        userSelect: 'none',
+      };
       network.addElement(node);
       node.x = device.location.x;
       node.y = device.location.y;
-      node.name = device.name;
       // node.setLabel(node.name, labelStyle);
-      node.setTooltip(node.name);
+      node.setTooltip(tooltipContent, commonStyles);
       node.on('rightclick', (event: any) => {
         network.menu.setMenuItems([
           { label: 'Aggregated as a group', id: '0' },

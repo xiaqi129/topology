@@ -15,14 +15,14 @@ export class Tooltip {
     userSelect: 'none',
   };
 
-  public addTooltip(ele: CommonElement, content?: string) {
+  public addTooltip(ele: CommonElement, content?: string, style?: any) {
     if (ele instanceof Node) {
       ele.addEventListener('mouseover', (event: any) => {
-        this.nodeTooltipOn(event, content);
+        this.nodeTooltipOn(event, content, style);
       });
     } else if (ele instanceof Edge) {
       ele.addEventListener('mouseover', (event: any) => {
-        this.edgeTooltipOn(event, content);
+        this.edgeTooltipOn(event, content, style);
       });
     }
     ele.addEventListener('mouseout', (event: any) => {
@@ -67,18 +67,17 @@ export class Tooltip {
     this.createTooltip(tooltipContent, tooltipStyles);
   }
 
-  private createTooltip(content: any, styles: any) {
+  private createTooltip(content: string, styles: any) {
     const network = document.getElementsByTagName('body')[0];
     const tooltip = document.createElement('div');
-    const text = document.createTextNode(content);
     tooltip.id = 'tooltip';
     _.each(styles, (v: any, k: any) => {
       tooltip.style[k] = v;
     });
-    tooltip.appendChild(text);
     if (network) {
       network.appendChild(tooltip);
     }
+    tooltip.innerHTML = content;
   }
 
   private tooltipMove(event: any) {
