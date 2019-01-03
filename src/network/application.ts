@@ -14,9 +14,9 @@ import { Group } from './group';
 export class Application extends PIXI.Application {
   private domRegex: string = '';
   private viewWrapper: HTMLElement | null = null;
-  private container: Viewport | undefined = undefined;
+  private container: Viewport | undefined;
 
-  constructor(domRegex: string = '', options = null) {
+  constructor(domRegex: string = '', iconResource: object, options = null) {
     super(options || {
       antialias: true,
       autoResize: true,
@@ -28,6 +28,22 @@ export class Application extends PIXI.Application {
       forceFXAA: true,
     });
     this.domRegex = domRegex;
+    this.initLoader(iconResource);
+  }
+
+  public initLoader(iconResource: any) {
+    PIXI.loader.reset();
+    PIXI.utils.clearTextureCache();
+    _.each(iconResource, (icon: any) => {
+      PIXI.loader.add(icon.name, icon.url);
+    });
+    PIXI.loader
+      .load((loader: any, resources: any) => {
+        _.each(resources, (resource) => {
+          resource.texture.iconWidth = iconResource[resource.name].width;
+          resource.texture.iconHeight = iconResource[resource.name].height;
+        });
+      });
     this.setup();
   }
 

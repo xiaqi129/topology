@@ -27,25 +27,28 @@ export class Network {
   private app: Application;
   private action: CommonAction;
   private tooltip: Tooltip;
+  private resources: object;
 
-  constructor(domRegex: string) {
+  constructor(domRegex: string, iconResource: object) {
     PIXI.utils.skipHello();
     this.topo = new Topo(this.loader);
-    this.drawer = new Drawer(domRegex, this.topo);
+    this.drawer = new Drawer(domRegex, this.topo, iconResource);
     this.app = this.drawer.getWhiteBoard();
     this.tooltip = new Tooltip();
     this.action = new CommonAction(this.app, this.topo, this.tooltip);
     this.menu = new PopMenu(domRegex, this.app, this.action);
+    this.resources = iconResource;
     this.disableContextMenu(domRegex);
   }
 
   public initIconResource(iconList: any) {
     PIXI.loader.reset();
     PIXI.utils.clearTextureCache();
+    const load = this.drawer.getWhiteBoard().loader;
     _.each(iconList, (icon) => {
-      PIXI.loader.add(icon.name, icon.url);
+      load.add(icon.name, icon.url);
     });
-    PIXI.loader
+    load
       .load((loader: any, resources: any) => {
         _.each(resources, (resource) => {
           resource.texture.iconWidth = iconList[resource.name].width;
@@ -59,18 +62,21 @@ export class Network {
   public addIconResource(iconList: any) {
     _.each(iconList, (icon) => {
       PIXI.loader.add(icon.name, icon.url);
-      PIXI.loader
-        .load((loader: any, resources: any) => {
-          const resource = _.get(resources, icon.name);
-          resource.texture.iconWidth = icon.width;
-          resource.texture.iconHeight = icon.height;
-        });
     });
+    PIXI.loader
+      .load((loader: any, resources: any) => {
+        _.each(resources, (resource) => {
+          if (iconList[resource.name]) {
+            resource.texture.iconWidth = iconList[resource.name].width;
+            resource.texture.iconHeight = iconList[resource.name].height;
+          }
+        });
+      });
   }
 
   public createNode(iconName?: string) {
     if (iconName) {
-      return this.topo.createNode(iconName);
+      return this.topo.createNode(this.resources, iconName);
     }
     return this.topo.createNode();
   }

@@ -57,34 +57,49 @@ export class Tooltip {
     const tooltipContent = content || 'node tooltip';
     const tooltipStyles: any = {};
     _.assign(tooltipStyles, Tooltip.commonStyles, customStyle);
-    this.createTooltip(tooltipContent, tooltipStyles);
+    this.createTooltip(event, tooltipContent, tooltipStyles);
   }
 
   private edgeTooltipOn(event: any, content?: string, customStyle?: any) {
     const tooltipContent = content || 'edge tooltip';
     const tooltipStyles: any = {};
     _.assign(tooltipStyles, Tooltip.commonStyles, customStyle);
-    this.createTooltip(tooltipContent, tooltipStyles);
+    this.createTooltip(event, tooltipContent, tooltipStyles);
   }
 
-  private createTooltip(content: string, styles: any) {
+  private createTooltip(event: any, content: string, styles: any) {
     const network = document.getElementsByTagName('body')[0];
     const tooltip = document.createElement('div');
     tooltip.id = 'tooltip';
     _.each(styles, (v: any, k: any) => {
       tooltip.style[k] = v;
     });
+    tooltip.innerHTML = content;
     if (network) {
       network.appendChild(tooltip);
     }
-    tooltip.innerHTML = content;
   }
 
   private tooltipMove(event: any) {
     const tooltip = document.getElementById('tooltip');
-    if (tooltip) {
-      tooltip.style.left = `${event.data.originalEvent.clientX + 20}px`;
-      tooltip.style.top = `${event.data.originalEvent.clientY + 20}px`;
+    const network = document.getElementsByTagName('body')[0];
+    if (tooltip && network) {
+      const networkHeight = network.clientHeight;
+      const networkWidth = network.clientWidth;
+      const y = event.data.global.y + 30;
+      const x = event.data.global.x + 40;
+      const tooltipHeight = tooltip.clientHeight + 5;
+      const tooltipWidth = tooltip.clientWidth + 5;
+      if (networkWidth - x > tooltipWidth) {
+        tooltip.style.left = `${x}px`;
+      } else {
+        tooltip.style.left = `${(x - tooltipWidth)}px`;
+      }
+      if (networkHeight - y > tooltipHeight) {
+        tooltip.style.top = `${y}px`;
+      } else {
+        tooltip.style.top = `${(y - tooltipHeight)}px`;
+      }
     }
   }
 

@@ -34,7 +34,7 @@ export class CommonAction {
   constructor(app: any, topo: ITopo, tooltip: Tooltip) {
     this.app = app;
     this.topo = topo;
-    this.container = app.getContainer();
+    this.container = app.container;
     this.tooltip = tooltip;
   }
 

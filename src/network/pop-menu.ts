@@ -162,11 +162,16 @@ export class PopMenu {
           a = null;
         });
         if (network) {
+          const tooltip = document.getElementById('tooltip');
+          const body = document.getElementsByTagName('body')[0];
+          if (tooltip && body) {
+            body.removeChild(tooltip);
+          }
           network.appendChild(this.menu);
           const networkHeight = network.clientHeight;
           const y = event.data.global.y + 30;
-          const menuHeight = this.menuItems.length * 30 + 5;
           this.menu.style.display = 'block';
+          const menuHeight = this.menuItems.length * 30 + 5;
           this.menu.style.left = `${event.data.global.x + 10}px`;
           if (networkHeight - y > menuHeight) {
             this.menu.style.top = `${y}px`;

@@ -27,6 +27,7 @@ export class Node extends CommonElement {
   private icon: any;
 
   constructor(
+    resources: any,
     edgesGroupByNodes: { [key: string]: Edge[] },
     elements: Edge | CommonElement[],
     selectedNodes: any[] = [],
@@ -40,7 +41,7 @@ export class Node extends CommonElement {
     // this.draw();  // 圆点
     // this.createSprite(resourceName || 'switch');  // 从loader中加载icon, 默认switch
     this.icon = icon;
-    this.draw();
+    this.draw(resources);
     this.tooltip = new Tooltip();
     this.setTooltip();
     // this.setLabel();
@@ -58,9 +59,12 @@ export class Node extends CommonElement {
     return this.parentNode;
   }
 
-  public draw() {
+  public draw(resources?: any) {
+    const size = _.ceil(_.size(resources) / 3);
     if (this.icon) {
-      this.drawSprite(this.icon);
+      setTimeout(() => {
+        this.drawSprite(this.icon);
+      },         size * 1500);
     } else {
       this.drawGraph();
     }
