@@ -18,9 +18,9 @@ export class Drawer {
   private topo: ITopo;
   private whiteBoard: Application;
 
-  constructor(container: string, topo: ITopo, iconResource: object) {
+  constructor(container: string, topo: ITopo) {
     this.topo = topo;
-    this.whiteBoard = new Application(container, iconResource);
+    this.whiteBoard = new Application(container);
   }
 
   public getWhiteBoard(): Application {

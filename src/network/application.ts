@@ -16,7 +16,7 @@ export class Application extends PIXI.Application {
   private viewWrapper: HTMLElement | null = null;
   private container: Viewport | undefined;
 
-  constructor(domRegex: string = '', iconResource: object, options = null) {
+  constructor(domRegex: string = '', options = null) {
     super(options || {
       antialias: true,
       autoResize: true,
@@ -28,7 +28,7 @@ export class Application extends PIXI.Application {
       forceFXAA: true,
     });
     this.domRegex = domRegex;
-    this.initLoader(iconResource);
+    this.setup();
   }
 
   public initLoader(iconResource: any) {

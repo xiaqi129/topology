@@ -33,8 +33,8 @@ const rgb2hex = (rgb: any) => {
   return (rgb && rgb.length === 4) ? `0X${hexR}${hexG}${hexB}` : '';
 };
 
-const network = new Network('network', iconResource);
-// network.initIconResource(iconResource);
+const network = new Network('network');
+network.initIconResource(iconResource);
 
 const devices = topoData.devices;
 const links = topoData.links;
@@ -227,8 +227,8 @@ _.each(groupsList, (group) => {
     network.menu.showMenu(event);
   });
 });
-// network.addIconResource(addResource);
-// const node1 = network.createNode('switch');
+network.addIconResource(addResource);
+// const node1 = network.createNode('switch1');
 // node1.x = 100;
 // node1.y = 100;
 // network.addElement(node1);

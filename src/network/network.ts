@@ -20,63 +20,60 @@ import { Topo } from './topo';
 
 export class Network {
   public menu: PopMenu;
-  public callback: any;
   private loader = PIXI.loader;
   private topo: Topo;
   private drawer: Drawer;
   private app: Application;
   private action: CommonAction;
   private tooltip: Tooltip;
-  private resources: object;
 
-  constructor(domRegex: string, iconResource: object) {
+  constructor(domRegex: string) {
     PIXI.utils.skipHello();
     this.topo = new Topo(this.loader);
-    this.drawer = new Drawer(domRegex, this.topo, iconResource);
+    this.drawer = new Drawer(domRegex, this.topo);
     this.app = this.drawer.getWhiteBoard();
     this.tooltip = new Tooltip();
     this.action = new CommonAction(this.app, this.topo, this.tooltip);
     this.menu = new PopMenu(domRegex, this.app, this.action);
-    this.resources = iconResource;
     this.disableContextMenu(domRegex);
   }
 
   public initIconResource(iconList: any) {
     PIXI.loader.reset();
     PIXI.utils.clearTextureCache();
-    const load = this.drawer.getWhiteBoard().loader;
-    _.each(iconList, (icon) => {
-      load.add(icon.name, icon.url);
-    });
-    load
-      .load((loader: any, resources: any) => {
-        _.each(resources, (resource) => {
-          resource.texture.iconWidth = iconList[resource.name].width;
-          resource.texture.iconHeight = iconList[resource.name].height;
-        });
-        this.callback();
-        this.callback = Function();
-      });
-  }
-
-  public addIconResource(iconList: any) {
-    _.each(iconList, (icon) => {
+    _.each(iconList, (icon: any) => {
       PIXI.loader.add(icon.name, icon.url);
     });
     PIXI.loader
       .load((loader: any, resources: any) => {
         _.each(resources, (resource) => {
-          if (iconList[resource.name]) {
-            resource.texture.iconWidth = iconList[resource.name].width;
-            resource.texture.iconHeight = iconList[resource.name].height;
-          }
+          resource.texture.iconWidth = iconList[resource.name].width;
+          resource.texture.iconHeight = iconList[resource.name].height;
         });
       });
   }
 
+  public addIconResource(iconList: any) {
+    PIXI.loader.onComplete.add(() => {
+      _.each(iconList, (icon) => {
+        PIXI.loader.add(icon.name, icon.url);
+      });
+      // console.log(PIXI.loader.resources);
+      // PIXI.loader.load((loader: any, resources: any) => {
+      //   _.each(resources, (resource) => {
+      //     console.log(resource);
+      //     if (iconList[resource.name]) {
+      //       resource.texture.iconWidth = iconList[resource.name].width;
+      //       resource.texture.iconHeight = iconList[resource.name].height;
+      //     }
+      //   });
+      // });
+    });
+  }
+
   public createNode(iconName?: string) {
     if (iconName) {
-      return this.topo.createNode(this.resources, iconName);
+      return this.topo.createNode(iconName);
     }
     return this.topo.createNode();
   }
