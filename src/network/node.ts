@@ -63,6 +63,9 @@ export class Node extends CommonElement {
       PIXI.loader.onComplete.add(() => {
         this.drawSprite(this.icon);
       });
+      if (PIXI.loader.loading === false) {
+        this.drawSprite(this.icon);
+      }
     } else {
       this.drawGraph();
     }

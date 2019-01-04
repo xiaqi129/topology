@@ -227,7 +227,7 @@ _.each(groupsList, (group) => {
     network.menu.showMenu(event);
   });
 });
-network.addIconResource(addResource);
+// network.addIconResource(addResource);
 // const node1 = network.createNode('switch1');
 // node1.x = 100;
 // node1.y = 100;
