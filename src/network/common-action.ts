@@ -23,6 +23,7 @@ export class CommonAction {
   private container: Viewport;
   private topo: ITopo;
   private clickColor: any;
+  private initScale: number | undefined;
   // bundle
   private lastClickTime: number = 0;
   private bundleLabelFlag: boolean = true;
@@ -40,6 +41,7 @@ export class CommonAction {
 
   public setZoom(num: number, center?: boolean) {
     let percent: number = 0;
+    this.initScale = num;
     const save: any = this.getCenter();
     this.container.scale.set(1);
     this.container.moveCenter(save);
@@ -62,14 +64,14 @@ export class CommonAction {
     const wrapperContainr = this.app.getWrapperBoundings();
     const containerWidth = appContainer.width;
     const containerHeight = appContainer.height;
-    const scaleX = wrapperContainr[0] / containerWidth;
-    const scaleY = wrapperContainr[1] / containerHeight;
+    const scaleX = containerWidth < wrapperContainr[0] ? containerWidth / wrapperContainr[0] : wrapperContainr[0] / containerWidth;
+    const scaleY = containerHeight < wrapperContainr[1] ? containerHeight / wrapperContainr[1] : wrapperContainr[1] / containerHeight;
     const scale = scaleX > scaleY ? scaleY : scaleX;
     appContainer.setTransform(0, 0, scale, scale, 0, 0, 0, 0, 0);
   }
 
   public zoomReset() {
-    this.container.setTransform(0, 0, 1, 1, 0, 0, 0, 0, 0);
+    this.container.setTransform(0, 0, this.initScale || 1, this.initScale || 1, 0, 0, 0, 0, 0);
   }
 
   public dragContainer() {
