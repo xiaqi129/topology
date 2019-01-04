@@ -21,7 +21,7 @@ export interface ITopo {
 
   addElements(node: Node[] | Group[] | Edge[]): void;
 
-  createNode(texture: string): Node;
+  createNode(load: PIXI.loaders.Loader, texture: string): Node;
 
   createGroup(): Group;
 
@@ -176,8 +176,8 @@ export class Topo implements ITopo {
     return this.elements;
   }
 
-  public createNode(icon?: any): Node {
-    return new Node(this.edgesGroupByNodes, this.elements, this.selectedNodes, icon);
+  public createNode(load: PIXI.loaders.Loader, icon?: any): Node {
+    return new Node(this.edgesGroupByNodes, this.elements, this.selectedNodes, load, icon);
   }
 
   public createGroup(): Group {

@@ -24,12 +24,14 @@ export class Node extends CommonElement {
   private last: any;
   private tooltip: Tooltip;
   private labelContent: string = '';
+  private load: PIXI.loaders.Loader;
   private icon: any;
 
   constructor(
     edgesGroupByNodes: { [key: string]: Edge[] },
     elements: Edge | CommonElement[],
     selectedNodes: any[] = [],
+    load: PIXI.loaders.Loader,
     icon?: any) {
     super();
     this.edgesGroupByNodes = edgesGroupByNodes;
@@ -40,6 +42,7 @@ export class Node extends CommonElement {
     // this.draw();  // 圆点
     // this.createSprite(resourceName || 'switch');  // 从loader中加载icon, 默认switch
     this.icon = icon;
+    this.load = load;
     this.draw();
     this.tooltip = new Tooltip();
     this.setTooltip();
@@ -63,7 +66,10 @@ export class Node extends CommonElement {
       PIXI.loader.onComplete.add(() => {
         this.drawSprite(this.icon);
       });
-      if (!PIXI.loader.loading) {
+      this.load.onComplete.add(() => {
+        this.drawSprite(this.icon);
+      });
+      if (!PIXI.loader.loading || !this.load.loading) {
         this.drawSprite(this.icon);
       }
     } else {

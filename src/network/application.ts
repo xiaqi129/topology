@@ -31,22 +31,6 @@ export class Application extends PIXI.Application {
     this.setup();
   }
 
-  public initLoader(iconResource: any) {
-    PIXI.loader.reset();
-    PIXI.utils.clearTextureCache();
-    _.each(iconResource, (icon: any) => {
-      PIXI.loader.add(icon.name, icon.url);
-    });
-    PIXI.loader
-      .load((loader: any, resources: any) => {
-        _.each(resources, (resource) => {
-          resource.texture.iconWidth = iconResource[resource.name].width;
-          resource.texture.iconHeight = iconResource[resource.name].height;
-        });
-      });
-    this.setup();
-  }
-
   public setup() {
     this.initApplication();
     this.fitWrapperSize();

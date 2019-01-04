@@ -26,6 +26,7 @@ export class Network {
   private app: Application;
   private action: CommonAction;
   private tooltip: Tooltip;
+  private load: PIXI.loaders.Loader;
 
   constructor(domRegex: string) {
     PIXI.utils.skipHello();
@@ -35,6 +36,7 @@ export class Network {
     this.tooltip = new Tooltip();
     this.action = new CommonAction(this.app, this.topo, this.tooltip);
     this.menu = new PopMenu(domRegex, this.app, this.action);
+    this.load = new PIXI.loaders.Loader();
     this.disableContextMenu(domRegex);
   }
 
@@ -54,28 +56,24 @@ export class Network {
   }
 
   public addIconResource(iconList: any) {
-    PIXI.loader.onComplete.add(() => {
-      _.each(iconList, (icon) => {
-        PIXI.loader.add(icon.name, icon.url);
+    _.each(iconList, (icon) => {
+      this.load.add(icon.name, icon.url);
+    });
+    this.load.load((loader: any, resources: any) => {
+      _.each(resources, (resource) => {
+        if (iconList[resource.name]) {
+          resource.texture.iconWidth = iconList[resource.name].width;
+          resource.texture.iconHeight = iconList[resource.name].height;
+        }
       });
-      // console.log(PIXI.loader.resources);
-      // PIXI.loader.load((loader: any, resources: any) => {
-      //   _.each(resources, (resource) => {
-      //     console.log(resource);
-      //     if (iconList[resource.name]) {
-      //       resource.texture.iconWidth = iconList[resource.name].width;
-      //       resource.texture.iconHeight = iconList[resource.name].height;
-      //     }
-      //   });
-      // });
     });
   }
 
   public createNode(iconName?: string) {
     if (iconName) {
-      return this.topo.createNode(iconName);
+      return this.topo.createNode(this.load, iconName);
     }
-    return this.topo.createNode();
+    return this.topo.createNode(this.load);
   }
 
   public createGroup() {
