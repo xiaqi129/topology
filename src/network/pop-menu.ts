@@ -169,10 +169,17 @@ export class PopMenu {
           }
           network.appendChild(this.menu);
           const networkHeight = network.clientHeight;
+          const networkWidth = network.clientWidth;
+          const x = event.data.global.x;
           const y = event.data.global.y + 30;
           this.menu.style.display = 'block';
           const menuHeight = this.menuItems.length * 30 + 5;
-          this.menu.style.left = `${event.data.global.x + 10}px`;
+          const menuWidth = this.menu.clientWidth;
+          if (networkWidth - x > menuWidth) {
+            this.menu.style.left = `${x + 20}px`;
+          } else {
+            this.menu.style.left = `${x - menuWidth}px`;
+          }
           if (networkHeight - y > menuHeight) {
             this.menu.style.top = `${y}px`;
           } else {

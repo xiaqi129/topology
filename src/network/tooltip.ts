@@ -86,19 +86,19 @@ export class Tooltip {
     if (tooltip && network) {
       const networkHeight = network.clientHeight;
       const networkWidth = network.clientWidth;
+      const x = event.data.global.x;
       const y = event.data.global.y + 30;
-      const x = event.data.global.x + 40;
-      const tooltipHeight = tooltip.clientHeight + 5;
-      const tooltipWidth = tooltip.clientWidth + 5;
+      const tooltipHeight = tooltip.clientHeight;
+      const tooltipWidth = tooltip.clientWidth;
       if (networkWidth - x > tooltipWidth) {
-        tooltip.style.left = `${x}px`;
+        tooltip.style.left = `${x + 40}px`;
       } else {
-        tooltip.style.left = `${(x - tooltipWidth)}px`;
+        tooltip.style.left = `${x - tooltipWidth - 40}px`;
       }
       if (networkHeight - y > tooltipHeight) {
         tooltip.style.top = `${y}px`;
       } else {
-        tooltip.style.top = `${(y - tooltipHeight)}px`;
+        tooltip.style.top = `${y - tooltipHeight}px`;
       }
     }
   }
