@@ -32,6 +32,7 @@ export class PopMenu {
 
   public createMenu() {
     const menu = document.createElement('DIV');
+    menu.id = 'pop-menu';
     menu.style.zIndex = '100000';
     menu.style.position = 'absolute';
     menu.style.background = '#FFFFFF';

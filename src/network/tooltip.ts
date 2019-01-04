@@ -8,6 +8,8 @@ export class Tooltip {
   public static commonStyles = {
     display: 'block',
     position: 'fixed',
+    top: '0',
+    left: '0',
     backgroundColor: 'black',
     color: 'white',
     padding: '5px 20px',
@@ -68,15 +70,19 @@ export class Tooltip {
   }
 
   private createTooltip(event: any, content: string, styles: any) {
-    const network = document.getElementsByTagName('body')[0];
-    const tooltip = document.createElement('div');
-    tooltip.id = 'tooltip';
-    _.each(styles, (v: any, k: any) => {
-      tooltip.style[k] = v;
-    });
-    tooltip.innerHTML = content;
-    if (network) {
-      network.appendChild(tooltip);
+    const popMenu = document.getElementById('pop-menu');
+
+    if (!popMenu || popMenu.style.display === 'none') {
+      const network = document.getElementsByTagName('body')[0];
+      const tooltip = document.createElement('div');
+      tooltip.id = 'tooltip';
+      _.each(styles, (v: any, k: any) => {
+        tooltip.style[k] = v;
+      });
+      tooltip.innerHTML = content;
+      if (network) {
+        network.appendChild(tooltip);
+      }
     }
   }
 
