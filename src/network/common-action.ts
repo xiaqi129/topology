@@ -85,6 +85,11 @@ export class CommonAction {
     this.moveSelect();
   }
 
+  public setSelectNodes(node: Node) {
+    this.removeSelectNodes();
+    this.topo.setSelectedNodes(node);
+  }
+
   public getSelectNodes() {
     const selectNodes = this.topo.getSelectedNodes();
     return selectNodes;
@@ -136,7 +141,7 @@ export class CommonAction {
           const nodeBottom = element.y + (element.height / 2);
           if ((nodeTop >= bounds.top) && (nodeRight <= bounds.right) &&
             (nodeBottom <= bounds.bottom) && (nodeLeft >= bounds.left)) {
-            element.selectOn(this.clickColor);
+            // element.selectOn(this.clickColor);
             this.topo.setSelectedNodes(element);
           }
         }
@@ -150,9 +155,9 @@ export class CommonAction {
   }
 
   public setClick(color?: any) {
-    this.clickColor = color;
     _.each(this.container.children, (element) => {
       if (element instanceof Node) {
+        element.defaultStyle.clickColor = color;
         element.addEventListener('mousedown', (event: PIXI.interaction.InteractionEvent) => {
           event.stopPropagation();
           this.cleanEdge();
@@ -180,6 +185,7 @@ export class CommonAction {
         element.on('click', (event: PIXI.interaction.InteractionEvent) => {
           this.cleanEdge();
           this.cleanNode();
+          this.topo.removeSelectedNodes();
         });
         _.each(element.children, (node) => {
           if (node instanceof GroupEdge) {
@@ -196,7 +202,6 @@ export class CommonAction {
     this.container.on('mousedown', () => {
       _.each(this.container.children, (element) => {
         if (element instanceof Node) {
-          // element.clearBorder();
           element.selectOff();
         }
         if (element instanceof Edge) {
@@ -357,10 +362,11 @@ export class CommonAction {
   }
 
   public searchNode(node: Node) {
+    const clickColor = node.defaultStyle.clickColor;
     this.cleanNode();
     this.setZoom(2);
     this.container.moveCenter(node.x, node.y);
-    node.selectOn(this.clickColor);
+    node.selectOn(clickColor);
   }
 
 }

@@ -207,6 +207,10 @@ export class Network {
     return this.action.getCenter();
   }
 
+  public setSelectNodes(node: Node) {
+    this.topo.setSelectedNodes(node);
+  }
+
   public syncView() {
     this.drawer.syncView();
     this.action.setClick();

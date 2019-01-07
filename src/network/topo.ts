@@ -201,8 +201,10 @@ export class Topo implements ITopo {
     });
   }
 
-  public setSelectedNodes(element: CommonElement) {
+  public setSelectedNodes(element: Node) {
+    const clickColor = element.defaultStyle.clickColor;
     this.selectedNodes.push(element);
+    element.selectOn(clickColor);
   }
 
   public getSelectedNodes() {

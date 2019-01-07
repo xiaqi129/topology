@@ -29,6 +29,7 @@ export interface IStyles {
   margin: number;
   height: number;
   width: number;
+  clickColor: number;
 }
 
 export interface IPosition {
@@ -59,6 +60,7 @@ export abstract class CommonElement extends PIXI.Container {
     margin: 5,
     height: 15,
     width: 15,
+    clickColor: 0X00e5ff,
   };
   private id: string = _.uniqueId('element_');
 

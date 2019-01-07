@@ -226,9 +226,9 @@ export class Group extends CommonElement {
    * 1: polygon, 2: ellipse
    */
   public setOutlineStyle(styleType: number) {
-    if (_.indexOf([1, 2], styleType) < 0) {
+    if (_.indexOf([1, 2, 3, 4], styleType) < 0) {
       throw Error(
-        'The group outline type only support polygon & ellipse. 1: polygon, 2: ellipse.');
+        'The group outline type only support polygon & ellipse. 1: polygon, 2: ellipse, 3: rectangle, 4: square');
     }
     this.outLineStyleType = styleType;
     this.draw();
@@ -368,6 +368,27 @@ export class Group extends CommonElement {
     }
   }
 
+  public drawRectOutline(graph: PIXI.Graphics, vertexPointsNumber: number[][]) {
+    const size = this.getNodesMaxSize();
+    const padding = size + this.defaultStyle.padding;
+    if (vertexPointsNumber.length > 1) {
+      const polygonObject: any = new polygon(vertexPointsNumber);
+      const rect = polygonObject.aabb();
+      const x = rect.x - padding;
+      const y = rect.y - padding;
+      const width = rect.w + padding * 2;
+      const height = rect.h + padding * 2;
+      graph.drawRect(x, y, width, height);
+      graph.endFill();
+    } else {
+      const x = vertexPointsNumber[0][0];
+      const y = vertexPointsNumber[0][1];
+      const radius = size;
+      graph.drawRect(x, y, radius, radius);
+      graph.endFill();
+    }
+  }
+
   // draw polygon background outline
   public drawGroupExpandedOutline() {
     const vertexPointsNumber = this.getGroupVertexNumber();
@@ -385,6 +406,9 @@ export class Group extends CommonElement {
         break;
       case 2:
         this.drawEllipseOutline(graph, vertexPointsNumber);
+        break;
+      case 3:
+        this.drawRectOutline(graph, vertexPointsNumber);
         break;
       default:
         this.drawPolygonOutline(graph, vertexPointsNumber);

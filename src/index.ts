@@ -115,6 +115,18 @@ _.each(devices, (device: any) => {
         { label: 'Aggregated as a group', id: '0' },
         { label: 'Hide the Node', id: '1' },
         { label: 'Change Switch Icon', id: '2' },
+        { label: 'Secondary menu', id: '3' },
+      ]);
+      network.menu.setSubMenu([
+        { parent: '0', label: 'hhhahhhhh!', id: '0' },
+        { parent: '0', label: 'aaaaaaa!', id: '1' },
+        // { parent: '1', label: 'wwwwwww!', id: '0' },
+        // { parent: '1', label: 'ddddd!', id: '1' },
+        { parent: '2', label: 'cccccc!', id: '0' },
+        { parent: '2', label: 'vvvvvv!', id: '1' },
+        { parent: '3', label: 'dderqrerd!', id: '0' },
+        { parent: '3', label: 'ddafafdaf!', id: '1' },
+        { parent: '3', label: 'fadgrt!', id: '2' },
       ]);
       network.menu.menuOnAction = (id) => {
         if (id === '0') {
@@ -147,6 +159,12 @@ _.each(devices, (device: any) => {
           });
         } else if (id === '2') {
           node.changeIcon('switch');
+          network.menu.setSubMenu([
+            { label: 'aaaa', id: '1' },
+          ]);
+        } else if (id === '3') {
+          // network.menu.setClass('popMenu');
+          // network.menu.showMenu(event);
         }
       };
       network.menu.setClass('popMenu');
@@ -199,7 +217,7 @@ _.each(groupsList, (group) => {
   const children = group.children;
   newGroup.name = group.id;
   network.addElement(newGroup);
-  newGroup.setOutlineStyle(2);
+  newGroup.setOutlineStyle(3);
   newGroup.setStyle({
     fillOpacity: 0.3,
     fillColor: rgb2hex(bgColor),
@@ -227,14 +245,13 @@ _.each(groupsList, (group) => {
     network.menu.showMenu(event);
   });
 });
-network.addIconResource(addResource);
-const node1 = network.createNode('switch1');
-node1.x = 100;
-node1.y = 100;
-network.addElement(node1);
 network.syncView();
+// const nodess = network.getNodeObj();
+// _.each(nodess, (node: any) => {
+//   network.setSelectNodes(node);
+// });
 network.setDrag();
-// network.setClick();
+network.setClick(0XFF5733);
 network.setZoom(0.7);
 // network.setZoom(0.6);
 const zoomIn = document.querySelector('button.btn_zoomIn');
@@ -246,7 +263,10 @@ const nodeLabelToggle = document.querySelector('button.btn_nodeLabelToggle');
 const searchNode = document.querySelector('button.btn_search_node');
 if (zoomIn) {
   zoomIn.addEventListener('click', () => {
-    network.setZoom(1.3);
+    const nodess = network.getNodeObj();
+    _.each(nodess, (node: any) => {
+      network.setSelectNodes(node);
+    });
   });
 }
 if (zoomOut) {
