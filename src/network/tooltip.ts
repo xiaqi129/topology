@@ -8,6 +8,8 @@ export class Tooltip {
   public static commonStyles = {
     display: 'block',
     position: 'fixed',
+    top: '0',
+    left: '0',
     backgroundColor: 'black',
     color: 'white',
     padding: '5px 20px',
@@ -68,15 +70,19 @@ export class Tooltip {
   }
 
   private createTooltip(event: any, content: string, styles: any) {
-    const network = document.getElementsByTagName('body')[0];
-    const tooltip = document.createElement('div');
-    tooltip.id = 'tooltip';
-    _.each(styles, (v: any, k: any) => {
-      tooltip.style[k] = v;
-    });
-    tooltip.innerHTML = content;
-    if (network) {
-      network.appendChild(tooltip);
+    const popMenu = document.getElementById('pop-menu');
+
+    if (!popMenu || popMenu.style.display === 'none') {
+      const network = document.getElementsByTagName('body')[0];
+      const tooltip = document.createElement('div');
+      tooltip.id = 'tooltip';
+      _.each(styles, (v: any, k: any) => {
+        tooltip.style[k] = v;
+      });
+      tooltip.innerHTML = content;
+      if (network) {
+        network.appendChild(tooltip);
+      }
     }
   }
 
@@ -86,19 +92,19 @@ export class Tooltip {
     if (tooltip && network) {
       const networkHeight = network.clientHeight;
       const networkWidth = network.clientWidth;
+      const x = event.data.global.x;
       const y = event.data.global.y + 30;
-      const x = event.data.global.x + 40;
-      const tooltipHeight = tooltip.clientHeight + 5;
-      const tooltipWidth = tooltip.clientWidth + 5;
+      const tooltipHeight = tooltip.clientHeight;
+      const tooltipWidth = tooltip.clientWidth;
       if (networkWidth - x > tooltipWidth) {
-        tooltip.style.left = `${x}px`;
+        tooltip.style.left = `${x + 40}px`;
       } else {
-        tooltip.style.left = `${(x - tooltipWidth)}px`;
+        tooltip.style.left = `${x - tooltipWidth - 40}px`;
       }
       if (networkHeight - y > tooltipHeight) {
         tooltip.style.top = `${y}px`;
       } else {
-        tooltip.style.top = `${(y - tooltipHeight)}px`;
+        tooltip.style.top = `${y - tooltipHeight}px`;
       }
     }
   }
