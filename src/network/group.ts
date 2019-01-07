@@ -37,8 +37,6 @@ export class Group extends CommonElement {
   // drag
   private dragging: boolean = false;
   private last: any;
-  private current: number | undefined;
-  private leftDown: boolean | undefined;
   private hideNodes: Node[] = [];
   private hideEdges: Edge[] = [];
   private labelPosition: string = 'Center';
@@ -97,8 +95,6 @@ export class Group extends CommonElement {
 
   public addChildNodes(element: Node, preventDraw: boolean = false) {
     this.childrenNode.push(element);
-    // this.addChild(element);
-    // this.toggleChildNodesVisible(this.isExpanded, element);
     if (!preventDraw) {
       this.draw();
     }
@@ -182,11 +178,9 @@ export class Group extends CommonElement {
   public onDragStart(event: any) {
     event.stopPropagation();
     if (event.data.originalEvent.button === 0) {
-      this.leftDown = true;
       const parent = this.parent.toLocal(event.data.global);
       this.dragging = true;
       this.last = { parents: parent };
-      this.current = event.data.pointerId;
     }
   }
 
@@ -358,7 +352,6 @@ export class Group extends CommonElement {
       const ellipseHeight = height / Math.sqrt(2);
       graph.drawEllipse(centerX, centerY, ellipseWidth, ellipseHeight);
       graph.endFill();
-      // console.log(this);
     } else {
       const x = vertexPointsNumber[0][0];
       const y = vertexPointsNumber[0][1];

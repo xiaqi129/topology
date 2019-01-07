@@ -103,7 +103,9 @@ export abstract class CommonElement extends PIXI.Container {
   public setStyle(styles: any, draw: boolean = true) {
     _.extend(this.defaultStyle, styles);
     if (draw) {
-      this.draw();
+      PIXI.loader.onComplete.add(() => {
+        this.draw();
+      });
     }
   }
 

@@ -3,14 +3,12 @@ import { Network } from './network/network';
 import { data as topoData } from './simpleData';
 
 const iconResource = {
-  switch: { name: 'switch', url: './pic/cisco-WS-C49.png', width: '10', height: '10' },
+  switch: { name: 'switch', url: './pic/WS-C49.png', width: '10', height: '10' },
   switchLayer3: { name: 'switchLayer3', url: './pic/cisco-WS-C68.png', width: '40', height: '40' },
   router: { name: 'router', url: './pic/cisco-18.png', width: '10', height: '10' },
 };
 const addResource = {
   switch1: { name: 'switch1', url: './pic/cisco-WS-C49.png', width: '10', height: '10' },
-  switchLayer33: { name: 'switchLayer33', url: './pic/cisco-WS-C68.png', width: '40', height: '40' },
-  router2: { name: 'router2', url: './pic/cisco-18.png', width: '10', height: '10' },
 };
 
 const keySort = (obj: any) => {
@@ -245,13 +243,14 @@ _.each(groupsList, (group) => {
     network.menu.showMenu(event);
   });
 });
+network.addIconResource(addResource);
+const node1 = network.createNode('switch1');
+node1.x = 100;
+node1.y = 100;
+network.addElement(node1);
 network.syncView();
-// const nodess = network.getNodeObj();
-// _.each(nodess, (node: any) => {
-//   network.setSelectNodes(node);
-// });
 network.setDrag();
-network.setClick(0XFF5733);
+// network.setClick();
 network.setZoom(0.7);
 // network.setZoom(0.6);
 const zoomIn = document.querySelector('button.btn_zoomIn');
@@ -263,10 +262,7 @@ const nodeLabelToggle = document.querySelector('button.btn_nodeLabelToggle');
 const searchNode = document.querySelector('button.btn_search_node');
 if (zoomIn) {
   zoomIn.addEventListener('click', () => {
-    const nodess = network.getNodeObj();
-    _.each(nodess, (node: any) => {
-      network.setSelectNodes(node);
-    });
+    network.setZoom(1.3);
   });
 }
 if (zoomOut) {

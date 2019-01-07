@@ -70,10 +70,7 @@ export class Network {
   }
 
   public createNode(iconName?: string) {
-    if (iconName) {
-      return this.topo.createNode(this.load, iconName);
-    }
-    return this.topo.createNode(this.load);
+    return this.topo.createNode(iconName);
   }
 
   public createGroup() {
@@ -212,8 +209,10 @@ export class Network {
   }
 
   public syncView() {
-    this.drawer.syncView();
-    this.action.setClick();
+    PIXI.loader.onComplete.add(() => {
+      this.drawer.syncView();
+      this.action.setClick();
+    });
   }
 
   public setClick(color?: any) {
