@@ -41,7 +41,6 @@ const groupsList = keySort(groups);
 // create Node
 const labelStyle = {
   fontSize: '0.6em',
-  fontWeight: 'bold',
 };
 _.each(devices, (device: any) => {
   const client = device.clients.User_Mark;
@@ -106,7 +105,7 @@ _.each(devices, (device: any) => {
     network.addElement(node);
     node.x = device.location.x;
     node.y = device.location.y;
-    // node.setLabel(node.name, labelStyle);
+    node.setLabel(device.name, labelStyle);
     node.setTooltip(tooltipContent, commonStyles);
     node.on('rightclick', (event: any) => {
       network.menu.setMenuItems([
@@ -243,13 +242,16 @@ _.each(groupsList, (group) => {
     network.menu.showMenu(event);
   });
 });
+network.syncView();
+network.setDrag();
 network.addIconResource(addResource);
 const node1 = network.createNode('switch1');
 node1.x = 100;
 node1.y = 100;
+node1.name = 'New Node';
+node1.setLabel(node1.name, labelStyle);
 network.addElement(node1);
-network.syncView();
-network.setDrag();
+
 // network.setClick();
 network.setZoom(0.7);
 // network.setZoom(0.6);
@@ -262,7 +264,10 @@ const nodeLabelToggle = document.querySelector('button.btn_nodeLabelToggle');
 const searchNode = document.querySelector('button.btn_search_node');
 if (zoomIn) {
   zoomIn.addEventListener('click', () => {
-    network.setZoom(1.3);
+    const nodess = _.sampleSize(network.getNodes(), 2);
+    _.each(nodess, (node) => {
+      network.setSelectNodes(node);
+    });
   });
 }
 if (zoomOut) {
@@ -300,8 +305,10 @@ if (tooltipToggle) {
   });
 }
 if (nodeLabelToggle) {
+  let labelToggle = true;
   nodeLabelToggle.addEventListener('click', () => {
-    network.nodeLabelToggle();
+    labelToggle = !labelToggle;
+    network.nodeLabelToggle(labelToggle);
   });
 }
 if (searchNode) {

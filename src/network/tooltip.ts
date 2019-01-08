@@ -35,7 +35,7 @@ export class Tooltip {
     });
   }
 
-  public setTooltipDisplay(isDisplay: any) {
+  public setTooltipDisplay(isDisplay: boolean) {
     if (isDisplay) {
       Tooltip.commonStyles.display = 'block';
     } else {

@@ -374,9 +374,9 @@ export class Group extends CommonElement {
       graph.drawRect(x, y, width, height);
       graph.endFill();
     } else {
-      const x = vertexPointsNumber[0][0];
-      const y = vertexPointsNumber[0][1];
-      const radius = size;
+      const x = vertexPointsNumber[0][0] - padding;
+      const y = vertexPointsNumber[0][1] - padding;
+      const radius = size + padding;
       graph.drawRect(x, y, radius, radius);
       graph.endFill();
     }

@@ -70,7 +70,7 @@ export class Network {
   }
 
   public createNode(iconName?: string) {
-    return this.topo.createNode(iconName);
+    return this.topo.createNode(this.load, iconName);
   }
 
   public createGroup() {
@@ -213,13 +213,20 @@ export class Network {
       this.drawer.syncView();
       this.action.setClick();
     });
+    this.load.onComplete.add(() => {
+      this.drawer.syncView();
+      this.action.setClick();
+    });
+    if (PIXI.loader.progress === 100) {
+      this.drawer.syncView();
+    }
   }
 
-  public setClick(color?: any) {
+  public setClick(color?: number) {
     this.action.setClick(color);
   }
 
-  public setTooltipDisplay(isDisplay: any) {
+  public setTooltipDisplay(isDisplay: boolean) {
     this.tooltip.setTooltipDisplay(isDisplay);
   }
 
@@ -231,8 +238,8 @@ export class Network {
     this.action.bundleLabelToggle();
   }
 
-  public nodeLabelToggle() {
-    this.action.nodeLabelToggle();
+  public nodeLabelToggle(labelToggle: boolean) {
+    this.action.nodeLabelToggle(labelToggle);
   }
 
   public searchNode(node: Node) {

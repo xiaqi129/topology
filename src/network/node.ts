@@ -24,22 +24,28 @@ export class Node extends CommonElement {
   private last: any;
   private tooltip: Tooltip;
   private labelContent: string = '';
+  private labelStyle: {} = {};
   private icon: any;
 
   constructor(
     edgesGroupByNodes: { [key: string]: Edge[] },
     elements: Edge | CommonElement[],
     selectedNodes: any[] = [],
+    loader: PIXI.loaders.Loader,
     icon?: any) {
     super();
     this.edgesGroupByNodes = edgesGroupByNodes;
     this.data = null;
+    this.labelStyle = {};
     this.dragging = false;
     this.elements = elements;
     this.selectedNodes = selectedNodes;
     // this.draw();  // 圆点
     // this.createSprite(resourceName || 'switch');  // 从loader中加载icon, 默认switch
     this.icon = icon;
+    loader.onComplete.add(() => {
+      this.draw();
+    });
     PIXI.loader.onComplete.add(() => {
       this.draw();
     });
@@ -260,17 +266,15 @@ export class Node extends CommonElement {
   }
 
   public setLabel(content?: string, style?: PIXI.TextStyleOptions) {
-
+    if (style) {
+      this.labelStyle = style;
+    }
     const oldLabel = this.getChildByName('node_label');
     if (oldLabel) {
       (oldLabel as any).setText(content || this.getUID());
       this.labelContent = (oldLabel as any).text;
     } else {
-      const labelStyleOptions = {
-        fontSize: 10,
-        fontWeight: 'bold',
-      };
-      const label = new Label(content || this.getUID(), style || labelStyleOptions);
+      const label = new Label(content || this.getUID(), style);
       label.name = 'node_label';
       this.addChild(label);
       this.labelContent = label.text;
@@ -279,6 +283,10 @@ export class Node extends CommonElement {
 
   public getLabelContent() {
     return this.labelContent;
+  }
+
+  public getLabelStyle() {
+    return this.labelStyle;
   }
 
   public changeIcon(icon: string) {

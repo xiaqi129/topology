@@ -40,7 +40,7 @@ export class Label extends PIXI.Text {
   public setPosition(position: number) {
 
     const posDisX = 1;  // x定位系数
-    const posDisY = 3;  // y定位系数
+    const posDisY = 2;  // y定位系数
     switch (position) {
       case 0:
         this.anchor.set(0.5 * posDisX, 1.5 * posDisY);

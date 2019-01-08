@@ -45,7 +45,7 @@ export class Topo implements ITopo {
 
   public loader: PIXI.loaders.Loader | null = null;
 
-  private selectedNodes: any[] = [];
+  private selectedNodes: Node[] = [];
 
   private elements: any[] = [];
 
@@ -176,8 +176,8 @@ export class Topo implements ITopo {
     return this.elements;
   }
 
-  public createNode(icon?: any): Node {
-    return new Node(this.edgesGroupByNodes, this.elements, this.selectedNodes, icon);
+  public createNode(loader: PIXI.loaders.Loader, icon?: any): Node {
+    return new Node(this.edgesGroupByNodes, this.elements, this.selectedNodes, loader, icon);
   }
 
   public createGroup(): Group {

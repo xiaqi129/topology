@@ -343,13 +343,11 @@ export class CommonAction {
     }
   }
 
-  public nodeLabelToggle() {
-    this.nodeLabelFlag = !this.nodeLabelFlag;
-
-    if (this.nodeLabelFlag) {
+  public nodeLabelToggle(labelToggle: boolean) {
+    if (labelToggle) {
       _.each(this.container.children, (element) => {
         if (element instanceof Node) {
-          element.setLabel(element.getLabelContent());
+          element.setLabel(element.getLabelContent(), element.getLabelStyle());
         }
       });
     } else {
