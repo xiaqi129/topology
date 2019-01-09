@@ -161,7 +161,7 @@ export class Node extends CommonElement {
   }
 
   public drawSprite(icon: any) {
-    const texture = PIXI.Texture.from(icon);
+    const texture = PIXI.Texture.fromImage(icon);
     const node = new PIXI.Sprite(texture);
     node.width = (texture as any).iconWidth;
     node.height = (texture as any).iconHeight;

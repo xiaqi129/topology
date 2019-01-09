@@ -26,6 +26,7 @@ export class Application extends PIXI.Application {
       transparent: true,
       width: 0,
       forceFXAA: true,
+      forceCanvas: true,
     });
     this.domRegex = domRegex;
     this.setup();

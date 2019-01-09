@@ -219,6 +219,7 @@ export class Network {
     });
     if (PIXI.loader.progress === 100) {
       this.drawer.syncView();
+      this.action.setClick();
     }
   }
 

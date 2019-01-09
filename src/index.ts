@@ -5,7 +5,7 @@ import { data as topoData } from './simpleData';
 const iconResource = {
   switch: { name: 'switch', url: './pic/WS-C49.png', width: '10', height: '10' },
   switchLayer3: { name: 'switchLayer3', url: './pic/cisco-WS-C68.png', width: '40', height: '40' },
-  router: { name: 'router', url: './pic/cisco-18.png', width: '10', height: '10' },
+  router: { name: 'router', url: './pic/cisco-18.png', width: '5', height: '5' },
 };
 const addResource = {
   switch1: { name: 'switch1', url: './pic/cisco-WS-C49.png', width: '10', height: '10' },
@@ -31,6 +31,70 @@ const rgb2hex = (rgb: any) => {
   return (rgb && rgb.length === 4) ? `0X${hexR}${hexG}${hexB}` : '';
 };
 
+// const network = new Network('network');
+// network.addIconResource(iconResource);
+// const num = 3000;
+// for (let i: number = 0, len: number = num; i < len;) {
+//   i += 1;
+//   const node = network.createNode('router');
+//   network.addElement(node);
+//   node.x = Math.random() * 3000;
+//   node.y = Math.random() * 1500;
+// }
+// const nodes = network.getNodes();
+// for (let i: number = 0, len: number = num; i < len;) {
+//   const srcNode = nodes[i];
+//   const destNode = nodes[i + 1];
+//   for (let j = 0; j < 4;) {
+//     const edge = network.createEdge(srcNode, destNode);
+//     edge.setStyle({
+//       arrowColor: 0Xc71bd3,
+//       arrowLength: 15,
+//       arrowType: 0,
+//       arrowWidth: 1,
+//       fillArrow: true,
+//       lineColor: 0xC7254E,
+//       lineDistance: 5,
+//       lineType: 1,
+//       lineWidth: 1,
+//     });
+//     network.addElement(edge);
+//     network.setBundle(edge);
+
+//     j += 1;
+//   }
+//   i += 2;
+// }
+// const group1 = network.createGroup();
+// network.addElement(group1);
+
+// const groupNodes1 = _.slice(_.shuffle(_.dropRight(nodes, (num / 2) + 1)), 0, 3);
+// _.each(groupNodes1, (node) => {
+//   group1.addChildNodes(node);
+// });
+// group1.setStyle({
+//   fillOpacity: 1,
+//   fillColor: 0xcddc39,
+// });
+// group1.setOutlineStyle(2);
+
+// group.setExpaned(false);
+
+// const group = network.createGroup();
+// network.addElement(group);
+
+// const groupNodes = _.slice(_.shuffle(_.dropRight(nodes, (num / 2) + 1)), 0, 3);
+// _.each(groupNodes, (node) => {
+//   group.addChildNodes(node);
+// });
+// group.setStyle({
+//   fillOpacity: 1,
+// });
+
+// network.syncView();
+// network.setDrag();
+// network.setClick();
+
 const network = new Network('network');
 network.initIconResource(iconResource);
 
@@ -41,6 +105,7 @@ const groupsList = keySort(groups);
 // create Node
 const labelStyle = {
   fontSize: '0.6em',
+  fill: 'red',
 };
 _.each(devices, (device: any) => {
   const client = device.clients.User_Mark;
@@ -198,8 +263,13 @@ _.each(links, (link) => {
         { label: 'Print line Info', id: '2' },
       ]);
       network.menu.menuOnAction = (id) => {
-        // tslint:disable-next-line:no-console
-        console.log(id);
+        if (id === '0') {
+          const node: any = network.getNodeObj();
+          const startNode = node[edge.startNode.name];
+          const endNode = node[edge.endNode.name];
+          network.setSelectNodes(startNode);
+          network.setSelectNodes(endNode);
+        }
       };
       network.menu.setClass('popMenu');
       network.menu.showMenu(event);
@@ -244,17 +314,11 @@ _.each(groupsList, (group) => {
 });
 network.syncView();
 network.setDrag();
-network.addIconResource(addResource);
-const node1 = network.createNode('switch1');
-node1.x = 100;
-node1.y = 100;
-node1.name = 'New Node';
-node1.setLabel(node1.name, labelStyle);
-network.addElement(node1);
 
-// network.setClick();
-network.setZoom(0.7);
+network.setClick(0X00e5ff);
+// network.setZoom(0.7);
 // network.setZoom(0.6);
+const body = document.getElementById('network');
 const zoomIn = document.querySelector('button.btn_zoomIn');
 const zoomOut = document.querySelector('button.btn_zoomOut');
 const zoomOver = document.querySelector('button.btn_zoomOver');
@@ -272,7 +336,13 @@ if (zoomIn) {
 }
 if (zoomOut) {
   zoomOut.addEventListener('click', () => {
-    network.setZoom(0.7);
+    // network.addIconResource(addResource);
+    // const node1 = network.createNode('switch1');
+    // node1.x = 100;
+    // node1.y = 100;
+    // node1.name = 'New Node';
+    // node1.setLabel(node1.name, labelStyle);
+    // network.addElement(node1);
   });
 }
 if (zoomOver) {
@@ -304,8 +374,8 @@ if (tooltipToggle) {
     network.setTooltipDisplay(isDisplay);
   });
 }
+let labelToggle = true;
 if (nodeLabelToggle) {
-  let labelToggle = true;
   nodeLabelToggle.addEventListener('click', () => {
     labelToggle = !labelToggle;
     network.nodeLabelToggle(labelToggle);
@@ -319,5 +389,16 @@ if (searchNode) {
         network.searchNode(node);
       }
     });
+  });
+}
+if (body) {
+  body.addEventListener('wheel', () => {
+    if (labelToggle) {
+      if (network.getZoom() < 1.3) {
+        network.nodeLabelToggle(false);
+      } else {
+        network.nodeLabelToggle(true);
+      }
+    }
   });
 }

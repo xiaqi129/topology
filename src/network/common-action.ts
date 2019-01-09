@@ -22,7 +22,6 @@ export class CommonAction {
   private app: Application;
   private container: Viewport;
   private topo: ITopo;
-  private clickColor: any;
   private initScale: number | undefined;
   // bundle
   private lastClickTime: number = 0;
@@ -83,11 +82,6 @@ export class CommonAction {
   public setSelect() {
     this.container.removePlugin('drag');
     this.moveSelect();
-  }
-
-  public setSelectNodes(node: Node) {
-    this.removeSelectNodes();
-    this.topo.setSelectedNodes(node);
   }
 
   public getSelectNodes() {
@@ -357,6 +351,10 @@ export class CommonAction {
         }
       });
     }
+  }
+
+  public toggleLabel() {
+    this.nodeLabelFlag = !this.nodeLabelFlag;
   }
 
   public searchNode(node: Node) {
