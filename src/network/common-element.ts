@@ -78,6 +78,12 @@ export abstract class CommonElement extends PIXI.Container {
     const childNodes = _.filter(this.children, (child) => {
       return child instanceof PIXI.Graphics;
     });
+    const sprite = _.find(this.children, (child) => {
+      return child.name === 'node_sprite';
+    });
+    if (sprite) {
+      sprite.destroy();
+    }
     _.each(childNodes, (node: any) => {
       node.destroy();
     });

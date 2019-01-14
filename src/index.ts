@@ -5,10 +5,10 @@ import { data as topoData } from './simpleData';
 const iconResource = {
   switch: { name: 'switch', url: './pic/WS-C49.png', width: '10', height: '10' },
   switchLayer3: { name: 'switchLayer3', url: './pic/cisco-WS-C68.png', width: '40', height: '40' },
-  router: { name: 'router', url: './pic/cisco-18.png', width: '5', height: '5' },
+  router: { name: 'router', url: './pic/cisco-18.png', width: '20', height: '20' },
 };
 const addResource = {
-  switch1: { name: 'switch1', url: './pic/cisco-WS-C49.png', width: '10', height: '10' },
+  switch1: { name: 'switch1', url: './pic/cisco-WS-C49.png', width: '20', height: '20' },
 };
 
 const keySort = (obj: any) => {
@@ -94,6 +94,13 @@ const rgb2hex = (rgb: any) => {
 // network.syncView();
 // network.setDrag();
 // network.setClick();
+const commonStyles = {
+  backgroundColor: 'transparent;',
+  color: 'black',
+  padding: '5px 20px',
+  fontSize: '12px',
+  userSelect: 'none',
+};
 
 const network = new Network('network');
 network.initIconResource(iconResource);
@@ -160,13 +167,6 @@ _.each(devices, (device: any) => {
           <td>${device.clients.User_Role}</td>
           </tr>
           </table>`;
-    const commonStyles = {
-      backgroundColor: 'white',
-      color: 'black',
-      padding: '5px 20px',
-      fontSize: '12px',
-      userSelect: 'none',
-    };
     network.addElement(node);
     node.x = device.location.x;
     node.y = device.location.y;
@@ -242,6 +242,25 @@ _.each(links, (link) => {
   const destNodeName = link.remote_host;
   const srcNode = _.get(nodes, srcNodeName);
   const destNode = _.get(nodes, destNodeName);
+  const linkTooltipContent = `
+  <table border = "1">
+    <tr class="dog">
+    <th>HostName</th>
+    <th>Interface</th>
+    <th>Interface</th>
+    <th>Hostname</th>
+    <th>Link Protocol</th>
+    <th>Link State</th>
+    </tr>
+    <tr>
+    <td>${link.local_host}</td>
+    <td>${link.remote_host}</td>
+    <td>${link.local_int}</td>
+    <td>${link.remote_int}</td>
+    <td>${link.link_state}</td>
+    <td>${link.link_protocol}</td>
+    </tr>
+    </table>`;
   if (srcNode && destNode) {
     const edge = network.createEdge(srcNode, destNode);
     edge.setStyle({
@@ -274,7 +293,7 @@ _.each(links, (link) => {
       network.menu.setClass('popMenu');
       network.menu.showMenu(event);
     });
-    edge.setTooltip(`${edge.startNode.name} >>> ${edge.endNode.name}`);
+    edge.setTooltip(linkTooltipContent, commonStyles);
     network.setBundle(edge);
   }
 });
@@ -392,9 +411,16 @@ if (searchNode) {
   });
 }
 if (body) {
-  body.addEventListener('wheel', () => {
+  let sign;
+  body.addEventListener('wheel', (event) => {
+    const nodesObj = network.getNodeObj();
+    sign = event.deltaY > 0 ? 1 : -1;
+    const zoomNum = _.add(1 , _.multiply(0.04, sign));
+    _.each(nodesObj, (node: any) => {
+      node.scale.set(_.multiply(node.scale.x, zoomNum));
+    });
     if (labelToggle) {
-      if (network.getZoom() < 1.3) {
+      if (network.getZoom() < 1) {
         network.nodeLabelToggle(false);
       } else {
         network.nodeLabelToggle(true);

@@ -587,8 +587,8 @@ export class Edge extends CommonElement {
     }
   }
 
-  public setTooltip(content?: string) {
+  public setTooltip(content?: string, style?: any) {
     this.removeAllListeners();
-    this.tooltip.addTooltip(this, content || `${this.startNode.id}  >>>>  ${this.endNode.id}`);
+    this.tooltip.addTooltip(this, content || `${this.startNode.id}  >>>>  ${this.endNode.id}`, style);
   }
 }

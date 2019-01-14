@@ -57,6 +57,7 @@
     "bezier-js": "^2.2.15",
     "graham-scan-convex-hull": "^0.2.0",
     "lodash": "^4.17.10",
+    "lodash-arithmetic": "^1.0.0",
     "pixi-viewport": "^3.11.2",
     "pixi.js": "^4.8.2",
     "polygon": "^1.0.2",
