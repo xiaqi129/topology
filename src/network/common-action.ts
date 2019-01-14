@@ -89,7 +89,13 @@ export class CommonAction {
     return selectNodes;
   }
 
+  public setSelectNodes(node: Node) {
+    this.topo.setSelectedNodes(node);
+  }
+
   public removeSelectNodes() {
+    this.cleanEdge();
+    this.cleanNode();
     this.topo.removeSelectedNodes();
   }
 

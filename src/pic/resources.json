@@ -1,0 +1,52 @@
+{"frames": {
+
+"cisco-18.png":
+{
+	"frame": {"x":0,"y":0,"w":100,"h":101},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":100,"h":101},
+	"sourceSize": {"w":100,"h":101}
+},
+"cisco-WS-C49.png":
+{
+	"frame": {"x":100,"y":0,"w":100,"h":101},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":100,"h":101},
+	"sourceSize": {"w":100,"h":101}
+},
+"cisco-WS-C68.png":
+{
+	"frame": {"x":0,"y":101,"w":78,"h":116},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":78,"h":116},
+	"sourceSize": {"w":78,"h":116}
+},
+"generate_all_the_reports.svg":
+{
+	"frame": {"x":78,"y":101,"w":60,"h":70},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":60,"h":70},
+	"sourceSize": {"w":60,"h":70}
+},
+"WS-C49.png":
+{
+	"frame": {"x":138,"y":101,"w":60,"h":29},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":60,"h":29},
+	"sourceSize": {"w":60,"h":29}
+}},
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "resources.png",
+	"format": "RGBA8888",
+	"size": {"w":200,"h":217},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:2b3031564c7376f68efa382b84ff8bf2:c2bbe8705924c3eeb99a3a7f7918d2c5:19b347f51627ec12809fffa771f50137$"
+}
+}

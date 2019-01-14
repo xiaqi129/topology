@@ -161,6 +161,10 @@ export class Node extends CommonElement {
   }
 
   public drawSprite(icon: any) {
+    // const id = PIXI.loader.resources['./pic/resources.json'].textures;
+    // if (id) {
+    // console.log(id);
+    // const texture = id['cisco-18.png'];
     const texture = PIXI.Texture.fromImage(icon);
     const node = new PIXI.Sprite(texture);
     node.width = (texture as any).iconWidth;
@@ -175,6 +179,7 @@ export class Node extends CommonElement {
       .on('mousemove', this.onDragMove.bind(this));
     node.name = 'node_sprite';
     this.addChild(node);
+    // }
   }
 
   public getWidth() {
@@ -211,7 +216,6 @@ export class Node extends CommonElement {
   }
 
   public selectOn(color?: any) {
-    // this.clearBorder();
     this.selectOff();
 
     const children = this.children;
@@ -219,8 +223,6 @@ export class Node extends CommonElement {
       if (child.name === 'node_sprite') {
         const border = new PIXI.Graphics();
         const lineWidth = 8;
-        child.width = child.width * 1.5;
-        child.height = child.height * 1.5;
         border.lineStyle(lineWidth, color || 0X00e5ff, 1);
         border.drawRoundedRect(
           -(child.texture.width + lineWidth) / 2,
@@ -247,17 +249,19 @@ export class Node extends CommonElement {
         child.addChild(border);
       }
     });
+    this.scale.set(1.5);
   }
 
   public selectOff() {
     const children = this.children;
     _.each(children, (child: any) => {
-      if (child.name === 'node_sprite' || child.name === 'node_graph') {
-        child.width = child._texture.iconWidth;
-        child.height = child._texture.iconHeight;
+      if (child.name === 'node_sprite') {
+        child.removeChild(child.getChildByName('node_border'));
+      } else if (child.name === 'node_graph') {
         child.removeChild(child.getChildByName('node_border'));
       }
     });
+    this.scale.set(1);
   }
 
   public setTooltip(content?: string, style?: any) {

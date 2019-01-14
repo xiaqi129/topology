@@ -319,12 +319,17 @@ _.each(groupsList, (group) => {
 
   newGroup.on('rightclick', (event: any) => {
     network.menu.setMenuItems([
-      // { label: 'Aggregated as a group', id: '0' },
       { label: 'Disaggregate selected group', id: '0' },
+      { label: 'Extened a group', id: '1' },
     ]);
     network.menu.menuOnAction = (id) => {
       if (id === '0') {
         newGroup.removeChildNodes();
+      } else if (id === '1') {
+        newGroup.setStyle({
+          padding: 50,
+        });
+        newGroup.draw();
       }
     };
     network.menu.setClass('popMenu');
@@ -415,10 +420,10 @@ if (body) {
   body.addEventListener('wheel', (event) => {
     const nodesObj = network.getNodeObj();
     sign = event.deltaY > 0 ? 1 : -1;
-    const zoomNum = _.add(1 , _.multiply(0.04, sign));
-    _.each(nodesObj, (node: any) => {
-      node.scale.set(_.multiply(node.scale.x, zoomNum));
-    });
+    const zoomNum = _.add(1, _.multiply(0.04, sign));
+    // _.each(nodesObj, (node: any) => {
+    //   node.scale.set(_.multiply(node.scale.x, zoomNum));
+    // });
     if (labelToggle) {
       if (network.getZoom() < 1) {
         network.nodeLabelToggle(false);

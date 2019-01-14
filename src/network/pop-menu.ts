@@ -73,10 +73,8 @@ export class PopMenu {
       if (isInSelect) {
         selectElement.selectOn(selectElement.defaultStyle.clickColor);
       } else if (!(selectElement instanceof Group)) {
-        this.action.cleanNode();
-        this.action.cleanEdge();
         this.action.removeSelectNodes();
-        selectElement.selectOn(selectElement.defaultStyle.clickColor);
+        this.action.setSelectNodes(selectElement);
       }
       _.each(this.menuItems, (menu: any) => {
         idList.push(menu.id);

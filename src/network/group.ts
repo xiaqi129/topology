@@ -355,7 +355,7 @@ export class Group extends CommonElement {
     } else {
       const x = vertexPointsNumber[0][0];
       const y = vertexPointsNumber[0][1];
-      const radius = size;
+      const radius = size + padding;
       graph.drawCircle(x, y, radius);
       graph.endFill();
     }

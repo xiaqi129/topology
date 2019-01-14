@@ -46,8 +46,11 @@ export class Network {
     _.each(iconList, (icon: any) => {
       PIXI.loader.add(icon.name, icon.url);
     });
+    // PIXI.loader.add('./pic/resources.json');
     PIXI.loader
       .load((loader: any, resources: any) => {
+        // const id = PIXI.loader.resources['./pic/resources.json'].textures;
+        // console.log(id);
         _.each(resources, (resource) => {
           resource.texture.iconWidth = iconList[resource.name].width;
           resource.texture.iconHeight = iconList[resource.name].height;
