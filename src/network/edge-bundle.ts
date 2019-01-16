@@ -101,12 +101,18 @@ export class EdgeBundle extends CommonElement {
     const distanceStep = 1;
     const degreeStep = 8;
     const values: number[][] = [];
-    for (let i = 0, len = edges.length; i < len;) {
-      _.each([1, -1], (j) => {
-        values.push([(distance + i * distanceStep) * j, (degree + i * degreeStep) * j]);
-      });
-      i += 1;
-    }
+    const isSameDirection = _.every(edges, (edg: Edge) => {
+      return edg.startNode === this.startNode;
+    });
+    _.each(edges, (edge: any, i: number) => {
+      if (isSameDirection) {
+        _.each([1, -1], (j) => {
+          values.push([(distance + i * distanceStep) * j, (degree + i * degreeStep) * j]);
+        });
+      } else {
+        values.push([(distance + i * distanceStep), (degree + i * degreeStep)]);
+      }
+    });
     _.each(this.children, (edge, i) => {
       if (edge instanceof Edge) {
         edge.setStyle({

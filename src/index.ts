@@ -59,7 +59,6 @@ const rgb2hex = (rgb: any) => {
 //       lineWidth: 1,
 //     });
 //     network.addElement(edge);
-//     // network.setBundle(edge);
 
 //     j += 1;
 //   }
