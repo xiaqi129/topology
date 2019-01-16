@@ -504,6 +504,7 @@ export class Group extends CommonElement {
     this.sortGraphicsIndex();
     this.updateLabelPos();
     this.updateLabelSize();
+    document.addEventListener('mouseup', this.onDragEnd.bind(this));
   }
 
   public getChildEdges() {
