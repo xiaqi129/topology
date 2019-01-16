@@ -8,11 +8,12 @@
 import * as _ from 'lodash';
 import { CommonElement, IStyles } from './common-element';
 
-import { Edge } from './edge';
-import { EdgeBundle } from './edge-bundle';
 import { Group } from './group';
 import { Label } from './label';
 import { Tooltip } from './tooltip';
+
+import { Edge } from './edge';
+import { EdgeBundle } from './edge-bundle';
 
 export class Node extends CommonElement {
   private parentNode: Group | null = null;
@@ -29,7 +30,7 @@ export class Node extends CommonElement {
 
   constructor(
     edgesGroupByNodes: { [key: string]: Edge[] },
-    elements: Edge | CommonElement[],
+    elements: CommonElement[],
     selectedNodes: any[] = [],
     loader: PIXI.loaders.Loader,
     icon?: any) {
@@ -140,6 +141,14 @@ export class Node extends CommonElement {
     _.each(this.elements, (element: any) => {
       const groupEdges = element.groupEdges;
       const isExpanded = element.isExpanded;
+      if (element instanceof EdgeBundle) {
+        _.each(element.children, (edge: any) => {
+          edge.draw();
+        });
+      }
+      if (element instanceof Edge) {
+        element.draw();
+      }
       // when the group is Expanded redraw it
       if (element instanceof Group && element.isExpanded) {
         element.draw();

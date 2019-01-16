@@ -234,12 +234,24 @@ export class Network {
     this.tooltip.setTooltipDisplay(isDisplay);
   }
 
-  public setBundle(edge: any) {
-    this.action.setBundle(edge);
+  public setBundleFlag(flag: boolean) {
+    _.each(this.getElements(), (element) => {
+      if (element instanceof EdgeBundle && !element.isExpanded) {
+        element.setBundleFlag(flag);
+      }
+    });
   }
 
   public bundleLabelToggle() {
     this.action.bundleLabelToggle();
+  }
+
+  public setBundelExpanded(flag: boolean) {
+    _.each(this.getElements(), (element) => {
+      if (element instanceof EdgeBundle && element.isExpanded !== flag) {
+        element.setExpaned(flag);
+      }
+    });
   }
 
   public nodeLabelToggle(labelToggle: boolean) {

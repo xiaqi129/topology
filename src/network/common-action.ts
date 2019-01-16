@@ -160,8 +160,11 @@ export class CommonAction {
         element.defaultStyle.clickColor = color;
         element.addEventListener('mousedown', (event: PIXI.interaction.InteractionEvent) => {
           event.stopPropagation();
-          this.cleanEdge();
-          element.selectOne(color);
+          if (this.getSelectNodes().length < 1) {
+            this.removeSelectNodes();
+            element.selectOne(color);
+            this.setSelectNodes(element);
+          }
         });
       } else if (element instanceof Edge) {
         this.defaultLineColor = element.defaultStyle.lineColor;
@@ -266,60 +269,6 @@ export class CommonAction {
       if (ele instanceof Node) {
         ele.selectOff();
       }
-    });
-  }
-
-  public setBundle(edge: any) {
-    edge.addEventListener('mousedown', (event: PIXI.interaction.InteractionEvent) => {
-      event.stopPropagation();
-      const currentTime = new Date().getTime();
-      // double click
-      if (currentTime - this.lastClickTime < 500) {
-        const parent = edge.parent;
-        const color = edge.defaultStyle.lineColor;
-        if (!this.bundleData[parent.getBundleID()]) {
-          // collapse
-          this.bundleData[parent.getBundleID()] = [];
-          const children = parent.children;
-          for (const child of children) {
-            this.bundleData[parent.getBundleID()].push(child);
-          }
-          parent.removeChildren(0, parent.children.length);
-          const afterBundle = new Edge(edge.startNode, edge.endNode);
-          afterBundle.setStyle(edge.defaultStyle);
-          if (this.bundleLabelFlag) {
-            const label = this.topo.createLabel(
-              `(${this.bundleData[parent.getBundleID()].length})`);
-            label.name = 'bundle_label';
-            label.setPosition(4);
-            label.x = (edge.startNode.x + edge.endNode.x) / 2;
-            label.y = (edge.startNode.y + edge.endNode.y) / 2;
-            afterBundle.addChild(label);
-          }
-          this.setBundle(afterBundle);
-          // add to elements
-          this.topo.addElement(afterBundle);
-          afterBundle.setStyle({
-            lineType: 0,
-          });
-          parent.addChild(afterBundle);
-
-          this.bundledEdge.push(afterBundle);
-        } else {
-          // expand
-          parent.removeChildren(0, parent.children.length);
-          const edges = this.bundleData[parent.getBundleID()];
-          for (const newEdge of edges) {
-            parent.addChild(newEdge);
-          }
-          this.bundleData[parent.getBundleID()] = undefined;
-        }
-        this.tooltip.clearTooltip();
-        this.setClick();
-      } else {
-        this.lastClickTime = currentTime;
-      }
-
     });
   }
 
