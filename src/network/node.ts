@@ -18,7 +18,6 @@ import { EdgeBundle } from './edge-bundle';
 export class Node extends CommonElement {
   private parentNode: Group | null = null;
   private data: any;
-  private edgesGroupByNodes: { [key: string]: Edge[] };
   private elements: Edge | CommonElement[];
   private selectedNodes: any[] = [];
   private dragging: boolean;
@@ -29,13 +28,11 @@ export class Node extends CommonElement {
   private icon: any;
 
   constructor(
-    edgesGroupByNodes: { [key: string]: Edge[] },
     elements: CommonElement[],
     selectedNodes: any[] = [],
     loader: PIXI.loaders.Loader,
     icon?: any) {
     super();
-    this.edgesGroupByNodes = edgesGroupByNodes;
     this.data = null;
     this.labelStyle = {};
     this.dragging = false;
@@ -141,6 +138,7 @@ export class Node extends CommonElement {
     _.each(this.elements, (element: any) => {
       const groupEdges = element.groupEdges;
       const isExpanded = element.isExpanded;
+      // redraw all of the EdgeBundle and Edge
       if (element instanceof EdgeBundle) {
         _.each(element.children, (edge: any) => {
           edge.draw();
@@ -157,14 +155,6 @@ export class Node extends CommonElement {
       if (element instanceof Group && !isExpanded) {
         element.rmElements(groupEdges);
         element.drawEdges();
-      }
-    });
-    // redraw all of the EdgeBundle and Edge
-    _.each(this.edgesGroupByNodes, (edgesGroup, key) => {
-      if (_.includes(key, this.getUID())) {
-        _.each(edgesGroup, (edge: Edge) => {
-          edge.draw();
-        });
       }
     });
   }

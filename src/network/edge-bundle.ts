@@ -71,6 +71,7 @@ export class EdgeBundle extends CommonElement {
       const edges = this.bundleData[bundleId];
       _.each(edges, (bundleEdge) => {
         this.addChild(bundleEdge);
+        bundleEdge.draw();
       });
     }
     this.clearTooltip();

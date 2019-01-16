@@ -179,7 +179,7 @@ export class Topo implements ITopo {
   }
 
   public createNode(loader: PIXI.loaders.Loader, icon?: any): Node {
-    return new Node(this.edgesGroupByNodes, this.elements, this.selectedNodes, loader, icon);
+    return new Node(this.elements, this.selectedNodes, loader, icon);
   }
 
   public createGroup(): Group {
