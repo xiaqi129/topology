@@ -34,7 +34,7 @@ export class Edge extends CommonElement {
     this.endNode = endNode;
     this.draw();
     this.tooltip = new Tooltip();
-    this.setTooltip();
+    // this.setTooltip();
   }
 
   public getEdge() {

@@ -45,6 +45,7 @@ export class Group extends CommonElement {
     super();
     this.elements = elements;
     this.draw();
+    document.addEventListener('mouseup', this.onDragEnd.bind(this));
   }
 
   public toggleGroupExpand() {
@@ -484,9 +485,6 @@ export class Group extends CommonElement {
       this.setChildIndex(graphic, 0);
       graphic
         .on('mousedown', this.onDragStart, this)
-        .on('mouseup', this.onDragEnd, this)
-        .on('mouseupoutside', this.onDragEnd, this)
-        .on('mouseout', this.onDragEnd, this)
         .on('mousemove', this.onDragMove, this);
     }
   }
@@ -504,7 +502,6 @@ export class Group extends CommonElement {
     this.sortGraphicsIndex();
     this.updateLabelPos();
     this.updateLabelSize();
-    document.addEventListener('mouseup', this.onDragEnd.bind(this));
   }
 
   public getChildEdges() {

@@ -135,13 +135,14 @@ export class CommonAction {
       const bounds = rectangle.getLocalBounds();
       _.each(elements, (element) => {
         if (element instanceof Node) {
-          const nodeTop = element.y - (element.height / 2);
-          const nodeLeft = element.x - (element.width / 2);
-          const nodeRight = element.x + (element.width / 2);
-          const nodeBottom = element.y + (element.height / 2);
+          const sprite: any = element.getChildByName('node_sprite') ?
+          element.getChildByName('node_sprite') : element.getChildByName('node_graph');
+          const nodeTop = element.y - (sprite.height / 2);
+          const nodeLeft = element.x - (sprite.width / 2);
+          const nodeRight = element.x + (sprite.width / 2);
+          const nodeBottom = element.y + (sprite.height / 2);
           if ((nodeTop >= bounds.top) && (nodeRight <= bounds.right) &&
             (nodeBottom <= bounds.bottom) && (nodeLeft >= bounds.left)) {
-            // element.selectOn(this.clickColor);
             this.topo.setSelectedNodes(element);
           }
         }
