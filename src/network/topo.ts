@@ -51,10 +51,6 @@ export class Topo implements ITopo {
 
   private edgesGroupByNodes: { [key: string]: Edge[] } = {};
 
-  constructor(loader: PIXI.loaders.Loader) {
-    this.loader = loader;
-  }
-
   public addElement(element: Node | Group | Edge) {
     this.addElements([element]);
   }

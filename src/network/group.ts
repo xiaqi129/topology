@@ -28,11 +28,12 @@ export class Group extends CommonElement {
   public isExpanded: boolean = true;
   public groupEdges: GroupEdge[] = [];
   public centerPoint: IPosition[] = [];
-  private superstratumInfo: any;
+  private superstratumInfo: Group[] = [];
+  private substratumInfo: Group[] = [];
   private positionList: IPosition[] = [];
   private elements: Edge | CommonElement[];
   private polygonHullOutlineName: string = _.uniqueId('hull_outline_');
-  private childrenNode: Node[] = [];
+  private childrenNode: any[] = [];
   private visibleNode: Node[] = [];
   private outLineStyleType: number = 1;
   private lastClickTime: number = 0;
@@ -57,13 +58,17 @@ export class Group extends CommonElement {
       const currentTime = new Date().getTime();
       const includeGroups = this.childrenNode[0].getIncluedGroup();
       this.superstratumInfo = _.slice(includeGroups, 0, _.indexOf(includeGroups, this));
+      const isSuperExpanded = _.find(this.superstratumInfo, (group: Group) => {
+        return !group.isExpanded;
+      });
       if (this.intersection()[0].length === 0) {
         if (currentTime - this.lastClickTime < 500) {
           this.isExpanded = !this.isExpanded;
           this.lastClickTime = 0;
+          this.analyzeSubstratum();
           this.setExpaned(this.isExpanded);
           this.toggleShowEdges(this.isExpanded);
-          this.redrawGroup();
+          this.redrawGroup(this.isExpanded);
         } else {
           this.lastClickTime = currentTime;
         }
@@ -71,12 +76,27 @@ export class Group extends CommonElement {
     });
   }
 
-  public redrawGroup() {
+  public redrawGroup(expanded: boolean) {
     _.each(this.elements, (group: CommonElement) => {
       if (group instanceof Group) {
         group.draw();
       }
     });
+    _.each(this.substratumInfo, (group) => {
+      group.visible = expanded;
+    });
+  }
+
+  public analyzeSubstratum() {
+    const subStratum: any = [];
+    this.substratumInfo = [];
+    _.each(this.childrenNode, (node: Node) => {
+      const lastStratum = _.last(node.incluedGroups);
+      if (lastStratum !== this) {
+        subStratum.push(lastStratum);
+      }
+    });
+    this.substratumInfo = _.uniq(subStratum);
   }
 
   public getVisibleNodes() {
@@ -130,11 +150,7 @@ export class Group extends CommonElement {
 
   public getGroupVertexNumber() {
     this.positionList = [];
-    if (this.isExpanded) {
-      this.vertexPoints(this.visibleNode);
-    } else {
-      this.vertexPoints(this.childrenNode);
-    }
+    this.vertexPoints(this.childrenNode);
     const vertexPointsList = _.map(this.positionList, (pos: IPosition) => {
       return _.values(pos);
     });
@@ -502,7 +518,6 @@ export class Group extends CommonElement {
   public draw() {
     this.rmElements(this.groupEdges);
     this.clearDisplayObjects();
-    this.getAllVisibleNodes();
     if (!this.isExpanded) {
       this.drawEdges();
       this.drawGroupNode();

@@ -30,7 +30,7 @@ export class Network {
 
   constructor(domRegex: string) {
     PIXI.utils.skipHello();
-    this.topo = new Topo(this.loader);
+    this.topo = new Topo();
     this.drawer = new Drawer(domRegex, this.topo);
     this.app = this.drawer.getWhiteBoard();
     this.tooltip = new Tooltip();

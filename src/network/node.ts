@@ -16,12 +16,12 @@ import { Edge } from './edge';
 import { EdgeBundle } from './edge-bundle';
 
 export class Node extends CommonElement {
+  public incluedGroups: Group[] = [];
   private parentNode: Group | null = null;
   private data: any;
   private elements: Edge | CommonElement[];
   private selectedNodes: any[] = [];
   private dragging: boolean;
-  private incluedGroups: Group[] = [];
   private last: any;
   private tooltip: Tooltip;
   private labelContent: string = '';
