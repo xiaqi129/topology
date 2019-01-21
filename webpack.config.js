@@ -6,7 +6,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 module.exports = {
     mode: 'development',
-    entry: './src/network/network.ts',
+    entry: './src/index.ts',
     devtool: "source-map",
     // devtool: false,
     resolve: {
@@ -18,14 +18,14 @@ module.exports = {
         library: 'network',
         libraryTarget: 'umd'
     },
-    externals: {
-        lodash: {
-            commonjs: 'lodash',
-            commonjs2: 'lodash',
-            amd: 'lodash',
-            root: '_'
-        }
-    },
+    // externals: {
+    //     lodash: {
+    //         commonjs: 'lodash',
+    //         commonjs2: 'lodash',
+    //         amd: 'lodash',
+    //         root: '_'
+    //     }
+    // },
     performance: { hints: false },
     module: {
         rules: [{

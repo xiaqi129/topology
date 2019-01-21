@@ -21,6 +21,7 @@ export class Node extends CommonElement {
   private elements: Edge | CommonElement[];
   private selectedNodes: any[] = [];
   private dragging: boolean;
+  private incluedGroups: Group[] = [];
   private last: any;
   private tooltip: Tooltip;
   private labelContent: string = '';
@@ -295,5 +296,13 @@ export class Node extends CommonElement {
   public changeIcon(icon: string) {
     this.removeChild(this.getChildByName('node_sprite'));
     this.drawSprite(icon);
+  }
+
+  public setIncluedGroup(group: Group) {
+    this.incluedGroups.push(group);
+  }
+
+  public getIncluedGroup() {
+    return this.incluedGroups;
   }
 }

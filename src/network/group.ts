@@ -28,10 +28,12 @@ export class Group extends CommonElement {
   public isExpanded: boolean = true;
   public groupEdges: GroupEdge[] = [];
   public centerPoint: IPosition[] = [];
+  private superstratumInfo: any;
   private positionList: IPosition[] = [];
   private elements: Edge | CommonElement[];
   private polygonHullOutlineName: string = _.uniqueId('hull_outline_');
   private childrenNode: Node[] = [];
+  private visibleNode: Node[] = [];
   private outLineStyleType: number = 1;
   private lastClickTime: number = 0;
   // drag
@@ -53,15 +55,26 @@ export class Group extends CommonElement {
     graph.on('click', (event) => {
       // event.stopPropagation();
       const currentTime = new Date().getTime();
+      const includeGroups = this.childrenNode[0].getIncluedGroup();
+      this.superstratumInfo = _.slice(includeGroups, 0, _.indexOf(includeGroups, this));
       if (this.intersection()[0].length === 0) {
         if (currentTime - this.lastClickTime < 500) {
           this.isExpanded = !this.isExpanded;
           this.lastClickTime = 0;
           this.setExpaned(this.isExpanded);
           this.toggleShowEdges(this.isExpanded);
+          this.redrawGroup();
         } else {
           this.lastClickTime = currentTime;
         }
+      }
+    });
+  }
+
+  public redrawGroup() {
+    _.each(this.elements, (group: CommonElement) => {
+      if (group instanceof Group) {
+        group.draw();
       }
     });
   }
@@ -79,6 +92,7 @@ export class Group extends CommonElement {
 
   public setExpaned(expanded: boolean) {
     this.toggleChildNodesVisible(expanded);
+    this.isExpanded = expanded;
     this.draw();
   }
 
@@ -95,6 +109,7 @@ export class Group extends CommonElement {
   }
 
   public addChildNodes(element: Node, preventDraw: boolean = false) {
+    element.setIncluedGroup(this);
     this.childrenNode.push(element);
     if (!preventDraw) {
       this.draw();
@@ -106,7 +121,7 @@ export class Group extends CommonElement {
     this.parent.removeChild(this);
   }
 
-  public toggleChildNodesVisible(visible: boolean, element?: Node | Group) {
+  public toggleChildNodesVisible(visible: boolean, element?: Node) {
     const children = element ? [element] : this.getVisibleNodes();
     _.each(children, (node) => {
       node.visible = visible;
@@ -115,7 +130,11 @@ export class Group extends CommonElement {
 
   public getGroupVertexNumber() {
     this.positionList = [];
-    this.vertexPoints(this.childrenNode);
+    if (this.isExpanded) {
+      this.vertexPoints(this.visibleNode);
+    } else {
+      this.vertexPoints(this.childrenNode);
+    }
     const vertexPointsList = _.map(this.positionList, (pos: IPosition) => {
       return _.values(pos);
     });
@@ -127,37 +146,29 @@ export class Group extends CommonElement {
     if (!vertexPointsList.length) {
       return [];
     }
+    if (vertexPointsList.length === 1) {
+      return [vertexPointsList[0][0], vertexPointsList[0][1]];
+    }
     const center = (new polygon(vertexPointsList)).center();
     return [center.x, center.y];
   }
 
   public getAllVisibleNodes(children?: PIXI.DisplayObject[]) {
-    const nodes: Node[] = [];
+    this.visibleNode = [];
     _.each(children || this.childrenNode, (node) => {
       if (node instanceof Node && node.visible) {
-        nodes.push(node);
-      } else if (node instanceof Group && node.children.length > 0) {
-        this.getAllVisibleNodes(node.children);
+        this.visibleNode.push(node);
       }
     });
-    return nodes;
+    return this.visibleNode;
   }
 
   public vertexPoints(children: PIXI.DisplayObject[]) {
     _.each(children, (node) => {
-      if (this.isExpanded) {
-        if (node instanceof Node && node.visible) {
-          this.positionList.push({
-            x: node.x,
-            y: node.y,
-          });
-        }
-      } else {
-        this.positionList.push({
-          x: node.x,
-          y: node.y,
-        });
-      }
+      this.positionList.push({
+        x: node.x,
+        y: node.y,
+      });
     });
   }
 
@@ -356,7 +367,7 @@ export class Group extends CommonElement {
     } else {
       const x = vertexPointsNumber[0][0];
       const y = vertexPointsNumber[0][1];
-      const radius = size;
+      const radius = size + padding / 2;
       graph.drawCircle(x, y, radius);
       graph.endFill();
     }
@@ -375,9 +386,9 @@ export class Group extends CommonElement {
       graph.drawRect(x, y, width, height);
       graph.endFill();
     } else {
+      const radius = size + padding;
       const x = vertexPointsNumber[0][0] - padding;
       const y = vertexPointsNumber[0][1] - padding;
-      const radius = size + padding;
       graph.drawRect(x, y, radius, radius);
       graph.endFill();
     }
@@ -480,7 +491,6 @@ export class Group extends CommonElement {
 
   public sortGraphicsIndex() {
     const graphic = this.getChildByName(this.polygonHullOutlineName);
-    // const children = this.children;
     if (graphic) {
       this.setChildIndex(graphic, 0);
       graphic
@@ -492,6 +502,7 @@ export class Group extends CommonElement {
   public draw() {
     this.rmElements(this.groupEdges);
     this.clearDisplayObjects();
+    this.getAllVisibleNodes();
     if (!this.isExpanded) {
       this.drawEdges();
       this.drawGroupNode();
@@ -581,7 +592,7 @@ export class Group extends CommonElement {
 
   public setLabel(content?: string, position?: string, style?: PIXI.TextStyleOptions) {
     const vertexPointsNumber = this.getGroupVertexNumber();
-    if (this.width !== 0 && vertexPointsNumber.length > 1) {
+    if (this.width !== 0 && vertexPointsNumber.length > 0) {
       const size = _.floor(this.width / 25) + 1;
       const labelStyleOptions = {
         fontSize: size,
@@ -605,7 +616,7 @@ export class Group extends CommonElement {
     const vertexPointsNumber = this.getGroupVertexNumber();
     const label = this.getChildByName('group_label');
     if (label) {
-      if (vertexPointsNumber.length > 1) {
+      if (vertexPointsNumber.length > 0) {
         label.visible = true;
       } else {
         label.visible = false;

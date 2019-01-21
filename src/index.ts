@@ -33,7 +33,7 @@ const rgb2hex = (rgb: any) => {
 
 // const network = new Network('network');
 // network.addIconResource(iconResource);
-// const num = 4;
+// const num = 20;
 // for (let i: number = 0, len: number = num; i < len;) {
 //   i += 1;
 //   const node = network.createNode('router');
@@ -45,7 +45,7 @@ const rgb2hex = (rgb: any) => {
 // for (let i: number = 0, len: number = num; i < len;) {
 //   const srcNode = nodes[i];
 //   const destNode = nodes[i + 1];
-//   for (let j = 0; j < 10;) {
+//   for (let j = 0; j < 4;) {
 //     const edge = network.createEdge(srcNode, destNode);
 //     edge.setStyle({
 //       arrowColor: 0Xc71bd3,
@@ -64,6 +64,17 @@ const rgb2hex = (rgb: any) => {
 //   }
 //   i += 2;
 // }
+// const group = network.createGroup();
+// network.addElement(group);
+
+// const groupNodes = _.slice(_.shuffle(_.dropRight(nodes, (num / 2) + 1)), 0, 3);
+// _.each(groupNodes, (node) => {
+//   node.setStyle({ lineColor: 0xf55d54 });
+//   group.addChildNodes(node);
+//   group.setStyle({
+//     fillOpacity: 1,
+//   });
+// });
 // network.syncView();
 // network.setDrag();
 
@@ -151,17 +162,6 @@ _.each(devices, (device: any) => {
         { label: 'Hide the Node', id: '1' },
         { label: 'Change Switch Icon', id: '2' },
         { label: 'Secondary menu', id: '3' },
-      ]);
-      network.menu.setSubMenu([
-        { parent: '0', label: 'hhhahhhhh!', id: '0' },
-        { parent: '0', label: 'aaaaaaa!', id: '1' },
-        // { parent: '1', label: 'wwwwwww!', id: '0' },
-        // { parent: '1', label: 'ddddd!', id: '1' },
-        { parent: '2', label: 'cccccc!', id: '0' },
-        { parent: '2', label: 'vvvvvv!', id: '1' },
-        { parent: '3', label: 'dderqrerd!', id: '0' },
-        { parent: '3', label: 'ddafafdaf!', id: '1' },
-        { parent: '3', label: 'fadgrt!', id: '2' },
       ]);
       network.menu.menuOnAction = (id) => {
         if (id === '0') {
@@ -275,7 +275,7 @@ _.each(groupsList, (group) => {
   const children = group.children;
   newGroup.name = group.id;
   network.addElement(newGroup);
-  newGroup.setOutlineStyle(3);
+  newGroup.setOutlineStyle(2);
   newGroup.setStyle({
     fillOpacity: 0.3,
     fillColor: rgb2hex(bgColor),
@@ -310,7 +310,6 @@ _.each(groupsList, (group) => {
 });
 network.syncView();
 network.setDrag();
-
 // network.setClick(0X00e5ff);
 // network.setZoom(0.7);
 // network.setZoom(0.6);
