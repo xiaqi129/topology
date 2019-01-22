@@ -6,6 +6,7 @@ const iconResource = {
   switch: { name: 'switch', url: './pic/WS-C49.png', width: '10', height: '10' },
   switchLayer3: { name: 'switchLayer3', url: './pic/cisco-WS-C68.png', width: '40', height: '40' },
   router: { name: 'router', url: './pic/cisco-18.png', width: '20', height: '20' },
+  lock: { name: 'lock', url: './pic/lock.png', width: '40', height: '40' },
 };
 const addResource = {
   switch1: { name: 'switch1', url: './pic/cisco-WS-C49.png', width: '20', height: '20' },
@@ -93,6 +94,7 @@ const devices = topoData.devices;
 const links = topoData.links;
 const groups = topoData.groups;
 const groupsList = keySort(groups);
+let isLock: boolean = false;
 // create Node
 const labelStyle = {
   fontSize: '0.6em',
@@ -161,7 +163,7 @@ _.each(devices, (device: any) => {
         { label: 'Aggregated as a group', id: '0' },
         { label: 'Hide the Node', id: '1' },
         { label: 'Change Switch Icon', id: '2' },
-        { label: 'Secondary menu', id: '3' },
+        { label: 'Lock/Unlock Node', id: '3' },
       ]);
       network.menu.menuOnAction = (id) => {
         if (id === '0') {
@@ -194,10 +196,13 @@ _.each(devices, (device: any) => {
           });
         } else if (id === '2') {
           node.changeIcon('switch');
-          network.menu.setSubMenu([
-            { label: 'aaaa', id: '1' },
-          ]);
         } else if (id === '3') {
+          isLock = !isLock;
+          if (isLock) {
+            network.lockElement(node);
+          } else {
+            network.unlockElement(node);
+          }
           // network.menu.setClass('popMenu');
           // network.menu.showMenu(event);
         }
