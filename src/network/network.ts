@@ -212,6 +212,12 @@ export class Network {
     this.topo.setSelectedNodes(node);
   }
 
+  public clearHighlight() {
+    this.action.cleanEdge();
+    this.action.cleanNode();
+    this.topo.removeSelectedNodes();
+  }
+
   public syncView() {
     PIXI.loader.onComplete.add(() => {
       this.drawer.syncView();

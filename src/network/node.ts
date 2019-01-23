@@ -16,6 +16,7 @@ import { Edge } from './edge';
 import { EdgeBundle } from './edge-bundle';
 
 export class Node extends CommonElement {
+  public isLock: boolean = false;
   public incluedGroups: Group[] = [];
   private parentNode: Group | null = null;
   private data: any;

@@ -333,6 +333,7 @@ export class CommonAction {
       lock.height = 8;
       lock.anchor.set(1.5, 1.5);
       lock.name = 'node_lock';
+      element.isLock = true;
       element.addChild(lock);
     }
   }
@@ -343,6 +344,7 @@ export class CommonAction {
         element.getChildByName('node_sprite') : element.getChildByName('node_graph');
       sprite.on('mousemove', element.onDragMove.bind(element));
       const lock = element.getChildByName('node_lock');
+      element.isLock = false;
       lock.destroy();
     }
   }

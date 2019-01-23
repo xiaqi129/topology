@@ -16,7 +16,6 @@ import { EdgeBundle } from './edge-bundle';
 import { GroupEdge } from './edge-conn-group';
 import { Label } from './label';
 import ConvexHullGrahamScan from './lib/convex-hull';
-// import Point from './lib/point';
 import { Node } from './node';
 
 interface IEvent {
@@ -27,7 +26,7 @@ export class Group extends CommonElement {
   public groupEdgesEvent?: IEvent = {};
   public isExpanded: boolean = true;
   public groupEdges: GroupEdge[] = [];
-  public centerPoint: IPosition[] = [];
+  public centerPoint: any[] = [];
   private superstratumInfo: Group[] = [];
   private substratumInfo: Group[] = [];
   private positionList: IPosition[] = [];
@@ -35,7 +34,7 @@ export class Group extends CommonElement {
   private polygonHullOutlineName: string = _.uniqueId('hull_outline_');
   private childrenNode: any[] = [];
   private visibleNode: Node[] = [];
-  private expandedVisibleNodes: Node[] = [];
+  private expandedVisibleNodes: any[] = [];
   private outLineStyleType: number = 1;
   private lastClickTime: number = 0;
   // drag
@@ -83,7 +82,7 @@ export class Group extends CommonElement {
       return !group.isExpanded;
     });
     _.each(closeSubstratum, (group: Group) => {
-      visibleNodes = _.concat(this.expandedVisibleNodes, group.expandedVisibleNodes);
+      visibleNodes = _.concat(this.expandedVisibleNodes, group);
       this.expandedVisibleNodes = _.flatten(visibleNodes);
     });
   }
@@ -165,6 +164,12 @@ export class Group extends CommonElement {
     const vertexPointsList = _.map(this.positionList, (pos: IPosition) => {
       return _.values(pos);
     });
+    // const closeSubstratum = _.filter(this.substratumInfo, (group: Group) => {
+    //   return !group.isExpanded;
+    // });
+    // _.each(closeSubstratum, (group: Group) => {
+    //   vertexPointsList = _.concat(vertexPointsList, group.centerPoint);
+    // });
     return vertexPointsList;
   }
 
@@ -192,10 +197,18 @@ export class Group extends CommonElement {
 
   public vertexPoints(children: PIXI.DisplayObject[]) {
     _.each(children, (node) => {
-      this.positionList.push({
-        x: node.x,
-        y: node.y,
-      });
+      if (node instanceof Node) {
+        this.positionList.push({
+          x: node.x,
+          y: node.y,
+        });
+      } else if (node instanceof Group) {
+        const graph = node.getChildByName(node.polygonHullOutlineName);
+        this.positionList.push({
+          x: graph.x,
+          y: graph.y,
+        });
+      }
     });
   }
 
@@ -307,10 +320,12 @@ export class Group extends CommonElement {
 
   public getMaxSize(nodes: Node[]) {
     const nodeSize = _.map(nodes, (node) => {
-      if (!node) {
-        return [0, 0];
+      if (node instanceof Node) {
+        if (!node) {
+          return [0, 0];
+        }
+        return [node.getWidth(), node.getHeight()];
       }
-      return [node.getWidth(), node.getHeight()];
     });
     return _.max(_.flatten(nodeSize)) || 0;
   }
@@ -423,9 +438,9 @@ export class Group extends CommonElement {
 
   // draw polygon background outline
   public drawGroupExpandedOutline() {
+    this.centerPoint = this.getGroupPosition();
     this.getExpandedVisibleNodes();
     const vertexPointsNumber = this.getGroupVertexNumber();
-    this.centerPoint = this.getGroupPosition();
     const pointsCount = vertexPointsNumber.length;
     const graph = this.createOutlineGraphic();
     this.interactive = true;

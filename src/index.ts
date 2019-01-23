@@ -164,6 +164,7 @@ _.each(devices, (device: any) => {
         { label: 'Hide the Node', id: '1' },
         { label: 'Change Switch Icon', id: '2' },
         { label: 'Lock/Unlock Node', id: '3' },
+        { label: 'Print Node', id: '4' },
       ]);
       network.menu.menuOnAction = (id) => {
         if (id === '0') {
@@ -205,6 +206,8 @@ _.each(devices, (device: any) => {
           }
           // network.menu.setClass('popMenu');
           // network.menu.showMenu(event);
+        } else if (id === '4') {
+          // console.log(node);
         }
       };
       network.menu.setClass('popMenu');
@@ -264,6 +267,7 @@ _.each(links, (link) => {
           const node: any = network.getNodeObj();
           const startNode = node[edge.startNode.name];
           const endNode = node[edge.endNode.name];
+          network.clearHighlight();
           network.setSelectNodes(startNode);
           network.setSelectNodes(endNode);
         }

@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import * as Viewport from 'pixi-viewport';
 import { CommonAction } from './common-action';
 import { Edge } from './edge';
-import { Group } from './group';
+import { Node } from './node';
 
 /**
  * @license
@@ -72,9 +72,10 @@ export class PopMenu {
       }
       if (isInSelect) {
         selectElement.selectOn(selectElement.defaultStyle.clickColor);
-      } else if (!(selectElement instanceof Group)) {
-        this.action.removeSelectNodes();
-        this.action.setSelectNodes(selectElement);
+      } else if (selectElement instanceof Node) {
+        selectElement.selectOn();
+      } else if (selectElement instanceof Edge) {
+        selectElement.selectOn();
       }
       _.each(this.menuItems, (menu: any) => {
         idList.push(menu.id);
