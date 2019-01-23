@@ -11,6 +11,7 @@ import { Application } from './application';
 import { Node } from './node';
 import { ITopo } from './topo';
 
+import { CommonElement } from './common-element';
 import { Edge } from './edge';
 import { EdgeBundle } from './edge-bundle';
 import { GroupEdge } from './edge-conn-group';
@@ -136,7 +137,7 @@ export class CommonAction {
       _.each(elements, (element) => {
         if (element instanceof Node) {
           const sprite: any = element.getChildByName('node_sprite') ?
-          element.getChildByName('node_sprite') : element.getChildByName('node_graph');
+            element.getChildByName('node_sprite') : element.getChildByName('node_graph');
           const nodeTop = element.y - (sprite.height / 2);
           const nodeLeft = element.x - (sprite.width / 2);
           const nodeRight = element.x + (sprite.width / 2);
@@ -319,6 +320,31 @@ export class CommonAction {
     this.setZoom(2);
     this.container.moveCenter(node.x, node.y);
     node.selectOn(clickColor);
+  }
+
+  public lockElement(element: CommonElement) {
+    if (element instanceof Node) {
+      const sprite = element.getChildByName('node_sprite') ?
+        element.getChildByName('node_sprite') : element.getChildByName('node_graph');
+      sprite.off('mousemove');
+      const lockTexture = PIXI.Texture.fromFrame('lock');
+      const lock = new PIXI.Sprite(lockTexture);
+      lock.anchor.set(1.5, 1.5);
+      lock.name = 'node_lock';
+      element.isLock = true;
+      element.addChild(lock);
+    }
+  }
+
+  public unLockElement(element: CommonElement) {
+    if (element instanceof Node) {
+      const sprite = element.getChildByName('node_sprite') ?
+        element.getChildByName('node_sprite') : element.getChildByName('node_graph');
+      sprite.on('mousemove', element.onDragMove.bind(element));
+      const lock = element.getChildByName('node_lock');
+      element.isLock = false;
+      lock.destroy();
+    }
   }
 
 }

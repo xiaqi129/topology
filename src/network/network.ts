@@ -15,6 +15,7 @@ import { Node } from './node';
 import { PopMenu } from './pop-menu';
 import { Tooltip } from './tooltip';
 
+import { CommonElement } from './common-element';
 import { EdgeBundle } from './edge-bundle';
 import { Topo } from './topo';
 
@@ -212,6 +213,12 @@ export class Network {
     this.topo.setSelectedNodes(node);
   }
 
+  public clearHighlight() {
+    this.action.cleanEdge();
+    this.action.cleanNode();
+    this.topo.removeSelectedNodes();
+  }
+
   public syncView() {
     PIXI.loader.onComplete.add(() => {
       this.drawer.syncView();
@@ -261,6 +268,14 @@ export class Network {
 
   public searchNode(node: Node) {
     this.action.searchNode(node);
+  }
+
+  public lockElement(element: CommonElement) {
+    this.action.lockElement(element);
+  }
+
+  public unlockElement(element: CommonElement) {
+    this.action.unLockElement(element);
   }
 
   public hideElement(element: any) {

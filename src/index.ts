@@ -6,7 +6,8 @@ const iconResource = {
   // switch: { name: 'switch', url: './pic/WS-C49.png', width: '10', height: '10' },
   // switchLayer3: { name: 'switchLayer3', url: './pic/cisco-WS-C68.png', width: '40', height: '40' },
   // router: { name: 'router', url: './pic/cisco-18.png', width: '20', height: '20' },
-  resources: { name: 'resources', url: './pic/resources.json' },
+  // lock: { name: 'lock', url: './pic/lock.png', width: '40', height: '40' },
+  resources: { name: 'resources', url: './pic/res.json' },
 };
 const addResource = {
   switch1: { name: 'switch1', url: './pic/cisco-WS-C49.png', width: '20', height: '20' },
@@ -94,6 +95,7 @@ const devices = topoData.devices;
 const links = topoData.links;
 const groups = topoData.groups;
 const groupsList = keySort(groups);
+let isLock: boolean = false;
 // create Node
 const labelStyle = {
   fontSize: '0.6em',
@@ -102,7 +104,7 @@ const labelStyle = {
 _.each(devices, (device: any) => {
   const client = device.clients.User_Mark;
   if (!(client === 'Hidden')) {
-    const node = network.createNode('cisco-18.png');
+    const node = network.createNode('router');
     node.name = device.name;
     const tooltipContent = `
         <table border = "1">
@@ -162,7 +164,8 @@ _.each(devices, (device: any) => {
         { label: 'Aggregated as a group', id: '0' },
         { label: 'Hide the Node', id: '1' },
         { label: 'Change Switch Icon', id: '2' },
-        { label: 'Secondary menu', id: '3' },
+        { label: 'Lock/Unlock Node', id: '3' },
+        { label: 'Print Node', id: '4' },
       ]);
       network.menu.menuOnAction = (id) => {
         if (id === '0') {
@@ -195,12 +198,17 @@ _.each(devices, (device: any) => {
           });
         } else if (id === '2') {
           node.changeIcon('switch');
-          network.menu.setSubMenu([
-            { label: 'aaaa', id: '1' },
-          ]);
         } else if (id === '3') {
+          isLock = !isLock;
+          if (isLock) {
+            network.lockElement(node);
+          } else {
+            network.unlockElement(node);
+          }
           // network.menu.setClass('popMenu');
           // network.menu.showMenu(event);
+        } else if (id === '4') {
+          // console.log(node);
         }
       };
       network.menu.setClass('popMenu');
@@ -260,6 +268,7 @@ _.each(links, (link) => {
           const node: any = network.getNodeObj();
           const startNode = node[edge.startNode.name];
           const endNode = node[edge.endNode.name];
+          network.clearHighlight();
           network.setSelectNodes(startNode);
           network.setSelectNodes(endNode);
         }
