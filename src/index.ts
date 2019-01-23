@@ -3,9 +3,10 @@ import { Network } from './network/network';
 import { data as topoData } from './simpleData';
 
 const iconResource = {
-  switch: { name: 'switch', url: './pic/WS-C49.png', width: '10', height: '10' },
-  switchLayer3: { name: 'switchLayer3', url: './pic/cisco-WS-C68.png', width: '40', height: '40' },
-  router: { name: 'router', url: './pic/cisco-18.png', width: '20', height: '20' },
+  // switch: { name: 'switch', url: './pic/WS-C49.png', width: '10', height: '10' },
+  // switchLayer3: { name: 'switchLayer3', url: './pic/cisco-WS-C68.png', width: '40', height: '40' },
+  // router: { name: 'router', url: './pic/cisco-18.png', width: '20', height: '20' },
+  resources: { name: 'resources', url: './pic/resources.json' },
 };
 const addResource = {
   switch1: { name: 'switch1', url: './pic/cisco-WS-C49.png', width: '20', height: '20' },
@@ -101,7 +102,7 @@ const labelStyle = {
 _.each(devices, (device: any) => {
   const client = device.clients.User_Mark;
   if (!(client === 'Hidden')) {
-    const node = network.createNode('router');
+    const node = network.createNode('cisco-18.png');
     node.name = device.name;
     const tooltipContent = `
         <table border = "1">
