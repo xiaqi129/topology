@@ -332,10 +332,8 @@ export class CommonAction {
       const sprite = element.getChildByName('node_sprite') ?
         element.getChildByName('node_sprite') : element.getChildByName('node_graph');
       sprite.off('mousemove');
-      const lockTexture = PIXI.Texture.fromImage('lock');
+      const lockTexture = PIXI.Texture.fromFrame('lock');
       const lock = new PIXI.Sprite(lockTexture);
-      lock.width = 8;
-      lock.height = 8;
       lock.anchor.set(1.5, 1.5);
       lock.name = 'node_lock';
       element.isLock = true;

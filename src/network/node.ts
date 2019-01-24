@@ -166,10 +166,17 @@ export class Node extends CommonElement {
     // if (id) {
     // console.log(id);
     // const texture = id['cisco-18.png'];
-    const texture = PIXI.Texture.fromImage(icon);
+
+    // old
+    // const texture = PIXI.Texture.fromImage(icon);
+    // const node = new PIXI.Sprite(texture);
+    // node.width = (texture as any).iconWidth;
+    // node.height = (texture as any).iconHeight;
+
+    // sprite
+    const texture = PIXI.Texture.fromFrame(icon);
     const node = new PIXI.Sprite(texture);
-    node.width = (texture as any).iconWidth;
-    node.height = (texture as any).iconHeight;
+
     node.anchor.set(0.5, 0.5);
     node.interactive = true;
     node.buttonMode = true;
