@@ -153,8 +153,6 @@ export class Topo implements ITopo {
         edges = edges.concat(childEges);
       }
     });
-    // const edges: Edge[] = _.filter(this.elements, element => element instanceof Edge);
-    // const bundleEdges: EdgeBundle[] = _.
     const edgesGroups = _.groupBy(_.uniq(edges), (edge) => {
       return this.getSortNodesUID(edge);
     });

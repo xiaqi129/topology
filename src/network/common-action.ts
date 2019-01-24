@@ -192,6 +192,11 @@ export class CommonAction {
           this.cleanNode();
           this.topo.removeSelectedNodes();
         });
+        element.addEventListener('mousedown', () => {
+          this.cleanEdge();
+          this.cleanNode();
+          // node.selectOn();
+        });
         _.each(element.children, (node) => {
           if (node instanceof GroupEdge) {
             node.addEventListener('mousedown', (event: PIXI.interaction.InteractionEvent) => {

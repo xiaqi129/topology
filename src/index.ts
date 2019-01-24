@@ -297,7 +297,7 @@ _.each(groupsList, (group) => {
   });
   const nameArr = _.split(newGroup.name as string, '#@');
   newGroup.setLabel(nameArr[nameArr.length - 1], 'Above');
-
+  newGroup.setToggleExpanded(true);
   newGroup.on('rightclick', (event: any) => {
     network.menu.setMenuItems([
       { label: 'Disaggregate selected group', id: '0' },

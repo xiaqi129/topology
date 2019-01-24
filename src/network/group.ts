@@ -27,6 +27,7 @@ export class Group extends CommonElement {
   public isExpanded: boolean = true;
   public groupEdges: GroupEdge[] = [];
   public centerPoint: any[] = [];
+  private toggleExpanded: boolean = false;
   private superstratumInfo: Group[] = [];
   private substratumInfo: Group[] = [];
   private positionList: IPosition[] = [];
@@ -164,12 +165,6 @@ export class Group extends CommonElement {
     const vertexPointsList = _.map(this.positionList, (pos: IPosition) => {
       return _.values(pos);
     });
-    // const closeSubstratum = _.filter(this.substratumInfo, (group: Group) => {
-    //   return !group.isExpanded;
-    // });
-    // _.each(closeSubstratum, (group: Group) => {
-    //   vertexPointsList = _.concat(vertexPointsList, group.centerPoint);
-    // });
     return vertexPointsList;
   }
 
@@ -551,7 +546,9 @@ export class Group extends CommonElement {
     } else {
       this.drawGroupExpandedOutline();
     }
-    this.toggleGroupExpand();
+    if (this.toggleExpanded) {
+      this.toggleGroupExpand();
+    }
     this.sortGraphicsIndex();
     this.updateLabelPos();
     this.updateLabelSize();
@@ -601,6 +598,10 @@ export class Group extends CommonElement {
       }
     });
     return [intersectionNode, intersectionGroup];
+  }
+
+  public setToggleExpanded(expanded: boolean) {
+    this.toggleExpanded = expanded;
   }
 
   public getLabelPos() {
