@@ -334,6 +334,8 @@ export class CommonAction {
       sprite.off('mousemove');
       const lockTexture = PIXI.Texture.fromFrame('lock');
       const lock = new PIXI.Sprite(lockTexture);
+      lock.width = element.iconWidth / 2;
+      lock.height = element.iconHeight / 2;
       lock.anchor.set(1.5, 1.5);
       lock.name = 'node_lock';
       element.isLock = true;

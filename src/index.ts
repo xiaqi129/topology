@@ -7,10 +7,7 @@ const iconResource = {
   // switchLayer3: { name: 'switchLayer3', url: './pic/cisco-WS-C68.png', width: '40', height: '40' },
   // router: { name: 'router', url: './pic/cisco-18.png', width: '20', height: '20' },
   // lock: { name: 'lock', url: './pic/lock.png', width: '40', height: '40' },
-  resources: { name: 'resources', url: './pic/res.json' },
-};
-const addResource = {
-  switch1: { name: 'switch1', url: './pic/cisco-WS-C49.png', width: '20', height: '20' },
+  resources: { name: 'resources', url: './pic/imageDict.json' },
 };
 
 const keySort = (obj: any) => {
@@ -104,8 +101,10 @@ const labelStyle = {
 _.each(devices, (device: any) => {
   const client = device.clients.User_Mark;
   if (!(client === 'Hidden')) {
-    const node = network.createNode('router');
+    const node = network.createNode('routerSVG');
     node.name = device.name;
+    node.iconWidth = 20;
+    node.iconHeight = 20;
     const tooltipContent = `
         <table border = "1">
           <tr class="dog">

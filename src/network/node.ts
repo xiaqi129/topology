@@ -18,6 +18,8 @@ import { EdgeBundle } from './edge-bundle';
 export class Node extends CommonElement {
   public isLock: boolean = false;
   public incluedGroups: Group[] = [];
+  public iconWidth: number = 20;
+  public iconHeight: number = 20;
   private parentNode: Group | null = null;
   private data: any;
   private elements: Edge | CommonElement[];
@@ -176,7 +178,8 @@ export class Node extends CommonElement {
     // sprite
     const texture = PIXI.Texture.fromFrame(icon);
     const node = new PIXI.Sprite(texture);
-
+    node.width = this.iconWidth;
+    node.height = this.iconHeight;
     node.anchor.set(0.5, 0.5);
     node.interactive = true;
     node.buttonMode = true;
