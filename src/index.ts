@@ -92,7 +92,6 @@ const devices = topoData.devices;
 const links = topoData.links;
 const groups = topoData.groups;
 const groupsList = keySort(groups);
-let isLock: boolean = false;
 // create Node
 const labelStyle = {
   fontSize: '0.6em',
@@ -198,14 +197,14 @@ _.each(devices, (device: any) => {
         } else if (id === '2') {
           node.changeIcon('WS-C49');
         } else if (id === '3') {
-          isLock = !isLock;
-          if (isLock) {
-            network.lockElement(node);
-          } else {
-            network.unlockElement(node);
-          }
-          // network.menu.setClass('popMenu');
-          // network.menu.showMenu(event);
+          const selectNodes = network.getSelectedNodes();
+          _.each(selectNodes, (selectNode) => {
+            if (!selectNode.isLock) {
+              network.lockElement(selectNode);
+            } else {
+              network.unlockElement(selectNode);
+            }
+          });
         } else if (id === '4') {
           // console.log(node);
         }

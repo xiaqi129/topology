@@ -135,7 +135,7 @@ export class CommonAction {
       flag = false;
       const bounds = rectangle.getLocalBounds();
       _.each(elements, (element) => {
-        if (element instanceof Node) {
+        if (element instanceof Node && !element.isLock) {
           const sprite: any = element.getChildByName('node_sprite') ?
             element.getChildByName('node_sprite') : element.getChildByName('node_graph');
           const nodeTop = element.y - (sprite.height / 2);

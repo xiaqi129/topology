@@ -13,7 +13,6 @@ import { Node } from './node';
 
 export class PopMenu {
   public menuOnAction!: (id: string) => void;
-  public subMenu: [] = [];
   private menu: HTMLElement;
   private isVisible: boolean;
   private menuClass: string | null;
@@ -64,16 +63,19 @@ export class PopMenu {
       const idList: any = [];
       const selectElement = event.target.parent;
       const selectedNodes = this.action.getSelectNodes();
-      let isInSelect;
-      if (selectedNodes.length > 0) {
-        isInSelect = _.find(selectedNodes, (node) => {
-          return node === selectElement;
-        });
-      }
-      if (isInSelect) {
-        selectElement.selectOn(selectElement.defaultStyle.clickColor);
-      } else if (selectElement instanceof Node) {
-        selectElement.selectOn();
+      // let isInSelect;
+      // if (selectedNodes.length > 0) {
+      //   isInSelect = _.find(selectedNodes, (node) => {
+      //     return node === selectElement;
+      //   });
+      // }
+      if (selectElement instanceof Node) {
+        if (selectedNodes.length < 2) {
+          this.action.removeSelectNodes();
+          this.action.setSelectNodes(selectElement);
+        } else {
+          this.action.setSelectNodes(selectElement);
+        }
       } else if (selectElement instanceof Edge) {
         selectElement.selectOn();
       }
@@ -120,9 +122,6 @@ export class PopMenu {
             } else if (evt.target) {
               element = evt.target;
             }
-            const subMenuItem = _.filter(this.subMenu, (item: { parent: string, label: string, id: string }) => {
-              return item.parent === element.id;
-            });
             const parent = element.parentNode;
             parent.style.background = '#0088cc';
             element.style.color = '#FFFFFF';
@@ -196,10 +195,5 @@ export class PopMenu {
 
   public setMenuItems(menuItems: any) {
     this.menuItems = menuItems;
-  }
-
-  public setSubMenu(menuItems: any) {
-    _.remove(this.subMenu);
-    this.subMenu = menuItems;
   }
 }

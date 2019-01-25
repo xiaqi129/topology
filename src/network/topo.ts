@@ -199,8 +199,11 @@ export class Topo implements ITopo {
 
   public setSelectedNodes(element: Node) {
     const clickColor = element.defaultStyle.clickColor;
-    this.selectedNodes.push(element);
-    element.selectOn(clickColor);
+    const isinclude = _.includes(this.selectedNodes, element);
+    if (!isinclude) {
+      this.selectedNodes.push(element);
+      element.selectOn(clickColor);
+    }
   }
 
   public getSelectedNodes() {

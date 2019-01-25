@@ -228,12 +228,11 @@ export class Node extends CommonElement {
 
   public selectOn(color?: any) {
     this.selectOff();
-
     const children = this.children;
     _.each(children, (child: any) => {
       if (child.name === 'node_sprite') {
         const border = new PIXI.Graphics();
-        const lineWidth = 8;
+        const lineWidth = 4;
         border.lineStyle(lineWidth, color || 0X00e5ff, 1);
         border.drawRoundedRect(
           -(child.texture.width + lineWidth) / 2,
