@@ -641,7 +641,7 @@ export class Group extends CommonElement {
         fontSize: size,
         fontWeight: 'bold',
       };
-      const label = new Label(content || 'group', style || labelStyleOptions);
+      const label = new Label(content || undefined, style || labelStyleOptions);
       label.setPosition(4);
       label.name = 'group_label';
       label.alpha = 0.8;
@@ -652,6 +652,13 @@ export class Group extends CommonElement {
       label.x = labelPos.x;
       label.y = labelPos.y;
       this.addChild(label);
+    }
+  }
+
+  public setLabelText(content: string) {
+    const label: any = this.getChildByName('group_label');
+    if (label) {
+      label.setText(content);
     }
   }
 

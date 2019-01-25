@@ -196,7 +196,7 @@ _.each(devices, (device: any) => {
             group.draw();
           });
         } else if (id === '2') {
-          node.changeIcon('switch');
+          node.changeIcon('WS-C49');
         } else if (id === '3') {
           isLock = !isLock;
           if (isLock) {
@@ -302,6 +302,7 @@ _.each(groupsList, (group) => {
     network.menu.setMenuItems([
       { label: 'Disaggregate selected group', id: '0' },
       { label: 'Extened a group', id: '1' },
+      { label: 'Change Group Name', id: '2' },
     ]);
     network.menu.menuOnAction = (id) => {
       if (id === '0') {
@@ -311,6 +312,8 @@ _.each(groupsList, (group) => {
           padding: 50,
         });
         newGroup.draw();
+      } else if (id === '2') {
+        newGroup.setLabelText('aaaaaaaa');
       }
     };
     network.menu.setClass('popMenu');
