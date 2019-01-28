@@ -75,7 +75,7 @@ export class Network {
   }
 
   public createNode(iconName?: string) {
-    return this.topo.createNode(this.load, iconName);
+    return this.topo.createNode(iconName);
   }
 
   public createGroup() {
@@ -169,16 +169,15 @@ export class Network {
     return selectedNodes;
   }
 
-  public removeElements(element: PIXI.Container) {
+  public removeElements(element: CommonElement) {
     const elements = this.topo.getElements();
-    _.remove(elements, elem => element === elem);
+    _.remove(elements, (elem: CommonElement) => {
+      return element === elem;
+    });
     if (element instanceof Edge) {
-      const edgesGroupByNodesUID = this.topo.getEdgesGroup();
-      const uidStr = element.edgeNodesSortUIDStr();
-      const edge = _.get(edgesGroupByNodesUID, uidStr);
-      edge[0].removeBrotherEdge(element);
+      element.destroy();
     }
-    element.destroy();
+    element.removeChildren(0, element.children.length);
   }
 
   public setDrag() {
@@ -221,10 +220,6 @@ export class Network {
 
   public syncView() {
     PIXI.loader.onComplete.add(() => {
-      this.drawer.syncView();
-      this.action.setClick();
-    });
-    this.load.onComplete.add(() => {
       this.drawer.syncView();
       this.action.setClick();
     });

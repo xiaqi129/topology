@@ -34,7 +34,6 @@ export class Node extends CommonElement {
   constructor(
     elements: CommonElement[],
     selectedNodes: any[] = [],
-    loader: PIXI.loaders.Loader,
     icon?: any) {
     super();
     this.data = null;
@@ -45,12 +44,12 @@ export class Node extends CommonElement {
     // this.draw();  // 圆点
     // this.createSprite(resourceName || 'switch');  // 从loader中加载icon, 默认switch
     this.icon = icon;
-    loader.onComplete.add(() => {
-      this.draw();
-    });
     PIXI.loader.onComplete.add(() => {
       this.draw();
     });
+    if (!PIXI.loader.loading) {
+      this.draw();
+    }
     this.tooltip = new Tooltip();
     this.setTooltip();
     // this.setLabel();

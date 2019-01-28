@@ -164,6 +164,7 @@ _.each(devices, (device: any) => {
         { label: 'Change Switch Icon', id: '2' },
         { label: 'Lock/Unlock Node', id: '3' },
         { label: 'Print Node', id: '4' },
+        { label: 'Remove Node', id: '5' },
       ]);
       network.menu.menuOnAction = (id) => {
         if (id === '0') {
@@ -207,6 +208,8 @@ _.each(devices, (device: any) => {
           });
         } else if (id === '4') {
           // console.log(node);
+        } else if (id === '5') {
+          network.removeElements(node);
         }
       };
       network.menu.setClass('popMenu');
@@ -269,6 +272,10 @@ _.each(links, (link) => {
           network.clearHighlight();
           network.setSelectNodes(startNode);
           network.setSelectNodes(endNode);
+        } else if (id === '1') {
+          network.removeElements(edge);
+        } else if (id === '2') {
+          // console.log(edge);
         }
       };
       network.menu.setClass('popMenu');
@@ -302,6 +309,7 @@ _.each(groupsList, (group) => {
       { label: 'Disaggregate selected group', id: '0' },
       { label: 'Extened a group', id: '1' },
       { label: 'Change Group Name', id: '2' },
+      { label: 'Remove Group', id: '3' },
     ]);
     network.menu.menuOnAction = (id) => {
       if (id === '0') {
@@ -312,7 +320,9 @@ _.each(groupsList, (group) => {
         });
         newGroup.draw();
       } else if (id === '2') {
-        newGroup.setLabelText('aaaaaaaa');
+        // console.log(network.getElements());
+      } else if (id === '3') {
+        network.removeElements(newGroup);
       }
     };
     network.menu.setClass('popMenu');
@@ -335,10 +345,11 @@ const nodeLabelToggle = document.querySelector('button.btn_nodeLabelToggle');
 const searchNode = document.querySelector('button.btn_search_node');
 if (zoomIn) {
   zoomIn.addEventListener('click', () => {
-    const nodess = _.sampleSize(network.getNodes(), 2);
-    _.each(nodess, (node) => {
-      network.setSelectNodes(node);
-    });
+    const newNode = network.createNode('Router');
+    newNode.x = 30;
+    newNode.y = 30;
+    network.addElement(newNode);
+    network.syncView();
   });
 }
 if (zoomOut) {
