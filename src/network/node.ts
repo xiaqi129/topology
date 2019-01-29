@@ -282,12 +282,23 @@ export class Node extends CommonElement {
     if (style) {
       this.labelStyle = style;
     }
+    _.extend(this.labelStyle, ({
+      fontFamily: 'Arial',
+      fontSize: '0.6em',
+      fontWeight: 'bold',
+      fill: ['#ffffff', '#0099ff'],
+      stroke: '#4a1850',
+      strokeThickness: 3,
+      breakWords: true,
+      wordWrap: true,
+      wordWrapWidth: 44,
+    }));
     const oldLabel = this.getChildByName('node_label');
     if (oldLabel) {
       (oldLabel as any).setText(content || this.getUID());
       this.labelContent = (oldLabel as any).text;
     } else {
-      const label = new Label(content || this.getUID(), style);
+      const label = new Label(content || this.getUID(), this.labelStyle);
       label.name = 'node_label';
       this.addChild(label);
       this.labelContent = label.text;

@@ -151,7 +151,7 @@ _.each(devices, (device: any) => {
     network.addElement(node);
     node.x = device.location.x;
     node.y = device.location.y;
-    node.setLabel(device.name, labelStyle);
+    node.setLabel(device.name);
     node.setTooltip(tooltipContent, commonStyles);
     node.on('rightclick', (event: any) => {
       network.menu.setMenuItems([
