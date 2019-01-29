@@ -329,17 +329,39 @@ export class CommonAction {
 
   public lockElement(element: CommonElement) {
     if (element instanceof Node) {
+      const lockTexture = PIXI.Texture.fromFrame('lock');
+      const lock = new PIXI.Sprite(lockTexture);
       const sprite = element.getChildByName('node_sprite') ?
         element.getChildByName('node_sprite') : element.getChildByName('node_graph');
       sprite.off('mousemove');
-      const lockTexture = PIXI.Texture.fromFrame('lock');
-      const lock = new PIXI.Sprite(lockTexture);
       lock.width = element.iconWidth / 2;
       lock.height = element.iconHeight / 2;
       lock.anchor.set(1.5, 1.5);
       lock.name = 'node_lock';
       element.isLock = true;
       element.addChild(lock);
+    } else if (element instanceof Group) {
+      const nodes = element.expandedVisibleNodes;
+      const graph = _.find(element.children, (g) => {
+        return g instanceof PIXI.Graphics;
+      });
+      _.each(nodes, (node) => {
+        const sprite = node.getChildByName('node_sprite') ?
+          node.getChildByName('node_sprite') : node.getChildByName('node_graph');
+        sprite.off('mousemove');
+        const lockTexture = PIXI.Texture.fromFrame('lock');
+        const lock = new PIXI.Sprite(lockTexture);
+        lock.width = node.iconWidth / 2;
+        lock.height = node.iconHeight / 2;
+        lock.anchor.set(1.5, 1.5);
+        lock.name = 'node_lock';
+        node.isLock = true;
+        node.addChild(lock);
+      });
+      if (graph) {
+        graph.off('mousemove');
+        element.isLock = true;
+      }
     }
   }
 
@@ -351,6 +373,23 @@ export class CommonAction {
       const lock = element.getChildByName('node_lock');
       element.isLock = false;
       lock.destroy();
+    } else if (element instanceof Group) {
+      const nodes = element.expandedVisibleNodes;
+      const graph = _.find(element.children, (g) => {
+        return g instanceof PIXI.Graphics;
+      });
+      _.each(nodes, (node) => {
+        const sprite = node.getChildByName('node_sprite') ?
+          node.getChildByName('node_sprite') : node.getChildByName('node_graph');
+        sprite.on('mousemove', node.onDragMove.bind(node));
+        const lock = node.getChildByName('node_lock');
+        node.isLock = false;
+        lock.destroy();
+      });
+      if (graph) {
+        graph.on('mousemove', element.onDragMove.bind(element));
+        element.isLock = false;
+      }
     }
   }
 

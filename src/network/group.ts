@@ -27,6 +27,8 @@ export class Group extends CommonElement {
   public isExpanded: boolean = true;
   public groupEdges: GroupEdge[] = [];
   public centerPoint: any[] = [];
+  public isLock: boolean = false;
+  public expandedVisibleNodes: any[] = [];
   private toggleExpanded: boolean = false;
   private superstratumInfo: Group[] = [];
   private substratumInfo: Group[] = [];
@@ -35,7 +37,6 @@ export class Group extends CommonElement {
   private polygonHullOutlineName: string = _.uniqueId('hull_outline_');
   private childrenNode: any[] = [];
   private visibleNode: Node[] = [];
-  private expandedVisibleNodes: any[] = [];
   private outLineStyleType: number = 1;
   private lastClickTime: number = 0;
   // drag
@@ -531,9 +532,10 @@ export class Group extends CommonElement {
     const graphic = this.getChildByName(this.polygonHullOutlineName);
     if (graphic) {
       this.setChildIndex(graphic, 0);
-      graphic
-        .on('mousedown', this.onDragStart, this)
-        .on('mousemove', this.onDragMove, this);
+      graphic.on('mousedown', this.onDragStart, this);
+      if (!this.isLock) {
+        graphic.on('mousemove', this.onDragMove, this);
+      }
     }
   }
 

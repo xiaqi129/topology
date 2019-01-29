@@ -3,10 +3,6 @@ import { Network } from './network/network';
 import { data as topoData } from './simpleData';
 
 const iconResource = {
-  // switch: { name: 'switch', url: './pic/WS-C49.png', width: '10', height: '10' },
-  // switchLayer3: { name: 'switchLayer3', url: './pic/cisco-WS-C68.png', width: '40', height: '40' },
-  // router: { name: 'router', url: './pic/cisco-18.png', width: '20', height: '20' },
-  // lock: { name: 'lock', url: './pic/lock.png', width: '40', height: '40' },
   resources: { name: 'resources', url: './pic/imageDict.json' },
 };
 
@@ -196,7 +192,9 @@ _.each(devices, (device: any) => {
             group.draw();
           });
         } else if (id === '2') {
-          node.changeIcon('WS-C49');
+          node.iconWidth = 40;
+          node.iconHeight  = 60;
+          node.changeIcon('group');
         } else if (id === '3') {
           const selectNodes = network.getSelectedNodes();
           _.each(selectNodes, (selectNode) => {
@@ -308,7 +306,7 @@ _.each(groupsList, (group) => {
     network.menu.setMenuItems([
       { label: 'Disaggregate selected group', id: '0' },
       { label: 'Extened a group', id: '1' },
-      { label: 'Change Group Name', id: '2' },
+      { label: 'Lock/Unlock Group', id: '2' },
       { label: 'Remove Group', id: '3' },
     ]);
     network.menu.menuOnAction = (id) => {
@@ -320,7 +318,11 @@ _.each(groupsList, (group) => {
         });
         newGroup.draw();
       } else if (id === '2') {
-        // console.log(network.getElements());
+        if (!newGroup.isLock) {
+          network.lockElement(newGroup);
+        } else {
+          network.unlockElement(newGroup);
+        }
       } else if (id === '3') {
         network.removeElements(newGroup);
       }
@@ -422,9 +424,6 @@ if (body) {
     const nodesObj = network.getNodeObj();
     sign = event.deltaY > 0 ? 1 : -1;
     const zoomNum = _.add(1, _.multiply(0.04, sign));
-    // _.each(nodesObj, (node: any) => {
-    //   node.scale.set(_.multiply(node.scale.x, zoomNum));
-    // });
     if (labelToggle) {
       if (network.getZoom() < 1) {
         network.nodeLabelToggle(false);
