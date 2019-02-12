@@ -7,8 +7,8 @@
 
 import * as _ from 'lodash';
 import Viewport from 'pixi-viewport';
-import * as Rx from 'rxjs';
-import { debounceTime, windowWhen } from 'rxjs/operators';
+// import * as Rx from 'rxjs';
+// import { debounceTime, windowWhen } from 'rxjs/operators';
 import { Group } from './group';
 
 export class Application extends PIXI.Application {
@@ -60,12 +60,12 @@ export class Application extends PIXI.Application {
 
   public fitWrapperSize() {
     this.autoResizeByWrapperBoundings();
-    Rx.
-      fromEvent(window, 'resize').
-      pipe(debounceTime(500)).
-      subscribe(() => {
-        this.autoResizeByWrapperBoundings();
-      });
+    // Rx.
+    //   fromEvent(window, 'resize').
+    //   pipe(debounceTime(500)).
+    //   subscribe(() => {
+    //     this.autoResizeByWrapperBoundings();
+    //   });
   }
 
   public autoResizeByWrapperBoundings() {

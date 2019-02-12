@@ -193,7 +193,7 @@ _.each(devices, (device: any) => {
           });
         } else if (id === '2') {
           node.iconWidth = 40;
-          node.iconHeight  = 60;
+          node.iconHeight = 60;
           node.changeIcon('group');
         } else if (id === '3') {
           const selectNodes = network.getSelectedNodes();
@@ -261,6 +261,7 @@ _.each(links, (link) => {
         { label: 'Select its neighbors', id: '0' },
         { label: 'Hide/Unhide this links', id: '1' },
         { label: 'Print line Info', id: '2' },
+        { label: 'Remove Link', id: '3' },
       ]);
       network.menu.menuOnAction = (id) => {
         if (id === '0') {
@@ -273,7 +274,10 @@ _.each(links, (link) => {
         } else if (id === '1') {
           network.removeElements(edge);
         } else if (id === '2') {
-          // console.log(edge);
+          // tslint:disable-next-line:no-console
+          console.log(_.size(network.getEdgeObj()));
+        } else if (id === '3') {
+          network.removeElements(edge);
         }
       };
       network.menu.setClass('popMenu');

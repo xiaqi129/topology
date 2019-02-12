@@ -64,14 +64,6 @@ export class Network {
       this.load.add(icon.name, icon.url);
     });
     this.load.load();
-    // this.load.load((loader: any, resources: any) => {
-    //   _.each(resources, (resource) => {
-    //     if (iconList[resource.name]) {
-    //       resource.texture.iconWidth = iconList[resource.name].width;
-    //       resource.texture.iconHeight = iconList[resource.name].height;
-    //     }
-    //   });
-    // });
   }
 
   public createNode(iconName?: string) {
@@ -174,10 +166,12 @@ export class Network {
     _.remove(elements, (elem: CommonElement) => {
       return element === elem;
     });
-    if (element instanceof Edge) {
+    if (element instanceof Node) {
+      element.removeChildren(0, element.children.length);
+      element.labelContent = '';
+    } else {
       element.destroy();
     }
-    element.removeChildren(0, element.children.length);
   }
 
   public setDrag() {

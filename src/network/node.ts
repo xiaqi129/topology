@@ -19,6 +19,7 @@ export class Node extends CommonElement {
   public isLock: boolean = false;
   public incluedGroups: Group[] = [];
   public iconWidth: number = 20;
+  public labelContent: string = '';
   public iconHeight: number = 20;
   private parentNode: Group | null = null;
   private data: any;
@@ -27,7 +28,6 @@ export class Node extends CommonElement {
   private dragging: boolean;
   private last: any;
   private tooltip: Tooltip;
-  private labelContent: string = '';
   private labelStyle: {} = {};
   private icon: any;
 
@@ -295,10 +295,10 @@ export class Node extends CommonElement {
     }));
     const oldLabel = this.getChildByName('node_label');
     if (oldLabel) {
-      (oldLabel as any).setText(content || this.getUID());
+      (oldLabel as any).setText(content);
       this.labelContent = (oldLabel as any).text;
     } else {
-      const label = new Label(content || this.getUID(), this.labelStyle);
+      const label = new Label(content, this.labelStyle);
       label.name = 'node_label';
       this.addChild(label);
       this.labelContent = label.text;
