@@ -27,11 +27,11 @@ const rgb2hex = (rgb: any) => {
 };
 
 // const network = new Network('network');
-// network.addIconResource(iconResource);
-// const num = 20;
+// network.initIconResource(iconResource);
+// const num = 3000;
 // for (let i: number = 0, len: number = num; i < len;) {
 //   i += 1;
-//   const node = network.createNode('router');
+//   const node = network.createNode('routerSVG');
 //   network.addElement(node);
 //   node.x = Math.random() * 1800;
 //   node.y = Math.random() * 900;
@@ -40,17 +40,17 @@ const rgb2hex = (rgb: any) => {
 // for (let i: number = 0, len: number = num; i < len;) {
 //   const srcNode = nodes[i];
 //   const destNode = nodes[i + 1];
-//   for (let j = 0; j < 4;) {
+//   for (let j = 0; j < 1;) {
 //     const edge = network.createEdge(srcNode, destNode);
 //     edge.setStyle({
 //       arrowColor: 0Xc71bd3,
 //       arrowLength: 15,
-//       arrowType: 0,
+//       arrowType: 3,
 //       arrowWidth: 1,
 //       fillArrow: true,
 //       lineColor: 0xC7254E,
 //       lineDistance: 5,
-//       lineType: 1,
+//       lineType: 0,
 //       lineWidth: 1,
 //     });
 //     network.addElement(edge);

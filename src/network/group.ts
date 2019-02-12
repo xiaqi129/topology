@@ -29,9 +29,9 @@ export class Group extends CommonElement {
   public centerPoint: any[] = [];
   public isLock: boolean = false;
   public expandedVisibleNodes: any[] = [];
+  public superstratumInfo: Group[] = [];
+  public substratumInfo: Group[] = [];
   private toggleExpanded: boolean = false;
-  private superstratumInfo: Group[] = [];
-  private substratumInfo: Group[] = [];
   private positionList: IPosition[] = [];
   private elements: Edge | CommonElement[];
   private polygonHullOutlineName: string = _.uniqueId('hull_outline_');

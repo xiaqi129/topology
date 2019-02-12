@@ -342,6 +342,7 @@ export class CommonAction {
       element.addChild(lock);
     } else if (element instanceof Group) {
       const nodes = element.expandedVisibleNodes;
+      const substratumGroups = element.substratumInfo;
       const graph = _.find(element.children, (g) => {
         return g instanceof PIXI.Graphics;
       });
@@ -362,6 +363,15 @@ export class CommonAction {
         graph.off('mousemove');
         element.isLock = true;
       }
+      _.each(substratumGroups, (group) => {
+        const back = _.find(group.children, (g) => {
+          return g instanceof PIXI.Graphics;
+        });
+        if (back) {
+          back.off('mousemove');
+          group.isLock = true;
+        }
+      });
     }
   }
 
@@ -375,6 +385,7 @@ export class CommonAction {
       lock.destroy();
     } else if (element instanceof Group) {
       const nodes = element.expandedVisibleNodes;
+      const substratumGroups = element.substratumInfo;
       const graph = _.find(element.children, (g) => {
         return g instanceof PIXI.Graphics;
       });
@@ -390,6 +401,15 @@ export class CommonAction {
         graph.on('mousemove', element.onDragMove.bind(element));
         element.isLock = false;
       }
+      _.each(substratumGroups, (group) => {
+        const back = _.find(group.children, (g) => {
+          return g instanceof PIXI.Graphics;
+        });
+        if (back) {
+          back.on('mousemove', group.onDragMove.bind(group));
+          group.isLock = false;
+        }
+      });
     }
   }
 
