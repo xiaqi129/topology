@@ -31,6 +31,8 @@ export class Group extends CommonElement {
   public expandedVisibleNodes: any[] = [];
   public superstratumInfo: Group[] = [];
   public substratumInfo: Group[] = [];
+  public labelContent: string = '';
+  private labelStyle: any;
   private toggleExpanded: boolean = false;
   private positionList: IPosition[] = [];
   private elements: Edge | CommonElement[];
@@ -49,6 +51,7 @@ export class Group extends CommonElement {
   constructor(elements: Edge | CommonElement[]) {
     super();
     this.elements = elements;
+    this.labelStyle = {};
     this.draw();
     document.addEventListener('mouseup', this.onDragEnd.bind(this));
   }
@@ -634,16 +637,28 @@ export class Group extends CommonElement {
 
     return labelPos;
   }
-
+  // Set Group Label
   public setLabel(content?: string, position?: string, style?: PIXI.TextStyleOptions) {
     const vertexPointsNumber = this.getGroupVertexNumber();
     if (this.width !== 0 && vertexPointsNumber.length > 0) {
+      if (style) {
+        this.labelStyle = style;
+      }
       const size = _.floor(this.width / 25) + 1;
-      const labelStyleOptions = {
+      _.extend(this.labelStyle, ({
+        fontFamily: 'Arial Black',
+        fill: [
+          '#1243eb',
+          '#0061c1',
+          '#0000fd',
+          'black',
+        ],
         fontSize: size,
-        fontWeight: 'bold',
-      };
-      const label = new Label(content || undefined, style || labelStyleOptions);
+        letterSpacing: 2,
+        stroke: 'white',
+        whiteSpace: 'normal',
+      }));
+      const label = new Label(content || undefined, this.labelStyle);
       label.setPosition(4);
       label.name = 'group_label';
       label.alpha = 0.8;
@@ -654,13 +669,27 @@ export class Group extends CommonElement {
       label.x = labelPos.x;
       label.y = labelPos.y;
       this.addChild(label);
+      this.labelContent = label.text;
     }
+  }
+
+  public getLabelContent() {
+    return this.labelContent;
+  }
+
+  public getLabelStyle() {
+    return this.labelStyle;
+  }
+
+  public getLabelPosition() {
+    return this.labelPosition;
   }
 
   public setLabelText(content: string) {
     const label: any = this.getChildByName('group_label');
     if (label) {
       label.setText(content);
+      this.labelContent = content;
     }
   }
 
@@ -699,6 +728,6 @@ export class Group extends CommonElement {
       const targetNodeId = edge.getTargetNode().getUID();
       return _.join([srcNodeId, targetNodeId].sort());
     }));
-
   }
+
 }

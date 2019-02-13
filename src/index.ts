@@ -192,9 +192,9 @@ _.each(devices, (device: any) => {
             group.draw();
           });
         } else if (id === '2') {
-          node.iconWidth = 40;
-          node.iconHeight = 60;
-          node.changeIcon('group');
+          // node.iconWidth = 40;
+          // node.iconHeight = 60;
+          node.changeIcon('cisco-18');
         } else if (id === '3') {
           const selectNodes = network.getSelectedNodes();
           _.each(selectNodes, (selectNode) => {
@@ -312,6 +312,7 @@ _.each(groupsList, (group) => {
       { label: 'Extened a group', id: '1' },
       { label: 'Lock/Unlock Group', id: '2' },
       { label: 'Remove Group', id: '3' },
+      { label: 'Debug', id: '4' },
     ]);
     network.menu.menuOnAction = (id) => {
       if (id === '0') {
@@ -329,6 +330,9 @@ _.each(groupsList, (group) => {
         }
       } else if (id === '3') {
         network.removeElements(newGroup);
+      } else if (id === '4') {
+        // tslint:disable-next-line:no-console
+        console.log(newGroup);
       }
     };
     network.menu.setClass('popMenu');
@@ -348,6 +352,7 @@ const dragOrSelect = document.querySelector('button.btn_dragOrSelect');
 const tooltipToggle = document.querySelector('button.btn_tooltipToggle');
 const bundleToggle = document.querySelector('button.btn_bundleLabelToggle');
 const nodeLabelToggle = document.querySelector('button.btn_nodeLabelToggle');
+const groupLabelToggle = document.querySelector('button.btn_groupLabelToggle');
 const searchNode = document.querySelector('button.btn_search_node');
 if (zoomIn) {
   zoomIn.addEventListener('click', () => {
@@ -410,6 +415,14 @@ if (bundleToggle) {
   bundleToggle.addEventListener('click', () => {
     bundleLabelToggle = !bundleLabelToggle;
     network.setBundelExpanded(bundleLabelToggle);
+  });
+}
+
+let grouptitleToggle = true;
+if (groupLabelToggle) {
+  groupLabelToggle.addEventListener('click', () => {
+    grouptitleToggle = !grouptitleToggle;
+    network.groupLabelToggle(grouptitleToggle);
   });
 }
 if (searchNode) {

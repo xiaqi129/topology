@@ -239,6 +239,17 @@ export class Network {
     });
   }
 
+  public groupLabelToggle(labelToggle: boolean) {
+    const groups = this.getGroupObj();
+    _.each(groups, (group: Group) => {
+      if (labelToggle) {
+        group.setLabel(group.getLabelContent(), group.getLabelPosition(), group.getLabelStyle());
+      } else {
+        group.removeChild(group.getChildByName('group_label'));
+      }
+    });
+  }
+
   public bundleLabelToggle() {
     this.action.bundleLabelToggle();
   }
