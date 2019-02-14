@@ -89,15 +89,12 @@ const links = topoData.links;
 const groups = topoData.groups;
 const groupsList = keySort(groups);
 // create Node
-const labelStyle = {
-  fontSize: '0.6em',
-  fill: 'red',
-};
 _.each(devices, (device: any) => {
   const client = device.clients.User_Mark;
   if (!(client === 'Hidden')) {
     const node = network.createNode('routerSVG');
     node.name = device.name;
+    node.clients = device.clients;
     node.iconWidth = 20;
     node.iconHeight = 20;
     const tooltipContent = `
@@ -353,6 +350,7 @@ const tooltipToggle = document.querySelector('button.btn_tooltipToggle');
 const bundleToggle = document.querySelector('button.btn_bundleLabelToggle');
 const nodeLabelToggle = document.querySelector('button.btn_nodeLabelToggle');
 const groupLabelToggle = document.querySelector('button.btn_groupLabelToggle');
+const linkLabelToggle = document.querySelector('button.btn_linkLabelToggle');
 const searchNode = document.querySelector('button.btn_search_node');
 if (zoomIn) {
   zoomIn.addEventListener('click', () => {
@@ -418,11 +416,24 @@ if (bundleToggle) {
   });
 }
 
+if (linkLabelToggle) {
+  linkLabelToggle.addEventListener('click', () => {
+    network.getSelectEdge();
+  });
+}
+
 let grouptitleToggle = true;
 if (groupLabelToggle) {
   groupLabelToggle.addEventListener('click', () => {
     grouptitleToggle = !grouptitleToggle;
-    network.groupLabelToggle(grouptitleToggle);
+    const node = network.getNodeObj();
+    _.each(node, (n: any) => {
+      if (grouptitleToggle) {
+        n.setLabelText(n.name);
+      } else {
+        n.setLabelText(n.clients.User_Role);
+      }
+    });
   });
 }
 if (searchNode) {

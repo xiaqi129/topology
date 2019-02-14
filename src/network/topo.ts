@@ -37,6 +37,12 @@ export interface ITopo {
 
   removeSelectedNodes(): void;
 
+  setSelectedEdge(element: CommonElement): void;
+
+  getSelectedEdge(): Edge | undefined;
+
+  removeSelectedEdge(): void;
+
   removeEdgeBundleByName(name: string): void;
 
 }
@@ -46,6 +52,8 @@ export class Topo implements ITopo {
   public loader: PIXI.loaders.Loader | null = null;
 
   private selectedNodes: Node[] = [];
+
+  private selectedEdge: Edge | undefined;
 
   private elements: any[] = [];
 
@@ -212,5 +220,17 @@ export class Topo implements ITopo {
 
   public removeSelectedNodes() {
     return _.remove(this.selectedNodes);
+  }
+
+  public setSelectedEdge(element: Edge) {
+    this.selectedEdge = element;
+  }
+
+  public getSelectedEdge() {
+    return this.selectedEdge;
+  }
+
+  public removeSelectedEdge() {
+    this.selectedEdge = undefined;
   }
 }

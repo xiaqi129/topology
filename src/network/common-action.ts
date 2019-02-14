@@ -94,6 +94,15 @@ export class CommonAction {
     this.topo.setSelectedNodes(node);
   }
 
+  public getSelectEdge() {
+    const selectEdge = this.topo.getSelectedEdge();
+    return selectEdge;
+  }
+
+  public setSelectEdge(edge: Edge) {
+    this.topo.setSelectedEdge(edge);
+  }
+
   public removeSelectNodes() {
     this.cleanEdge();
     this.cleanNode();
@@ -171,18 +180,20 @@ export class CommonAction {
       } else if (element instanceof Edge) {
         this.defaultLineColor = element.defaultStyle.lineColor;
         element.addEventListener('mousedown', (event: PIXI.interaction.InteractionEvent) => {
+          event.stopPropagation();
           this.cleanEdge();
           this.cleanNode();
-          event.stopPropagation();
+          this.topo.setSelectedEdge(element);
           element.selectOn();
         });
       } else if (element instanceof EdgeBundle) {
         _.each(element.children, (edges: any) => {
           this.defaultLineColor = edges.defaultStyle.lineColor;
           edges.addEventListener('mousedown', (event: PIXI.interaction.InteractionEvent) => {
+            event.stopPropagation();
             this.cleanEdge();
             this.cleanNode();
-            event.stopPropagation();
+            this.topo.setSelectedEdge(edges);
             edges.selectOn();
           });
         });
@@ -243,6 +254,7 @@ export class CommonAction {
   }
 
   public cleanEdge() {
+    this.topo.removeSelectedEdge();
     _.each(this.container.children, (ele) => {
       if (ele instanceof Edge) {
         ele.setStyle({

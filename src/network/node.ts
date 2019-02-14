@@ -21,6 +21,7 @@ export class Node extends CommonElement {
   public iconWidth: number = 20;
   public labelContent: string = '';
   public iconHeight: number = 20;
+  public clients: {} = {};
   private parentNode: Group | null = null;
   private data: any;
   private elements: Edge | CommonElement[];
@@ -278,21 +279,23 @@ export class Node extends CommonElement {
     this.tooltip.addTooltip(this, content || this.getUID(), style);
   }
 
+  // Set Node Label
   public setLabel(content?: string, style?: PIXI.TextStyleOptions) {
-    if (style) {
-      this.labelStyle = style;
-    }
-    _.extend(this.labelStyle, ({
+    this.labelStyle = {
       fontFamily: 'Arial',
       fontSize: '0.6em',
       fontWeight: 'bold',
       fill: ['#ffffff', '#0099ff'],
-      stroke: '#4a1850',
+      lineJoin: 'round',
+      miterLimit: 2,
       strokeThickness: 3,
       breakWords: true,
       wordWrap: true,
       wordWrapWidth: 44,
-    }));
+    };
+    if (style) {
+      _.extend(this.labelStyle, style);
+    }
     const oldLabel = this.getChildByName('node_label');
     if (oldLabel) {
       (oldLabel as any).setText(content);
@@ -311,6 +314,14 @@ export class Node extends CommonElement {
 
   public getLabelStyle() {
     return this.labelStyle;
+  }
+
+  public setLabelText(content: string) {
+    const label: any = this.getChildByName('node_label');
+    if (label) {
+      label.setText(content);
+      this.labelContent = content;
+    }
   }
 
   public changeIcon(icon: string) {

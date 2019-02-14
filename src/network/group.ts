@@ -641,11 +641,8 @@ export class Group extends CommonElement {
   public setLabel(content?: string, position?: string, style?: PIXI.TextStyleOptions) {
     const vertexPointsNumber = this.getGroupVertexNumber();
     if (this.width !== 0 && vertexPointsNumber.length > 0) {
-      if (style) {
-        this.labelStyle = style;
-      }
       const size = _.floor(this.width / 25) + 1;
-      _.extend(this.labelStyle, ({
+      this.labelStyle = {
         fontFamily: 'Arial Black',
         fill: [
           '#1243eb',
@@ -657,7 +654,10 @@ export class Group extends CommonElement {
         letterSpacing: 2,
         stroke: 'white',
         whiteSpace: 'normal',
-      }));
+      };
+      if (style) {
+        _.extend(this.labelStyle, style);
+      }
       const label = new Label(content || undefined, this.labelStyle);
       label.setPosition(4);
       label.name = 'group_label';

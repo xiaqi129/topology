@@ -63,12 +63,6 @@ export class PopMenu {
       const idList: any = [];
       const selectElement = event.target.parent;
       const selectedNodes = this.action.getSelectNodes();
-      // let isInSelect;
-      // if (selectedNodes.length > 0) {
-      //   isInSelect = _.find(selectedNodes, (node) => {
-      //     return node === selectElement;
-      //   });
-      // }
       if (selectElement instanceof Node) {
         if (selectedNodes.length < 2) {
           this.action.removeSelectNodes();
@@ -77,6 +71,8 @@ export class PopMenu {
           this.action.setSelectNodes(selectElement);
         }
       } else if (selectElement instanceof Edge) {
+        this.action.removeSelectNodes();
+        this.action.setSelectEdge(selectElement);
         selectElement.selectOn();
       }
       _.each(this.menuItems, (menu: any) => {

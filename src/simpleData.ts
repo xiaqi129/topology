@@ -18390,7 +18390,7 @@ export const data = {
       'clients': {
         'root_switch': '',
         'icon_changed': false,
-        'User_Role': '',
+        'User_Role': 'aaaa',
         'User_City': 'Kuala Lumpur',
         'device_source': 'from Static',
         'tooltip': '172.17.16.134',
@@ -18431,7 +18431,7 @@ export const data = {
       'clients': {
         'root_switch': '',
         'icon_changed': true,
-        'User_Role': '',
+        'User_Role': 'aaaa',
         'User_City': 'Kuala Lumpur',
         'device_source': 'from Static',
         'tooltip': '172.17.26.22',
@@ -18470,7 +18470,7 @@ export const data = {
       'clients': {
         'root_switch': '',
         'icon_changed': false,
-        'User_Role': '',
+        'User_Role': 'ffff',
         'User_City': 'Kuala Lumpur',
         'device_source': 'from dmvpn',
         'tooltip': '192.168.23.101',
@@ -18511,7 +18511,7 @@ export const data = {
       'clients': {
         'root_switch': '',
         'icon_changed': false,
-        'User_Role': '',
+        'User_Role': 'ssss',
         'User_City': 'Kuala Lumpur',
         'device_source': 'from dmvpn',
         'tooltip': '192.168.23.100',
@@ -18552,7 +18552,7 @@ export const data = {
       'clients': {
         'root_switch': '',
         'icon_changed': false,
-        'User_Role': '',
+        'User_Role': 'ddddd',
         'User_City': 'Kuala Lumpur',
         'device_source': 'from dmvpn',
         'tooltip': '192.168.23.105',
@@ -18593,7 +18593,7 @@ export const data = {
       'clients': {
         'root_switch': '',
         'icon_changed': false,
-        'User_Role': '',
+        'User_Role': 'fafaf',
         'User_City': 'Kuala Lumpur',
         'device_source': 'from dmvpn',
         'tooltip': '192.168.23.104',
@@ -18635,7 +18635,7 @@ export const data = {
       'clients': {
         'root_switch': '',
         'icon_changed': false,
-        'User_Role': '',
+        'User_Role': 'fafa',
         'User_City': 'Kuala Lumpur',
         'device_source': 'from dmvpn',
         'tooltip': '192.168.23.106',
@@ -18677,7 +18677,7 @@ export const data = {
       'clients': {
         'root_switch': '',
         'icon_changed': false,
-        'User_Role': '',
+        'User_Role': 'fafaf',
         'User_City': 'Kuala Lumpur',
         'device_source': 'from Static',
         'tooltip': '172.17.18.166',
@@ -22511,7 +22511,7 @@ export const data = {
       'clients': {
         'root_switch': '',
         'icon_changed': false,
-        'User_Role': '',
+        'User_Role': 'aaaaa',
         'User_City': 'Kuala Lumpur',
         'device_source': 'from subnet',
         'tooltip': '192.168.16.0/24',

@@ -206,6 +206,15 @@ export class Network {
     this.topo.setSelectedNodes(node);
   }
 
+  public setSelectEdge(edge: Edge) {
+    this.topo.setSelectedEdge(edge);
+  }
+
+  public getSelectEdge() {
+    const selectEdge = this.topo.getSelectedEdge();
+    return selectEdge;
+  }
+
   public clearHighlight() {
     this.action.cleanEdge();
     this.action.cleanNode();
