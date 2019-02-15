@@ -20,6 +20,7 @@ export class Edge extends CommonElement {
   public endNode: any;
   public edge: PIXI.Graphics;
   public arrow: PIXI.Graphics;
+  public defalultColor: number = 0;
   public bundleExplosion: boolean = false;
   private brotherEdges: Edge[] = [];
   private brotherEdgeName: string = 'BROTHER_EDGE';
@@ -245,6 +246,7 @@ export class Edge extends CommonElement {
     if (redraw) {
       this.draw();
     }
+    this.defalultColor = this.defaultStyle.lineColor;
   }
 
   public getStyle() {
@@ -506,11 +508,11 @@ export class Edge extends CommonElement {
   }
 
   public selectOn() {
-    this.setStyle(
-      {
-        fillColor: 0X024997,
-        lineColor: 0X024997,
-      });
+    const highLight = {
+      lineColor: 0X024997,
+    };
+    _.extend(this.defaultStyle, highLight);
+    this.draw();
   }
 
   public drawLineEdge(

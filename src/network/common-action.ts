@@ -227,15 +227,13 @@ export class CommonAction {
         }
         if (element instanceof Edge) {
           element.setStyle({
-            fillColor: this.defaultLineColor,
-            lineColor: this.defaultLineColor,
+            lineColor: element.defalultColor,
           });
         }
         if (element instanceof EdgeBundle) {
           _.each(element.children, (edges: any) => {
             edges.setStyle({
-              fillColor: this.defaultLineColor,
-              lineColor: this.defaultLineColor,
+              lineColor: edges.defalultColor,
             });
           });
         }
@@ -243,8 +241,7 @@ export class CommonAction {
           _.each(element.children, (node) => {
             if (node instanceof GroupEdge) {
               node.setStyle({
-                fillColor: this.defaultLineColor,
-                lineColor: this.defaultLineColor,
+                lineColor: node.defalultColor,
               });
             }
           });
@@ -258,15 +255,13 @@ export class CommonAction {
     _.each(this.container.children, (ele) => {
       if (ele instanceof Edge) {
         ele.setStyle({
-          fillColor: this.defaultLineColor,
-          lineColor: this.defaultLineColor,
+          lineColor: ele.defalultColor,
         });
       }
       if (ele instanceof EdgeBundle) {
         _.each(ele.children, (edge: any) => {
           edge.setStyle({
-            fillColor: this.defaultLineColor,
-            lineColor: this.defaultLineColor,
+            lineColor: edge.defalultColor,
           });
         });
       }
@@ -274,8 +269,7 @@ export class CommonAction {
         _.each(ele.children, (groupedge) => {
           if (groupedge instanceof GroupEdge) {
             groupedge.setStyle({
-              fillColor: this.defaultLineColor,
-              lineColor: this.defaultLineColor,
+              lineColor: groupedge.defalultColor,
             });
           }
         });
@@ -336,6 +330,7 @@ export class CommonAction {
     this.cleanNode();
     this.setZoom(2);
     this.container.moveCenter(node.x, node.y);
+    this.container.setChildIndex(node, this.container.children.length - 1);
     node.selectOn(clickColor);
   }
 

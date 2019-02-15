@@ -47,7 +47,7 @@ export class EdgeBundle extends CommonElement {
       this.removeChildren(0, this.children.length);
       const afterBundle = new Edge(this.startNode, this.endNode);
       afterBundle.setStyle(this.style);
-      if (this.bundleLabelFlag) {
+      if (this.bundleLabelFlag && this.bundleData[bundleId]) {
         const label = new Label(`(${this.bundleData[bundleId].length})`);
         label.name = 'bundle_label';
         label.setPosition(4);

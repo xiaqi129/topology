@@ -418,7 +418,10 @@ if (bundleToggle) {
 
 if (linkLabelToggle) {
   linkLabelToggle.addEventListener('click', () => {
-    network.getSelectEdge();
+    const edges = network.getEdgeObj();
+    _.each(edges, (edge: any) => {
+      edge.visible = false;
+    });
   });
 }
 

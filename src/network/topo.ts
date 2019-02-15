@@ -78,9 +78,9 @@ export class Topo implements ITopo {
   // find brother edge not in edge bundle
   public findBrotherEdge(edge: Edge) {
     const edgesFound: Edge[] = _.get(this.edgesGroupByNodes, edge.edgeNodesSortUIDStr(), []);
-    _.remove(edgesFound, (edgeFound: Edge) => {
-      return edgeFound.parent && (edgeFound.parent instanceof EdgeBundle);
-    });
+    // _.remove(edgesFound, (edgeFound: Edge) => {
+    //   return edgeFound.parent instanceof EdgeBundle;
+    // });
     return edgesFound;
   }
 
