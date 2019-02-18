@@ -94,49 +94,119 @@ export class Edge extends CommonElement {
 
   public calcEdgePoints(start: any, end: any, lineWidth: number) {
     const half = lineWidth * 0.5;
+    const breakNum = 21;
+    const breakLength = 5;
+    const pointsList = [];
+    const angle = this.getAngle();
+    const breakX = breakLength * Math.sin(angle);
+    const breakY = breakLength * Math.cos(angle);
+    const distanceX = Math.abs(start.x - end.x) / breakNum - Math.abs(breakX);
+    const distanceY = Math.abs(start.y - end.y) / breakNum - Math.abs(breakY);
     let sLeft = {};
     let sRight = {};
-    let eRight = {};
-    let eLeft = {};
-    const sX = start.x;
-    const sY = start.y;
+    let eRight: any = {};
+    let eLeft: any = {};
+    let sX = start.x;
+    let sY = start.y;
     const eX = end.x;
     const eY = end.y;
     const results: any = {};
-
-    if ((sX < eX && sY < eY) ||
-      (sX > eX && sY > eY)) {
-      sLeft = new Point(sX - half, sY + half);
-      sRight = new Point(sX + half, sY - half);
-      eRight = new Point(eX + half, eY - half);
-      eLeft = new Point(eX - half, eY + half);
-    } else if ((sX > eX && sY < eY) ||
-      (sX < eX && sY > eY)) {
-      sLeft = new Point(sX - half, sY - half);
-      sRight = new Point(sX + half, sY + half);
-      eRight = new Point(eX + half, eY + half);
-      eLeft = new Point(eX - half, eY - half);
-    } else if (sX === eX &&
-      (sY > eY || sY < eY)) {
-      sLeft = new Point(sX - half, sY);
-      sRight = new Point(sX + half, sY);
-      eRight = new Point(eX + half, eY);
-      eLeft = new Point(eX - half, eY);
-
-    } else if (sY === eY &&
-      (sX < eX || sX > eX)) {
-      sLeft = new Point(sX, sY + half);
-      sRight = new Point(sX, sY - half);
-      eRight = new Point(eX, eY - half);
-      eLeft = new Point(eX, eY + half);
+    if (this.defaultStyle.lineType === 0) {
+      if ((sX < eX && sY < eY) ||
+        (sX > eX && sY > eY)) {
+        sLeft = new Point(sX - half, sY + half);
+        sRight = new Point(sX + half, sY - half);
+        eRight = new Point(eX + half, eY - half);
+        eLeft = new Point(eX - half, eY + half);
+      } else if ((sX > eX && sY < eY) ||
+        (sX < eX && sY > eY)) {
+        sLeft = new Point(sX - half, sY - half);
+        sRight = new Point(sX + half, sY + half);
+        eRight = new Point(eX + half, eY + half);
+        eLeft = new Point(eX - half, eY - half);
+      } else if (sX === eX &&
+        (sY > eY || sY < eY)) {
+        sLeft = new Point(sX - half, sY);
+        sRight = new Point(sX + half, sY);
+        eRight = new Point(eX + half, eY);
+        eLeft = new Point(eX - half, eY);
+      } else if (sY === eY &&
+        (sX < eX || sX > eX)) {
+        sLeft = new Point(sX, sY + half);
+        sRight = new Point(sX, sY - half);
+        eRight = new Point(eX, eY - half);
+        eLeft = new Point(eX, eY + half);
+      }
+      results.sLeft = sLeft;
+      results.sRight = sRight;
+      results.eRight = eRight;
+      results.eLeft = eLeft;
+      pointsList.push(results);
+    } else {
+      for (let index = 0; index < breakNum; index = index + 1) {
+        const result: any = {};
+        if (sX > eX && sY > eY && (sX - distanceX > eX) && (sY - distanceY > eY)) {
+          sLeft = new Point(sX - half, sY + half);
+          sRight = new Point(sX + half, sY - half);
+          eRight = new Point(sX + half - distanceX, sY - half - distanceY);
+          eLeft = new Point(sX - half - distanceX, sY + half - distanceY);
+          sX = sX - distanceX - breakX;
+          sY = sY - distanceY - breakY;
+        } else if (sX < eX && sY < eY && (sX + distanceX < eX) && (sY + distanceY < eY)) {
+          sLeft = new Point(sX - half, sY + half);
+          sRight = new Point(sX + half, sY - half);
+          eRight = new Point(sX + half + distanceX, sY - half + distanceY);
+          eLeft = new Point(sX - half + distanceX, sY + half + distanceY);
+          sX = sX + distanceX - breakX;
+          sY = sY + distanceY - breakY;
+        } else if (sX > eX && sY < eY && (sX - distanceX > eX) && (sY + distanceY < eY)) {
+          sLeft = new Point(sX - half, sY - half);
+          sRight = new Point(sX + half, sY + half);
+          eRight = new Point(sX + half - distanceX, sY + half + distanceY);
+          eLeft = new Point(sX - half - distanceX, sY - half + distanceY);
+          sX = sX - distanceX - breakX;
+          sY = sY + distanceY - breakY;
+        } else if (sX < eX && sY > eY && (sX + distanceX < eX) && (sY - distanceY > eY)) {
+          sLeft = new Point(sX - half, sY - half);
+          sRight = new Point(sX + half, sY + half);
+          eRight = new Point(sX + half + distanceX, sY + half - distanceY);
+          eLeft = new Point(sX - half + distanceX, sY - half - distanceY);
+          sX = sX + distanceX - breakX;
+          sY = sY - distanceY - breakY;
+        } else if (sX === eX && sY > eY && (sY - distanceY > eY)) {
+          sLeft = new Point(sX - half, sY);
+          sRight = new Point(sX + half, sY);
+          eRight = new Point(eX + half, sY - distanceY);
+          eLeft = new Point(eX - half, sY - distanceY);
+          sY = sY - distanceY - breakY;
+        } else if (sX === eX && sY < eY && (sY + distanceY < eY)) {
+          sLeft = new Point(sX - half, sY);
+          sRight = new Point(sX + half, sY);
+          eRight = new Point(eX + half, sY + distanceY);
+          eLeft = new Point(eX - half, sY + distanceY);
+          sY = sY + distanceY - breakY;
+        } else if (sY === eY && sX < eX && (sX + distanceX < eX)) {
+          sLeft = new Point(sX, sY + half);
+          sRight = new Point(sX, sY - half);
+          eRight = new Point(sX + distanceX, eY - half);
+          eLeft = new Point(sX + distanceX, eY + half);
+          sX = sX + distanceX - breakX;
+        } else if (sY === eY && sX > eX && (sX - distanceX > eX)) {
+          sLeft = new Point(sX, sY + half);
+          sRight = new Point(sX, sY - half);
+          eRight = new Point(sX - distanceX, eY - half);
+          eLeft = new Point(sX - distanceX, eY + half);
+          sX = sX - distanceX - breakX;
+        }
+        result.sLeft = sLeft;
+        result.sRight = sRight;
+        result.eRight = eRight;
+        result.eLeft = eLeft;
+        pointsList.push(result);
+      }
     }
 
-    results.sLeft = sLeft;
-    results.sRight = sRight;
-    results.eRight = eRight;
-    results.eLeft = eLeft;
-
-    return results;
+    return pointsList;
   }
 
   public drawEdge(graph: any, points: any) {
@@ -149,6 +219,20 @@ export class Edge extends CommonElement {
     graph.lineTo(points.eRight.x, points.eRight.y);
     graph.lineTo(points.eLeft.x, points.eLeft.y);
     graph.endFill();
+  }
+
+  public drawImaginaryLink(graph: any, points: any) {
+    const style = this.defaultStyle;
+    graph.interactive = true;
+    _.each(points, (point) => {
+      graph.lineStyle(style.lineWidth, style.lineColor);
+      graph.beginFill(style.lineColor, style.fillOpacity);
+      graph.moveTo(point.sLeft.x, point.sLeft.y);
+      graph.lineTo(point.sRight.x, point.sRight.y);
+      graph.lineTo(point.eRight.x, point.eRight.y);
+      graph.lineTo(point.eLeft.x, point.eLeft.y);
+      graph.endFill();
+    });
   }
 
   public edgeLength(sx: number, sy: number, ex: number, ey: number) {
@@ -351,8 +435,15 @@ export class Edge extends CommonElement {
 
   public createLinkEdge(srcNodePos: any, endNodePos: any, style: any) {
     const points = this.calcEdgePoints(
-      srcNodePos, endNodePos, style.lineWidth);
+      srcNodePos, endNodePos, style.lineWidth)[0];
     this.drawEdge(this.edge, points);
+    return this.edge;
+  }
+
+  public createImaginaryEdge(srcNodePos: any, endNodePos: any, style: any) {
+    const points = this.calcEdgePoints(
+      srcNodePos, endNodePos, style.lineWidth);
+    this.drawImaginaryLink(this.edge, points);
     return this.edge;
   }
 
@@ -555,6 +646,19 @@ export class Edge extends CommonElement {
     return [edgeRelated[0], arrow];
   }
 
+  public drawImaginaryEdge(
+    srcNodePos: any,
+    endNodePos: any,
+    style: any,
+  ) {
+    const srcNodePosAdjusted =
+      this.getParallelPoint(srcNodePos, this.defaultStyle.lineDistance, this.getAngle());
+    const endNodePosAdjusted =
+      this.getParallelPoint(endNodePos, this.defaultStyle.lineDistance, this.getAngle());
+    const edge = this.createImaginaryEdge(srcNodePosAdjusted, endNodePosAdjusted, style);
+    return [edge];
+  }
+
   public draw() {
     this.clearEdgeRelatedGraph();
     const style = this.defaultStyle;
@@ -579,8 +683,10 @@ export class Edge extends CommonElement {
     let elements: DisplayObject[] = [];
     if (style.lineType === 0) {
       elements = this.drawLineEdge(srcNodePos, endNodePos, angle, this.defaultStyle);
-    } else {
+    } else if (style.lineType === 1) {
       elements = this.drawBezierEdge(srcNodePos, endNodePos, this.defaultStyle);
+    } else {
+      elements = this.drawImaginaryEdge(srcNodePos, endNodePos, this.defaultStyle);
     }
     this.addChildren(elements);
     if (this.getChildByName('bundle_label')) {

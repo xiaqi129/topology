@@ -249,7 +249,7 @@ _.each(links, (link) => {
       fillArrow: true,
       lineColor: 0xC7254E,
       lineDistance: 0,
-      lineType: 0,
+      lineType: 2,
       lineWidth: 0.3,
     });
     network.addElement(edge);
@@ -272,7 +272,7 @@ _.each(links, (link) => {
           network.removeElements(edge);
         } else if (id === '2') {
           // tslint:disable-next-line:no-console
-          console.log(_.size(network.getEdgeObj()));
+          console.log(edge);
         } else if (id === '3') {
           network.removeElements(edge);
         }

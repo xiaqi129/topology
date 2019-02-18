@@ -127,7 +127,6 @@ export class Node extends CommonElement {
         _.each(this.selectedNodes, (node) => {
           node.position.x += (newPosition.x - this.last.parents.x);
           node.position.y += (newPosition.y - this.last.parents.y);
-          node.redrawEdge();
         });
         this.last = { parents: newPosition, x: distX, y: distY };
       } else {
