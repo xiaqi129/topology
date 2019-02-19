@@ -230,6 +230,9 @@ export class Network {
       this.drawer.syncView();
       this.action.setClick();
     }
+    if (this.getZoom() < 3) {
+      this.edgeLabelToggle(false);
+    }
   }
 
   public setClick(color?: number) {
@@ -255,6 +258,18 @@ export class Network {
         group.setLabel(group.getLabelContent(), group.getLabelPosition(), group.getLabelStyle());
       } else {
         group.removeChild(group.getChildByName('group_label'));
+      }
+    });
+  }
+
+  public edgeLabelToggle(labelToggle: boolean) {
+    const edges = this.getEdgeObj();
+    _.each(edges, (edge: Edge) => {
+      const srcLabel = edge.getChildByName('edge_srclabel');
+      const endLabel = edge.getChildByName('edge_endlabel');
+      if (srcLabel && endLabel) {
+        srcLabel.visible = labelToggle;
+        endLabel.visible = labelToggle;
       }
     });
   }

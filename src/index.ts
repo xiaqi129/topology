@@ -215,6 +215,19 @@ _.each(devices, (device: any) => {
 
 // create Links
 const nodes = network.getNodeObj();
+const edgeLabel = {
+  fill: [
+    'red',
+    '#be1432',
+  ],
+  fontFamily: 'Times New Roman',
+  // fontSize: 14,
+  fontWeight: 'bold',
+  letterSpacing: 1,
+  lineJoin: 'bevel',
+  stroke: '#800040',
+  strokeThickness: 1,
+};
 _.each(links, (link) => {
   const srcNodeName = link.local_host;
   const destNodeName = link.remote_host;
@@ -249,10 +262,9 @@ _.each(links, (link) => {
       fillArrow: true,
       lineColor: 0xC7254E,
       lineDistance: 0,
-      lineType: 2,
+      lineType: 0,
       lineWidth: 0.3,
     });
-    network.addElement(edge);
     edge.edge.on('rightclick', (event: any) => {
       network.menu.setMenuItems([
         { label: 'Select its neighbors', id: '0' },
@@ -281,6 +293,8 @@ _.each(links, (link) => {
       network.menu.showMenu(event);
     });
     edge.setTooltip(linkTooltipContent, commonStyles);
+    network.addElement(edge);
+    edge.setLabel(link.local_int, link.remote_int);
   }
 });
 _.each(groupsList, (group) => {
@@ -338,9 +352,6 @@ _.each(groupsList, (group) => {
 });
 network.syncView();
 network.setDrag();
-// network.setClick(0X00e5ff);
-// network.setZoom(0.7);
-// network.setZoom(0.6);
 const body = document.getElementById('network');
 const zoomIn = document.querySelector('button.btn_zoomIn');
 const zoomOut = document.querySelector('button.btn_zoomOut');
@@ -415,13 +426,11 @@ if (bundleToggle) {
     network.setBundelExpanded(bundleLabelToggle);
   });
 }
-
+let edgeLabelToggle = true;
 if (linkLabelToggle) {
   linkLabelToggle.addEventListener('click', () => {
-    const edges = network.getEdgeObj();
-    _.each(edges, (edge: any) => {
-      edge.visible = false;
-    });
+    edgeLabelToggle = !edgeLabelToggle;
+    network.edgeLabelToggle(edgeLabelToggle);
   });
 }
 
@@ -460,6 +469,13 @@ if (body) {
         network.nodeLabelToggle(false);
       } else {
         network.nodeLabelToggle(true);
+      }
+    }
+    if (edgeLabelToggle) {
+      if (network.getZoom() < 3) {
+        network.edgeLabelToggle(false);
+      } else {
+        network.edgeLabelToggle(true);
       }
     }
   });

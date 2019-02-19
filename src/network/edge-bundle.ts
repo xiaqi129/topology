@@ -23,6 +23,7 @@ export class EdgeBundle extends CommonElement {
   private startNode: Node;
   private endNode: Node;
   private style: any;
+  private labelContent: any;
 
   constructor(edge: Edge) {
     super();
@@ -55,7 +56,7 @@ export class EdgeBundle extends CommonElement {
         label.y = (this.startNode.y + this.endNode.y) / 2;
         afterBundle.addChild(label);
       } else {
-        this.removeChild(this.getChildByName('node_label'));
+        this.removeChild(this.getChildByName('bundle_label'));
       }
       this.setBundle(afterBundle);
       // add to elements
@@ -63,8 +64,6 @@ export class EdgeBundle extends CommonElement {
         lineType: 0,
       });
       this.addChild(afterBundle);
-      // this.bundleEdge.push(afterBundle);
-      // console.log(this.bundleEdge);
     } else {
       // expand
       this.removeChildren(0, this.children.length);
@@ -115,6 +114,10 @@ export class EdgeBundle extends CommonElement {
     });
     _.each(this.children, (edge, i) => {
       if (edge instanceof Edge) {
+        // const srcLabel = edge.getChildByName('edge_srclabel');
+        // const endLabel = edge.getChildByName('edge_endlabel');
+        // edge.removeChild(srcLabel);
+        // edge.removeChild(endLabel);
         edge.setStyle({
           bezierLineDistance: values[i][0],
           bezierLineDegree: values[i][1],

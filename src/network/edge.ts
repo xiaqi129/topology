@@ -10,6 +10,7 @@ import * as _ from 'lodash';
 import { DisplayObject } from 'pixi.js';
 import { CommonElement, IStyles } from './common-element';
 import { Group } from './group';
+import { Label } from './label';
 import { Node } from './node';
 import { Tooltip } from './tooltip';
 
@@ -22,7 +23,10 @@ export class Edge extends CommonElement {
   public arrow: PIXI.Graphics;
   public defalultColor: number = 0;
   public bundleExplosion: boolean = false;
+  public labelToggle: boolean = false;
   private brotherEdges: Edge[] = [];
+  private labelStyle: any;
+  private labelContent: string[];
   private brotherEdgeName: string = 'BROTHER_EDGE';
   private bundleStyle: number = 1; // 0: link style, 1: bezier style
   private tooltip: Tooltip;
@@ -33,6 +37,8 @@ export class Edge extends CommonElement {
     this.arrow = new PIXI.Graphics();
     this.startNode = startNode;
     this.endNode = endNode;
+    this.labelStyle = {};
+    this.labelContent = [];
     this.draw();
     this.tooltip = new Tooltip();
     // this.setTooltip();
@@ -94,7 +100,7 @@ export class Edge extends CommonElement {
 
   public calcEdgePoints(start: any, end: any, lineWidth: number) {
     const half = lineWidth * 0.5;
-    const breakNum = 21;
+    const breakNum = 15;
     const breakLength = 5;
     const pointsList = [];
     const angle = this.getAngle();
@@ -280,6 +286,8 @@ export class Edge extends CommonElement {
     // const srcPointY = points.shift() - curveDistance * Math.sin(angle);
     const parallelPoint = this.getParallelPoint(
       { x: points.shift(), y: points.shift() }, curveDistance, angle);
+    const srcLabel = this.getChildByName('edge_srclabel');
+    const endLabel = this.getChildByName('edge_endlabel');
     graph.interactive = true;
     graph.beginFill(style.lineColor, style.bezierOacity);
     graph.moveTo(parallelPoint.x, parallelPoint.y);
@@ -291,6 +299,12 @@ export class Edge extends CommonElement {
     points[1] = points[1] - curveDegree * Math.sin(angle);
     points[2] = points[2] + curveDegree * Math.cos(angle);
     points[3] = points[3] - curveDegree * Math.sin(angle);
+    if (srcLabel && endLabel) {
+      srcLabel.x = points[0];
+      srcLabel.y = points[1];
+      endLabel.x = points[2];
+      endLabel.y = points[3];
+    }
     graph.bezierCurveTo.apply(graph, points);
 
     const echoDistance = style.lineWidth * 1.5; // curve width
@@ -689,14 +703,77 @@ export class Edge extends CommonElement {
       elements = this.drawImaginaryEdge(srcNodePos, endNodePos, this.defaultStyle);
     }
     this.addChildren(elements);
-    if (this.getChildByName('bundle_label')) {
-      this.getChildByName('bundle_label').x = (this.startNode.x + this.endNode.x) / 2;
-      this.getChildByName('bundle_label').y = (this.startNode.y + this.endNode.y) / 2;
-    }
+    this.addOthers();
   }
 
   public setTooltip(content?: string, style?: any) {
     this.removeAllListeners();
     this.tooltip.addTooltip(this, content || `${this.startNode.id}  >>>>  ${this.endNode.id}`, style);
+  }
+
+  public addOthers() {
+    const bundleLabel = this.getChildByName('bundle_label');
+    const srcLabel = this.getChildByName('edge_srclabel');
+    const endLabel = this.getChildByName('edge_endlabel');
+    if (bundleLabel) {
+      bundleLabel.x = (this.startNode.x + this.endNode.x) / 2;
+      bundleLabel.y = (this.startNode.y + this.endNode.y) / 2;
+    }
+    if (srcLabel && endLabel) {
+      this.setLabelPosition(srcLabel, endLabel);
+    }
+  }
+
+  public setLabel(srcContent?: string, endContent?: string, style?: PIXI.TextStyleOptions) {
+    if (style) {
+      _.extend(this.labelStyle, style);
+    }
+    this.labelStyle = {
+      fontSize: 6,
+    };
+    if (srcContent && endContent) {
+      if (this.defaultStyle.lineType === 1) {
+        this.draw();
+      }
+      const srcLabel = new Label(srcContent, this.labelStyle);
+      const endLabel = new Label(endContent, this.labelStyle);
+      this.labelContent.push(srcContent);
+      this.labelContent.push(endContent);
+      this.labelContent = _.take(this.labelContent, 2);
+      srcLabel.setPosition(0);
+      endLabel.setPosition(0);
+      srcLabel.name = 'edge_srclabel';
+      endLabel.name = 'edge_endlabel';
+      this.setLabelPosition(srcLabel, endLabel);
+      this.addChild(srcLabel);
+      this.addChild(endLabel);
+
+    }
+  }
+
+  public getLabelContent() {
+    return this.labelContent;
+  }
+
+  public getLabelStyle() {
+    return this.labelStyle;
+  }
+
+  public setLabelPosition(srcLabel: PIXI.DisplayObject, endLabel: PIXI.DisplayObject) {
+    const len = this.edgeLength(this.startNode.x, this.startNode.y, this.endNode.x, this.endNode.y) * 0.2;
+    const angle = Math.atan2(this.startNode.y - this.endNode.y, this.startNode.x - this.endNode.x);
+    if (this.defaultStyle.lineType !== 1) {
+      srcLabel.x = this.startNode.x - len * Math.cos(angle);
+      srcLabel.y = this.startNode.y - len * Math.sin(angle);
+      endLabel.x = this.endNode.x + len * Math.cos(angle);
+      endLabel.y = this.endNode.y + len * Math.sin(angle);
+    }
+    if (this.startNode.x > this.endNode.x) {
+      srcLabel.rotation = angle;
+      endLabel.rotation = angle;
+    } else {
+      srcLabel.rotation = Math.atan2(this.endNode.y - this.startNode.y, this.endNode.x - this.startNode.x);
+      endLabel.rotation = Math.atan2(this.endNode.y - this.startNode.y, this.endNode.x - this.startNode.x);
+    }
   }
 }

@@ -477,28 +477,6 @@ export class Group extends CommonElement {
     return _.remove(elements);
   }
 
-  public setBundleEdgesPosition(edges: Edge[]) {
-    // const edges = this.children;
-    const distance = 5;
-    const degree = 20;
-    const step = 8;
-    const values: number[][] = [];
-    for (let i = 0, len = edges.length; i < len;) {
-      _.each([1, -1], (j) => {
-        values.push([(distance + i * step) * j, (degree + i * step) * j]);
-      });
-      i += 1;
-    }
-    _.each(this.children, (edge, i) => {
-      if (edge instanceof Edge) {
-        edge.setStyle({
-          bezierLineDistance: values[i][0],
-          bezierLineDegree: values[i][1],
-        });
-      }
-    });
-  }
-
   public drawEdges() {
     const edges = this.filterEdge();
     const nodes = _.filter(this.childrenNode, (item) => {
