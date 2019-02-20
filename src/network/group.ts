@@ -58,7 +58,6 @@ export class Group extends CommonElement {
 
   public toggleGroupExpand() {
     const graph = this.getChildByName(this.polygonHullOutlineName);
-    this.analyzeSubstratum();
     graph.on('click', (event) => {
       // event.stopPropagation();
       const currentTime = new Date().getTime();
@@ -529,6 +528,7 @@ export class Group extends CommonElement {
     } else {
       this.drawGroupExpandedOutline();
     }
+    this.analyzeSubstratum();
     if (this.toggleExpanded) {
       this.toggleGroupExpand();
     }

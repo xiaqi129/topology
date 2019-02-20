@@ -21,6 +21,7 @@ import { Topo } from './topo';
 
 export class Network {
   public menu: PopMenu;
+  public callback: any;
   private loader = PIXI.loader;
   private topo: Topo;
   private drawer: Drawer;
@@ -47,16 +48,10 @@ export class Network {
     _.each(iconList, (icon: any) => {
       PIXI.loader.add(icon.name, icon.url);
     });
-    PIXI.loader.load();
-    // PIXI.loader
-    //   .load((loader: any, resources: any) => {
-    //     // const id = PIXI.loader.resources['./pic/resources.json'].textures;
-    //     // console.log(id);
-    //     _.each(resources, (resource) => {
-    //       resource.texture.iconWidth = iconList[resource.name].width;
-    //       resource.texture.iconHeight = iconList[resource.name].height;
-    //     });
-    //   });
+    PIXI.loader.load(() => {
+      this.callback();
+      this.callback = Function();
+    });
   }
 
   public addIconResource(iconList: any) {
@@ -169,7 +164,10 @@ export class Network {
     if (element instanceof Node) {
       element.removeChildren(0, element.children.length);
       element.labelContent = '';
-    } else {
+    } else if (element instanceof Edge) {
+      this.topo.clearObject(this.topo.getEdgesGroup());
+      element.destroy();
+    } else if (element instanceof Group) {
       element.destroy();
     }
   }
@@ -222,14 +220,8 @@ export class Network {
   }
 
   public syncView() {
-    PIXI.loader.onComplete.add(() => {
-      this.drawer.syncView();
-      this.action.setClick();
-    });
-    if (PIXI.loader.progress === 100) {
-      this.drawer.syncView();
-      this.action.setClick();
-    }
+    this.drawer.syncView();
+    this.action.setClick();
     if (this.getZoom() < 3) {
       this.edgeLabelToggle(false);
     }

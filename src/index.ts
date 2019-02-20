@@ -26,53 +26,6 @@ const rgb2hex = (rgb: any) => {
   return (rgb && rgb.length === 4) ? `0X${hexR}${hexG}${hexB}` : '';
 };
 
-// const network = new Network('network');
-// network.initIconResource(iconResource);
-// const num = 3000;
-// for (let i: number = 0, len: number = num; i < len;) {
-//   i += 1;
-//   const node = network.createNode('routerSVG');
-//   network.addElement(node);
-//   node.x = Math.random() * 1800;
-//   node.y = Math.random() * 900;
-// }
-// const nodes = network.getNodes();
-// for (let i: number = 0, len: number = num; i < len;) {
-//   const srcNode = nodes[i];
-//   const destNode = nodes[i + 1];
-//   for (let j = 0; j < 1;) {
-//     const edge = network.createEdge(srcNode, destNode);
-//     edge.setStyle({
-//       arrowColor: 0Xc71bd3,
-//       arrowLength: 15,
-//       arrowType: 3,
-//       arrowWidth: 1,
-//       fillArrow: true,
-//       lineColor: 0xC7254E,
-//       lineDistance: 5,
-//       lineType: 0,
-//       lineWidth: 1,
-//     });
-//     network.addElement(edge);
-
-//     j += 1;
-//   }
-//   i += 2;
-// }
-// const group = network.createGroup();
-// network.addElement(group);
-
-// const groupNodes = _.slice(_.shuffle(_.dropRight(nodes, (num / 2) + 1)), 0, 3);
-// _.each(groupNodes, (node) => {
-//   node.setStyle({ lineColor: 0xf55d54 });
-//   group.addChildNodes(node);
-//   group.setStyle({
-//     fillOpacity: 1,
-//   });
-// });
-// network.syncView();
-// network.setDrag();
-
 const commonStyles = {
   backgroundColor: 'transparent;',
   color: 'black',
@@ -80,278 +33,334 @@ const commonStyles = {
   fontSize: '12px',
   userSelect: 'none',
 };
-
 const network = new Network('network');
 network.initIconResource(iconResource);
 
-const devices = topoData.devices;
-const links = topoData.links;
-const groups = topoData.groups;
-const groupsList = keySort(groups);
-// create Node
-_.each(devices, (device: any) => {
-  const client = device.clients.User_Mark;
-  if (!(client === 'Hidden')) {
+// tslint:disable-next-line:only-arrow-functions
+const noData = function () {
+  const num = 3000;
+  for (let i: number = 0, len: number = num; i < len;) {
+    i += 1;
     const node = network.createNode('routerSVG');
-    node.name = device.name;
-    node.clients = device.clients;
-    node.iconWidth = 20;
-    node.iconHeight = 20;
-    const tooltipContent = `
-        <table border = "1">
-          <tr class="dog">
-          <th>HostName</th>
-          <th>Manufacture</th>
-          <th>Platform</th>
-          <th>Device IP</th>
-          <th>From Source</th>
-          <th>ICON</th>
-          <th>Role</th>
-          </tr>
-          <tr>
-          <td>${node.name}</td>
-          <td>${device.clients.User_Manufacturer}</td>
-          <td>${device.clients.platform}</td>
-          <td>${device.clients.deviceIP}</td>
-          <td>${device.clients.device_source}</td>
-          <td>${device.image}</td>
-          <td>${device.clients.User_Role}</td>
-          </tr>
-          <tr>
-          <td>${node.name}</td>
-          <td>${device.clients.User_Manufacturer}</td>
-          <td>${device.clients.platform}</td>
-          <td>${device.clients.deviceIP}</td>
-          <td>${device.clients.device_source}</td>
-          <td>${device.image}</td>
-          <td>${device.clients.User_Role}</td>
-          </tr>
-          <tr>
-          <td>${node.name}</td>
-          <td>${device.clients.User_Manufacturer}</td>
-          <td>${device.clients.platform}</td>
-          <td>${device.clients.deviceIP}</td>
-          <td>${device.clients.device_source}</td>
-          <td>${device.image}</td>
-          <td>${device.clients.User_Role}</td>
-          </tr>
-          <tr>
-          <td>${node.name}</td>
-          <td>${device.clients.User_Manufacturer}</td>
-          <td>${device.clients.platform}</td>
-          <td>${device.clients.deviceIP}</td>
-          <td>${device.clients.device_source}</td>
-          <td>${device.image}</td>
-          <td>${device.clients.User_Role}</td>
-          </tr>
-          </table>`;
     network.addElement(node);
-    node.x = device.location.x;
-    node.y = device.location.y;
-    node.setLabel(device.name);
-    node.setTooltip(tooltipContent, commonStyles);
-    node.on('rightclick', (event: any) => {
-      network.menu.setMenuItems([
-        { label: 'Aggregated as a group', id: '0' },
-        { label: 'Hide the Node', id: '1' },
-        { label: 'Change Switch Icon', id: '2' },
-        { label: 'Lock/Unlock Node', id: '3' },
-        { label: 'Print Node', id: '4' },
-        { label: 'Remove Node', id: '5' },
-      ]);
-      network.menu.menuOnAction = (id) => {
-        if (id === '0') {
-          const selectedNodes = network.getSelectedNodes();
-          const group = network.createGroup();
-          network.addElement(group);
-          group.setOutlineStyle(2);
-          _.each(selectedNodes, (selectedNode) => {
-            group.addChildNodes(selectedNode);
-          });
-          group.on('rightclick', (groupevent: any) => {
-            network.menu.setMenuItems([
-              // { label: 'Aggregated as a group', id: '0' },
-              { label: 'Disaggregate selected group', id: '0' },
-            ]);
-            network.menu.menuOnAction = (groupid) => {
-              if (groupid === '0') {
-                group.removeChildNodes();
-              }
-            };
-            network.menu.setClass('popMenu');
-            network.menu.showMenu(groupevent);
-          });
-          network.syncView();
-        } else if (id === '1') {
-          const groupList = network.getGroupObj();
-          network.hideElement(node);
-          _.each(groupList, (group: any) => {
-            group.draw();
-          });
-        } else if (id === '2') {
-          // node.iconWidth = 40;
-          // node.iconHeight = 60;
-          node.changeIcon('cisco-18');
-        } else if (id === '3') {
-          const selectNodes = network.getSelectedNodes();
-          _.each(selectNodes, (selectNode) => {
-            if (!selectNode.isLock) {
-              network.lockElement(selectNode);
-            } else {
-              network.unlockElement(selectNode);
-            }
-          });
-        } else if (id === '4') {
-          // console.log(node);
-        } else if (id === '5') {
-          network.removeElements(node);
-        }
-      };
-      network.menu.setClass('popMenu');
-      network.menu.showMenu(event);
-    });
+    node.x = Math.random() * 1800;
+    node.y = Math.random() * 900;
   }
-});
+  const nodes = network.getNodes();
+  for (let i: number = 0, len: number = num; i < len;) {
+    const srcNode = nodes[i];
+    const destNode = nodes[i + 1];
+    for (let j = 0; j < 1;) {
+      const edge = network.createEdge(srcNode, destNode);
+      edge.setStyle({
+        arrowColor: 0Xc71bd3,
+        arrowLength: 15,
+        arrowType: 3,
+        arrowWidth: 1,
+        fillArrow: true,
+        lineColor: 0xC7254E,
+        lineDistance: 5,
+        lineType: 0,
+        lineWidth: 1,
+      });
+      network.addElement(edge);
 
-// create Links
-const nodes = network.getNodeObj();
-const edgeLabel = {
-  fill: [
-    'red',
-    '#be1432',
-  ],
-  fontFamily: 'Times New Roman',
-  // fontSize: 14,
-  fontWeight: 'bold',
-  letterSpacing: 1,
-  lineJoin: 'bevel',
-  stroke: '#800040',
-  strokeThickness: 1,
-};
-_.each(links, (link) => {
-  const srcNodeName = link.local_host;
-  const destNodeName = link.remote_host;
-  const srcNode = _.get(nodes, srcNodeName);
-  const destNode = _.get(nodes, destNodeName);
-  const linkTooltipContent = `
-  <table border = "1">
-    <tr class="dog">
-    <th>HostName</th>
-    <th>Interface</th>
-    <th>Interface</th>
-    <th>Hostname</th>
-    <th>Link Protocol</th>
-    <th>Link State</th>
-    </tr>
-    <tr>
-    <td>${link.local_host}</td>
-    <td>${link.remote_host}</td>
-    <td>${link.local_int}</td>
-    <td>${link.remote_int}</td>
-    <td>${link.link_state}</td>
-    <td>${link.link_protocol}</td>
-    </tr>
-    </table>`;
-  if (srcNode && destNode) {
-    const edge = network.createEdge(srcNode, destNode);
-    edge.setStyle({
-      arrowColor: 0X006aad,
-      arrowLength: 13,
-      arrowType: 3,
-      arrowWidth: 0.01,
-      fillArrow: true,
-      lineColor: 0xC7254E,
-      lineDistance: 0,
-      lineType: 0,
-      lineWidth: 0.3,
-    });
-    edge.edge.on('rightclick', (event: any) => {
-      network.menu.setMenuItems([
-        { label: 'Select its neighbors', id: '0' },
-        { label: 'Hide/Unhide this links', id: '1' },
-        { label: 'Print line Info', id: '2' },
-        { label: 'Remove Link', id: '3' },
-      ]);
-      network.menu.menuOnAction = (id) => {
-        if (id === '0') {
-          const node: any = network.getNodeObj();
-          const startNode = node[edge.startNode.name];
-          const endNode = node[edge.endNode.name];
-          network.clearHighlight();
-          network.setSelectNodes(startNode);
-          network.setSelectNodes(endNode);
-        } else if (id === '1') {
-          network.removeElements(edge);
-        } else if (id === '2') {
-          // tslint:disable-next-line:no-console
-          console.log(edge);
-        } else if (id === '3') {
-          network.removeElements(edge);
-        }
-      };
-      network.menu.setClass('popMenu');
-      network.menu.showMenu(event);
-    });
-    edge.setTooltip(linkTooltipContent, commonStyles);
-    network.addElement(edge);
-    edge.setLabel(link.local_int, link.remote_int);
+      j += 1;
+    }
+    i += 2;
   }
-});
-_.each(groupsList, (group) => {
-  const bgColor = group.style.bgColor;
-  const newGroup = network.createGroup();
-  const children = group.children;
-  newGroup.name = group.id;
-  network.addElement(newGroup);
-  newGroup.setOutlineStyle(2);
-  newGroup.setStyle({
-    fillOpacity: 0.3,
-    fillColor: rgb2hex(bgColor),
+  const group = network.createGroup();
+  network.addElement(group);
+
+  const groupNodes = _.slice(_.shuffle(_.dropRight(nodes, (num / 2) + 1)), 0, 3);
+  _.each(groupNodes, (node) => {
+    node.setStyle({ lineColor: 0xf55d54 });
+    group.addChildNodes(node);
+    group.setStyle({
+      fillOpacity: 1,
+    });
   });
-  _.each(children, (child) => {
-    const node = _.get(nodes, child);
-    if (node) {
-      newGroup.addChildNodes(node);
+  network.syncView();
+  network.setDrag();
+};
+
+// tslint:disable-next-line:only-arrow-functions
+const simpleData = function () {
+
+  const devices = topoData.devices;
+  const links = topoData.links;
+  const groups = topoData.groups;
+  const groupsList = keySort(groups);
+  // create Node
+  _.each(devices, (device: any) => {
+    const client = device.clients.User_Mark;
+    if (!(client === 'Hidden')) {
+      const node = network.createNode('routerSVG');
+      // node.iconWidth = 50;
+      // node.iconHeight = 50;
+      node.draw();
+      node.name = device.name;
+      node.clients = device.clients;
+      const tooltipContent = `
+          <table border = "1">
+            <tr class="dog">
+            <th>HostName</th>
+            <th>Manufacture</th>
+            <th>Platform</th>
+            <th>Device IP</th>
+            <th>From Source</th>
+            <th>ICON</th>
+            <th>Role</th>
+            </tr>
+            <tr>
+            <td>${node.name}</td>
+            <td>${device.clients.User_Manufacturer}</td>
+            <td>${device.clients.platform}</td>
+            <td>${device.clients.deviceIP}</td>
+            <td>${device.clients.device_source}</td>
+            <td>${device.image}</td>
+            <td>${device.clients.User_Role}</td>
+            </tr>
+            <tr>
+            <td>${node.name}</td>
+            <td>${device.clients.User_Manufacturer}</td>
+            <td>${device.clients.platform}</td>
+            <td>${device.clients.deviceIP}</td>
+            <td>${device.clients.device_source}</td>
+            <td>${device.image}</td>
+            <td>${device.clients.User_Role}</td>
+            </tr>
+            <tr>
+            <td>${node.name}</td>
+            <td>${device.clients.User_Manufacturer}</td>
+            <td>${device.clients.platform}</td>
+            <td>${device.clients.deviceIP}</td>
+            <td>${device.clients.device_source}</td>
+            <td>${device.image}</td>
+            <td>${device.clients.User_Role}</td>
+            </tr>
+            <tr>
+            <td>${node.name}</td>
+            <td>${device.clients.User_Manufacturer}</td>
+            <td>${device.clients.platform}</td>
+            <td>${device.clients.deviceIP}</td>
+            <td>${device.clients.device_source}</td>
+            <td>${device.image}</td>
+            <td>${device.clients.User_Role}</td>
+            </tr>
+            </table>`;
+      network.addElement(node);
+      node.x = device.location.x;
+      node.y = device.location.y;
+      node.setLabel(device.name);
+      node.setTooltip(tooltipContent, commonStyles);
+      node.on('rightclick', (event: any) => {
+        network.menu.setMenuItems([
+          { label: 'Aggregated as a group', id: '0' },
+          { label: 'Hide the Node', id: '1' },
+          { label: 'Change Switch Icon', id: '2' },
+          { label: 'Lock/Unlock Node', id: '3' },
+          { label: 'Print Node', id: '4' },
+          { label: 'Remove Node', id: '5' },
+        ]);
+        network.menu.menuOnAction = (id) => {
+          if (id === '0') {
+            const selectedNodes = network.getSelectedNodes();
+            const group = network.createGroup();
+            network.addElement(group);
+            group.setOutlineStyle(2);
+            _.each(selectedNodes, (selectedNode) => {
+              group.addChildNodes(selectedNode);
+            });
+            group.on('rightclick', (groupevent: any) => {
+              network.menu.setMenuItems([
+                // { label: 'Aggregated as a group', id: '0' },
+                { label: 'Disaggregate selected group', id: '0' },
+              ]);
+              network.menu.menuOnAction = (groupid) => {
+                if (groupid === '0') {
+                  group.removeChildNodes();
+                }
+              };
+              network.menu.setClass('popMenu');
+              network.menu.showMenu(groupevent);
+            });
+            network.syncView();
+          } else if (id === '1') {
+            const groupList = network.getGroupObj();
+            network.hideElement(node);
+            _.each(groupList, (group: any) => {
+              group.draw();
+            });
+          } else if (id === '2') {
+            // node.iconWidth = 40;
+            // node.iconHeight = 60;
+            node.changeIcon('cisco-18');
+          } else if (id === '3') {
+            const selectNodes = network.getSelectedNodes();
+            _.each(selectNodes, (selectNode) => {
+              if (!selectNode.isLock) {
+                network.lockElement(selectNode);
+              } else {
+                network.unlockElement(selectNode);
+              }
+            });
+          } else if (id === '4') {
+            // tslint:disable-next-line:no-console
+            console.log(node);
+          } else if (id === '5') {
+            network.removeElements(node);
+          }
+        };
+        network.menu.setClass('popMenu');
+        network.menu.showMenu(event);
+      });
     }
   });
-  const nameArr = _.split(newGroup.name as string, '#@');
-  newGroup.setLabel(nameArr[nameArr.length - 1], 'Above');
-  newGroup.setToggleExpanded(true);
-  newGroup.on('rightclick', (event: any) => {
-    network.menu.setMenuItems([
-      { label: 'Disaggregate selected group', id: '0' },
-      { label: 'Extened a group', id: '1' },
-      { label: 'Lock/Unlock Group', id: '2' },
-      { label: 'Remove Group', id: '3' },
-      { label: 'Debug', id: '4' },
-    ]);
-    network.menu.menuOnAction = (id) => {
-      if (id === '0') {
-        newGroup.removeChildNodes();
-      } else if (id === '1') {
-        newGroup.setStyle({
-          padding: 50,
-        });
-        newGroup.draw();
-      } else if (id === '2') {
-        if (!newGroup.isLock) {
-          network.lockElement(newGroup);
-        } else {
-          network.unlockElement(newGroup);
-        }
-      } else if (id === '3') {
-        network.removeElements(newGroup);
-      } else if (id === '4') {
-        // tslint:disable-next-line:no-console
-        console.log(newGroup);
-      }
-    };
-    network.menu.setClass('popMenu');
-    network.menu.showMenu(event);
+  // create Links
+  const nodes = network.getNodeObj();
+  const edgeLabel = {
+    fill: [
+      'red',
+      '#be1432',
+    ],
+    fontFamily: 'Times New Roman',
+    // fontSize: 14,
+    fontWeight: 'bold',
+    letterSpacing: 1,
+    lineJoin: 'bevel',
+    stroke: '#800040',
+    strokeThickness: 1,
+  };
+  _.each(links, (link) => {
+    const srcNodeName = link.local_host;
+    const destNodeName = link.remote_host;
+    const srcNode = _.get(nodes, srcNodeName);
+    const destNode = _.get(nodes, destNodeName);
+    const linkTooltipContent = `
+    <table border = "1">
+      <tr class="dog">
+      <th>HostName</th>
+      <th>Interface</th>
+      <th>Interface</th>
+      <th>Hostname</th>
+      <th>Link Protocol</th>
+      <th>Link State</th>
+      </tr>
+      <tr>
+      <td>${link.local_host}</td>
+      <td>${link.remote_host}</td>
+      <td>${link.local_int}</td>
+      <td>${link.remote_int}</td>
+      <td>${link.link_state}</td>
+      <td>${link.link_protocol}</td>
+      </tr>
+      </table>`;
+    if (srcNode && destNode) {
+      const edge = network.createEdge(srcNode, destNode);
+      edge.setStyle({
+        arrowColor: 0X006aad,
+        arrowLength: 13,
+        arrowType: 3,
+        arrowWidth: 0.01,
+        fillArrow: true,
+        lineColor: 0xC7254E,
+        lineDistance: 0,
+        lineType: 0,
+        lineWidth: 0.3,
+      });
+      edge.edge.on('rightclick', (event: any) => {
+        network.menu.setMenuItems([
+          { label: 'Select its neighbors', id: '0' },
+          { label: 'Hide/Unhide this links', id: '1' },
+          { label: 'Print line Info', id: '2' },
+          { label: 'Remove Link', id: '3' },
+        ]);
+        network.menu.menuOnAction = (id) => {
+          if (id === '0') {
+            const node: any = network.getNodeObj();
+            const startNode = node[edge.startNode.name];
+            const endNode = node[edge.endNode.name];
+            network.clearHighlight();
+            network.setSelectNodes(startNode);
+            network.setSelectNodes(endNode);
+          } else if (id === '1') {
+            network.removeElements(edge);
+          } else if (id === '2') {
+            // tslint:disable-next-line:no-console
+            console.log(edge);
+          } else if (id === '3') {
+            network.removeElements(edge);
+          }
+        };
+        network.menu.setClass('popMenu');
+        network.menu.showMenu(event);
+      });
+      edge.setTooltip(linkTooltipContent, commonStyles);
+      network.addElement(edge);
+      edge.setLabel(link.local_int, link.remote_int);
+    }
   });
-});
-network.syncView();
-network.setDrag();
+  _.each(groupsList, (group) => {
+    const bgColor = group.style.bgColor;
+    const newGroup = network.createGroup();
+    const children = group.children;
+    newGroup.name = group.id;
+    network.addElement(newGroup);
+    newGroup.setOutlineStyle(2);
+    newGroup.setStyle({
+      fillOpacity: 0.3,
+      fillColor: rgb2hex(bgColor),
+    });
+    _.each(children, (child) => {
+      const node = _.get(nodes, child);
+      if (node) {
+        newGroup.addChildNodes(node);
+      }
+    });
+    const nameArr = _.split(newGroup.name as string, '#@');
+    newGroup.setLabel(nameArr[nameArr.length - 1], 'Above');
+    newGroup.setToggleExpanded(true);
+    newGroup.on('rightclick', (event: any) => {
+      network.menu.setMenuItems([
+        { label: 'Disaggregate selected group', id: '0' },
+        { label: 'Extened a group', id: '1' },
+        { label: 'Lock/Unlock Group', id: '2' },
+        { label: 'Remove Group', id: '3' },
+        { label: 'Debug', id: '4' },
+      ]);
+      network.menu.menuOnAction = (id) => {
+        if (id === '0') {
+          newGroup.removeChildNodes();
+        } else if (id === '1') {
+          newGroup.setStyle({
+            padding: 50,
+          });
+          newGroup.draw();
+        } else if (id === '2') {
+          if (!newGroup.isLock) {
+            network.lockElement(newGroup);
+          } else {
+            network.unlockElement(newGroup);
+          }
+        } else if (id === '3') {
+          network.removeElements(newGroup);
+        } else if (id === '4') {
+          // tslint:disable-next-line:no-console
+          console.log(newGroup);
+        }
+      };
+      network.menu.setClass('popMenu');
+      network.menu.showMenu(event);
+    });
+  });
+  network.syncView();
+  network.setDrag();
+};
+network.callback = () => {
+  simpleData();
+  // noData();
+};
 const body = document.getElementById('network');
 const zoomIn = document.querySelector('button.btn_zoomIn');
 const zoomOut = document.querySelector('button.btn_zoomOut');
@@ -365,22 +374,12 @@ const linkLabelToggle = document.querySelector('button.btn_linkLabelToggle');
 const searchNode = document.querySelector('button.btn_search_node');
 if (zoomIn) {
   zoomIn.addEventListener('click', () => {
-    const newNode = network.createNode('Router');
-    newNode.x = 30;
-    newNode.y = 30;
-    network.addElement(newNode);
-    network.syncView();
+    network.setZoom(network.getZoom() + 0.1);
   });
 }
 if (zoomOut) {
   zoomOut.addEventListener('click', () => {
-    // network.addIconResource(addResource);
-    // const node1 = network.createNode('switch1');
-    // node1.x = 100;
-    // node1.y = 100;
-    // node1.name = 'New Node';
-    // node1.setLabel(node1.name, labelStyle);
-    // network.addElement(node1);
+    network.setZoom(network.getZoom() - 0.1);
   });
 }
 if (zoomOver) {

@@ -42,18 +42,10 @@ export class Node extends CommonElement {
     this.dragging = false;
     this.elements = elements;
     this.selectedNodes = selectedNodes;
-    // this.draw();  // 圆点
-    // this.createSprite(resourceName || 'switch');  // 从loader中加载icon, 默认switch
     this.icon = icon;
-    PIXI.loader.onComplete.add(() => {
-      this.draw();
-    });
-    if (!PIXI.loader.loading) {
-      this.draw();
-    }
+    this.draw();
     this.tooltip = new Tooltip();
     this.setTooltip();
-    // this.setLabel();
   }
 
   public setParentNode(node: Group) {
@@ -163,18 +155,9 @@ export class Node extends CommonElement {
   }
 
   public drawSprite(icon: any) {
-    // const id = PIXI.loader.resources['./pic/resources.json'].textures;
-    // if (id) {
-    // console.log(id);
-    // const texture = id['cisco-18.png'];
-
-    // old
-    // const texture = PIXI.Texture.fromImage(icon);
-    // const node = new PIXI.Sprite(texture);
-    // node.width = (texture as any).iconWidth;
-    // node.height = (texture as any).iconHeight;
-
     // sprite
+    const oldSprite = this.getChildByName('node_sprite');
+    this.removeChild(oldSprite);
     const texture = PIXI.Texture.fromFrame(icon);
     const node = new PIXI.Sprite(texture);
     node.width = this.iconWidth;

@@ -45,10 +45,8 @@ export class CommonAction {
     const save: any = this.getCenter();
     this.container.scale.set(1);
     this.container.moveCenter(save);
-    if (num > 0 && num < 2) {
+    if (num > 0) {
       percent = num - 1;
-    } else if (num >= 2) {
-      percent = num;
     } else {
       throw Error('Zoom percent must greater than 0 !');
     }
@@ -336,6 +334,10 @@ export class CommonAction {
 
   public lockElement(element: CommonElement) {
     if (element instanceof Node) {
+      const nodeLock = element.getChildByName('node_lock');
+      if (nodeLock) {
+        element.removeChild(nodeLock);
+      }
       const lockTexture = PIXI.Texture.fromFrame('lock');
       const lock = new PIXI.Sprite(lockTexture);
       const sprite = element.getChildByName('node_sprite') ?
@@ -348,6 +350,7 @@ export class CommonAction {
       element.isLock = true;
       element.addChild(lock);
     } else if (element instanceof Group) {
+      element.draw();
       const nodes = element.expandedVisibleNodes;
       const substratumGroups = element.substratumInfo;
       const graph = _.find(element.children, (g) => {
@@ -357,6 +360,10 @@ export class CommonAction {
         const sprite = node.getChildByName('node_sprite') ?
           node.getChildByName('node_sprite') : node.getChildByName('node_graph');
         sprite.off('mousemove');
+        const nodeLock = node.getChildByName('node_lock');
+        if (nodeLock) {
+          node.removeChild(nodeLock);
+        }
         const lockTexture = PIXI.Texture.fromFrame('lock');
         const lock = new PIXI.Sprite(lockTexture);
         lock.width = node.iconWidth / 2;
@@ -389,7 +396,9 @@ export class CommonAction {
       sprite.on('mousemove', element.onDragMove.bind(element));
       const lock = element.getChildByName('node_lock');
       element.isLock = false;
-      lock.destroy();
+      if (lock) {
+        lock.destroy();
+      }
     } else if (element instanceof Group) {
       const nodes = element.expandedVisibleNodes;
       const substratumGroups = element.substratumInfo;
@@ -402,7 +411,9 @@ export class CommonAction {
         sprite.on('mousemove', node.onDragMove.bind(node));
         const lock = node.getChildByName('node_lock');
         node.isLock = false;
-        lock.destroy();
+        if (lock) {
+          lock.destroy();
+        }
       });
       if (graph) {
         graph.on('mousemove', element.onDragMove.bind(element));
