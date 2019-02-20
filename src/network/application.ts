@@ -7,8 +7,6 @@
 
 import * as _ from 'lodash';
 import Viewport from 'pixi-viewport';
-// import * as Rx from 'rxjs';
-// import { debounceTime, windowWhen } from 'rxjs/operators';
 import { Group } from './group';
 
 export class Application extends PIXI.Application {
@@ -55,24 +53,21 @@ export class Application extends PIXI.Application {
         .pinch()
         .wheel()
         .decelerate();
+
     }
   }
 
   public fitWrapperSize() {
-    this.autoResizeByWrapperBoundings();
-    // Rx.
-    //   fromEvent(window, 'resize').
-    //   pipe(debounceTime(500)).
-    //   subscribe(() => {
-    //     this.autoResizeByWrapperBoundings();
-    //   });
-  }
-
-  public autoResizeByWrapperBoundings() {
-    const boundingsRect = this.getWrapperBoundings();
-    const width = _.get(boundingsRect, 0);
-    const height = _.get(boundingsRect, 1);
-    this.renderer.resize(width, height);
+    this.viewWrapper = document.getElementById(this.domRegex);
+    if (this.viewWrapper) {
+      this.renderer.resize(this.viewWrapper.clientWidth, this.viewWrapper.clientHeight);
+    }
+    window.addEventListener('resize', () => {
+      if (this.container && this.viewWrapper) {
+        this.renderer.resize(this.viewWrapper.clientWidth, this.viewWrapper.clientHeight);
+        this.container.resize(this.viewWrapper.clientWidth, this.viewWrapper.clientHeight);
+      }
+    });
   }
 
   public getWrapperBoundings() {
