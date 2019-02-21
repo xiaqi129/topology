@@ -42,19 +42,29 @@ export class CommonAction {
   public setZoom(num: number, center?: boolean) {
     let percent: number = 0;
     this.initScale = num;
-    const save: any = this.getCenter();
+    const save: any = this.getDivCenter();
     this.container.scale.set(1);
     this.container.moveCenter(save);
     if (num > 0) {
       percent = num - 1;
+      this.container.zoomPercent(percent, center || true);
     } else {
       throw Error('Zoom percent must greater than 0 !');
     }
-    this.container.zoomPercent(percent, center || true);
   }
 
   public getCenter() {
     return this.container.center;
+  }
+
+  public getDivCenter() {
+    const div = document.getElementById(this.app.domRegex);
+    if (div) {
+      return {
+        x: div.clientWidth / 2,
+        y: div.clientHeight / 2,
+      };
+    }
   }
 
   public zoomOver() {
@@ -138,7 +148,7 @@ export class CommonAction {
         this.app.addElement(rectangle);
       }
     });
-    this.container.on('mouseup', (event: any) => {
+    window.addEventListener('mouseup', (event: any) => {
       flag = false;
       const bounds = rectangle.getLocalBounds();
       _.each(elements, (element) => {

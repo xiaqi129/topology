@@ -10,7 +10,7 @@ import Viewport from 'pixi-viewport';
 import { Group } from './group';
 
 export class Application extends PIXI.Application {
-  private domRegex: string = '';
+  public domRegex: string = '';
   private viewWrapper: HTMLElement | null = null;
   private container: Viewport | undefined;
 
@@ -102,6 +102,7 @@ export class Application extends PIXI.Application {
         this.container.addChild(element);
       }
     });
+    return true;
   }
 
 }

@@ -375,11 +375,14 @@ const searchNode = document.querySelector('button.btn_search_node');
 if (zoomIn) {
   zoomIn.addEventListener('click', () => {
     network.setZoom(network.getZoom() + 0.1);
+    console.log(network.getCenter());
   });
 }
 if (zoomOut) {
   zoomOut.addEventListener('click', () => {
-    network.setZoom(network.getZoom() - 0.1);
+    if (network.getZoom() > 0.2) {
+      network.setZoom(network.getZoom() - 0.1);
+    }
   });
 }
 if (zoomOver) {
@@ -476,6 +479,16 @@ if (body) {
       } else {
         network.edgeLabelToggle(true);
       }
+    }
+  });
+  window.addEventListener('keydown', (e) => {
+    if (e.keyCode === 17) {
+      network.setSelect();
+    }
+  });
+  window.addEventListener('keyup', (e) => {
+    if (e.keyCode === 17) {
+      network.setDrag();
     }
   });
 }
