@@ -33,6 +33,19 @@ const commonStyles = {
   fontSize: '12px',
   userSelect: 'none',
 };
+
+const nodeLabelStyle = {
+  fontFamily: 'Arial',
+  fontSize: 6,
+  fontWeight: 'bold',
+  fill: ['#ffffff', '#0099ff'],
+  lineJoin: 'round',
+  miterLimit: 2,
+  strokeThickness: 3,
+  breakWords: true,
+  wordWrap: true,
+  wordWrapWidth: 44,
+};
 const network = new Network('network');
 network.initIconResource(iconResource);
 
@@ -152,7 +165,7 @@ const simpleData = function () {
       network.addElement(node);
       node.x = device.location.x;
       node.y = device.location.y;
-      node.setLabel(device.name);
+      node.setLabel(device.name, nodeLabelStyle);
       node.setTooltip(tooltipContent, commonStyles);
       node.on('rightclick', (event: any) => {
         network.menu.setMenuItems([

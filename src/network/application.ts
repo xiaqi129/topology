@@ -39,8 +39,10 @@ export class Application extends PIXI.Application {
     this.viewWrapper = document.getElementById(this.domRegex);
     if (this.viewWrapper) {
       this.container = new Viewport({
-        screenWidth: this.viewWrapper.clientWidth,
-        screenHeight: this.viewWrapper.clientHeight,
+        screenWidth: window.innerWidth,
+        screenHeight: window.innerHeight,
+        worldWidth: this.viewWrapper.clientWidth,
+        worldHeight: this.viewWrapper.clientHeight,
         interaction: this.renderer.plugins.interaction,
         divWheel: this.viewWrapper,
       });
@@ -52,8 +54,14 @@ export class Application extends PIXI.Application {
         .clamp()
         .pinch()
         .wheel()
+        .clamp()
+        .clampZoom({
+          minWidth: 50,
+          minHeight: 50,
+          maxWidth: 5000,
+          maxHeight: 5000,
+        })
         .decelerate();
-
     }
   }
 

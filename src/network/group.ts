@@ -636,6 +636,13 @@ export class Group extends CommonElement {
       if (style) {
         _.extend(this.labelStyle, style);
       }
+      if (content.length > 25) {
+        _.extend(this.labelStyle, {
+          breakWords: true,
+          wordWrap: true,
+          wordWrapWidth: graph.width - 10,
+        });
+      }
       const label = new Label(content || undefined, this.labelStyle);
       label.setPosition(4);
       label.name = 'group_label';
@@ -693,6 +700,7 @@ export class Group extends CommonElement {
     if (label && graph) {
       if (this.width !== 0 && this.isExpanded) {
         label.style.fontSize = _.floor(graph.width / 25) + 1;
+        label.style.wordWrapWidth = graph.width - 10;
       } else {
         const textLength = _.ceil(label.text.length / 2);
         label.style.fontSize = nodeWidth / textLength;

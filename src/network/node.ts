@@ -263,18 +263,6 @@ export class Node extends CommonElement {
 
   // Set Node Label
   public setLabel(content?: string, style?: PIXI.TextStyleOptions) {
-    this.labelStyle = {
-      fontFamily: 'Arial',
-      fontSize: '0.6em',
-      fontWeight: 'bold',
-      fill: ['#ffffff', '#0099ff'],
-      lineJoin: 'round',
-      miterLimit: 2,
-      strokeThickness: 3,
-      breakWords: true,
-      wordWrap: true,
-      wordWrapWidth: 44,
-    };
     if (style) {
       _.extend(this.labelStyle, style);
     }
