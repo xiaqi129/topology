@@ -42,9 +42,11 @@ export class CommonAction {
   public setZoom(num: number, center?: boolean) {
     let percent: number = 0;
     this.initScale = num;
-    const save: any = this.getDivCenter();
+    const centerPoint: any = this.app.getWrapperBoundings();
     this.container.scale.set(1);
-    this.container.moveCenter(save);
+    this.container.x = 0;
+    this.container.y = 0;
+    this.container.moveCenter(centerPoint[0] / 2, centerPoint[1] / 2);
     if (num > 0) {
       percent = num - 1;
       this.container.zoomPercent(percent, center || true);
@@ -55,16 +57,6 @@ export class CommonAction {
 
   public getCenter() {
     return this.container.center;
-  }
-
-  public getDivCenter() {
-    const div = document.getElementById(this.app.domRegex);
-    if (div) {
-      return {
-        x: div.clientWidth / 2,
-        y: div.clientHeight / 2,
-      };
-    }
   }
 
   public zoomOver() {

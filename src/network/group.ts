@@ -672,8 +672,13 @@ export class Group extends CommonElement {
 
   public setLabelText(content: string) {
     const label: any = this.getChildByName('group_label');
-    if (label) {
+    const graph: any = this.getChildByName(this.polygonHullOutlineName);
+    if (label && graph) {
       label.setText(content);
+      label.style.fontSize = _.floor(graph.width / 25) + 1;
+      label.style.breakWords =  true;
+      label.style.wordWrap =  true;
+      label.style.wordWrapWidth = graph.width - 10;
       this.labelContent = content;
     }
   }

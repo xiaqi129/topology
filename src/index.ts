@@ -332,7 +332,7 @@ const simpleData = function () {
       }
     });
     const nameArr = _.split(newGroup.name as string, '#@');
-    newGroup.setLabel(`${nameArr[nameArr.length - 1]}`, 'Center');
+    newGroup.setLabel(`222222222222222222222222222222222222222222222${nameArr[nameArr.length - 1]}`, 'Center');
     newGroup.setToggleExpanded(true);
     newGroup.on('rightclick', (event: any) => {
       network.menu.setMenuItems([
@@ -400,16 +400,12 @@ if (zoomOut) {
 if (zoomOver) {
   let isZoom = true;
   zoomOver.addEventListener('click', () => {
-    if (network.getZoom() > 3 || network.getZoom() < 0.5) {
-      network.zoomReset();
+    if (isZoom) {
+      network.zoomOver();
     } else {
-      if (isZoom) {
-        network.zoomOver();
-      } else {
-        network.zoomReset();
-      }
-      isZoom = !isZoom;
+      network.zoomReset();
     }
+    isZoom = !isZoom;
   });
 }
 if (dragOrSelect) {
