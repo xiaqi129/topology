@@ -186,6 +186,9 @@ export class Network {
 
   public zoomOver() {
     this.action.zoomOver();
+    if (this.getZoom() < 3) {
+      this.edgeLabelToggle(false);
+    }
   }
 
   public getZoom() {
@@ -194,6 +197,9 @@ export class Network {
 
   public zoomReset() {
     this.action.zoomReset();
+    if (this.getZoom() < 3) {
+      this.edgeLabelToggle(false);
+    }
   }
 
   public getCenter() {

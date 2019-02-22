@@ -617,9 +617,9 @@ export class Group extends CommonElement {
   }
   // Set Group Label
   public setLabel(content?: string, position?: string, style?: PIXI.TextStyleOptions) {
-    const vertexPointsNumber = this.getGroupVertexNumber();
-    if (this.width !== 0 && vertexPointsNumber.length > 0) {
-      const size = _.floor(this.width / 25) + 1;
+    const graph: any = this.getChildByName(this.polygonHullOutlineName);
+    if (this.width !== 0 && content && graph) {
+      const size = _.floor(graph.width / 25) + 1;
       this.labelStyle = {
         fontFamily: 'Arial Black',
         fill: [
@@ -687,14 +687,15 @@ export class Group extends CommonElement {
   }
 
   public updateLabelSize() {
-    const label = this.getChildByName('group_label');
+    const label: any = this.getChildByName('group_label');
+    const graph: any = this.getChildByName(this.polygonHullOutlineName);
     const nodeWidth = this.defaultStyle.width;
-    if (label) {
+    if (label && graph) {
       if (this.width !== 0 && this.isExpanded) {
-        (label as PIXI.Text).style.fontSize = _.floor(this.width / 25) + 1;
+        label.style.fontSize = _.floor(graph.width / 25) + 1;
       } else {
-        const textLength = _.ceil((label as PIXI.Text).text.length / 2);
-        (label as PIXI.Text).style.fontSize = nodeWidth / textLength;
+        const textLength = _.ceil(label.text.length / 2);
+        label.style.fontSize = nodeWidth / textLength;
       }
     }
   }

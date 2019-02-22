@@ -319,7 +319,7 @@ const simpleData = function () {
       }
     });
     const nameArr = _.split(newGroup.name as string, '#@');
-    newGroup.setLabel(nameArr[nameArr.length - 1], 'Above');
+    newGroup.setLabel(`${nameArr[nameArr.length - 1]}`, 'Center');
     newGroup.setToggleExpanded(true);
     newGroup.on('rightclick', (event: any) => {
       network.menu.setMenuItems([
@@ -375,7 +375,6 @@ const searchNode = document.querySelector('button.btn_search_node');
 if (zoomIn) {
   zoomIn.addEventListener('click', () => {
     network.setZoom(network.getZoom() + 0.1);
-    console.log(network.getCenter());
   });
 }
 if (zoomOut) {
@@ -388,12 +387,16 @@ if (zoomOut) {
 if (zoomOver) {
   let isZoom = true;
   zoomOver.addEventListener('click', () => {
-    if (isZoom) {
-      network.zoomOver();
-    } else {
+    if (network.getZoom() > 3 || network.getZoom() < 0.5) {
       network.zoomReset();
+    } else {
+      if (isZoom) {
+        network.zoomOver();
+      } else {
+        network.zoomReset();
+      }
+      isZoom = !isZoom;
     }
-    isZoom = !isZoom;
   });
 }
 if (dragOrSelect) {
