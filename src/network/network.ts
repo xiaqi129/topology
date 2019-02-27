@@ -65,8 +65,8 @@ export class Network {
     return this.topo.createNode(iconName);
   }
 
-  public createGroup() {
-    return this.topo.createGroup();
+  public createGroup(emptyObj?: any) {
+    return this.topo.createGroup(emptyObj);
   }
 
   public createEdge(startNode: Node | Group, endNode: Node | Group) {

@@ -20,7 +20,7 @@ export class Edge extends CommonElement {
   public startNode: any;
   public endNode: any;
   public edge: PIXI.Graphics;
-  public arrow: PIXI.Graphics;
+  public arrow: PIXI.Graphics | undefined;
   public defalultColor: number = 0;
   public bundleExplosion: boolean = false;
   public labelToggle: boolean = false;
@@ -34,7 +34,6 @@ export class Edge extends CommonElement {
   constructor(startNode: Node | Group, endNode: Node | Group) {
     super();
     this.edge = new PIXI.Graphics();
-    this.arrow = new PIXI.Graphics();
     this.startNode = startNode;
     this.endNode = endNode;
     this.labelStyle = {};
@@ -299,7 +298,7 @@ export class Edge extends CommonElement {
     points[1] = points[1] - curveDegree * Math.sin(angle);
     points[2] = points[2] + curveDegree * Math.cos(angle);
     points[3] = points[3] - curveDegree * Math.sin(angle);
-    if (srcLabel && endLabel) {
+    if (srcLabel || endLabel) {
       srcLabel.x = points[0];
       srcLabel.y = points[1];
       endLabel.x = points[2];
@@ -427,6 +426,7 @@ export class Edge extends CommonElement {
 
   public createArrow(position: any, angle: number, reverse: boolean = true) {
     const style = this.defaultStyle;
+    this.arrow = new PIXI.Graphics();
     this.arrow.lineStyle(style.arrowWidth, style.arrowColor, 1);
     if (style.fillArrow) {
       this.arrow.beginFill(style.arrowColor);
@@ -440,7 +440,9 @@ export class Edge extends CommonElement {
 
   public clearEdgeRelatedGraph() {
     this.edge.clear();
-    this.arrow.clear();
+    if (this.arrow) {
+      this.arrow.clear();
+    }
   }
 
   public getDistance(size: any, lineDistance: number) {
@@ -594,6 +596,7 @@ export class Edge extends CommonElement {
     controlPoints: any,
     style: any,
   ) {
+    this.arrow = new PIXI.Graphics();
     this.arrow.lineStyle(style.arrowWidth, style.arrowColor, 1);
     if (style.fillArrow) {
       this.arrow.beginFill(style.arrowColor);
@@ -694,7 +697,7 @@ export class Edge extends CommonElement {
       angle,
       this.getDistance(endNodeSize, lineDistance),
     );
-    let elements: DisplayObject[] = [];
+    let elements: any[] = [];
     if (style.lineType === 0) {
       elements = this.drawLineEdge(srcNodePos, endNodePos, angle, this.defaultStyle);
     } else if (style.lineType === 1) {
@@ -719,27 +722,21 @@ export class Edge extends CommonElement {
       bundleLabel.x = (this.startNode.x + this.endNode.x) / 2;
       bundleLabel.y = (this.startNode.y + this.endNode.y) / 2;
     }
-    if (srcLabel && endLabel) {
+    if (srcLabel || endLabel) {
       this.setLabelPosition(srcLabel, endLabel);
     }
   }
 
-  public setLabel(srcContent?: string, endContent?: string, style?: PIXI.TextStyleOptions) {
+  public setLabel(srcContent: string, endContent: string, style?: PIXI.TextStyleOptions) {
     if (style) {
       _.extend(this.labelStyle, style);
     }
-    this.labelStyle = {
-      fontSize: 6,
-    };
-    if (srcContent && endContent) {
-      if (this.defaultStyle.lineType === 1) {
-        this.draw();
-      }
+    if (srcContent || endContent) {
       const srcLabel = new Label(srcContent, this.labelStyle);
       const endLabel = new Label(endContent, this.labelStyle);
       this.labelContent.push(srcContent);
       this.labelContent.push(endContent);
-      this.labelContent = _.take(this.labelContent, 2);
+      this.labelContent = _.uniq(this.labelContent);
       srcLabel.setPosition(0);
       endLabel.setPosition(0);
       srcLabel.name = 'edge_srclabel';
@@ -747,7 +744,9 @@ export class Edge extends CommonElement {
       this.setLabelPosition(srcLabel, endLabel);
       this.addChild(srcLabel);
       this.addChild(endLabel);
-
+      if (this.defaultStyle.lineType === 1) {
+        this.draw();
+      }
     }
   }
 

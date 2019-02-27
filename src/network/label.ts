@@ -14,7 +14,7 @@ export class Label extends PIXI.Text {
     const defaultStyles = new PIXI.TextStyle({
       fontFamily: 'Arial',
       fontSize: 10,
-      fill: '0x0099ff',
+      fill: '0x0386d2',
     });
     if (style) {
       _.extend(defaultStyles, style);

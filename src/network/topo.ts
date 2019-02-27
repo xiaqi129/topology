@@ -184,8 +184,8 @@ export class Topo implements ITopo {
     return new Node(this.elements, this.selectedNodes, icon);
   }
 
-  public createGroup(): Group {
-    return new Group(this.elements);
+  public createGroup(emptyObj?: any): Group {
+    return new Group(this.elements, emptyObj);
   }
 
   public createEdge(startNode: Node | Group, endNode: Node | Group): Edge {

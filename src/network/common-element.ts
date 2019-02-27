@@ -70,7 +70,9 @@ export abstract class CommonElement extends PIXI.Container {
 
   public addChildren(elements: PIXI.DisplayObject[]) {
     _.each(elements, (element: PIXI.DisplayObject) => {
-      this.addChild(element);
+      if (element) {
+        this.addChild(element);
+      }
     });
   }
 
@@ -109,9 +111,7 @@ export abstract class CommonElement extends PIXI.Container {
   public setStyle(styles: any, draw: boolean = true) {
     _.extend(this.defaultStyle, styles);
     if (draw) {
-      PIXI.loader.onComplete.add(() => {
-        this.draw();
-      });
+      this.draw();
     }
   }
 

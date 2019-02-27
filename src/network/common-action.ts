@@ -80,11 +80,13 @@ export class CommonAction {
   public dragContainer() {
     this.container.removeAllListeners('mousemove');
     this.container.removeAllListeners('mouseup');
+    this.container.cursor = 'move';
     this.container.drag();
   }
 
   public setSelect() {
     this.container.removePlugin('drag');
+    this.container.cursor = 'crosshair';
     this.moveSelect();
   }
 
@@ -227,6 +229,7 @@ export class CommonAction {
       _.each(this.container.children, (element) => {
         if (element instanceof Node) {
           element.selectOff();
+          this.topo.removeSelectedNodes();
         }
         if (element instanceof Edge) {
           element.setStyle({

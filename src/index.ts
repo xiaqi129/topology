@@ -35,16 +35,9 @@ const commonStyles = {
 };
 
 const nodeLabelStyle = {
-  fontFamily: 'Arial',
-  fontSize: 6,
-  fontWeight: 'bold',
-  fill: ['#ffffff', '#0099ff'],
-  lineJoin: 'round',
-  miterLimit: 2,
-  strokeThickness: 3,
   breakWords: true,
   wordWrap: true,
-  wordWrapWidth: 44,
+  wordWrapWidth: 73,
 };
 const network = new Network('network');
 network.initIconResource(iconResource);
@@ -71,7 +64,7 @@ const noData = function () {
         arrowType: 3,
         arrowWidth: 1,
         fillArrow: true,
-        lineColor: 0xC7254E,
+        lineColor: 0X0386d2,
         lineDistance: 5,
         lineType: 0,
         lineWidth: 1,
@@ -277,7 +270,7 @@ const simpleData = function () {
         arrowType: 3,
         arrowWidth: 0.01,
         fillArrow: true,
-        lineColor: 0xC7254E,
+        // lineColor: 0X0386d2,
         lineDistance: 0,
         lineType: 0,
         lineWidth: 0.3,
@@ -311,7 +304,9 @@ const simpleData = function () {
       });
       edge.setTooltip(linkTooltipContent, commonStyles);
       network.addElement(edge);
-      edge.setLabel(link.local_int, link.remote_int);
+      edge.setLabel(link.local_int, link.remote_int, {
+        fontSize: 6,
+      });
     }
   });
   _.each(groupsList, (group) => {
@@ -332,7 +327,7 @@ const simpleData = function () {
       }
     });
     const nameArr = _.split(newGroup.name as string, '#@');
-    newGroup.setLabel(`222222222222222222222222222222222222222222222${nameArr[nameArr.length - 1]}`, 'Center');
+    newGroup.setLabel(`${nameArr[nameArr.length - 1]}`, 'Center');
     newGroup.setToggleExpanded(true);
     newGroup.on('rightclick', (event: any) => {
       network.menu.setMenuItems([
@@ -448,18 +443,49 @@ if (linkLabelToggle) {
   });
 }
 
-let grouptitleToggle = true;
+// let grouptitleToggle = true;
+const emptyObj = {
+  type: 'circle',
+  location: { x: 100, y: 100 },
+  size: 100,
+  color: 0X00ff00,
+  opacity: 0.5,
+};
 if (groupLabelToggle) {
   groupLabelToggle.addEventListener('click', () => {
-    grouptitleToggle = !grouptitleToggle;
-    const node = network.getNodeObj();
-    _.each(node, (n: any) => {
-      if (grouptitleToggle) {
-        n.setLabelText(n.name);
-      } else {
-        n.setLabelText(n.clients.User_Role);
-      }
+    const emptyGroup = network.createGroup(emptyObj);
+    emptyGroup.defaultStyle.fillColor = 0X00ff00;
+    emptyGroup.defaultStyle.fillOpacity = 0.5;
+    emptyGroup.draw();
+    network.addElement(emptyGroup);
+    emptyGroup.setLabel('text', 'Center');
+    network.syncView();
+    emptyGroup.on('rightclick', (event: any) => {
+      network.menu.setMenuItems([
+        { label: 'add child node', id: '0' },
+        { label: 'change style', id: '1' },
+      ]);
+      network.menu.menuOnAction = (id) => {
+        if (id === '0') {
+          const node = _.get(network.getNodeObj(), '192.168.30.0/24');
+          emptyGroup.addChildNodes(node);
+        } else if (id === '1') {
+          emptyGroup.defaultStyle.fillColor = 0Xff0000;
+          emptyGroup.draw();
+        }
+      };
+      network.menu.setClass('popMenu');
+      network.menu.showMenu(event);
     });
+    // grouptitleToggle = !grouptitleToggle;
+    // const node = network.getNodeObj();
+    // _.each(node, (n: any) => {
+    //   if (grouptitleToggle) {
+    //     n.setLabelText(n.name);
+    //   } else {
+    //     n.setLabelText(n.clients.User_Role);
+    //   }
+    // });
   });
 }
 if (searchNode) {
@@ -473,11 +499,39 @@ if (searchNode) {
   });
 }
 if (body) {
-  let sign;
+  // let sign;
   body.addEventListener('wheel', (event) => {
     const nodesObj = network.getNodeObj();
-    sign = event.deltaY > 0 ? 1 : -1;
-    const zoomNum = _.add(1, _.multiply(0.04, sign));
+    const edgeObj = network.getEdgeObj();
+    const groupObj = network.getGroupObj();
+    const sign = event.deltaY > 0 ? 1 : -1;
+    const zoomNum = 1 + (sign * 0.03);
+    if (network.getZoom() < 10 && network.getZoom() > 0.4) {
+      _.each(nodesObj, (node: any) => {
+        const sprite: any = node.getChildByName('node_sprite') ?
+          node.getChildByName('node_sprite') : node.getChildByName('node_graph');
+        const label = node.getChildByName('node_label');
+        if (label) {
+          label.scale.x *= zoomNum;
+          label.scale.y *= zoomNum;
+        }
+        sprite.scale.x *= zoomNum;
+        sprite.scale.y *= zoomNum;
+      });
+      _.each(edgeObj, (edge: any) => {
+        const srcLabel = edge.getChildByName('edge_srclabel');
+        const endLabel = edge.getChildByName('edge_endlabel');
+        if (srcLabel && endLabel) {
+          srcLabel.scale.x *= zoomNum;
+          srcLabel.scale.y *= zoomNum;
+          endLabel.scale.x *= zoomNum;
+          endLabel.scale.y *= zoomNum;
+        }
+      });
+      _.each(groupObj, (group: any) => {
+        group.draw();
+      });
+    }
     if (labelToggle) {
       if (network.getZoom() < 1) {
         network.nodeLabelToggle(false);

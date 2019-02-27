@@ -22,6 +22,14 @@ interface IEvent {
   [event: string]: (edges: Edge[]) => {};
 }
 
+export interface IEmptyGroup {
+  type: string;
+  location: { x: number, y: number };
+  size: number;
+  color: number;
+  opacity: number;
+}
+
 export class Group extends CommonElement {
   public groupEdgesEvent?: IEvent = {};
   public isExpanded: boolean = true;
@@ -47,11 +55,13 @@ export class Group extends CommonElement {
   private hideNodes: Node[] = [];
   private hideEdges: Edge[] = [];
   private labelPosition: string = 'Center';
+  private emptyObj: IEmptyGroup | undefined;
 
-  constructor(elements: Edge | CommonElement[]) {
+  constructor(elements: Edge | CommonElement[], emptyObj: IEmptyGroup | undefined) {
     super();
     this.elements = elements;
     this.labelStyle = {};
+    this.emptyObj = emptyObj;
     this.draw();
     document.addEventListener('mouseup', this.onDragEnd.bind(this));
   }
@@ -144,7 +154,9 @@ export class Group extends CommonElement {
 
   public addChildNodes(element: Node, preventDraw: boolean = false) {
     element.setIncluedGroup(this);
+    this.position.set(0, 0);
     this.childrenNode.push(element);
+    this.emptyObj = undefined;
     if (!preventDraw) {
       this.draw();
     }
@@ -173,9 +185,9 @@ export class Group extends CommonElement {
 
   public getGroupPosition() {
     const vertexPointsList = this.getGroupVertexNumber();
-    if (!vertexPointsList.length) {
-      return [];
-    }
+    // if (!vertexPointsList.length) {
+    //   return [];
+    // }
     if (vertexPointsList.length === 1) {
       return [vertexPointsList[0][0], vertexPointsList[0][1]];
     }
@@ -245,22 +257,29 @@ export class Group extends CommonElement {
       const edges = this.filterEdge();
       const intersectionNodes = this.intersection()[0];
       const intersectionGroup = this.intersection()[1];
-      _.each(this.childrenNode, (element) => {
-        if (element instanceof Node) {
-          element.position.x += newPosition.x - this.last.parents.x;
-          element.position.y += newPosition.y - this.last.parents.y;
-        }
-      });
-      _.each(edges, (edge: Edge) => {
-        edge.draw();
-      });
-      if (intersectionNodes) {
-        _.each(intersectionGroup, (group) => {
-          group.draw();
+      if (this.childrenNode.length > 0) {
+        _.each(this.childrenNode, (element) => {
+          if (element instanceof Node) {
+            element.position.x += newPosition.x - this.last.parents.x;
+            element.position.y += newPosition.y - this.last.parents.y;
+          }
         });
+        _.each(edges, (edge: Edge) => {
+          edge.draw();
+        });
+        if (intersectionNodes) {
+          _.each(intersectionGroup, (group) => {
+            group.draw();
+          });
+        }
+      } else {
+        this.position.x += newPosition.x - this.last.parents.x;
+        this.position.y += newPosition.y - this.last.parents.y;
+        this.centerPoint[0] = this.position.x;
+        this.centerPoint[1] = this.position.y;
       }
-      this.draw();
       this.last = { parents: newPosition };
+      this.draw();
     } else {
       this.dragging = false;
     }
@@ -436,8 +455,8 @@ export class Group extends CommonElement {
 
   // draw polygon background outline
   public drawGroupExpandedOutline() {
-    this.centerPoint = this.getGroupPosition();
     this.getExpandedVisibleNodes();
+    this.centerPoint = this.getGroupPosition();
     const vertexPointsNumber = this.getGroupVertexNumber();
     const pointsCount = vertexPointsNumber.length;
     const graph = this.createOutlineGraphic();
@@ -526,7 +545,11 @@ export class Group extends CommonElement {
       this.drawEdges();
       this.drawGroupNode();
     } else {
-      this.drawGroupExpandedOutline();
+      if (!this.emptyObj) {
+        this.drawGroupExpandedOutline();
+      } else {
+        this.drawEmptyGroup();
+      }
     }
     this.analyzeSubstratum();
     if (this.toggleExpanded) {
@@ -535,6 +558,34 @@ export class Group extends CommonElement {
     this.sortGraphicsIndex();
     this.updateLabelPos();
     this.updateLabelSize();
+  }
+
+  public drawEmptyGroup() {
+    if (this.emptyObj) {
+      const graph = new PIXI.Graphics();
+      const emptyInfo = this.emptyObj;
+      const style = this.defaultStyle;
+      graph.name = this.polygonHullOutlineName;
+      this.interactive = true;
+      graph.interactive = true;
+      graph.buttonMode = true;
+      this.centerPoint = [emptyInfo.location.x, emptyInfo.location.y];
+      this.addChild(graph);
+      graph.lineStyle(style.lineWidth, style.lineColor);
+      graph.beginFill(style.fillColor, style.fillOpacity);
+      switch (emptyInfo.type) {
+        case 'circle':
+          graph.drawCircle(emptyInfo.location.x, emptyInfo.location.y, emptyInfo.size);
+          graph.endFill();
+          this.outLineStyleType = 1;
+          break;
+        case 'square':
+          graph.drawRect(emptyInfo.location.x, emptyInfo.location.y, emptyInfo.size, emptyInfo.size);
+          graph.endFill();
+          this.outLineStyleType = 2;
+          break;
+      }
+    }
   }
 
   public getChildEdges() {
@@ -575,7 +626,7 @@ export class Group extends CommonElement {
     _.each(this.elements, (groups: CommonElement) => {
       if (groups instanceof Group && groups !== this) {
         intersectionNode = _.intersection(this.childrenNode, groups.childrenNode);
-        if (intersectionNode) {
+        if (intersectionNode.length > 0) {
           intersectionGroup.push(groups);
         }
       }
@@ -609,10 +660,16 @@ export class Group extends CommonElement {
       },
     };
     const labelPos = { x: 0, y: 0 };
-    const centerPoint = this.getGroupPosition();
-    labelPos.x = centerPoint[0] + labelPositionData[this.labelPosition].x;
-    labelPos.y = centerPoint[1] + labelPositionData[this.labelPosition].y;
-
+    const centerPoint: { x: number, y: number } = { x: 0, y: 0 };
+    if (!this.emptyObj) {
+      centerPoint.x = this.getGroupPosition()[0];
+      centerPoint.y = this.getGroupPosition()[1];
+    } else {
+      centerPoint.x = this.emptyObj.location.x;
+      centerPoint.y = this.emptyObj.location.y;
+    }
+    labelPos.x = centerPoint.x + labelPositionData[this.labelPosition].x;
+    labelPos.y = centerPoint.y + labelPositionData[this.labelPosition].y;
     return labelPos;
   }
   // Set Group Label
@@ -621,17 +678,15 @@ export class Group extends CommonElement {
     if (this.width !== 0 && content && graph) {
       const size = _.floor(graph.width / 25) + 1;
       this.labelStyle = {
-        fontFamily: 'Arial Black',
-        fill: [
-          '#1243eb',
-          '#0061c1',
-          '#0000fd',
-          'black',
-        ],
         fontSize: size,
-        letterSpacing: 2,
-        stroke: 'white',
-        whiteSpace: 'normal',
+        fill: [
+          '#0776da',
+          '#5146d9',
+        ],
+        fontFamily: 'Georgia',
+        fontWeight: 'bold',
+        letterSpacing: 1,
+        strokeThickness: 1,
       };
       if (style) {
         _.extend(this.labelStyle, style);
@@ -676,22 +731,16 @@ export class Group extends CommonElement {
     if (label && graph) {
       label.setText(content);
       label.style.fontSize = _.floor(graph.width / 25) + 1;
-      label.style.breakWords =  true;
-      label.style.wordWrap =  true;
+      label.style.breakWords = true;
+      label.style.wordWrap = true;
       label.style.wordWrapWidth = graph.width - 10;
       this.labelContent = content;
     }
   }
 
   public updateLabelPos() {
-    const vertexPointsNumber = this.getGroupVertexNumber();
     const label = this.getChildByName('group_label');
     if (label) {
-      if (vertexPointsNumber.length > 0) {
-        label.visible = true;
-      } else {
-        label.visible = false;
-      }
       const labelPos = this.getLabelPos();
       label.x = labelPos.x;
       label.y = labelPos.y;
