@@ -577,12 +577,12 @@ export class Group extends CommonElement {
         case 'circle':
           graph.drawCircle(emptyInfo.location.x, emptyInfo.location.y, emptyInfo.size);
           graph.endFill();
-          this.outLineStyleType = 1;
+          this.outLineStyleType = 2;
           break;
         case 'square':
           graph.drawRect(emptyInfo.location.x, emptyInfo.location.y, emptyInfo.size, emptyInfo.size);
           graph.endFill();
-          this.outLineStyleType = 2;
+          this.outLineStyleType = 3;
           break;
       }
     }
@@ -665,8 +665,14 @@ export class Group extends CommonElement {
       centerPoint.x = this.getGroupPosition()[0];
       centerPoint.y = this.getGroupPosition()[1];
     } else {
-      centerPoint.x = this.emptyObj.location.x;
-      centerPoint.y = this.emptyObj.location.y;
+      switch (this.emptyObj.type) {
+        case 'circle':
+          centerPoint.x = this.emptyObj.location.x;
+          centerPoint.y = this.emptyObj.location.y;
+        case 'square':
+          centerPoint.x = this.emptyObj.location.x + this.emptyObj.size / 2;
+          centerPoint.y = this.emptyObj.location.y + this.emptyObj.size / 2;
+      }
     }
     labelPos.x = centerPoint.x + labelPositionData[this.labelPosition].x;
     labelPos.y = centerPoint.y + labelPositionData[this.labelPosition].y;
@@ -686,7 +692,6 @@ export class Group extends CommonElement {
         fontFamily: 'Georgia',
         fontWeight: 'bold',
         letterSpacing: 1,
-        strokeThickness: 1,
       };
       if (style) {
         _.extend(this.labelStyle, style);

@@ -1,11 +1,12 @@
 import * as _ from 'lodash';
+import NP from 'number-precision';
 import { Network } from './network/network';
 import { data as topoData } from './simpleData';
 
 const iconResource = {
   resources: { name: 'resources', url: './pic/imageDict.json' },
 };
-
+(window as any).np = NP;
 const keySort = (obj: any) => {
   const keys = Object.keys(obj).sort();
   const sortedObj: any = {};
@@ -35,6 +36,7 @@ const commonStyles = {
 };
 
 const nodeLabelStyle = {
+  fontSize: 8,
   breakWords: true,
   wordWrap: true,
   wordWrapWidth: 73,
@@ -270,10 +272,10 @@ const simpleData = function () {
         arrowType: 3,
         arrowWidth: 0.01,
         fillArrow: true,
-        // lineColor: 0X0386d2,
+        lineColor: 0X0386d2,
         lineDistance: 0,
         lineType: 0,
-        lineWidth: 0.3,
+        lineWidth: 0.5,
       });
       edge.edge.on('rightclick', (event: any) => {
         network.menu.setMenuItems([
@@ -445,7 +447,7 @@ if (linkLabelToggle) {
 
 // let grouptitleToggle = true;
 const emptyObj = {
-  type: 'circle',
+  type: 'square',
   location: { x: 100, y: 100 },
   size: 100,
   color: 0X00ff00,
@@ -467,8 +469,10 @@ if (groupLabelToggle) {
       ]);
       network.menu.menuOnAction = (id) => {
         if (id === '0') {
-          const node = _.get(network.getNodeObj(), '192.168.30.0/24');
-          emptyGroup.addChildNodes(node);
+          const node1 = _.get(network.getNodeObj(), '192.168.30.0/24');
+          const node2 = _.get(network.getNodeObj(), '192.168.40.0/24');
+          emptyGroup.addChildNodes(node1);
+          emptyGroup.addChildNodes(node2);
         } else if (id === '1') {
           emptyGroup.defaultStyle.fillColor = 0Xff0000;
           emptyGroup.draw();
@@ -504,29 +508,33 @@ if (body) {
     const nodesObj = network.getNodeObj();
     const edgeObj = network.getEdgeObj();
     const groupObj = network.getGroupObj();
-    const sign = event.deltaY > 0 ? 1 : -1;
-    const zoomNum = 1 + (sign * 0.03);
-    if (network.getZoom() < 10 && network.getZoom() > 0.4) {
+    NP.enableBoundaryChecking(false);
+    const zoomNum = event.deltaY > 0 ? 1.05 : NP.divide(1, 1.05);
+    if (network.getZoom() < 9.5 && network.getZoom() > 0.34) {
       _.each(nodesObj, (node: any) => {
         const sprite: any = node.getChildByName('node_sprite') ?
           node.getChildByName('node_sprite') : node.getChildByName('node_graph');
         const label = node.getChildByName('node_label');
         if (label) {
-          label.scale.x *= zoomNum;
-          label.scale.y *= zoomNum;
+          label.scale.x = NP.times(label.scale.x, zoomNum);
+          label.scale.y = NP.times(label.scale.y, zoomNum);
         }
-        sprite.scale.x *= zoomNum;
-        sprite.scale.y *= zoomNum;
+        sprite.scale.x = NP.times(sprite.scale.x, zoomNum);
+        sprite.scale.y = NP.times(sprite.scale.y, zoomNum);
       });
       _.each(edgeObj, (edge: any) => {
         const srcLabel = edge.getChildByName('edge_srclabel');
         const endLabel = edge.getChildByName('edge_endlabel');
         if (srcLabel && endLabel) {
-          srcLabel.scale.x *= zoomNum;
-          srcLabel.scale.y *= zoomNum;
-          endLabel.scale.x *= zoomNum;
-          endLabel.scale.y *= zoomNum;
+          srcLabel.scale.x = NP.times(srcLabel.scale.x, zoomNum);
+          srcLabel.scale.y = NP.times(srcLabel.scale.y, zoomNum);
+          endLabel.scale.x = NP.times(endLabel.scale.x, zoomNum);
+          endLabel.scale.y = NP.times(endLabel.scale.y, zoomNum);
         }
+        edge.setStyle({
+          lineWidth: NP.times(edge.defaultStyle.lineWidth, zoomNum),
+        });
+        edge.draw();
       });
       _.each(groupObj, (group: any) => {
         group.draw();
