@@ -17,7 +17,7 @@ export class Tooltip {
     userSelect: 'none',
   };
 
-  public addTooltip(ele: CommonElement, content?: string, style?: any) {
+  public addTooltip(ele: CommonElement, content: string, style?: any) {
     if (ele instanceof Node) {
       ele.addEventListener('mouseover', (event: any) => {
         this.nodeTooltipOn(event, content, style);
@@ -55,8 +55,9 @@ export class Tooltip {
     }
   }
 
-  private nodeTooltipOn(event: any, content?: string, customStyle?: any) {
-    const tooltipContent = content || 'node tooltip';
+  private nodeTooltipOn(event: any, content: string, customStyle?: any) {
+    this.clearTooltip();
+    const tooltipContent = content;
     const tooltipStyles: any = {};
     _.assign(tooltipStyles, Tooltip.commonStyles, customStyle);
     this.createTooltip(event, tooltipContent, tooltipStyles);
@@ -71,7 +72,6 @@ export class Tooltip {
 
   private createTooltip(event: any, content: string, styles: any) {
     const popMenu = document.getElementById('pop-menu');
-
     if (!popMenu || popMenu.style.display === 'none') {
       const network = document.getElementsByTagName('body')[0];
       const tooltip = document.createElement('div');

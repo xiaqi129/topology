@@ -22,6 +22,7 @@ import { Topo } from './topo';
 export class Network {
   public menu: PopMenu;
   public callback: any;
+  public zoom: number;
   private loader = PIXI.loader;
   private topo: Topo;
   private drawer: Drawer;
@@ -29,9 +30,11 @@ export class Network {
   private action: CommonAction;
   private tooltip: Tooltip;
   private load: PIXI.loaders.Loader;
+  private domRegex: string;
 
   constructor(domRegex: string) {
     PIXI.utils.skipHello();
+    this.domRegex = domRegex;
     this.topo = new Topo();
     this.drawer = new Drawer(domRegex, this.topo);
     this.app = this.drawer.getWhiteBoard();
@@ -39,6 +42,7 @@ export class Network {
     this.action = new CommonAction(this.app, this.topo, this.tooltip);
     this.menu = new PopMenu(domRegex, this.app, this.action);
     this.load = new PIXI.loaders.Loader();
+    this.zoom = 1;
     this.disableContextMenu(domRegex);
   }
 
@@ -63,6 +67,30 @@ export class Network {
 
   public createNode(iconName?: string) {
     return this.topo.createNode(iconName);
+  }
+
+  public clearZoom() {
+    const wrapper = document.getElementById(this.domRegex);
+    if (wrapper) {
+      this.action.container.clampZoom({
+        minWidth: wrapper.clientWidth,
+        minHeight: wrapper.clientHeight,
+        maxWidth: wrapper.clientWidth,
+        maxHeight: wrapper.clientHeight,
+      });
+    }
+  }
+
+  public addZoom() {
+    const wrapper = document.getElementById(this.domRegex);
+    if (wrapper) {
+      this.action.container.clampZoom({
+        minWidth: 50,
+        minHeight: 50,
+        maxWidth: 5000,
+        maxHeight: 5000,
+      });
+    }
   }
 
   public createGroup(emptyObj?: any) {

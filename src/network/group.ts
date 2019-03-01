@@ -584,6 +584,11 @@ export class Group extends CommonElement {
           graph.endFill();
           this.outLineStyleType = 3;
           break;
+        default:
+          graph.drawCircle(emptyInfo.location.x, emptyInfo.location.y, emptyInfo.size);
+          graph.endFill();
+          this.outLineStyleType = 2;
+          break;
       }
     }
   }
@@ -669,9 +674,15 @@ export class Group extends CommonElement {
         case 'circle':
           centerPoint.x = this.emptyObj.location.x;
           centerPoint.y = this.emptyObj.location.y;
+          break;
         case 'square':
           centerPoint.x = this.emptyObj.location.x + this.emptyObj.size / 2;
           centerPoint.y = this.emptyObj.location.y + this.emptyObj.size / 2;
+          break;
+        default:
+          centerPoint.x = this.emptyObj.location.x;
+          centerPoint.y = this.emptyObj.location.y;
+          break;
       }
     }
     labelPos.x = centerPoint.x + labelPositionData[this.labelPosition].x;
@@ -680,6 +691,10 @@ export class Group extends CommonElement {
   }
   // Set Group Label
   public setLabel(content?: string, position?: string, style?: PIXI.TextStyleOptions) {
+    const groupLabel = this.getChildByName('group_label');
+    if (groupLabel) {
+      groupLabel.destroy();
+    }
     const graph: any = this.getChildByName(this.polygonHullOutlineName);
     if (this.width !== 0 && content && graph) {
       const size = _.floor(graph.width / 25) + 1;

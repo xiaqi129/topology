@@ -45,7 +45,6 @@ export class Node extends CommonElement {
     this.icon = icon;
     this.draw();
     this.tooltip = new Tooltip();
-    this.setTooltip();
   }
 
   public setParentNode(node: Group) {
@@ -74,8 +73,8 @@ export class Node extends CommonElement {
     const graph = new PIXI.Graphics();
     graph.name = 'node_graph';
     graph.lineStyle(style.lineWidth, style.lineColor);
-    graph.beginFill(style.fillColor, style.fillOpacity);
-    graph.drawCircle(0, 0, 5);
+    graph.beginFill(0X0386d2, style.fillOpacity);
+    graph.drawCircle(0, 0, 4);
     graph.endFill();
     graph.interactive = true;
     graph.buttonMode = true;
@@ -158,6 +157,7 @@ export class Node extends CommonElement {
     // sprite
     const oldSprite = this.getChildByName('node_sprite');
     this.removeChild(oldSprite);
+    this.clearDisplayObjects();
     const texture = PIXI.Texture.fromFrame(icon);
     const node = new PIXI.Sprite(texture);
     node.width = this.iconWidth;
@@ -256,9 +256,8 @@ export class Node extends CommonElement {
     this.scale.set(1);
   }
 
-  public setTooltip(content?: string, style?: any) {
-    this.removeAllListeners();
-    this.tooltip.addTooltip(this, content || this.getUID(), style);
+  public setTooltip(content: string, style?: any) {
+    this.tooltip.addTooltip(this, content, style);
   }
 
   // Set Node Label

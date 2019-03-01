@@ -20,8 +20,8 @@ import { Tooltip } from './tooltip';
 
 export class CommonAction {
   public defaultLineColor: number = 0;
+  public container: Viewport;
   private app: Application;
-  private container: Viewport;
   private topo: ITopo;
   private initScale: number | undefined;
   // bundle

@@ -94,7 +94,7 @@ const noData = function () {
 
 // tslint:disable-next-line:only-arrow-functions
 const simpleData = function () {
-
+  (window as any).network = network;
   const devices = topoData.devices;
   const links = topoData.links;
   const groups = topoData.groups;
@@ -307,7 +307,7 @@ const simpleData = function () {
       edge.setTooltip(linkTooltipContent, commonStyles);
       network.addElement(edge);
       edge.setLabel(link.local_int, link.remote_int, {
-        fontSize: 6,
+        fontSize: 8,
       });
     }
   });
@@ -366,6 +366,7 @@ const simpleData = function () {
   });
   network.syncView();
   network.setDrag();
+  network.clearZoom();
 };
 network.callback = () => {
   simpleData();
@@ -502,58 +503,69 @@ if (searchNode) {
     });
   });
 }
+const zoomNetworkElements = (zoomNum: number, e: any) => {
+  const nodesObj = network.getNodeObj();
+  const zoomScale = NP.divide(zoomNum, network.zoom);
+  _.each(nodesObj, (node: any) => {
+    node.position.set(NP.times(node.x, zoomScale), NP.times(node.y, zoomScale));
+  });
+  network.zoom = zoomNum;
+
+};
+const moveTopology = (zoom: number, originx: number, originy: number) => {
+  const moveOriginX = NP.times(originx, NP.minus(1, zoom));
+  const moveOriginY = NP.times(originy, NP.minus(1, zoom));
+  const nodesObj = network.getNodeObj();
+  _.each(nodesObj, (node: any) => {
+    node.position.set(node.x + moveOriginX, node.y + moveOriginY);
+    node.draw();
+  });
+};
 if (body) {
-  // let sign;
   body.addEventListener('wheel', (event) => {
-    const nodesObj = network.getNodeObj();
+    const zoom = network.zoom;
+    const nodeObj = network.getNodeObj();
     const edgeObj = network.getEdgeObj();
     const groupObj = network.getGroupObj();
     NP.enableBoundaryChecking(false);
-    const zoomNum = event.deltaY > 0 ? 1.05 : NP.divide(1, 1.05);
-    if (network.getZoom() < 9.5 && network.getZoom() > 0.34) {
-      _.each(nodesObj, (node: any) => {
-        const sprite: any = node.getChildByName('node_sprite') ?
-          node.getChildByName('node_sprite') : node.getChildByName('node_graph');
-        const label = node.getChildByName('node_label');
-        if (label) {
-          label.scale.x = NP.times(label.scale.x, zoomNum);
-          label.scale.y = NP.times(label.scale.y, zoomNum);
-        }
-        sprite.scale.x = NP.times(sprite.scale.x, zoomNum);
-        sprite.scale.y = NP.times(sprite.scale.y, zoomNum);
-      });
-      _.each(edgeObj, (edge: any) => {
-        const srcLabel = edge.getChildByName('edge_srclabel');
-        const endLabel = edge.getChildByName('edge_endlabel');
-        if (srcLabel && endLabel) {
-          srcLabel.scale.x = NP.times(srcLabel.scale.x, zoomNum);
-          srcLabel.scale.y = NP.times(srcLabel.scale.y, zoomNum);
-          endLabel.scale.x = NP.times(endLabel.scale.x, zoomNum);
-          endLabel.scale.y = NP.times(endLabel.scale.y, zoomNum);
-        }
-        edge.setStyle({
-          lineWidth: NP.times(edge.defaultStyle.lineWidth, zoomNum),
-        });
-        edge.draw();
-      });
-      _.each(groupObj, (group: any) => {
-        group.draw();
-      });
+    if (event.deltaY < 0) {
+      if (zoom < 4) {
+        zoomNetworkElements(zoom < 0.1 ? zoom + 0.03 : zoom + 0.05, event);
+      }
+    } else {
+      if (zoom > 0.4) {
+        zoomNetworkElements(zoom - 0.05 < 0.4 ? zoom : zoom - 0.05, event);
+      }
     }
+    const scale = NP.divide(network.zoom, zoom);
+    moveTopology(scale, event.clientX, event.clientY);
+    _.each(nodeObj, (node: any) => {
+      if (network.zoom < 0.75) {
+        node.drawGraph();
+      } else {
+        node.drawSprite(node.icon);
+      }
+    });
     if (labelToggle) {
-      if (network.getZoom() < 1) {
+      if (network.zoom < 1) {
         network.nodeLabelToggle(false);
       } else {
         network.nodeLabelToggle(true);
       }
     }
     if (edgeLabelToggle) {
-      if (network.getZoom() < 3) {
+      if (network.zoom < 2) {
         network.edgeLabelToggle(false);
       } else {
         network.edgeLabelToggle(true);
       }
     }
+    _.each(edgeObj, (edge: any) => {
+      edge.draw();
+    });
+    _.each(groupObj, (group: any) => {
+      group.draw();
+    });
   });
   window.addEventListener('keydown', (e) => {
     if (e.keyCode === 17) {
