@@ -31,12 +31,17 @@ export class CommonAction {
   private bundledEdge: any = [];
   private nodeLabelFlag: boolean = true;
   private tooltip: Tooltip;
+  // drag
+  private dragging: boolean = false;
+  private last: any;
+  private data: any;
 
   constructor(app: any, topo: ITopo, tooltip: Tooltip) {
     this.app = app;
     this.topo = topo;
     this.container = app.container;
     this.tooltip = tooltip;
+    document.addEventListener('mouseup', this.onDragEnd.bind(this));
   }
 
   public setZoom(num: number, center?: boolean) {
@@ -78,14 +83,15 @@ export class CommonAction {
   }
 
   public dragContainer() {
-    this.container.removeAllListeners('mousemove');
-    this.container.removeAllListeners('mouseup');
+    this.container.removeAllListeners();
+    this.setClick();
     this.container.cursor = 'move';
-    this.container.drag();
+    this.drag();
   }
 
   public setSelect() {
-    this.container.removePlugin('drag');
+    this.container.removeAllListeners();
+    this.setClick();
     this.container.cursor = 'crosshair';
     this.moveSelect();
   }
@@ -112,6 +118,64 @@ export class CommonAction {
     this.cleanEdge();
     this.cleanNode();
     this.topo.removeSelectedNodes();
+  }
+
+  public drag() {
+    this.container.on('mousedown', (event) => {
+      this.onDragStart(event);
+    });
+    this.container.on('mousemove', (event) => {
+      this.onDragMove(event);
+    });
+  }
+
+  public onDragStart(event: PIXI.interaction.InteractionEvent) {
+    const parent = this.container.parent.toLocal(event.data.global);
+    this.dragging = true;
+    this.data = event.data;
+    this.last = { parents: parent, x: event.data.global.x, y: event.data.global.y };
+  }
+
+  public onDragMove(event: PIXI.interaction.InteractionEvent) {
+    if (this.dragging) {
+      const newPosition = this.data.getLocalPosition(this.container.parent);
+      const distX = event.data.global.x;
+      const distY = event.data.global.y;
+      const elements = this.container.children;
+      _.each(elements, (element) => {
+        if (element instanceof Node) {
+          element.position.x += (newPosition.x - this.last.parents.x);
+          element.position.y += (newPosition.y - this.last.parents.y);
+        } else if (element instanceof Group) {
+          element.draw();
+        } else if (element instanceof Edge) {
+          element.draw();
+        } else if (element instanceof EdgeBundle) {
+          _.each(element.children, (edge: any) => {
+            edge.draw();
+          });
+        }
+      });
+      this.last = { parents: newPosition, x: distX, y: distY };
+    }
+  }
+
+  public onDragEnd() {
+    this.dragging = false;
+    this.data = null;
+    this.last = null;
+    const elements = this.container.children;
+    _.each(elements, (element) => {
+      if (element instanceof Group) {
+        element.draw();
+      } else if (element instanceof Edge) {
+        element.draw();
+      } else if (element instanceof EdgeBundle) {
+        _.each(element.children, (edge: any) => {
+          edge.draw();
+        });
+      }
+    });
   }
 
   public moveSelect() {

@@ -23,6 +23,7 @@ export class Network {
   public menu: PopMenu;
   public callback: any;
   public zoom: number;
+  public isSelect: boolean;
   private loader = PIXI.loader;
   private topo: Topo;
   private drawer: Drawer;
@@ -43,6 +44,7 @@ export class Network {
     this.menu = new PopMenu(domRegex, this.app, this.action);
     this.load = new PIXI.loaders.Loader();
     this.zoom = 1;
+    this.isSelect = false;
     this.disableContextMenu(domRegex);
   }
 
@@ -91,6 +93,17 @@ export class Network {
         maxHeight: 5000,
       });
     }
+  }
+
+  public getNetworkSize() {
+    const wrapper = document.getElementById(this.domRegex);
+    if (wrapper) {
+      return [wrapper.clientWidth, wrapper.clientHeight];
+    }
+  }
+
+  public getContainer() {
+    return this.app.getContainer();
   }
 
   public createGroup(emptyObj?: any) {
@@ -201,10 +214,12 @@ export class Network {
   }
 
   public setDrag() {
+    this.isSelect = false;
     this.action.dragContainer();
   }
 
   public setSelect() {
+    this.isSelect = true;
     this.action.setSelect();
   }
 

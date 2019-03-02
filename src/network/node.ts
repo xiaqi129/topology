@@ -15,6 +15,13 @@ import { Tooltip } from './tooltip';
 import { Edge } from './edge';
 import { EdgeBundle } from './edge-bundle';
 
+export interface IMark {
+  name: string;
+  width: number;
+  height: number;
+  position: string;
+}
+
 export class Node extends CommonElement {
   public isLock: boolean = false;
   public incluedGroups: Group[] = [];
@@ -31,6 +38,7 @@ export class Node extends CommonElement {
   private tooltip: Tooltip;
   private labelStyle: {} = {};
   private icon: any;
+  private markList: IMark[] = [];
 
   constructor(
     elements: CommonElement[],
@@ -84,6 +92,52 @@ export class Node extends CommonElement {
       .on('mouseupoutside', this.onDragEnd.bind(this))
       .on('mousemove', this.onDragMove.bind(this));
     this.addChild(graph);
+    _.each(this.markList, (mark) => {
+      const addSprite: any = this.getChildByName(`node_${mark.name}`);
+      if (addSprite) {
+        addSprite.width = 13;
+        addSprite.height = 13;
+        switch (mark.position) {
+          case 'top':
+            addSprite.x = -6.5;
+            addSprite.y = -13;
+            break;
+          case 'left':
+            addSprite.x = -13;
+            addSprite.y = -6.5;
+            break;
+          case 'bottom':
+            addSprite.x = -6.5;
+            addSprite.y = 0;
+            break;
+          case 'right':
+            addSprite.x = 0;
+            addSprite.y = -6.5;
+            break;
+          case 'top-left':
+            addSprite.x = -13;
+            addSprite.y = -13;
+            break;
+          case 'top-right':
+            addSprite.x = 0;
+            addSprite.y = -13;
+            break;
+          case 'bottom-left':
+            addSprite.x = -13;
+            addSprite.y = 0;
+            break;
+          case 'bottom-right':
+            addSprite.x = 0;
+            addSprite.y = 0;
+            break;
+          default:
+            addSprite.x = -6.5;
+            addSprite.y = -13;
+            break;
+        }
+        this.setChildIndex(addSprite, this.children.length - 1);
+      }
+    });
   }
 
   public onDragStart(event: PIXI.interaction.InteractionEvent) {
@@ -172,7 +226,56 @@ export class Node extends CommonElement {
       .on('mousemove', this.onDragMove.bind(this));
     node.name = 'node_sprite';
     this.addChild(node);
-    // }
+    _.each(this.markList, (mark: IMark) => {
+      const markSprite: any = this.getChildByName(`node_${mark.name}`);
+      if (markSprite) {
+        markSprite.width = mark.width;
+        markSprite.height = mark.height;
+        this.switchPos(markSprite, mark.position);
+        this.setChildIndex(markSprite, this.children.length - 1);
+      }
+    });
+  }
+
+  public switchPos(addSprite: any, pos: string) {
+    switch (pos) {
+      case 'top':
+        addSprite.x = -(addSprite.width / 2);
+        addSprite.y = -addSprite.height;
+        break;
+      case 'left':
+        addSprite.x = -addSprite.width;
+        addSprite.y = -(addSprite.height / 2);
+        break;
+      case 'bottom':
+        addSprite.x = -(addSprite.width / 2);
+        addSprite.y = 0;
+        break;
+      case 'right':
+        addSprite.x = 0;
+        addSprite.y = -(addSprite.height / 2);
+        break;
+      case 'top-left':
+        addSprite.x = -addSprite.width;
+        addSprite.y = -addSprite.height;
+        break;
+      case 'top-right':
+        addSprite.x = 0;
+        addSprite.y = -addSprite.height;
+        break;
+      case 'bottom-left':
+        addSprite.x = -addSprite.width;
+        addSprite.y = 0;
+        break;
+      case 'bottom-right':
+        addSprite.x = 0;
+        addSprite.y = 0;
+        break;
+      default:
+        addSprite.x = -(addSprite.width / 2);
+        addSprite.y = -addSprite.height;
+        break;
+    }
   }
 
   public getWidth() {
@@ -294,6 +397,7 @@ export class Node extends CommonElement {
   }
 
   public changeIcon(icon: string) {
+    this.icon = icon;
     this.removeChild(this.getChildByName('node_sprite'));
     this.drawSprite(icon);
   }
@@ -305,4 +409,57 @@ export class Node extends CommonElement {
   public getIncluedGroup() {
     return this.incluedGroups;
   }
+  // add and remove node mark at node around
+  public addNodeMark(icon: string, pos: string, iconWidth?: number, iconHeight?: number) {
+    const excessSprite = this.getChildByName(`node_${icon}`);
+    if (excessSprite) {
+      this.removeChild(excessSprite);
+    }
+    const txture = PIXI.Texture.fromFrame(icon);
+    const addSprite = new PIXI.Sprite(txture);
+    const sprite: any = this.getChildByName('node_sprite') ?
+      this.getChildByName('node_sprite') : this.getChildByName('node_graph');
+    let markObj: IMark;
+    addSprite.width = iconWidth || sprite.width;
+    addSprite.height = iconHeight || sprite.height;
+    addSprite.interactive = true;
+    addSprite.name = `node_${icon}`;
+    this.switchPos(addSprite, pos);
+    addSprite
+      .on('mousedown', this.onDragStart.bind(this))
+      .on('mouseup', this.onDragEnd.bind(this))
+      .on('mouseupoutside', this.onDragEnd.bind(this))
+      .on('mousemove', this.onDragMove.bind(this));
+    this.addChild(addSprite);
+    this.setChildIndex(addSprite, this.children.length - 1);
+    if (iconWidth && iconHeight) {
+      markObj = {
+        name: icon,
+        width: iconWidth,
+        height: iconHeight,
+        position: pos,
+
+      };
+    } else {
+      markObj = {
+        name: icon,
+        width: this.iconWidth,
+        height: this.iconHeight,
+        position: pos,
+      };
+    }
+    this.markList.push(markObj);
+    return addSprite;
+  }
+
+  public removeNodeMark(icon: string) {
+    const sprite = this.getChildByName(`node_${icon}`);
+    if (sprite) {
+      this.removeChild(sprite);
+      _.remove(this.markList, (mark: IMark) => {
+        return mark.name === icon;
+      });
+    }
+  }
+
 }

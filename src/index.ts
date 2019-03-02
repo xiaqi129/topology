@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import NP from 'number-precision';
 import { Network } from './network/network';
 import { data as topoData } from './simpleData';
-
+NP.enableBoundaryChecking(false);
 const iconResource = {
   resources: { name: 'resources', url: './pic/imageDict.json' },
 };
@@ -169,7 +169,8 @@ const simpleData = function () {
           { label: 'Change Switch Icon', id: '2' },
           { label: 'Lock/Unlock Node', id: '3' },
           { label: 'Print Node', id: '4' },
-          { label: 'Remove Node', id: '5' },
+          { label: 'Mark Node', id: '5' },
+          { label: 'unMark Node', id: '6' },
         ]);
         network.menu.menuOnAction = (id) => {
           if (id === '0') {
@@ -217,7 +218,9 @@ const simpleData = function () {
             // tslint:disable-next-line:no-console
             console.log(node);
           } else if (id === '5') {
-            network.removeElements(node);
+            const a = node.addNodeMark('mapSVG', 'top');
+          } else if (id === '6') {
+            node.removeNodeMark('mapSVG');
           }
         };
         network.menu.setClass('popMenu');
@@ -385,21 +388,39 @@ const linkLabelToggle = document.querySelector('button.btn_linkLabelToggle');
 const searchNode = document.querySelector('button.btn_search_node');
 if (zoomIn) {
   zoomIn.addEventListener('click', () => {
-    network.setZoom(network.getZoom() + 0.1);
+    const zoom = network.zoom;
+    const networkSize = network.getNetworkSize();
+    if (network.zoom < 4) {
+      zoomNetworkElements(NP.plus(network.zoom, 0.1));
+    }
+    if (networkSize) {
+      moveTopology(network.zoom / zoom, networkSize[0] / 2, networkSize[1] / 2);
+    }
   });
 }
 if (zoomOut) {
   zoomOut.addEventListener('click', () => {
-    if (network.getZoom() > 0.2) {
-      network.setZoom(network.getZoom() - 0.1);
+    const zoom = network.zoom;
+    const networkSize = network.getNetworkSize();
+    if (network.zoom > 0.4) {
+      zoomNetworkElements(NP.minus(network.zoom, 0.1));
+    }
+    if (networkSize) {
+      moveTopology(network.zoom / zoom, networkSize[0] / 2, networkSize[1] / 2);
     }
   });
 }
 if (zoomOver) {
   let isZoom = true;
   zoomOver.addEventListener('click', () => {
-    if (isZoom) {
-      network.zoomOver();
+    const container = network.getContainer();
+    const wrapperContainr = network.getNetworkSize();
+    if (isZoom && container && wrapperContainr) {
+      const scaleX = container.width < wrapperContainr[0] ? container.width / wrapperContainr[0] : wrapperContainr[0] / container.width;
+      const scaleY = container.height < wrapperContainr[1] ? container.height / wrapperContainr[1] : wrapperContainr[1] / container.height;
+      const zoom = scaleX > scaleY ? scaleY : scaleX;
+      zoomNetworkElements(zoom);
+      moveTopology(network.zoom / zoom, wrapperContainr[0] / 2, wrapperContainr[1] / 2);
     } else {
       network.zoomReset();
     }
@@ -503,72 +524,65 @@ if (searchNode) {
     });
   });
 }
-const zoomNetworkElements = (zoomNum: number, e: any) => {
+const zoomNetworkElements = (zoomNum: number) => {
   const nodesObj = network.getNodeObj();
   const zoomScale = NP.divide(zoomNum, network.zoom);
   _.each(nodesObj, (node: any) => {
     node.position.set(NP.times(node.x, zoomScale), NP.times(node.y, zoomScale));
   });
   network.zoom = zoomNum;
-
 };
 const moveTopology = (zoom: number, originx: number, originy: number) => {
   const moveOriginX = NP.times(originx, NP.minus(1, zoom));
   const moveOriginY = NP.times(originy, NP.minus(1, zoom));
   const nodesObj = network.getNodeObj();
+  const edgeObj = network.getEdgeObj();
+  const groupObj = network.getGroupObj();
   _.each(nodesObj, (node: any) => {
     node.position.set(node.x + moveOriginX, node.y + moveOriginY);
-    node.draw();
+    if (network.zoom < 0.75) {
+      node.drawGraph();
+    } else {
+      node.drawSprite(node.icon);
+    }
+  });
+  if (network.zoom < 1) {
+    network.nodeLabelToggle(false);
+  } else {
+    network.nodeLabelToggle(true);
+  }
+  if (edgeLabelToggle) {
+    if (network.zoom < 2) {
+      network.edgeLabelToggle(false);
+    } else {
+      network.edgeLabelToggle(true);
+    }
+  }
+  _.each(edgeObj, (edge: any) => {
+    edge.draw();
+  });
+  _.each(groupObj, (group: any) => {
+    group.draw();
   });
 };
 if (body) {
   body.addEventListener('wheel', (event) => {
     const zoom = network.zoom;
-    const nodeObj = network.getNodeObj();
-    const edgeObj = network.getEdgeObj();
-    const groupObj = network.getGroupObj();
-    NP.enableBoundaryChecking(false);
+    network.clearHighlight();
     if (event.deltaY < 0) {
       if (zoom < 4) {
-        zoomNetworkElements(zoom < 0.1 ? zoom + 0.03 : zoom + 0.05, event);
+        zoomNetworkElements(zoom + 0.1);
       }
     } else {
       if (zoom > 0.4) {
-        zoomNetworkElements(zoom - 0.05 < 0.4 ? zoom : zoom - 0.05, event);
+        zoomNetworkElements(zoom - 0.1);
       }
     }
     const scale = NP.divide(network.zoom, zoom);
     moveTopology(scale, event.clientX, event.clientY);
-    _.each(nodeObj, (node: any) => {
-      if (network.zoom < 0.75) {
-        node.drawGraph();
-      } else {
-        node.drawSprite(node.icon);
-      }
-    });
-    if (labelToggle) {
-      if (network.zoom < 1) {
-        network.nodeLabelToggle(false);
-      } else {
-        network.nodeLabelToggle(true);
-      }
-    }
-    if (edgeLabelToggle) {
-      if (network.zoom < 2) {
-        network.edgeLabelToggle(false);
-      } else {
-        network.edgeLabelToggle(true);
-      }
-    }
-    _.each(edgeObj, (edge: any) => {
-      edge.draw();
-    });
-    _.each(groupObj, (group: any) => {
-      group.draw();
-    });
   });
   window.addEventListener('keydown', (e) => {
-    if (e.keyCode === 17) {
+    if (e.keyCode === 17 && !network.isSelect) {
       network.setSelect();
     }
   });
