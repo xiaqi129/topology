@@ -49,7 +49,7 @@ const noData = function () {
   const num = 3000;
   for (let i: number = 0, len: number = num; i < len;) {
     i += 1;
-    const node = network.createNode('routerSVG');
+    const node = network.createNode('cisco-18');
     network.addElement(node);
     node.x = Math.random() * 1800;
     node.y = Math.random() * 900;

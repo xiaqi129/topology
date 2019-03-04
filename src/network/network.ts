@@ -271,9 +271,6 @@ export class Network {
   public syncView() {
     this.drawer.syncView();
     this.action.setClick();
-    if (this.getZoom() < 3) {
-      this.edgeLabelToggle(false);
-    }
   }
 
   public setClick(color?: number) {

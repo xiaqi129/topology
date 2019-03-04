@@ -8,8 +8,6 @@ export class Tooltip {
   public static commonStyles = {
     display: 'block',
     position: 'fixed',
-    // top: '0',
-    // left: '0',
     backgroundColor: 'black',
     color: 'white',
     padding: '5px 20px',
@@ -40,10 +38,6 @@ export class Tooltip {
     } else {
       Tooltip.commonStyles.display = 'none';
     }
-  }
-
-  public tooltipOff(event?: any) {
-    this.clearTooltip();
   }
 
   public clearTooltip() {

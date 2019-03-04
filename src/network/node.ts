@@ -214,8 +214,11 @@ export class Node extends CommonElement {
     this.clearDisplayObjects();
     const texture = PIXI.Texture.fromFrame(icon);
     const node = new PIXI.Sprite(texture);
-    node.width = this.iconWidth;
-    node.height = this.iconHeight;
+    const sclaeWidth = this.iconWidth / texture.width;
+    const scaleHeight = this.iconHeight / texture.height;
+    const scale = sclaeWidth > scaleHeight ? scaleHeight : sclaeWidth;
+    node.width = texture.width * scale;
+    node.height = texture.height * scale;
     node.anchor.set(0.5, 0.5);
     node.interactive = true;
     node.buttonMode = true;
@@ -313,49 +316,36 @@ export class Node extends CommonElement {
 
   public selectOn(color?: any) {
     this.selectOff();
-    const children = this.children;
-    _.each(children, (child: any) => {
-      if (child.name === 'node_sprite') {
-        const border = new PIXI.Graphics();
-        const lineWidth = 4;
-        border.lineStyle(lineWidth, color || 0X00e5ff, 1);
-        border.drawRoundedRect(
-          -(child.texture.width + lineWidth) / 2,
-          -(child.texture.height + lineWidth) / 2,
-          child.texture.width + lineWidth,
-          child.texture.height + lineWidth,
-          5,
-        );
-        border.name = 'node_border';
-        child.addChild(border);
-      }
-      if (child.name === 'node_graph') {
-        const border = new PIXI.Graphics();
-        const lineWidth = 2;
-        border.lineStyle(lineWidth, color || 0X00e5ff, 1);
-        border.drawRoundedRect(
-          -(child.width + lineWidth) / 2,
-          -(child.height + lineWidth) / 2,
-          child.width + lineWidth,
-          child.height + lineWidth,
-          7,
-        );
-        border.name = 'node_border';
-        child.addChild(border);
-      }
-    });
+    const border = new PIXI.Graphics();
+    const lineWidth = 2;
+    let radius = 0;
+    border.lineStyle(lineWidth, color || 0Xf5bd71, 1);
+    border.name = 'node_border';
+    const sprite: any = this.getChildByName('node_sprite') ?
+      this.getChildByName('node_sprite') : this.getChildByName('node_graph');
+    if (sprite.name === 'node_sprite') {
+      radius = sprite.width >= sprite.height ? sprite.width : sprite.height;
+      border.drawCircle(0, 0, radius / 2 + 5);
+      this.addChild(border);
+    }
+    if (sprite.name === 'node_graph') {
+      radius = 4;
+      border.drawCircle(0, 0, radius / 2 + 5);
+      this.addChild(border);
+    }
+
     this.scale.set(1.5);
   }
 
   public selectOff() {
-    const children = this.children;
-    _.each(children, (child: any) => {
-      if (child.name === 'node_sprite') {
-        child.removeChild(child.getChildByName('node_border'));
-      } else if (child.name === 'node_graph') {
-        child.removeChild(child.getChildByName('node_border'));
-      }
-    });
+    const sprite: any = this.getChildByName('node_sprite') ?
+      this.getChildByName('node_sprite') : this.getChildByName('node_graph');
+    if (sprite.name === 'node_sprite') {
+      this.removeChild(this.getChildByName('node_border'));
+    } else if (sprite.name === 'node_graph') {
+      this.removeChild(this.getChildByName('node_border'));
+    }
+
     this.scale.set(1);
   }
 
