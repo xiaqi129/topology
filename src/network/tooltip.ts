@@ -8,8 +8,8 @@ export class Tooltip {
   public static commonStyles = {
     display: 'block',
     position: 'fixed',
-    top: '0',
-    left: '0',
+    // top: '0',
+    // left: '0',
     backgroundColor: 'black',
     color: 'white',
     padding: '5px 20px',
@@ -21,17 +21,16 @@ export class Tooltip {
     if (ele instanceof Node) {
       ele.addEventListener('mouseover', (event: any) => {
         this.nodeTooltipOn(event, content, style);
+        this.tooltipMove(event);
       });
     } else if (ele instanceof Edge) {
       ele.addEventListener('mouseover', (event: any) => {
         this.edgeTooltipOn(event, content, style);
+        this.tooltipMove(event);
       });
     }
     ele.addEventListener('mouseout', (event: any) => {
-      this.tooltipOff(event);
-    });
-    ele.addEventListener('mousemove', (event: any) => {
-      this.tooltipMove(event);
+      this.clearTooltip();
     });
   }
 
@@ -58,16 +57,15 @@ export class Tooltip {
   private nodeTooltipOn(event: any, content: string, customStyle?: any) {
     this.clearTooltip();
     const tooltipContent = content;
-    const tooltipStyles: any = {};
-    _.assign(tooltipStyles, Tooltip.commonStyles, customStyle);
-    this.createTooltip(event, tooltipContent, tooltipStyles);
+    _.extend(Tooltip.commonStyles, customStyle);
+    this.createTooltip(event, tooltipContent, Tooltip.commonStyles);
   }
 
-  private edgeTooltipOn(event: any, content?: string, customStyle?: any) {
-    const tooltipContent = content || 'edge tooltip';
-    const tooltipStyles: any = {};
-    _.assign(tooltipStyles, Tooltip.commonStyles, customStyle);
-    this.createTooltip(event, tooltipContent, tooltipStyles);
+  private edgeTooltipOn(event: any, content: string, customStyle?: any) {
+    this.clearTooltip();
+    const tooltipContent = content;
+    _.extend(Tooltip.commonStyles, customStyle);
+    this.createTooltip(event, tooltipContent, Tooltip.commonStyles);
   }
 
   private createTooltip(event: any, content: string, styles: any) {
