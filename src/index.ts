@@ -280,6 +280,7 @@ const simpleData = function () {
         lineType: 0,
         lineWidth: 0.5,
       });
+      edge.setTooltip(linkTooltipContent, commonStyles);
       edge.edge.on('rightclick', (event: any) => {
         network.menu.setMenuItems([
           { label: 'Select its neighbors', id: '0' },
@@ -301,17 +302,17 @@ const simpleData = function () {
             // tslint:disable-next-line:no-console
             console.log(edge);
           } else if (id === '3') {
+            // network.syncView();
             network.removeElements(edge);
           }
         };
         network.menu.setClass('popMenu');
         network.menu.showMenu(event);
       });
-      edge.setTooltip(linkTooltipContent, commonStyles);
-      network.addElement(edge);
       edge.setLabel(link.local_int, link.remote_int, {
         fontSize: 8,
       });
+      network.addElement(edge);
     }
   });
   _.each(groupsList, (group) => {

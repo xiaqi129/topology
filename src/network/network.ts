@@ -207,6 +207,16 @@ export class Network {
       element.labelContent = '';
     } else if (element instanceof Edge) {
       this.topo.clearObject(this.topo.getEdgesGroup());
+      if (element.parent instanceof EdgeBundle) {
+        _.remove(element.parent.bundleEdge, (edge) => {
+          return edge === element;
+        });
+        if (element.parent.bundleEdge.length < 2) {
+          element.parent.bundleEdge[0].setStyle({
+            lineType: 0,
+          });
+        }
+      }
       element.destroy();
     } else if (element instanceof Group) {
       element.destroy();

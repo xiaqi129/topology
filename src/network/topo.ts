@@ -113,6 +113,7 @@ export class Topo implements ITopo {
       if (element instanceof Edge) {
         let edgeBundle: EdgeBundle;
         const edges = this.findBrotherEdge(element);
+        element.brotherEdges = edges;
         if (edges.length > 0) {
           edgeBundle = new EdgeBundle(element);
           edgeBundle.addEdges(edges);

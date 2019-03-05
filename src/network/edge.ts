@@ -24,10 +24,9 @@ export class Edge extends CommonElement {
   public defalultColor: number = 0;
   public bundleExplosion: boolean = false;
   public labelToggle: boolean = false;
-  private brotherEdges: Edge[] = [];
+  public brotherEdges: Edge[] = [];
   private labelStyle: any;
   private labelContent: string[];
-  private brotherEdgeName: string = 'BROTHER_EDGE';
   private bundleStyle: number = 1; // 0: link style, 1: bezier style
   private tooltip: Tooltip;
 

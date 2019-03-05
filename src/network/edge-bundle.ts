@@ -15,11 +15,11 @@ const Point = PIXI.Point;
 
 export class EdgeBundle extends CommonElement {
   public isExpanded: boolean = true;
+  public bundleEdge: any[] = [];
   private bundleID: string = '';
   private lastClickTime: number = 0;
   private bundleLabelFlag: boolean = true;
   private bundleData: any = {};
-  private bundleEdge: Edge[] = [];
   private startNode: Node;
   private endNode: Node;
   private style: any;
@@ -32,6 +32,7 @@ export class EdgeBundle extends CommonElement {
     this.endNode = edge.endNode;
     this.style = edge.defaultStyle;
     this.addChild(edge);
+    this.bundleEdge = this.children;
     this.setBundle(edge);
   }
 
@@ -63,17 +64,17 @@ export class EdgeBundle extends CommonElement {
         label.name = 'bundle_label';
         label.setPosition(4);
         afterBundle.addChild(label);
-        this.setBundle(afterBundle);
-        // add to elements
-        afterBundle.setStyle({
-          lineType: 0,
-        });
-        this.addChild(afterBundle);
         afterBundle.setChildIndex(label, afterBundle.children.length - 1);
         afterBundle.setChildIndex(graph, afterBundle.children.length - 2);
       } else {
         this.removeChild(this.getChildByName('bundle_label'));
       }
+      this.setBundle(afterBundle);
+      // add to elements
+      afterBundle.setStyle({
+        lineType: 0,
+      });
+      this.addChild(afterBundle);
     } else {
       // expand
       this.removeChildren(0, this.children.length);
@@ -97,6 +98,7 @@ export class EdgeBundle extends CommonElement {
 
   public addEdges(edges: Edge[]) {
     this.addChildren(edges);
+    this.bundleEdge = this.children;
     this.setBundleEdgesPosition();
     _.each(edges, (edge) => {
       this.setBundle(edge);

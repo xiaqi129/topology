@@ -569,7 +569,6 @@ export class Group extends CommonElement {
       this.interactive = true;
       graph.interactive = true;
       graph.buttonMode = true;
-      this.centerPoint = [emptyInfo.location.x, emptyInfo.location.y];
       this.addChild(graph);
       graph.lineStyle(style.lineWidth, style.lineColor);
       graph.beginFill(style.fillColor, style.fillOpacity);
@@ -722,6 +721,8 @@ export class Group extends CommonElement {
       label.setPosition(4);
       label.name = 'group_label';
       label.alpha = 0.8;
+      label.interactive = false;
+      label.buttonMode = false;
       if (position) {
         this.labelPosition = position;
       }
