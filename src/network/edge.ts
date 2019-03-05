@@ -716,11 +716,16 @@ export class Edge extends CommonElement {
 
   public addOthers() {
     const bundleLabel = this.getChildByName('bundle_label');
+    const bundleBackground = this.getChildByName('label_background');
     const srcLabel = this.getChildByName('edge_srclabel');
     const endLabel = this.getChildByName('edge_endlabel');
-    if (bundleLabel) {
+    if (bundleLabel && bundleBackground) {
       bundleLabel.x = (this.startNode.x + this.endNode.x) / 2;
       bundleLabel.y = (this.startNode.y + this.endNode.y) / 2;
+      bundleBackground.x = (this.startNode.x + this.endNode.x) / 2;
+      bundleBackground.y = (this.startNode.y + this.endNode.y) / 2;
+      this.setChildIndex(bundleLabel, this.children.length - 1);
+      this.setChildIndex(bundleBackground, this.children.length - 2);
     }
     if (srcLabel || endLabel) {
       this.setLabelPosition(srcLabel, endLabel);

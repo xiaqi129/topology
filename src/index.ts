@@ -562,7 +562,11 @@ const moveTopology = (zoom: number, originx: number, originy: number) => {
     edge.draw();
   });
   _.each(groupObj, (group: any) => {
+    const groupEdge = group.filterEdge();
     group.draw();
+    _.each(groupEdge, (edge) => {
+      edge.draw();
+    });
   });
 };
 if (body) {

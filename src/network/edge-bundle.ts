@@ -49,21 +49,31 @@ export class EdgeBundle extends CommonElement {
       const afterBundle = new Edge(this.startNode, this.endNode);
       afterBundle.setStyle(this.style);
       if (this.bundleLabelFlag && this.bundleData[bundleId]) {
-        const label = new Label(`(${this.bundleData[bundleId].length})`);
+        const graph = new PIXI.Graphics();
+        graph.name = 'label_background';
+        graph.beginFill(0X0081cf, 1);
+        graph.drawCircle(0, 0, 7);
+        graph.endFill();
+        afterBundle.addChild(graph);
+        const label = new Label(`${this.bundleData[bundleId].length}`, {
+          fill: 0Xffffff,
+          fontFamily: 'Times New Roman',
+          fontWeight: 'bold',
+        });
         label.name = 'bundle_label';
         label.setPosition(4);
-        label.x = (this.startNode.x + this.endNode.x) / 2;
-        label.y = (this.startNode.y + this.endNode.y) / 2;
         afterBundle.addChild(label);
+        this.setBundle(afterBundle);
+        // add to elements
+        afterBundle.setStyle({
+          lineType: 0,
+        });
+        this.addChild(afterBundle);
+        afterBundle.setChildIndex(label, afterBundle.children.length - 1);
+        afterBundle.setChildIndex(graph, afterBundle.children.length - 2);
       } else {
         this.removeChild(this.getChildByName('bundle_label'));
       }
-      this.setBundle(afterBundle);
-      // add to elements
-      afterBundle.setStyle({
-        lineType: 0,
-      });
-      this.addChild(afterBundle);
     } else {
       // expand
       this.removeChildren(0, this.children.length);
