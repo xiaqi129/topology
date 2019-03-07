@@ -375,22 +375,6 @@ export class CommonAction {
     }
   }
 
-  public nodeLabelToggle(labelToggle: boolean) {
-    if (labelToggle) {
-      _.each(this.container.children, (element) => {
-        if (element instanceof Node) {
-          element.setLabel(element.getLabelContent(), element.getLabelStyle());
-        }
-      });
-    } else {
-      _.each(this.container.children, (element) => {
-        if (element instanceof Node) {
-          element.removeChild(element.getChildByName('node_label'));
-        }
-      });
-    }
-  }
-
   public toggleLabel() {
     this.nodeLabelFlag = !this.nodeLabelFlag;
   }

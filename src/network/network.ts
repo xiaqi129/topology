@@ -338,7 +338,13 @@ export class Network {
   }
 
   public nodeLabelToggle(labelToggle: boolean) {
-    this.action.nodeLabelToggle(labelToggle);
+    const nodes = this.getNodeObj();
+    _.each(nodes, (node: Node) => {
+      const nodeLabel = node.getChildByName('node_label');
+      if (nodeLabel) {
+        nodeLabel.visible = labelToggle;
+      }
+    });
   }
 
   public searchNode(node: Node) {

@@ -99,6 +99,8 @@ const simpleData = function () {
   const links = topoData.links;
   const groups = topoData.groups;
   const groupsList = keySort(groups);
+  const labelArray: any = [];
+  const anchorArray: any = [];
   // create Node
   _.each(devices, (device: any) => {
     const client = device.clients.User_Mark;
@@ -160,7 +162,23 @@ const simpleData = function () {
       network.addElement(node);
       node.x = device.location.x;
       node.y = device.location.y;
-      node.setLabel(device.name, nodeLabelStyle);
+      const label = node.setLabel(device.name, nodeLabelStyle);
+      const sprite: any = node.getChildByName('node_sprite');
+      const radius = sprite.width > sprite.height ? sprite.width : sprite.height;
+      if (label && sprite) {
+        labelArray.push({
+          x: node.x + label.x,
+          y: node.y + label.y,
+          name: label.text,
+          width: label.width,
+          height: label.height,
+        });
+        anchorArray.push({
+          x: node.x,
+          y: node.y,
+          r: radius,
+        });
+      }
       node.setTooltip(tooltipContent, commonStyles);
       node.on('rightclick', (event: any) => {
         network.menu.setMenuItems([
@@ -228,6 +246,8 @@ const simpleData = function () {
       });
     }
   });
+  // console.log(labelArray);
+  // console.log(anchorArray);
   // create Links
   const nodes = network.getNodeObj();
   const edgeLabel = {
@@ -277,7 +297,8 @@ const simpleData = function () {
         fillArrow: true,
         lineColor: 0X0386d2,
         lineDistance: 0,
-        lineType: 0,
+        lineType: 1,
+        lineFull: 1,
         lineWidth: 0.5,
       });
       edge.setTooltip(linkTooltipContent, commonStyles);
@@ -450,7 +471,7 @@ let labelToggle = true;
 if (nodeLabelToggle) {
   nodeLabelToggle.addEventListener('click', () => {
     labelToggle = !labelToggle;
-    network.setBundleFlag(labelToggle);
+    network.nodeLabelToggle(labelToggle);
   });
 }
 let bundleLabelToggle = true;

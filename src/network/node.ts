@@ -286,7 +286,7 @@ export class Node extends CommonElement {
     if (sprite) {
       return (sprite as any).width;
     }
-    return this.width;
+    return 8;
   }
 
   public getHeight() {
@@ -294,7 +294,7 @@ export class Node extends CommonElement {
     if (sprite) {
       return (sprite as any).height;
     }
-    return this.height;
+    return 8;
   }
 
   public selectOne(color?: any) {
@@ -367,6 +367,7 @@ export class Node extends CommonElement {
       label.name = 'node_label';
       this.addChild(label);
       this.labelContent = label.text;
+      return label;
     }
   }
 
