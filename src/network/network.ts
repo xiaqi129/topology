@@ -7,6 +7,7 @@
 
 import * as _ from 'lodash';
 import { Application } from './application';
+import { ArrowLine, IPoint } from './arrow-line';
 import { CommonAction } from './common-action';
 import { Drawer } from './drawer';
 import { Edge } from './edge';
@@ -114,6 +115,10 @@ export class Network {
     return this.topo.createEdge(startNode, endNode);
   }
 
+  public createArrowLine(start: IPoint, end: IPoint) {
+    return this.topo.createArrowLine(start, end);
+  }
+
   public clear() {
     const elements = this.topo.getElements();
     _.each(elements, (element) => {
@@ -212,12 +217,14 @@ export class Network {
           return edge === element;
         });
         if (element.parent.bundleEdge.length < 2) {
-          element.parent.bundleEdge[0].setStyle({
-            lineType: 0,
-          });
+          if (element.parent.bundleEdge[0]) {
+            element.parent.bundleEdge[0].setStyle({
+              lineType: 0,
+            });
+          }
         }
       }
-      element.destroy();
+      element.removeChildren(0, element.children.length);
     } else if (element instanceof Group) {
       element.destroy();
     }

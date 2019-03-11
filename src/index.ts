@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 import NP from 'number-precision';
+// import { Labeler } from './network/lib/labeler';
 import { Network } from './network/network';
 import { data as topoData } from './simpleData';
 NP.enableBoundaryChecking(false);
@@ -42,6 +43,7 @@ const nodeLabelStyle = {
   wordWrapWidth: 73,
 };
 const network = new Network('network');
+// const labeler = new Labeler();
 network.initIconResource(iconResource);
 
 // tslint:disable-next-line:only-arrow-functions
@@ -163,22 +165,22 @@ const simpleData = function () {
       node.x = device.location.x;
       node.y = device.location.y;
       const label = node.setLabel(device.name, nodeLabelStyle);
-      const sprite: any = node.getChildByName('node_sprite');
-      const radius = sprite.width > sprite.height ? sprite.width : sprite.height;
-      if (label && sprite) {
-        labelArray.push({
-          x: node.x + label.x,
-          y: node.y + label.y,
-          name: label.text,
-          width: label.width,
-          height: label.height,
-        });
-        anchorArray.push({
-          x: node.x,
-          y: node.y,
-          r: radius,
-        });
-      }
+      // const sprite: any = node.getChildByName('node_sprite');
+      // const radius = sprite.width > sprite.height ? sprite.width : sprite.height;
+      // if (label && sprite) {
+      //   labelArray.push({
+      //     x: node.x + label.x,
+      //     y: node.y + label.y,
+      //     name: label.text,
+      //     width: label.width,
+      //     height: label.height,
+      //   });
+      //   anchorArray.push({
+      //     x: node.x,
+      //     y: node.y,
+      //     r: radius,
+      //   });
+      // }
       node.setTooltip(tooltipContent, commonStyles);
       node.on('rightclick', (event: any) => {
         network.menu.setMenuItems([
@@ -244,10 +246,50 @@ const simpleData = function () {
         network.menu.setClass('popMenu');
         network.menu.showMenu(event);
       });
+      // let dragging: boolean = false;
+      // let data: any = null;
+      // let parent: any = null;
+      // let last: any = null;
+      // let mark: PIXI.Sprite | undefined;
+      // node.on('mousedown', (event: any) => {
+      //   if (network.getSelectedNodes().length === 0) {
+      //     mark = node.addNodeMark('map-greenSVG', 'bottom-left');
+      //     mark.on('mousedown', (e: any) => {
+      //       parent = node.parent.toLocal(e.data.global);
+      //       node.off('mousemove');
+      //       dragging = true;
+      //       data = e.data;
+      //       last = { parents: parent, x: e.data.global.x, y: e.data.global.y };
+      //     });
+      //     mark.on('mousemove', (e: any) => {
+      //       if (dragging) {
+      //         const newPosition = data.getLocalPosition(node.parent);
+      //         const distX = e.data.global.x;
+      //         const distY = e.data.global.y;
+      //         network.createArrowLine(parent, newPosition);
+      //         last = { parents: newPosition, x: distX, y: distY };
+      //       }
+      //     });
+      //     document.addEventListener('mouseup', () => {
+      //       dragging = false;
+      //       data = null;
+      //       last = null;
+      //       node.on('mousemove', node.onDragMove);
+      //     });
+      //   }
+      // });
     }
   });
+  // const wrapper = document.getElementById('network');
   // console.log(labelArray);
-  // console.log(anchorArray);
+  // labeler.label(labelArray);
+  // labeler.anchor(anchorArray);
+  // if (wrapper) {
+  //   labeler.width(wrapper.clientWidth);
+  //   labeler.height(wrapper.clientHeight);
+  // }
+  // labeler.start(1000);
+  // console.log(labeler.start(1000));
   // create Links
   const nodes = network.getNodeObj();
   const edgeLabel = {
@@ -297,8 +339,8 @@ const simpleData = function () {
         fillArrow: true,
         lineColor: 0X0386d2,
         lineDistance: 0,
-        lineType: 1,
-        lineFull: 1,
+        lineType: 0,
+        lineFull: 0,
         lineWidth: 0.5,
       });
       edge.setTooltip(linkTooltipContent, commonStyles);

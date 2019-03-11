@@ -6,6 +6,7 @@
  */
 
 import * as _ from 'lodash';
+import { ArrowLine, IPoint } from './arrow-line';
 import { CommonElement } from './common-element';
 import { Edge } from './edge';
 import { EdgeBundle } from './edge-bundle';
@@ -22,6 +23,8 @@ export interface ITopo {
   addElements(node: Node[] | Group[] | Edge[]): void;
 
   createNode(load: PIXI.loaders.Loader, texture: string): Node;
+
+  createArrowLine(start: Node, end: IPoint): ArrowLine;
 
   createGroup(): Group;
 
@@ -78,9 +81,9 @@ export class Topo implements ITopo {
   // find brother edge not in edge bundle
   public findBrotherEdge(edge: Edge) {
     const edgesFound: Edge[] = _.get(this.edgesGroupByNodes, edge.edgeNodesSortUIDStr(), []);
-    // _.remove(edgesFound, (edgeFound: Edge) => {
-    //   return edgeFound.parent instanceof EdgeBundle;
-    // });
+    _.remove(edgesFound, (edgeFound: Edge) => {
+      return edgeFound === edge;
+    });
     return edgesFound;
   }
 
@@ -127,10 +130,10 @@ export class Topo implements ITopo {
             edgeBundle.addEdge(element);
           }
         }
+        this.refreshEdgesMaps();
         if (!edgeBundle) {
           this.elements.push(element);
         }
-        this.refreshEdgesMaps();
       } else {
         this.elements.push(element);
       }
@@ -191,6 +194,10 @@ export class Topo implements ITopo {
 
   public createEdge(startNode: Node | Group, endNode: Node | Group): Edge {
     return new Edge(startNode, endNode);
+  }
+
+  public createArrowLine(start: IPoint, end: IPoint) {
+    return new ArrowLine(start, end);
   }
 
   public createLabel(text?: string, style?: PIXI.TextStyleOptions, canvas?: HTMLCanvasElement) {

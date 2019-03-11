@@ -53,6 +53,11 @@ export class Node extends CommonElement {
     this.icon = icon;
     this.draw();
     this.tooltip = new Tooltip();
+    this
+    .on('mousedown', this.onDragStart)
+    .on('mouseup', this.onDragEnd)
+    .on('mouseupoutside', this.onDragEnd)
+    .on('mousemove', this.onDragMove);
   }
 
   public setParentNode(node: Group) {
@@ -86,11 +91,6 @@ export class Node extends CommonElement {
     graph.endFill();
     graph.interactive = true;
     graph.buttonMode = true;
-    graph
-      .on('mousedown', this.onDragStart.bind(this))
-      .on('mouseup', this.onDragEnd.bind(this))
-      .on('mouseupoutside', this.onDragEnd.bind(this))
-      .on('mousemove', this.onDragMove.bind(this));
     this.addChild(graph);
     _.each(this.markList, (mark) => {
       const addSprite: any = this.getChildByName(`node_${mark.name}`);
@@ -222,11 +222,6 @@ export class Node extends CommonElement {
     node.anchor.set(0.5, 0.5);
     node.interactive = true;
     node.buttonMode = true;
-    node
-      .on('mousedown', this.onDragStart.bind(this))
-      .on('mouseup', this.onDragEnd.bind(this))
-      .on('mouseupoutside', this.onDragEnd.bind(this))
-      .on('mousemove', this.onDragMove.bind(this));
     node.name = 'node_sprite';
     this.addChild(node);
     _.each(this.markList, (mark: IMark) => {
@@ -306,7 +301,6 @@ export class Node extends CommonElement {
     } else {
       _.each(this.elements, (element: any) => {
         if (element instanceof Node) {
-          // element.clearBorder();
           element.selectOff();
         }
       });
@@ -345,6 +339,7 @@ export class Node extends CommonElement {
     } else if (sprite.name === 'node_graph') {
       this.removeChild(this.getChildByName('node_border'));
     }
+    // this.removeChild(this.getChildByName('node_map-greenSVG'));
 
     this.scale.set(1);
   }
@@ -416,11 +411,6 @@ export class Node extends CommonElement {
     addSprite.interactive = true;
     addSprite.name = `node_${icon}`;
     this.switchPos(addSprite, pos);
-    addSprite
-      .on('mousedown', this.onDragStart.bind(this))
-      .on('mouseup', this.onDragEnd.bind(this))
-      .on('mouseupoutside', this.onDragEnd.bind(this))
-      .on('mousemove', this.onDragMove.bind(this));
     this.addChild(addSprite);
     this.setChildIndex(addSprite, this.children.length - 1);
     if (iconWidth && iconHeight) {
