@@ -9,11 +9,9 @@
 import * as _ from 'lodash';
 import polygon from 'polygon';
 import Offset from 'polygon-offset/dist/offset';
-import { CommonAction } from './common-action';
 import { CommonElement, IPosition } from './common-element';
 import { Edge } from './edge';
 import { EdgeBundle } from './edge-bundle';
-import { GroupEdge } from './edge-conn-group';
 import { Label } from './label';
 import ConvexHullGrahamScan from './lib/convex-hull';
 import { Node } from './node';
@@ -30,16 +28,28 @@ export interface IEmptyGroup {
   opacity: number;
 }
 
+export interface InodeResource {
+  src: Node;
+  end: Node;
+  srcLabel: PIXI.DisplayObject;
+  endLabel: PIXI.DisplayObject;
+}
+
+export interface IedgeResource {
+  src: string;
+  end: string;
+  line: string;
+}
+
 export class Group extends CommonElement {
-  public groupEdgesEvent?: IEvent = {};
   public isExpanded: boolean = true;
-  public groupEdges: GroupEdge[] = [];
   public centerPoint: any[] = [];
   public isLock: boolean = false;
   public expandedVisibleNodes: any[] = [];
   public superstratumInfo: Group[] = [];
   public substratumInfo: Group[] = [];
   public labelContent: string = '';
+  private edgeResource: IedgeResource[] = [];
   private labelStyle: any;
   private toggleExpanded: boolean = false;
   private positionList: IPosition[] = [];
@@ -56,19 +66,23 @@ export class Group extends CommonElement {
   private hideEdges: Edge[] = [];
   private labelPosition: string = 'Center';
   private emptyObj: IEmptyGroup | undefined;
+  // toggle
+  private edgeArray: Edge[] = [];
+  private nodeResource: InodeResource[] = [];
 
-  constructor(elements: Edge | CommonElement[], emptyObj: IEmptyGroup | undefined) {
+  constructor(elements: CommonElement[], emptyObj: IEmptyGroup | undefined) {
     super();
     this.elements = elements;
     this.labelStyle = {};
     this.emptyObj = emptyObj;
+    this.edgeResource = this.getEdgeResource();
     this.draw();
     document.addEventListener('mouseup', this.onDragEnd.bind(this));
   }
 
   public toggleGroupExpand() {
     const graph = this.getChildByName(this.polygonHullOutlineName);
-    graph.on('click', (event) => {
+    graph.on('click', () => {
       // event.stopPropagation();
       const currentTime = new Date().getTime();
       const includeGroups = this.childrenNode[0].getIncluedGroup();
@@ -77,7 +91,13 @@ export class Group extends CommonElement {
         if (currentTime - this.lastClickTime < 500) {
           this.isExpanded = !this.isExpanded;
           this.lastClickTime = 0;
-          this.setExpaned(this.isExpanded);
+          this.changeEdgeResource();
+          this.toggleChildNodesVisible(this.isExpanded);
+          if (!this.isExpanded) {
+            this.removeEdgeLabel();
+          } else {
+            this.addEdgeLabel();
+          }
           this.toggleShowEdges(this.isExpanded);
           this.redrawGroup(this.isExpanded);
         } else {
@@ -102,11 +122,6 @@ export class Group extends CommonElement {
   }
 
   public redrawGroup(expanded: boolean) {
-    _.each(this.elements, (group: CommonElement) => {
-      if (group instanceof Group) {
-        group.draw();
-      }
-    });
     _.each(this.substratumInfo, (group) => {
       group.visible = expanded;
     });
@@ -134,15 +149,78 @@ export class Group extends CommonElement {
     return visibleNodes;
   }
 
-  public setExpaned(expanded: boolean) {
-    this.toggleChildNodesVisible(expanded);
-    this.isExpanded = expanded;
+  public removeEdgeLabel() {
+    _.each(this.edgeArray, (edge: Edge) => {
+      this.nodeResource.push({
+        src: edge.startNode,
+        end: edge.endNode,
+        srcLabel: edge.getChildByName('edge_srclabel'),
+        endLabel: edge.getChildByName('edge_endlabel'),
+      });
+      edge.removeChild(edge.getChildByName('edge_srclabel'));
+      edge.removeChild(edge.getChildByName('edge_endlabel'));
+    });
     this.draw();
   }
 
-  public getVisibleEdge() {
+  public changeEdgeResource() {
+    const edgeResource: IedgeResource[] = _.cloneDeep(this.edgeResource);
+    _.each(this.getAllGroup(), (group: Group) => {
+      if (!group.isExpanded) {
+        const nodes = group.childrenNode;
+        _.each(nodes, (node: Node) => {
+          const change = edgeResource.filter(n => n.src === node.getUID() || n.end === node.getUID());
+          _.each(change, (e: IedgeResource) => {
+            if (e.src !== e.end) {
+              if (e.src === node.getUID()) {
+                e.src = group.getUID();
+              } else if (e.end === node.getUID()) {
+                e.end = group.getUID();
+              }
+            }
+          });
+        });
+      }
+    });
+    _.each(edgeResource, (e: IedgeResource) => {
+      const edge: Edge = this.getElementById(e.line);
+      if (edge && edge.visible && e.src !== e.end) {
+        edge.startNode = this.getElementById(e.src);
+        edge.endNode = this.getElementById(e.end);
+        edge.draw();
+      }
+    });
+  }
+
+  public getElementById(id: string) {
+    let elements: CommonElement[] = [];
+    _.each(this.elements, (element: CommonElement) => {
+      if (element instanceof EdgeBundle) {
+        const childrenEdges = element.children as Edge[];
+        elements = elements.concat(childrenEdges);
+      } else {
+        elements.push(element);
+      }
+    });
+    const ele: any = _.find(elements, (element) => {
+      return element.id === id;
+    });
+    return ele;
+  }
+
+  public groupEdge() {
+    // const edgeResource: IedgeResource[] = this.getEdgeResource();
+    // const edgeGroupBy = _.groupBy(edgeResource, (edge: IedgeResource) => {
+    //   return [`${edge.src.getUID()}${edge.src.getClassName()}`, `${edge.end.getUID()}${edge.end.getClassName()}`].sort().join();
+    // });
+    // _.each(edgeGroupBy, (groupEdge) => {
+
+    // });
+    // console.log(edgeGroupBy);
+  }
+
+  public getVisibleEdge(edges: Edge[]) {
     let visibleEdges;
-    const edges = this.filterEdge();
     if (!this.isExpanded) {
       this.hideEdges = _.filter(edges, (edge) => {
         return !edge.visible && !this.isExpanded;
@@ -157,9 +235,30 @@ export class Group extends CommonElement {
     this.position.set(0, 0);
     this.childrenNode.push(element);
     this.emptyObj = undefined;
+    this.edgeArray = _.difference(this.filterEdge(), this.filterInsideEdge());
     if (!preventDraw) {
       this.draw();
     }
+  }
+
+  public getAllGroup() {
+    return _.filter(this.elements, (element: CommonElement) => {
+      return element instanceof Group;
+    });
+  }
+
+  public getEdgeResource() {
+    const edges = this.getChildEdges();
+    const edgeResource: IedgeResource[] = [];
+    _.each(edges, (edge: Edge) => {
+      const edgeObj = {
+        src: edge.startNode.getUID(),
+        end: edge.endNode.getUID(),
+        line: edge.getUID(),
+      };
+      edgeResource.push(edgeObj);
+    });
+    return edgeResource;
   }
 
   public removeChildNodes() {
@@ -246,7 +345,7 @@ export class Group extends CommonElement {
     }
   }
 
-  public onDragEnd(event: any) {
+  public onDragEnd() {
     this.dragging = false;
     this.last = null;
   }
@@ -254,7 +353,7 @@ export class Group extends CommonElement {
   public onDragMove(event: any) {
     if (this.dragging) {
       const newPosition = this.parent.toLocal(event.data.global);
-      const edges = this.filterEdge();
+      const edges = this.getChildEdges();
       const intersectionNodes = this.intersection()[0];
       const intersectionGroup = this.intersection()[1];
       if (this.childrenNode.length > 0) {
@@ -393,12 +492,6 @@ export class Group extends CommonElement {
     }
   }
 
-  public addEventListener(event: string, callback: any) {
-    const eventsMap: any = {};
-    eventsMap[event] = callback;
-    _.extend(this.groupEdgesEvent, eventsMap);
-  }
-
   public getWidth() {
     return this.defaultStyle.width + this.defaultStyle.padding;
   }
@@ -481,50 +574,21 @@ export class Group extends CommonElement {
   }
 
   public toggleShowEdges(visible: boolean) {
-    const edgeListGroup = this.analyzeEdges();
-    _.each(_.flatten(edgeListGroup), (edge: Edge) => {
+    const edges = this.getVisibleEdge(this.filterInsideEdge());
+    _.each(edges, (edge: Edge) => {
       edge.visible = visible;
     });
-    return edgeListGroup;
   }
 
-  public rmElements(elements: PIXI.DisplayObject[]) {
-    _.each(elements, (element: PIXI.DisplayObject) => {
-      element.destroy();
-    });
-    return _.remove(elements);
-  }
-
-  public drawEdges() {
-    const edges = this.filterEdge();
-    const nodes = _.filter(this.childrenNode, (item) => {
-      return item instanceof Node;
-    });
-    _.each(edges, (edge: Edge) => {
-      // const edge = edges[0];
-      const srcNode = edge.getSrcNode();
-      const targetNode = edge.getTargetNode();
-      const srcNodeInGroup = _.includes(nodes, srcNode);
-      const targetNodeInGroup = _.includes(nodes, targetNode);
-      if (!(srcNodeInGroup && targetNodeInGroup)) {
-        const groupEdgeParams =
-          (srcNodeInGroup && !targetNodeInGroup) ?
-            [this, targetNode, edges] : [srcNode, this, edges];
-        const groupEdge: GroupEdge = new GroupEdge(
-          groupEdgeParams[0], groupEdgeParams[1], groupEdgeParams[2]);
-        groupEdge.setStyle(edge.getStyle());
-        this.addChild(groupEdge);
-        this.groupEdges.push(groupEdge);
-        const edgeGraphic = groupEdge.getEdge();
-        edgeGraphic.interactive = true;
-        edgeGraphic.buttonMode = true;
-        _.each(this.groupEdgesEvent, ((call: any, event: any) => {
-          edgeGraphic.on(event, () => {
-            call(edges, this);
-          });
-        }).bind(this));
-      }
-    });
+  public addEdgeLabel() {
+    if (this.nodeResource.length > 0) {
+      _.each(this.edgeArray, (edge: Edge, i: number) => {
+        if (this.nodeResource[i].srcLabel && this.nodeResource[i].endLabel) {
+          edge.addChild(this.nodeResource[i].srcLabel);
+          edge.addChild(this.nodeResource[i].endLabel);
+        }
+      });
+    }
   }
 
   public sortGraphicsIndex() {
@@ -539,10 +603,9 @@ export class Group extends CommonElement {
   }
 
   public draw() {
-    this.rmElements(this.groupEdges);
     this.clearDisplayObjects();
     if (!this.isExpanded) {
-      this.drawEdges();
+      // this.drawEdges();
       this.drawGroupNode();
     } else {
       if (!this.emptyObj) {
@@ -620,6 +683,20 @@ export class Group extends CommonElement {
         return true;
       }
       return false;
+    });
+    return edges;
+  }
+
+  public filterInsideEdge() {
+    let edges: Edge[] = this.getChildEdges();
+    let nodes = _.filter(this.childrenNode, (item) => {
+      return item instanceof Node;
+    });
+    nodes = _.concat(nodes, this.substratumInfo);
+    edges = _.filter(edges, (edge: Edge) => {
+      const srcNode = edge.getSrcNode();
+      const targetNode = edge.getTargetNode();
+      return _.includes(nodes, srcNode) && _.includes(nodes, targetNode);
     });
     return edges;
   }
@@ -782,14 +859,4 @@ export class Group extends CommonElement {
       }
     }
   }
-
-  private analyzeEdges() {
-    const edges = this.getVisibleEdge();
-    return _.values(_.groupBy(edges, (edge: Edge) => {
-      const srcNodeId = edge.getSrcNode().getUID();
-      const targetNodeId = edge.getTargetNode().getUID();
-      return _.join([srcNodeId, targetNodeId].sort());
-    }));
-  }
-
 }

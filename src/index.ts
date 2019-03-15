@@ -601,6 +601,7 @@ const moveTopology = (zoom: number, originx: number, originy: number) => {
   const moveOriginY = NP.times(originy, NP.minus(1, zoom));
   const nodesObj = network.getNodeObj();
   const edgeObj = network.getEdgeObj();
+  // console.log(_.size(edgeObj));
   const groupObj = network.getGroupObj();
   _.each(nodesObj, (node: any) => {
     node.position.set(node.x + moveOriginX, node.y + moveOriginY);

@@ -64,7 +64,7 @@ export abstract class CommonElement extends PIXI.Container {
     width: 15,
     clickColor: 0X00e5ff,
   };
-  private id: string = _.uniqueId('element_');
+  public id: string = _.uniqueId('element_');
 
   constructor() {
     super();

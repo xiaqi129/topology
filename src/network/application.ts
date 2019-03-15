@@ -74,6 +74,7 @@ export class Application extends PIXI.Application {
       if (this.container && this.viewWrapper) {
         this.renderer.resize(this.viewWrapper.clientWidth, this.viewWrapper.clientHeight);
         this.container.resize(this.viewWrapper.clientWidth, this.viewWrapper.clientHeight);
+        this.container.moveCenter(this.viewWrapper.clientWidth / 2, this.viewWrapper.clientHeight / 2);
       }
     });
   }

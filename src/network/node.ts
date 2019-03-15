@@ -184,8 +184,6 @@ export class Node extends CommonElement {
 
   public redrawEdge() {
     _.each(this.elements, (element: any) => {
-      const groupEdges = element.groupEdges;
-      const isExpanded = element.isExpanded;
       // redraw all of the EdgeBundle and Edge
       if (element instanceof EdgeBundle) {
         _.each(element.children, (edge: any) => {
@@ -198,11 +196,6 @@ export class Node extends CommonElement {
       // when the group is Expanded redraw it
       if (element instanceof Group && element.isExpanded) {
         element.draw();
-      }
-      // when the group is close on redraw groupEdges
-      if (element instanceof Group && !isExpanded) {
-        element.rmElements(groupEdges);
-        element.drawEdges();
       }
     });
   }

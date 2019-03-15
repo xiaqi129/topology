@@ -49,6 +49,7 @@ export class EdgeBundle extends CommonElement {
       this.removeChildren(0, this.children.length);
       const afterBundle = new Edge(this.startNode, this.endNode);
       afterBundle.setStyle(this.style);
+      afterBundle.name = 'bundle_line';
       if (this.bundleLabelFlag && this.bundleData[bundleId]) {
         const graph = new PIXI.Graphics();
         graph.name = 'label_background';
@@ -66,18 +67,18 @@ export class EdgeBundle extends CommonElement {
         afterBundle.addChild(label);
         afterBundle.setChildIndex(label, afterBundle.children.length - 1);
         afterBundle.setChildIndex(graph, afterBundle.children.length - 2);
+        // add to elements
+        afterBundle.setStyle({
+          lineType: 0,
+        });
+        this.addChild(afterBundle);
       } else {
         this.removeChild(this.getChildByName('bundle_label'));
       }
       this.setBundle(afterBundle);
-      // add to elements
-      afterBundle.setStyle({
-        lineType: 0,
-      });
-      this.addChild(afterBundle);
     } else {
       // expand
-      this.removeChildren(0, this.children.length);
+      this.removeChild(this.getChildByName('bundle_line'));
       const edges = this.bundleData[bundleId];
       _.each(edges, (bundleEdge) => {
         this.addChild(bundleEdge);

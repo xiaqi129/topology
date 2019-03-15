@@ -813,8 +813,8 @@ export class Edge extends CommonElement {
     const oldSrc = this.getChildByName('edge_srclabel');
     const oldEnd = this.getChildByName('edge_endlabel');
     if (oldSrc || oldEnd) {
-      this.removeChild(oldSrc);
-      this.removeChild(oldEnd);
+      oldSrc.destroy();
+      oldEnd.destroy();
     }
     if (srcContent || endContent) {
       const srcLabel = new Label(srcContent, this.labelStyle);

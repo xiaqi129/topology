@@ -130,13 +130,13 @@ export class Topo implements ITopo {
             edgeBundle.addEdge(element);
           }
         }
-        this.refreshEdgesMaps();
         if (!edgeBundle) {
           this.elements.push(element);
         }
       } else {
         this.elements.push(element);
       }
+      this.refreshEdgesMaps();
     });
   }
 
