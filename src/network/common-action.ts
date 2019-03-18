@@ -83,7 +83,7 @@ export class CommonAction {
   }
 
   public dragContainer() {
-    this.container.cursor = 'move';
+    this.container.buttonMode = true;
     this.container.removeAllListeners();
     this.clearHighlight();
     this.drag();

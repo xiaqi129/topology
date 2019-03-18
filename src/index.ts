@@ -341,7 +341,7 @@ const simpleData = function () {
         lineDistance: 0,
         lineType: 0,
         lineFull: 0,
-        lineWidth: 0.5,
+        lineWidth: 1,
       });
       edge.setTooltip(linkTooltipContent, commonStyles);
       edge.edge.on('rightclick', (event: any) => {

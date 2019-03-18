@@ -34,6 +34,8 @@ export interface ITopo {
 
   clear(): void;
 
+  getEdgesGroup(): { [key: string]: Edge[] };
+
   setSelectedNodes(element: CommonElement): void;
 
   getSelectedNodes(): any[];
@@ -47,6 +49,10 @@ export interface ITopo {
   removeSelectedEdge(): void;
 
   removeEdgeBundleByName(name: string): void;
+
+  removeElement(element: CommonElement): void;
+
+  clearObject(obj: { [key: string]: any }): void;
 
 }
 
@@ -76,6 +82,36 @@ export class Topo implements ITopo {
       return true;
     }
     return false;
+  }
+
+  public removeElement(element: CommonElement) {
+    const elements = this.getElements();
+    _.remove(elements, (elem: CommonElement) => {
+      return element === elem;
+    });
+    if (element instanceof Node) {
+      element.removeChildren(0, element.children.length);
+      element.labelContent = '';
+    } else if (element instanceof Edge) {
+      this.clearObject(this.getEdgesGroup());
+      if (element.parent instanceof EdgeBundle) {
+        _.remove(element.parent.bundleEdge, (edge) => {
+          return edge === element;
+        });
+        if (element.parent.bundleEdge.length < 2) {
+          if (element.parent.bundleEdge[0]) {
+            element.parent.bundleEdge[0].setStyle({
+              lineType: 0,
+            });
+          }
+        }
+      }
+      element.removeChildren(0, element.children.length);
+      element.startNode = undefined;
+      element.endNode = undefined;
+    } else if (element instanceof Group) {
+      element.destroy();
+    }
   }
 
   // find brother edge not in edge bundle
@@ -150,7 +186,6 @@ export class Topo implements ITopo {
     _.each(keys, (key: string) => {
       delete obj[key];
     });
-    return obj;
   }
 
   public refreshEdgesMaps() {

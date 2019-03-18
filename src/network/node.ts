@@ -54,10 +54,10 @@ export class Node extends CommonElement {
     this.draw();
     this.tooltip = new Tooltip();
     this
-    .on('mousedown', this.onDragStart)
-    .on('mouseup', this.onDragEnd)
-    .on('mouseupoutside', this.onDragEnd)
-    .on('mousemove', this.onDragMove);
+      .on('mousedown', this.onDragStart)
+      .on('mouseup', this.onDragEnd)
+      .on('mouseupoutside', this.onDragEnd)
+      .on('mousemove', this.onDragMove);
   }
 
   public setParentNode(node: Group) {
@@ -203,8 +203,9 @@ export class Node extends CommonElement {
   public drawSprite(icon: any) {
     // sprite
     const oldSprite = this.getChildByName('node_sprite');
+    const oldgraph = this.getChildByName('node_graph');
     this.removeChild(oldSprite);
-    this.clearDisplayObjects();
+    this.removeChild(oldgraph);
     const texture = PIXI.Texture.fromFrame(icon);
     const node = new PIXI.Sprite(texture);
     const sclaeWidth = this.iconWidth / texture.width;

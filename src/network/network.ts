@@ -203,31 +203,7 @@ export class Network {
   }
 
   public removeElements(element: CommonElement) {
-    const elements = this.topo.getElements();
-    _.remove(elements, (elem: CommonElement) => {
-      return element === elem;
-    });
-    if (element instanceof Node) {
-      element.removeChildren(0, element.children.length);
-      element.labelContent = '';
-    } else if (element instanceof Edge) {
-      this.topo.clearObject(this.topo.getEdgesGroup());
-      if (element.parent instanceof EdgeBundle) {
-        _.remove(element.parent.bundleEdge, (edge) => {
-          return edge === element;
-        });
-        if (element.parent.bundleEdge.length < 2) {
-          if (element.parent.bundleEdge[0]) {
-            element.parent.bundleEdge[0].setStyle({
-              lineType: 0,
-            });
-          }
-        }
-      }
-      element.removeChildren(0, element.children.length);
-    } else if (element instanceof Group) {
-      element.destroy();
-    }
+    this.topo.removeElement(element);
   }
 
   public setDrag() {
