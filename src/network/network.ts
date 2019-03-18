@@ -6,19 +6,20 @@
  */
 
 import * as _ from 'lodash';
+import NP from 'number-precision';
 import { Application } from './application';
-import { ArrowLine, IPoint } from './arrow-line';
+import { IPoint } from './arrow-line';
 import { CommonAction } from './common-action';
+import { CommonElement } from './common-element';
 import { Drawer } from './drawer';
 import { Edge } from './edge';
+import { EdgeBundle } from './edge-bundle';
 import { Group } from './group';
 import { Node } from './node';
 import { PopMenu } from './pop-menu';
 import { Tooltip } from './tooltip';
-
-import { CommonElement } from './common-element';
-import { EdgeBundle } from './edge-bundle';
 import { Topo } from './topo';
+NP.enableBoundaryChecking(false);
 
 export class Network {
   public menu: PopMenu;
@@ -72,27 +73,74 @@ export class Network {
     return this.topo.createNode(iconName);
   }
 
-  public clearZoom() {
-    const wrapper = document.getElementById(this.domRegex);
-    if (wrapper) {
-      this.action.container.clampZoom({
-        minWidth: wrapper.clientWidth,
-        minHeight: wrapper.clientHeight,
-        maxWidth: wrapper.clientWidth,
-        maxHeight: wrapper.clientHeight,
-      });
-    }
+  public zoomNetworkElements(zoomNum: number) {
+    const nodesObj = this.getNodeObj();
+    const zoomScale = NP.divide(zoomNum, this.zoom);
+    _.each(nodesObj, (node: any) => {
+      node.position.set(NP.times(node.x, zoomScale), NP.times(node.y, zoomScale));
+    });
+    this.zoom = zoomNum;
   }
 
-  public addZoom() {
+  public moveTopology(zoom: number, originx: number, originy: number) {
+    const moveOriginX = NP.times(originx, NP.minus(1, zoom));
+    const moveOriginY = NP.times(originy, NP.minus(1, zoom));
+    const nodesObj = this.getNodeObj();
+    const edgeObj = this.getEdgeObj();
+    // console.log(_.size(edgeObj));
+    const groupObj = this.getGroupObj();
+    _.each(nodesObj, (node: any) => {
+      node.position.set(node.x + moveOriginX, node.y + moveOriginY);
+      if (this.zoom < 0.75) {
+        node.setStyle({
+          width: 4,
+        });
+        node.drawGraph();
+      } else {
+        node.drawSprite(node.icon);
+      }
+    });
+    if (this.zoom < 1) {
+      this.nodeLabelToggle(false);
+    } else {
+      this.nodeLabelToggle(true);
+    }
+    if (this.zoom < 2) {
+      this.edgeLabelToggle(false);
+    } else {
+      this.edgeLabelToggle(true);
+    }
+    _.each(edgeObj, (edge: any) => {
+      edge.draw();
+    });
+    _.each(groupObj, (group: any) => {
+      const groupEdge = group.filterEdge();
+      group.draw();
+      _.each(groupEdge, (edge) => {
+        edge.draw();
+      });
+    });
+  }
+
+  public setZoom() {
     const wrapper = document.getElementById(this.domRegex);
     if (wrapper) {
-      this.action.container.clampZoom({
-        minWidth: 50,
-        minHeight: 50,
-        maxWidth: 5000,
-        maxHeight: 5000,
+      wrapper.addEventListener('wheel', (e) => {
+        const zoom = this.zoom;
+        this.clearHighlight();
+        if (e.deltaY < 0) {
+          if (zoom < 4) {
+            this.zoomNetworkElements(zoom + 0.1);
+          }
+        } else {
+          if (zoom > 0.4) {
+            this.zoomNetworkElements(zoom - 0.1);
+          }
+        }
+        const scale = NP.divide(this.zoom, zoom);
+        this.moveTopology(scale, e.clientX, e.clientY);
       });
+
     }
   }
 
@@ -216,10 +264,6 @@ export class Network {
     this.action.setSelect();
   }
 
-  public setZoom(num: number, center?: boolean) {
-    this.action.setZoom(num, center);
-  }
-
   public zoomOver() {
     this.action.zoomOver();
     if (this.getZoom() < 3) {
@@ -328,10 +372,6 @@ export class Network {
         nodeLabel.visible = labelToggle;
       }
     });
-  }
-
-  public searchNode(node: Node) {
-    this.action.searchNode(node);
   }
 
   public lockElement(element: CommonElement) {

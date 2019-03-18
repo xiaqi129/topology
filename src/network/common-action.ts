@@ -6,7 +6,6 @@
  */
 
 import * as _ from 'lodash';
-import * as Viewport from 'pixi-viewport';
 import { Application } from './application';
 import { Node } from './node';
 import { ITopo } from './topo';
@@ -20,7 +19,7 @@ import { Tooltip } from './tooltip';
 
 export class CommonAction {
   public defaultLineColor: number = 0;
-  public container: Viewport;
+  public container: PIXI.Container;
   private app: Application;
   private topo: ITopo;
   private initScale: number | undefined;
@@ -44,24 +43,8 @@ export class CommonAction {
     document.addEventListener('mouseup', this.onDragEnd.bind(this));
   }
 
-  public setZoom(num: number, center?: boolean) {
-    let percent: number = 0;
-    this.initScale = num;
-    const centerPoint: any = this.app.getWrapperBoundings();
-    this.container.scale.set(1);
-    this.container.x = 0;
-    this.container.y = 0;
-    this.container.moveCenter(centerPoint[0] / 2, centerPoint[1] / 2);
-    if (num > 0) {
-      percent = num - 1;
-      this.container.zoomPercent(percent, center || true);
-    } else {
-      throw Error('Zoom percent must greater than 0 !');
-    }
-  }
-
   public getCenter() {
-    return this.container.center;
+    return this.app.getContainerCenter();
   }
 
   public zoomOver() {
@@ -73,25 +56,25 @@ export class CommonAction {
     const scaleY = containerHeight < wrapperContainr[1] ? containerHeight / wrapperContainr[1] : wrapperContainr[1] / containerHeight;
     const scale = scaleX > scaleY ? scaleY : scaleX;
     appContainer.setTransform(0, 0, scale, scale, 0, 0, 0, 0, 0);
-    this.container.moveCenter(wrapperContainr[0] / 2, wrapperContainr[1] / 2);
+    this.app.moveCenter(wrapperContainr[0] / 2, wrapperContainr[1] / 2);
   }
 
   public zoomReset() {
     const wrapperContainr = this.app.getWrapperBoundings();
     this.container.setTransform(0, 0, this.initScale || 1, this.initScale || 1, 0, 0, 0, 0, 0);
-    this.container.moveCenter(wrapperContainr[0] / 2, wrapperContainr[1] / 2);
+    this.app.moveCenter(wrapperContainr[0] / 2, wrapperContainr[1] / 2);
   }
 
   public dragContainer() {
-    this.container.buttonMode = true;
     this.container.removeAllListeners();
+    this.container.cursor = 'default';
     this.clearHighlight();
     this.drag();
   }
 
   public setSelect() {
-    this.container.cursor = 'crosshair';
     this.container.removeAllListeners();
+    this.container.cursor = 'crosshair';
     this.clearHighlight();
     this.moveSelect();
   }
@@ -114,6 +97,10 @@ export class CommonAction {
     this.topo.setSelectedEdge(edge);
   }
 
+  public moveCenter(x: number, y: number) {
+    this.app.moveCenter(x, y);
+  }
+
   public removeSelectNodes() {
     this.cleanEdge();
     this.cleanNode();
@@ -121,10 +108,11 @@ export class CommonAction {
   }
 
   public drag() {
-    this.container.on('mousedown', (event) => {
+    this.container.on('mousedown', (event: any) => {
       this.onDragStart(event);
+      this.container.cursor = 'move';
     });
-    this.container.on('mousemove', (event) => {
+    this.container.on('mousemove', (event: any) => {
       this.onDragMove(event);
     });
   }
@@ -162,6 +150,7 @@ export class CommonAction {
 
   public onDragEnd() {
     this.dragging = false;
+    this.container.cursor = 'default';
     this.data = null;
     this.last = null;
     const elements = this.container.children;
@@ -381,15 +370,6 @@ export class CommonAction {
 
   public toggleLabel() {
     this.nodeLabelFlag = !this.nodeLabelFlag;
-  }
-
-  public searchNode(node: Node) {
-    const clickColor = node.defaultStyle.clickColor;
-    this.cleanNode();
-    this.setZoom(2);
-    this.container.moveCenter(node.x, node.y);
-    this.container.setChildIndex(node, this.container.children.length - 1);
-    node.selectOn(clickColor);
   }
 
   public lockElement(element: CommonElement) {

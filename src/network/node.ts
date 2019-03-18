@@ -87,7 +87,7 @@ export class Node extends CommonElement {
     graph.name = 'node_graph';
     graph.lineStyle(style.lineWidth, style.lineColor);
     graph.beginFill(0X0386d2, style.fillOpacity);
-    graph.drawCircle(0, 0, 4);
+    graph.drawCircle(0, 0, style.width);
     graph.endFill();
     graph.interactive = true;
     graph.buttonMode = true;

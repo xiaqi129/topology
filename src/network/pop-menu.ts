@@ -1,5 +1,4 @@
 import * as _ from 'lodash';
-import * as Viewport from 'pixi-viewport';
 import { CommonAction } from './common-action';
 import { Edge } from './edge';
 import { Node } from './node';
@@ -18,7 +17,7 @@ export class PopMenu {
   private menuClass: string | null;
   private menuItems: [] = [];
   private domId: string;
-  private container: Viewport;
+  private container: PIXI.Container;
   private action: CommonAction;
   constructor(domRegex: string, app: any, action: CommonAction) {
     this.domId = domRegex;

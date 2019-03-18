@@ -3,7 +3,6 @@ import NP from 'number-precision';
 // import { Labeler } from './network/lib/labeler';
 import { Network } from './network/network';
 import { data as topoData } from './simpleData';
-NP.enableBoundaryChecking(false);
 const iconResource = {
   resources: { name: 'resources', url: './pic/imageDict.json' },
 };
@@ -433,7 +432,7 @@ const simpleData = function () {
   });
   network.syncView();
   network.setDrag();
-  network.clearZoom();
+  network.setZoom();
 };
 network.callback = () => {
   simpleData();
@@ -443,22 +442,20 @@ const body = document.getElementById('network');
 const zoomIn = document.querySelector('button.btn_zoomIn');
 const zoomOut = document.querySelector('button.btn_zoomOut');
 const zoomOver = document.querySelector('button.btn_zoomOver');
-const dragOrSelect = document.querySelector('button.btn_dragOrSelect');
 const tooltipToggle = document.querySelector('button.btn_tooltipToggle');
 const bundleToggle = document.querySelector('button.btn_bundleLabelToggle');
 const nodeLabelToggle = document.querySelector('button.btn_nodeLabelToggle');
 const groupLabelToggle = document.querySelector('button.btn_groupLabelToggle');
 const linkLabelToggle = document.querySelector('button.btn_linkLabelToggle');
-const searchNode = document.querySelector('button.btn_search_node');
 if (zoomIn) {
   zoomIn.addEventListener('click', () => {
     const zoom = network.zoom;
     const networkSize = network.getNetworkSize();
     if (network.zoom < 4) {
-      zoomNetworkElements(NP.plus(network.zoom, 0.1));
+      network.zoomNetworkElements(NP.plus(network.zoom, 0.1));
     }
     if (networkSize) {
-      moveTopology(network.zoom / zoom, networkSize[0] / 2, networkSize[1] / 2);
+      network.moveTopology(network.zoom / zoom, networkSize[0] / 2, networkSize[1] / 2);
     }
   });
 }
@@ -467,10 +464,10 @@ if (zoomOut) {
     const zoom = network.zoom;
     const networkSize = network.getNetworkSize();
     if (network.zoom > 0.4) {
-      zoomNetworkElements(NP.minus(network.zoom, 0.1));
+      network.zoomNetworkElements(NP.minus(network.zoom, 0.1));
     }
     if (networkSize) {
-      moveTopology(network.zoom / zoom, networkSize[0] / 2, networkSize[1] / 2);
+      network.moveTopology(network.zoom / zoom, networkSize[0] / 2, networkSize[1] / 2);
     }
   });
 }
@@ -483,23 +480,12 @@ if (zoomOver) {
       const scaleX = container.width < wrapperContainr[0] ? container.width / wrapperContainr[0] : wrapperContainr[0] / container.width;
       const scaleY = container.height < wrapperContainr[1] ? container.height / wrapperContainr[1] : wrapperContainr[1] / container.height;
       const zoom = scaleX > scaleY ? scaleY : scaleX;
-      zoomNetworkElements(zoom);
-      moveTopology(network.zoom / zoom, wrapperContainr[0] / 2, wrapperContainr[1] / 2);
+      network.zoomNetworkElements(zoom);
+      network.moveTopology(network.zoom / zoom, wrapperContainr[0] / 2, wrapperContainr[1] / 2);
     } else {
       network.zoomReset();
     }
     isZoom = !isZoom;
-  });
-}
-if (dragOrSelect) {
-  let isDrag = false;
-  dragOrSelect.addEventListener('click', () => {
-    if (isDrag) {
-      network.setDrag();
-    } else {
-      network.setSelect();
-    }
-    isDrag = !isDrag;
   });
 }
 if (tooltipToggle) {
@@ -578,78 +564,7 @@ if (groupLabelToggle) {
     // });
   });
 }
-if (searchNode) {
-  searchNode.addEventListener('click', () => {
-    const searchInput = document.querySelector('input.input_search_node') as HTMLInputElement;
-    _.each(network.getNodes(), (node) => {
-      if (node.getUID() === `element_${searchInput.value}`) {
-        network.searchNode(node);
-      }
-    });
-  });
-}
-const zoomNetworkElements = (zoomNum: number) => {
-  const nodesObj = network.getNodeObj();
-  const zoomScale = NP.divide(zoomNum, network.zoom);
-  _.each(nodesObj, (node: any) => {
-    node.position.set(NP.times(node.x, zoomScale), NP.times(node.y, zoomScale));
-  });
-  network.zoom = zoomNum;
-};
-const moveTopology = (zoom: number, originx: number, originy: number) => {
-  const moveOriginX = NP.times(originx, NP.minus(1, zoom));
-  const moveOriginY = NP.times(originy, NP.minus(1, zoom));
-  const nodesObj = network.getNodeObj();
-  const edgeObj = network.getEdgeObj();
-  // console.log(_.size(edgeObj));
-  const groupObj = network.getGroupObj();
-  _.each(nodesObj, (node: any) => {
-    node.position.set(node.x + moveOriginX, node.y + moveOriginY);
-    if (network.zoom < 0.75) {
-      node.drawGraph();
-    } else {
-      node.drawSprite(node.icon);
-    }
-  });
-  if (network.zoom < 1) {
-    network.nodeLabelToggle(false);
-  } else {
-    network.nodeLabelToggle(true);
-  }
-  if (edgeLabelToggle) {
-    if (network.zoom < 2) {
-      network.edgeLabelToggle(false);
-    } else {
-      network.edgeLabelToggle(true);
-    }
-  }
-  _.each(edgeObj, (edge: any) => {
-    edge.draw();
-  });
-  _.each(groupObj, (group: any) => {
-    const groupEdge = group.filterEdge();
-    group.draw();
-    _.each(groupEdge, (edge) => {
-      edge.draw();
-    });
-  });
-};
 if (body) {
-  body.addEventListener('wheel', (event) => {
-    const zoom = network.zoom;
-    network.clearHighlight();
-    if (event.deltaY < 0) {
-      if (zoom < 4) {
-        zoomNetworkElements(zoom + 0.1);
-      }
-    } else {
-      if (zoom > 0.4) {
-        zoomNetworkElements(zoom - 0.1);
-      }
-    }
-    const scale = NP.divide(network.zoom, zoom);
-    moveTopology(scale, event.clientX, event.clientY);
-  });
   window.addEventListener('keydown', (e) => {
     if (e.keyCode === 17 && !network.isSelect) {
       network.setSelect();
