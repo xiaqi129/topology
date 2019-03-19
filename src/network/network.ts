@@ -321,14 +321,6 @@ export class Network {
     this.tooltip.setTooltipDisplay(isDisplay);
   }
 
-  public setBundleFlag(flag: boolean) {
-    _.each(this.getElements(), (element) => {
-      if (element instanceof EdgeBundle && !element.isExpanded) {
-        element.setBundleFlag(flag);
-      }
-    });
-  }
-
   public groupLabelToggle(labelToggle: boolean) {
     const groups = this.getGroupObj();
     _.each(groups, (group: Group) => {
@@ -352,8 +344,20 @@ export class Network {
     });
   }
 
-  public bundleLabelToggle() {
-    this.action.bundleLabelToggle();
+  public bundleLabelToggle(flag: boolean) {
+    _.each(this.getElements(), (element) => {
+      if (element instanceof EdgeBundle && !element.isExpanded) {
+        const edge: any = element.children[0];
+        if (edge) {
+          const background = edge.getChildByName('label_background');
+          const label = edge.getChildByName('bundle_label');
+          if (background && label) {
+            background.visible = flag;
+            label.visible = flag;
+          }
+        }
+      }
+    });
   }
 
   public setBundelExpanded(flag: boolean) {

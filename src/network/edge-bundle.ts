@@ -16,14 +16,13 @@ const Point = PIXI.Point;
 export class EdgeBundle extends CommonElement {
   public isExpanded: boolean = true;
   public bundleEdge: any[] = [];
+  public toggleBundle: boolean = true;
   private bundleID: string = '';
   private lastClickTime: number = 0;
-  private bundleLabelFlag: boolean = true;
   private bundleData: any = {};
   private startNode: Node;
   private endNode: Node;
   private style: any;
-  private labelContent: any;
 
   constructor(edge: Edge) {
     super();
@@ -37,55 +36,57 @@ export class EdgeBundle extends CommonElement {
   }
 
   public draw() {
-    const bundleId = this.getBundleID();
-    if (!this.isExpanded) {
-      // collapse
-      if (this.children.length > 1) {
-        this.bundleData[bundleId] = [];
-        _.each(this.children, (child) => {
-          this.bundleData[bundleId].push(child);
-        });
-      }
-      this.removeChildren(0, this.children.length);
-      const afterBundle = new Edge(this.startNode, this.endNode);
-      afterBundle.setStyle(this.style);
-      afterBundle.name = 'bundle_line';
-      if (this.bundleLabelFlag && this.bundleData[bundleId]) {
-        const graph = new PIXI.Graphics();
-        graph.name = 'label_background';
-        graph.beginFill(0X0081cf, 1);
-        graph.drawCircle(0, 0, 7);
-        graph.endFill();
-        afterBundle.addChild(graph);
-        const label = new Label(`${this.bundleData[bundleId].length}`, {
-          fill: 0Xffffff,
-          fontFamily: 'Times New Roman',
-          fontWeight: 'bold',
-        });
-        label.name = 'bundle_label';
-        label.setPosition(4);
-        afterBundle.addChild(label);
-        afterBundle.setChildIndex(label, afterBundle.children.length - 1);
-        afterBundle.setChildIndex(graph, afterBundle.children.length - 2);
-        // add to elements
-        afterBundle.setStyle({
-          lineType: 0,
-        });
-        this.addChild(afterBundle);
+    if (this.toggleBundle) {
+      const bundleId = this.getBundleID();
+      if (!this.isExpanded) {
+        // collapse
+        if (this.children.length > 1) {
+          this.bundleData[bundleId] = [];
+          _.each(this.children, (child) => {
+            this.bundleData[bundleId].push(child);
+          });
+        }
+        this.removeChildren(0, this.children.length);
+        const afterBundle = new Edge(this.startNode, this.endNode);
+        afterBundle.setStyle(this.style);
+        afterBundle.name = 'bundle_line';
+        if (this.bundleData[bundleId]) {
+          const graph = new PIXI.Graphics();
+          graph.name = 'label_background';
+          graph.beginFill(0X0081cf, 1);
+          graph.drawCircle(0, 0, 7);
+          graph.endFill();
+          afterBundle.addChild(graph);
+          const label = new Label(`${this.bundleData[bundleId].length}`, {
+            fill: 0Xffffff,
+            fontFamily: 'Times New Roman',
+            fontWeight: 'bold',
+          });
+          label.name = 'bundle_label';
+          label.setPosition(4);
+          afterBundle.addChild(label);
+          afterBundle.setChildIndex(label, afterBundle.children.length - 1);
+          afterBundle.setChildIndex(graph, afterBundle.children.length - 2);
+          // add to elements
+          afterBundle.setStyle({
+            lineType: 0,
+          });
+          this.addChild(afterBundle);
+        } else {
+          this.removeChild(this.getChildByName('bundle_label'));
+        }
+        this.setBundle(afterBundle);
       } else {
-        this.removeChild(this.getChildByName('bundle_label'));
+        // expand
+        this.removeChild(this.getChildByName('bundle_line'));
+        const edges = this.bundleData[bundleId];
+        _.each(edges, (bundleEdge) => {
+          this.addChild(bundleEdge);
+          bundleEdge.draw();
+        });
       }
-      this.setBundle(afterBundle);
-    } else {
-      // expand
-      this.removeChild(this.getChildByName('bundle_line'));
-      const edges = this.bundleData[bundleId];
-      _.each(edges, (bundleEdge) => {
-        this.addChild(bundleEdge);
-        bundleEdge.draw();
-      });
+      this.clearTooltip();
     }
-    this.clearTooltip();
   }
 
   public addEdge(edge: Edge) {
@@ -127,10 +128,6 @@ export class EdgeBundle extends CommonElement {
     });
     _.each(this.children, (edge, i) => {
       if (edge instanceof Edge) {
-        // const srcLabel = edge.getChildByName('edge_srclabel');
-        // const endLabel = edge.getChildByName('edge_endlabel');
-        // edge.removeChild(srcLabel);
-        // edge.removeChild(endLabel);
         edge.setStyle({
           bezierLineDistance: values[i][0],
           bezierLineDegree: values[i][1],
@@ -146,22 +143,19 @@ export class EdgeBundle extends CommonElement {
   }
 
   public setBundle(edge: any) {
-    edge.addEventListener('mousedown', (event: PIXI.interaction.InteractionEvent) => {
-      // event.stopPropagation();
-      const currentTime = new Date().getTime();
-      // double click
-      if (currentTime - this.lastClickTime < 500) {
-        this.isExpanded = !this.isExpanded;
-        this.draw();
-      } else {
-        this.lastClickTime = currentTime;
-      }
-    });
-  }
-
-  public setBundleFlag(flag: boolean) {
-    this.bundleLabelFlag = flag;
-    this.draw();
+    if (this.toggleBundle) {
+      edge.addEventListener('mousedown', (event: PIXI.interaction.InteractionEvent) => {
+        // event.stopPropagation();
+        const currentTime = new Date().getTime();
+        // double click
+        if (currentTime - this.lastClickTime < 500) {
+          this.isExpanded = !this.isExpanded;
+          this.draw();
+        } else {
+          this.lastClickTime = currentTime;
+        }
+      });
+    }
   }
 
   public clearTooltip() {

@@ -24,10 +24,6 @@ export class CommonAction {
   private topo: ITopo;
   private initScale: number | undefined;
   // bundle
-  private lastClickTime: number = 0;
-  private bundleLabelFlag: boolean = true;
-  private bundleData: any = {};
-  private bundledEdge: any = [];
   private nodeLabelFlag: boolean = true;
   private tooltip: Tooltip;
   // drag
@@ -368,26 +364,6 @@ export class CommonAction {
         ele.selectOff();
       }
     });
-  }
-
-  public bundleLabelToggle() {
-    this.bundleLabelFlag = !this.bundleLabelFlag;
-
-    if (this.bundleLabelFlag) {
-      _.each(this.bundledEdge, (edge) => {
-        const label = this.topo.createLabel(
-          `(${this.bundleData[edge.parent.getBundleID()].length})`);
-        label.name = 'bundle_label';
-        label.setPosition(4);
-        label.x = (edge.startNode.x + edge.endNode.x) / 2;
-        label.y = (edge.startNode.y + edge.endNode.y) / 2;
-        edge.addChild(label);
-      });
-    } else {
-      _.each(this.bundledEdge, (edge) => {
-        edge.removeChild(edge.getChildByName('bundle_label'));
-      });
-    }
   }
 
   public toggleLabel() {

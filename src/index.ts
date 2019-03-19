@@ -499,7 +499,7 @@ let labelToggle = true;
 if (nodeLabelToggle) {
   nodeLabelToggle.addEventListener('click', () => {
     labelToggle = !labelToggle;
-    network.nodeLabelToggle(labelToggle);
+    network.bundleLabelToggle(labelToggle);
   });
 }
 let bundleLabelToggle = true;

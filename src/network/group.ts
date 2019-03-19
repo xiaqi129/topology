@@ -84,13 +84,16 @@ export class Group extends CommonElement {
 
   public toggleGroupExpand() {
     const graph = this.getChildByName(this.polygonHullOutlineName);
+    const isBundle = _.every(this.edgeArray, (edge: Edge) => {
+      return edge.parent !== null;
+    });
     graph.on('click', () => {
       // event.stopPropagation();
       const currentTime = new Date().getTime();
       const includeGroups = this.childrenNode[0].getIncluedGroup();
       this.superstratumInfo = _.slice(includeGroups, 0, _.indexOf(includeGroups, this));
       if (this.intersection()[0].length === 0) {
-        if (currentTime - this.lastClickTime < 500) {
+        if (currentTime - this.lastClickTime < 500 && isBundle) {
           this.isExpanded = !this.isExpanded;
           this.lastClickTime = 0;
           this.changeEdgeResource();
@@ -171,12 +174,7 @@ export class Group extends CommonElement {
   public changeEdgeResource() {
     const edgeResource: IedgeResource[] = _.cloneDeep(this.edgeResource);
     let changeEdges: IedgeResource[] = [];
-    _.each(this.removeEdge, (e: IedgeResource) => {
-      const edge: Edge = this.getElementById(e.line);
-      if (edge) {
-        edge.visible = true;
-      }
-    });
+    this.resetEdge();
     _.remove(this.removeEdge);
     _.remove(changeEdges);
     _.each(this.getAllGroup(), (group: any) => {
@@ -199,6 +197,11 @@ export class Group extends CommonElement {
             }
           });
         });
+        _.each(this.edgeArray, (edge) => {
+          if (edge.parent instanceof EdgeBundle) {
+            edge.parent.toggleBundle = false;
+          }
+        });
       }
     });
 
@@ -213,6 +216,24 @@ export class Group extends CommonElement {
         edge.endNode = this.getElementById(e.end);
         edge.draw();
       }
+    });
+  }
+
+  public getAllEdgeBundle() {
+    return _.filter(this.elements, (element) => {
+      return element instanceof EdgeBundle;
+    });
+  }
+
+  public resetEdge() {
+    _.each(this.removeEdge, (e: IedgeResource) => {
+      const edge: Edge = this.getElementById(e.line);
+      if (edge) {
+        edge.visible = true;
+      }
+    });
+    _.each(this.getAllEdgeBundle(), (edgeBundle: EdgeBundle) => {
+      edgeBundle.toggleBundle = true;
     });
   }
 
