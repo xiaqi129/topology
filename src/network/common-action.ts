@@ -121,7 +121,7 @@ export class CommonAction {
     const parent = this.container.parent.toLocal(event.data.global);
     this.dragging = true;
     this.data = event.data;
-    this.last = { parents: parent, x: event.data.global.x, y: event.data.global.y };
+    this.last = { parents: parent };
   }
 
   public onDragMove(event: PIXI.interaction.InteractionEvent) {
@@ -129,22 +129,24 @@ export class CommonAction {
       const newPosition = this.data.getLocalPosition(this.container.parent);
       const distX = event.data.global.x;
       const distY = event.data.global.y;
-      const elements = this.container.children;
-      _.each(elements, (element) => {
+      const edges = this.getChildEdges();
+      const groups = this.getAllGroup();
+      const elements: any = this.topo.getElements();
+      _.each(elements, (element: CommonElement) => {
         if (element instanceof Node) {
           element.position.x += (newPosition.x - this.last.parents.x);
           element.position.y += (newPosition.y - this.last.parents.y);
-        } else if (element instanceof Group) {
-          element.draw();
-        } else if (element instanceof Edge) {
-          element.draw();
-        } else if (element instanceof EdgeBundle) {
-          _.each(element.children, (edge: any) => {
-            edge.draw();
-          });
         }
       });
+      _.each(groups, (group) => {
+        group.draw();
+      });
+      _.each(edges, (edge: Edge) => {
+        edge.draw();
+      });
       this.last = { parents: newPosition, x: distX, y: distY };
+    } else {
+      this.dragging = false;
     }
   }
 
@@ -153,23 +155,42 @@ export class CommonAction {
     this.container.cursor = 'default';
     this.data = null;
     this.last = null;
-    const elements = this.container.children;
-    _.each(elements, (element) => {
-      if (element instanceof Group) {
-        element.draw();
-      } else if (element instanceof Edge) {
-        element.draw();
-      } else if (element instanceof EdgeBundle) {
-        _.each(element.children, (edge: any) => {
-          edge.draw();
-        });
+    const edges = this.getChildEdges();
+    const groups = this.getAllGroup();
+    _.each(groups, (group) => {
+      group.draw();
+    });
+    _.each(edges, (edge: Edge) => {
+      edge.draw();
+    });
+  }
+
+  public getChildEdges() {
+    let edges: Edge[] = [];
+    const elements: any = this.topo.getElements();
+
+    _.each(elements, (element: CommonElement) => {
+      if (element instanceof Edge) {
+        edges.push(element);
       }
+      if (element instanceof EdgeBundle) {
+        const childrenEdges = element.children as Edge[];
+        edges = edges.concat(childrenEdges);
+      }
+    });
+    return edges;
+  }
+
+  public getAllGroup() {
+    const elements: any = this.topo.getElements();
+    return _.filter(elements, (element: CommonElement) => {
+      return element instanceof Group;
     });
   }
 
   public moveSelect() {
     const rectangle = new PIXI.Graphics();
-    const elements = this.container.children;
+    const elements = this.topo.getElements();
     let flag = false;
     let oldLeft = 0;
     let oldTop = 0;
@@ -224,7 +245,8 @@ export class CommonAction {
   }
 
   public setClick(color?: any) {
-    _.each(this.container.children, (element) => {
+    const elements = this.topo.getElements();
+    _.each(elements, (element) => {
       if (element instanceof Node) {
         element.defaultStyle.clickColor = color;
         element.addEventListener('mousedown', (event: PIXI.interaction.InteractionEvent) => {
@@ -283,7 +305,7 @@ export class CommonAction {
 
   public clearHighlight() {
     this.container.on('mousedown', () => {
-      _.each(this.container.children, (element) => {
+      _.each(this.topo.getElements(), (element) => {
         if (element instanceof Node) {
           element.selectOff();
           this.topo.removeSelectedNodes();
@@ -315,7 +337,7 @@ export class CommonAction {
 
   public cleanEdge() {
     this.topo.removeSelectedEdge();
-    _.each(this.container.children, (ele) => {
+    _.each(this.topo.getElements(), (ele) => {
       if (ele instanceof Edge) {
         ele.setStyle({
           lineColor: ele.defalultColor,
@@ -341,7 +363,7 @@ export class CommonAction {
   }
 
   public cleanNode() {
-    _.each(this.container.children, (ele) => {
+    _.each(this.topo.getElements(), (ele) => {
       if (ele instanceof Node) {
         ele.selectOff();
       }

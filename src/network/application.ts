@@ -107,7 +107,7 @@ export class Application extends PIXI.Application {
 
   public addElements(elements: PIXI.Container[]) {
     _.each(elements, (element) => {
-      if (!(element.parent instanceof Group) && this.container) {
+      if (this.container && element) {
         this.container.addChild(element);
       }
     });

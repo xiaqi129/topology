@@ -107,8 +107,6 @@ export class Topo implements ITopo {
         }
       }
       element.removeChildren(0, element.children.length);
-      element.startNode = undefined;
-      element.endNode = undefined;
     } else if (element instanceof Group) {
       element.destroy();
     }

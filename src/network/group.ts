@@ -127,6 +127,10 @@ export class Group extends CommonElement {
     _.each(this.substratumInfo, (group) => {
       group.visible = expanded;
     });
+    _.each(this.superstratumInfo, (group) => {
+      group.draw();
+    });
+    this.draw();
   }
 
   public analyzeSubstratum() {
@@ -162,7 +166,6 @@ export class Group extends CommonElement {
       edge.removeChild(edge.getChildByName('edge_srclabel'));
       edge.removeChild(edge.getChildByName('edge_endlabel'));
     });
-    this.draw();
   }
 
   public changeEdgeResource() {
@@ -199,7 +202,7 @@ export class Group extends CommonElement {
       }
     });
 
-    // group edge by src and end id
+    // group edge by src and end id then hide redundant edge
     this.groupEdge(changeEdges);
 
     // change edge startNode and endNode
@@ -227,7 +230,7 @@ export class Group extends CommonElement {
         });
         _.each(groupEdge, (edgeRes: IedgeResource, n: number) => {
           const edge: Edge = this.getElementById(edgeRes.line);
-          if (n !== index && edge && edgeRes.src !== edgeRes.end) {
+          if (n !== index && edge && edgeRes.src !== edgeRes.end && edge.visible) {
             this.removeEdge.push(edgeRes);
             edge.visible = false;
           }
