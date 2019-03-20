@@ -197,7 +197,7 @@ export class Group extends CommonElement {
             }
           });
         });
-        _.each(this.edgeArray, (edge) => {
+        _.each(_.concat(group.edgeArray, group.filterInsideEdge()), (edge) => {
           if (edge.parent instanceof EdgeBundle) {
             edge.parent.toggleBundle = false;
           }
@@ -638,6 +638,10 @@ export class Group extends CommonElement {
     });
   }
 
+  public getChildNodes() {
+    return this.childrenNode;
+  }
+
   public addEdgeLabel() {
     if (this.nodeResource.length > 0) {
       _.each(this.edgeArray, (edge: Edge, i: number) => {
@@ -663,7 +667,6 @@ export class Group extends CommonElement {
   public draw() {
     this.clearDisplayObjects();
     if (!this.isExpanded) {
-      // this.drawEdges();
       this.drawGroupNode();
     } else {
       if (!this.emptyObj) {

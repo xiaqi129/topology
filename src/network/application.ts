@@ -10,7 +10,7 @@ import { Group } from './group';
 
 export class Application extends PIXI.Application {
   public domRegex: string = '';
-  private viewWrapper: HTMLElement | undefined;
+  private viewWrapper: HTMLElement;
   private container: PIXI.Container | undefined;
 
   constructor(domRegex: string = '', options = null) {
@@ -22,6 +22,7 @@ export class Application extends PIXI.Application {
       forceCanvas: true,
     });
     this.domRegex = domRegex;
+    this.viewWrapper = this.getWrapper();
     this.setup();
   }
 
@@ -31,7 +32,6 @@ export class Application extends PIXI.Application {
   }
 
   public initApplication() {
-    this.viewWrapper = this.getWrapper();
     if (this.viewWrapper) {
       this.container = new PIXI.Container();
       this.viewWrapper.appendChild(this.view);
@@ -52,7 +52,6 @@ export class Application extends PIXI.Application {
   }
 
   public fitWrapperSize() {
-    this.viewWrapper = this.getWrapper();
     if (this.viewWrapper) {
       this.renderer.resize(this.viewWrapper.clientWidth, this.viewWrapper.clientHeight);
     }
@@ -61,6 +60,7 @@ export class Application extends PIXI.Application {
         this.renderer.resize(this.viewWrapper.clientWidth, this.viewWrapper.clientHeight);
         this.moveCenter(this.viewWrapper.clientWidth / 2, this.viewWrapper.clientHeight / 2);
         this.container.hitArea = new PIXI.Rectangle(0, 0, this.viewWrapper.clientWidth, this.viewWrapper.clientHeight);
+        (this.container as any).center = [this.viewWrapper.clientWidth / 2, this.viewWrapper.clientHeight / 2];
       }
     });
   }
@@ -74,16 +74,15 @@ export class Application extends PIXI.Application {
   }
 
   public getContainerCenter() {
-    if (this.viewWrapper) {
-      const point = new PIXI.Point(this.viewWrapper.clientWidth / 2, this.viewWrapper.clientHeight / 2);
-      return point;
-    }
+    const point = new PIXI.Point(this.viewWrapper.clientWidth / 2, this.viewWrapper.clientHeight / 2);
+    return point;
   }
 
   public getWrapper() {
-    const wrapper = document.getElementById(this.domRegex);
-    if (wrapper) {
+    if (this.domRegex) {
+      const wrapper: any = document.getElementById(this.domRegex);
       return wrapper;
+
     }
   }
 

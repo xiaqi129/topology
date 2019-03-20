@@ -43,24 +43,6 @@ export class CommonAction {
     return this.app.getContainerCenter();
   }
 
-  public zoomOver() {
-    const appContainer = this.container;
-    const wrapperContainr = this.app.getWrapperBoundings();
-    const containerWidth = appContainer.width;
-    const containerHeight = appContainer.height;
-    const scaleX = containerWidth < wrapperContainr[0] ? containerWidth / wrapperContainr[0] : wrapperContainr[0] / containerWidth;
-    const scaleY = containerHeight < wrapperContainr[1] ? containerHeight / wrapperContainr[1] : wrapperContainr[1] / containerHeight;
-    const scale = scaleX > scaleY ? scaleY : scaleX;
-    appContainer.setTransform(0, 0, scale, scale, 0, 0, 0, 0, 0);
-    this.app.moveCenter(wrapperContainr[0] / 2, wrapperContainr[1] / 2);
-  }
-
-  public zoomReset() {
-    const wrapperContainr = this.app.getWrapperBoundings();
-    this.container.setTransform(0, 0, this.initScale || 1, this.initScale || 1, 0, 0, 0, 0, 0);
-    this.app.moveCenter(wrapperContainr[0] / 2, wrapperContainr[1] / 2);
-  }
-
   public dragContainer() {
     this.container.removeAllListeners();
     this.container.cursor = 'default';
@@ -234,10 +216,6 @@ export class CommonAction {
       });
       rectangle.clear();
     });
-  }
-
-  public getZoom() {
-    return this.container.scale.x;
   }
 
   public setClick(color?: any) {

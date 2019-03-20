@@ -472,20 +472,19 @@ if (zoomOut) {
   });
 }
 if (zoomOver) {
-  let isZoom = true;
+  // let isZoom = true;
   zoomOver.addEventListener('click', () => {
-    const container = network.getContainer();
-    const wrapperContainr = network.getNetworkSize();
-    if (isZoom && container && wrapperContainr) {
-      const scaleX = container.width < wrapperContainr[0] ? container.width / wrapperContainr[0] : wrapperContainr[0] / container.width;
-      const scaleY = container.height < wrapperContainr[1] ? container.height / wrapperContainr[1] : wrapperContainr[1] / container.height;
-      const zoom = scaleX > scaleY ? scaleY : scaleX;
-      network.zoomNetworkElements(zoom);
-      network.moveTopology(network.zoom / zoom, wrapperContainr[0] / 2, wrapperContainr[1] / 2);
-    } else {
-      network.zoomReset();
-    }
-    isZoom = !isZoom;
+    network.zoomOver();
+    // const container = network.getContainer();
+    // const wrapperContainr = network.getNetworkSize();
+    // if (container && wrapperContainr) {
+    //   const scaleX = container.width < wrapperContainr[0] ? container.width / wrapperContainr[0] : wrapperContainr[0] / container.width;
+    //   const scaleY = container.height < wrapperContainr[1] ? container.height / wrapperContainr[1] : wrapperContainr[1] / container.height;
+    //   const zoom = scaleX > scaleY ? scaleY : scaleX;
+    //   network.zoomNetworkElements(zoom);
+    //   network.moveTopology(network.zoom / zoom, wrapperContainr[0] / 2, wrapperContainr[1] / 2);
+    // }
+    // isZoom = !isZoom;
   });
 }
 if (tooltipToggle) {

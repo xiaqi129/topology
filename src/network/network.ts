@@ -7,10 +7,11 @@
 
 import * as _ from 'lodash';
 import NP from 'number-precision';
+import polygon from 'polygon';
 import { Application } from './application';
 import { IPoint } from './arrow-line';
 import { CommonAction } from './common-action';
-import { CommonElement } from './common-element';
+import { CommonElement, IPosition } from './common-element';
 import { Drawer } from './drawer';
 import { Edge } from './edge';
 import { EdgeBundle } from './edge-bundle';
@@ -19,7 +20,6 @@ import { Node } from './node';
 import { PopMenu } from './pop-menu';
 import { Tooltip } from './tooltip';
 import { Topo } from './topo';
-NP.enableBoundaryChecking(false);
 
 export class Network {
   public menu: PopMenu;
@@ -37,6 +37,7 @@ export class Network {
 
   constructor(domRegex: string) {
     PIXI.utils.skipHello();
+    NP.enableBoundaryChecking(false);
     this.domRegex = domRegex;
     this.topo = new Topo();
     this.drawer = new Drawer(domRegex, this.topo);
@@ -86,40 +87,10 @@ export class Network {
     const moveOriginX = NP.times(originx, NP.minus(1, zoom));
     const moveOriginY = NP.times(originy, NP.minus(1, zoom));
     const nodesObj = this.getNodeObj();
-    const edgeObj = this.getEdgeObj();
-    // console.log(_.size(edgeObj));
-    const groupObj = this.getGroupObj();
     _.each(nodesObj, (node: any) => {
       node.position.set(node.x + moveOriginX, node.y + moveOriginY);
-      if (this.zoom < 0.75) {
-        node.setStyle({
-          width: 4,
-        });
-        node.drawGraph();
-      } else {
-        node.drawSprite(node.icon);
-      }
     });
-    if (this.zoom < 1) {
-      this.nodeLabelToggle(false);
-    } else {
-      this.nodeLabelToggle(true);
-    }
-    if (this.zoom < 2) {
-      this.edgeLabelToggle(false);
-    } else {
-      this.edgeLabelToggle(true);
-    }
-    _.each(edgeObj, (edge: any) => {
-      edge.draw();
-    });
-    _.each(groupObj, (group: any) => {
-      const groupEdge = group.filterEdge();
-      group.draw();
-      _.each(groupEdge, (edge) => {
-        edge.draw();
-      });
-    });
+    this.reDraw();
   }
 
   public setZoom() {
@@ -129,11 +100,11 @@ export class Network {
         const zoom = this.zoom;
         this.clearHighlight();
         if (e.deltaY < 0) {
-          if (zoom < 4) {
+          if (zoom < 5) {
             this.zoomNetworkElements(zoom + 0.1);
           }
         } else {
-          if (zoom > 0.4) {
+          if (zoom > 0.15) {
             this.zoomNetworkElements(zoom - 0.1);
           }
         }
@@ -265,21 +236,23 @@ export class Network {
   }
 
   public zoomOver() {
-    this.action.zoomOver();
-    if (this.getZoom() < 3) {
-      this.edgeLabelToggle(false);
+    let center: number[] = [];
+    // const centerP = this.getCenter();
+    const nodes = this.getNodeObj();
+    const groups = this.getGroupObj();
+    const isOutsideGroup: any = _.find(groups, (group: Group) => {
+      return group.getChildNodes().length === _.size(nodes);
+    });
+    this.analyzeZoom(isOutsideGroup);
+    if (isOutsideGroup) {
+      center = isOutsideGroup.centerPoint;
+    } else {
+      const vertexPointsList = this.vertexPoints();
+      const analyzeCenter = (new polygon(vertexPointsList)).center();
+      center = [analyzeCenter.x, analyzeCenter.y];
     }
-  }
-
-  public getZoom() {
-    return this.action.getZoom();
-  }
-
-  public zoomReset() {
-    this.action.zoomReset();
-    if (this.getZoom() < 3) {
-      this.edgeLabelToggle(false);
-    }
+    this.moveToCenter(center);
+    // this.action.moveCenter(centerP.x, centerP.y);
   }
 
   public getCenter() {
@@ -431,6 +404,50 @@ export class Network {
     }
   }
 
+  private analyzeZoom(isOutsideGroup: Group | undefined) {
+    const wrapperContainr = this.app.getWrapperBoundings();
+    const center = this.getCenter();
+    const nodes = this.getNodeObj();
+    let rateX: number;
+    let rateY: number;
+    let scale: number;
+    let zoomRate: number;
+    if (isOutsideGroup) {
+      rateX = Math.abs(isOutsideGroup.width / wrapperContainr[0]);
+      rateY = Math.abs(isOutsideGroup.height / wrapperContainr[1]);
+      scale = rateX > rateY ? rateX : rateY;
+    } else {
+      let maxX: number = center.x;
+      let minX: number = center.x;
+      let maxY: number = center.y;
+      let minY: number = center.y;
+      if (_.size(nodes) !== 0) {
+        maxX = minX = this.getNodes()[0].x;
+        maxY = minY = this.getNodes()[0].y;
+      }
+      _.each(nodes, (node: Node) => {
+        if (node.visible) {
+          const x = node.x;
+          const y = node.y;
+          maxX = maxX > x ? maxX : x;
+          minX = minX < x ? minX : x;
+          maxY = maxY > y ? maxY : y;
+          minY = minY < y ? minY : y;
+        }
+      });
+      rateX = Math.abs((maxX - minX) / wrapperContainr[0]);
+      rateY = Math.abs((maxY - minY) / wrapperContainr[1]);
+      scale = rateX > rateY ? rateX : rateY;
+    }
+    zoomRate = 1 / scale;
+    this.zoom = this.zoom * zoomRate;
+    _.each(nodes, (node: Node) => {
+      node.x = node.x * zoomRate;
+      node.y = node.y * zoomRate;
+    });
+    this.reDraw();
+  }
+
   private disableContextMenu(domRegex: string) {
     const html = document.getElementById(domRegex);
     if (html) {
@@ -438,5 +455,64 @@ export class Network {
         e.preventDefault();
       });
     }
+  }
+
+  private reDraw() {
+    const nodesObj = this.getNodeObj();
+    const edgeObj = this.getEdgeObj();
+    const groupObj = this.getGroupObj();
+    _.each(nodesObj, (node: any) => {
+      if (this.zoom < 0.75) {
+        node.setStyle({
+          width: 4,
+        });
+        node.drawGraph();
+      } else {
+        node.drawSprite(node.icon);
+      }
+    });
+    if (this.zoom < 1) {
+      this.nodeLabelToggle(false);
+    } else {
+      this.nodeLabelToggle(true);
+    }
+    if (this.zoom < 2) {
+      this.edgeLabelToggle(false);
+    } else {
+      this.edgeLabelToggle(true);
+    }
+    _.each(edgeObj, (edge: any) => {
+      edge.draw();
+    });
+    _.each(groupObj, (group: any) => {
+      group.draw();
+    });
+  }
+
+  private moveToCenter(center: number[]) {
+    const wrapperCenter = this.getCenter();
+    const nodes = this.getNodeObj();
+    const moveX = wrapperCenter.x - center[0];
+    const moveY = wrapperCenter.y - center[1];
+    _.each(nodes, (node: Node) => {
+      node.x = node.x + moveX;
+      node.y = node.y + moveY;
+    });
+    this.reDraw();
+  }
+
+  private vertexPoints() {
+    const nodes = this.getNodeObj();
+    const positionList: IPosition[] = [];
+    _.each(nodes, (node: Node) => {
+      positionList.push({
+        x: node.x,
+        y: node.y,
+      });
+    });
+    const vertexPointsList = _.map(positionList, (pos: IPosition) => {
+      return _.values(pos);
+    });
+    return vertexPointsList;
   }
 }
