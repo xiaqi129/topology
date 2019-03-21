@@ -15,6 +15,9 @@ export class Application extends PIXI.Application {
 
   constructor(domRegex: string = '', options = null) {
     super(options || {
+      antialias: true,
+      height: 0,
+      width: 0,
       autoResize: true,
       resolution: 2,
       transparent: true,
@@ -37,6 +40,7 @@ export class Application extends PIXI.Application {
       this.viewWrapper.appendChild(this.view);
       if (this.container) {
         this.stage.addChild(this.container);
+        this.moveCenter(this.viewWrapper.clientWidth / 2, this.viewWrapper.clientHeight / 2);
         this.container.hitArea = new PIXI.Rectangle(0, 0, this.viewWrapper.clientWidth, this.viewWrapper.clientHeight);
         this.container.interactive = true;
         (this.container as any).center = [this.viewWrapper.clientWidth / 2, this.viewWrapper.clientHeight / 2];

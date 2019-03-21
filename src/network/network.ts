@@ -104,8 +104,12 @@ export class Network {
             this.zoomNetworkElements(zoom + 0.1);
           }
         } else {
-          if (zoom > 0.15) {
-            this.zoomNetworkElements(zoom - 0.1);
+          if (zoom > 0.1) {
+            if (zoom - 0.1 >= 0.1) {
+              this.zoomNetworkElements(zoom - 0.1);
+            } else {
+              this.zoomNetworkElements(0.1);
+            }
           }
         }
         const scale = NP.divide(this.zoom, zoom);
@@ -237,7 +241,6 @@ export class Network {
 
   public zoomOver() {
     let center: number[] = [];
-    // const centerP = this.getCenter();
     const nodes = this.getNodeObj();
     const groups = this.getGroupObj();
     const isOutsideGroup: any = _.find(groups, (group: Group) => {
@@ -252,7 +255,6 @@ export class Network {
       center = [analyzeCenter.x, analyzeCenter.y];
     }
     this.moveToCenter(center);
-    // this.action.moveCenter(centerP.x, centerP.y);
   }
 
   public getCenter() {

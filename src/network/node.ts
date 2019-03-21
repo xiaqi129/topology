@@ -81,7 +81,10 @@ export class Node extends CommonElement {
   }
 
   public drawGraph() {
-    this.clearDisplayObjects();
+    const oldSprite = this.getChildByName('node_sprite');
+    const oldgraph = this.getChildByName('node_graph');
+    this.removeChild(oldSprite);
+    this.removeChild(oldgraph);
     const style = this.defaultStyle;
     const graph = new PIXI.Graphics();
     graph.name = 'node_graph';

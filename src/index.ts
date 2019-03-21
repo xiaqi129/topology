@@ -6,7 +6,6 @@ import { data as topoData } from './simpleData';
 const iconResource = {
   resources: { name: 'resources', url: './pic/imageDict.json' },
 };
-(window as any).np = NP;
 const keySort = (obj: any) => {
   const keys = Object.keys(obj).sort();
   const sortedObj: any = {};

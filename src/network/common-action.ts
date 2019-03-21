@@ -172,25 +172,21 @@ export class CommonAction {
     let flag = false;
     let oldLeft = 0;
     let oldTop = 0;
-    let hitAreaX = 0;
-    let hitAreaY = 0;
     let width = 0;
     let height = 0;
     this.container.on('mousedown', (event: any) => {
       if (this.container.hitArea instanceof PIXI.Rectangle) {
         this.topo.removeSelectedNodes();
         flag = true;
-        hitAreaX = this.container.hitArea.x;
-        hitAreaY = this.container.hitArea.y;
-        oldLeft = (event.data.global.x / this.container.scale.x) + hitAreaX;
-        oldTop = (event.data.global.y / this.container.scale.y) + hitAreaY;
+        oldLeft = event.data.global.x;
+        oldTop = event.data.global.y;
       }
     });
     this.container.on('mousemove', (event: any) => {
       if (flag) {
         rectangle.clear();
-        width = (event.data.global.x / this.container.scale.x) + hitAreaX - oldLeft;
-        height = (event.data.global.y / this.container.scale.y) + hitAreaY - oldTop;
+        width = event.data.global.x - oldLeft;
+        height = event.data.global.y - oldTop;
         rectangle.lineStyle(1, 0X024997, 1);
         rectangle.alpha = 0.8;
         rectangle.drawRect(oldLeft, oldTop, width, height);
