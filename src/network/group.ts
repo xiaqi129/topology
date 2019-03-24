@@ -665,6 +665,10 @@ export class Group extends CommonElement {
   }
 
   public draw() {
+    const graph = this.getChildByName(this.polygonHullOutlineName);
+    if (graph) {
+      graph.destroy();
+    }
     this.clearDisplayObjects();
     if (!this.isExpanded) {
       this.drawGroupNode();

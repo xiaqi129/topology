@@ -4,7 +4,6 @@ import { Edge } from './edge';
 import { Node } from './node';
 
 export class Tooltip {
-
   public static commonStyles = {
     display: 'block',
     position: 'fixed',
@@ -14,16 +13,20 @@ export class Tooltip {
     fontSize: '12px',
     userSelect: 'none',
   };
+  private domRegex: string | undefined;
+  constructor(domRegex: string | undefined) {
+    this.domRegex = domRegex;
+  }
 
   public addTooltip(ele: CommonElement, content: string, style?: any) {
     if (ele instanceof Node) {
       ele.addEventListener('mouseover', (event: any) => {
-        this.nodeTooltipOn(event, content, style);
+        this.nodeTooltipOn(content, style);
         this.tooltipMove(event);
       });
     } else if (ele instanceof Edge) {
       ele.addEventListener('mouseover', (event: any) => {
-        this.edgeTooltipOn(event, content, style);
+        this.edgeTooltipOn(content, style);
         this.tooltipMove(event);
       });
     }
@@ -41,62 +44,72 @@ export class Tooltip {
   }
 
   public clearTooltip() {
-    const network = document.getElementsByTagName('body')[0];
-    const tooltip = document.getElementById('tooltip');
-    if (network && tooltip) {
-      network.removeChild(tooltip);
+    if (this.domRegex) {
+      const network = document.getElementById(this.domRegex);
+      const tooltip = document.getElementById('tooltip');
+      if (network && tooltip) {
+        network.removeChild(tooltip);
+      }
     }
   }
 
-  private nodeTooltipOn(event: any, content: string, customStyle?: any) {
+  private nodeTooltipOn(content: string, customStyle?: any) {
     this.clearTooltip();
     const tooltipContent = content;
     _.extend(Tooltip.commonStyles, customStyle);
-    this.createTooltip(event, tooltipContent, Tooltip.commonStyles);
+    this.createTooltip(tooltipContent, Tooltip.commonStyles);
   }
 
-  private edgeTooltipOn(event: any, content: string, customStyle?: any) {
+  private edgeTooltipOn(content: string, customStyle?: any) {
     this.clearTooltip();
     const tooltipContent = content;
     _.extend(Tooltip.commonStyles, customStyle);
-    this.createTooltip(event, tooltipContent, Tooltip.commonStyles);
+    this.createTooltip(tooltipContent, Tooltip.commonStyles);
   }
 
-  private createTooltip(event: any, content: string, styles: any) {
+  private createTooltip(content: string, styles: any) {
     const popMenu = document.getElementById('pop-menu');
     if (!popMenu || popMenu.style.display === 'none') {
-      const network = document.getElementsByTagName('body')[0];
-      const tooltip = document.createElement('div');
-      tooltip.id = 'tooltip';
-      _.each(styles, (v: any, k: any) => {
-        tooltip.style[k] = v;
-      });
-      tooltip.innerHTML = content;
-      if (network) {
-        network.appendChild(tooltip);
+      if (this.domRegex) {
+        const network = document.getElementById(this.domRegex);
+        if (network) {
+          const tooltip = document.createElement('div');
+          tooltip.id = 'tooltip';
+          _.each(styles, (v: any, k: any) => {
+            tooltip.style[k] = v;
+          });
+          tooltip.innerHTML = content;
+          if (network) {
+            network.appendChild(tooltip);
+          }
+        }
       }
     }
   }
 
   private tooltipMove(event: any) {
-    const tooltip = document.getElementById('tooltip');
-    const network = document.getElementsByTagName('body')[0];
-    if (tooltip && network) {
-      const networkHeight = network.clientHeight;
-      const networkWidth = network.clientWidth;
-      const x = event.data.global.x;
-      const y = event.data.global.y + 30;
-      const tooltipHeight = tooltip.clientHeight;
-      const tooltipWidth = tooltip.clientWidth;
-      if (networkWidth - x > tooltipWidth) {
-        tooltip.style.left = `${x + 40}px`;
-      } else {
-        tooltip.style.left = `${x - tooltipWidth - 40}px`;
-      }
-      if (networkHeight - y > tooltipHeight) {
-        tooltip.style.top = `${y}px`;
-      } else {
-        tooltip.style.top = `${y - tooltipHeight}px`;
+    if (this.domRegex) {
+      const tooltip = document.getElementById('tooltip');
+      const wrapper = document.getElementById(this.domRegex);
+      if (wrapper && tooltip) {
+        const top = wrapper.getBoundingClientRect().top;
+        const left = wrapper.getBoundingClientRect().left;
+        const networkHeight = wrapper.offsetHeight + top;
+        const networkWidth = wrapper.offsetWidth + left;
+        const x = event.data.global.x + left;
+        const y = event.data.global.y + top;
+        const tooltipHeight = tooltip.offsetHeight;
+        const tooltipWidth = tooltip.offsetWidth;
+        if (networkWidth - x > tooltipWidth) {
+          tooltip.style.left = `${x + 40}px`;
+        } else {
+          tooltip.style.left = `${x - tooltipWidth - 40}px`;
+        }
+        if (networkHeight - y > tooltipHeight) {
+          tooltip.style.top = `${y + 30}px`;
+        } else {
+          tooltip.style.top = `${y - tooltipHeight - 30}px`;
+        }
       }
     }
   }

@@ -22,13 +22,13 @@ export interface ITopo {
 
   addElements(node: Node[] | Group[] | Edge[]): void;
 
-  createNode(load: PIXI.loaders.Loader, texture: string): Node;
+  createNode(domRegex: string, texture: string): Node;
 
   createArrowLine(start: Node, end: IPoint): ArrowLine;
 
   createGroup(): Group;
 
-  createEdge(startNode: Node | Group, endNode: Node | Group): Edge;
+  createEdge(startNode: Node | Group, endNode: Node | Group, domRegex?: string): Edge;
 
   createLabel(text?: string, style?: PIXI.TextStyleOptions, canvas?: HTMLCanvasElement): Label;
 
@@ -217,16 +217,16 @@ export class Topo implements ITopo {
     return this.elements;
   }
 
-  public createNode(icon?: any): Node {
-    return new Node(this.elements, this.selectedNodes, icon);
+  public createNode(domRegex: string, icon?: any): Node {
+    return new Node(this.elements, domRegex, this.selectedNodes, icon);
   }
 
   public createGroup(emptyObj?: any): Group {
     return new Group(this.elements, emptyObj);
   }
 
-  public createEdge(startNode: Node | Group, endNode: Node | Group): Edge {
-    return new Edge(startNode, endNode);
+  public createEdge(startNode: Node | Group, endNode: Node | Group, domRegex?: string): Edge {
+    return new Edge(startNode, endNode, domRegex);
   }
 
   public createArrowLine(start: IPoint, end: IPoint) {

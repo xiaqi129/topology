@@ -154,15 +154,14 @@ export class PopMenu {
       });
       if (network) {
         const tooltip = document.getElementById('tooltip');
-        const body = document.getElementsByTagName('body')[0];
-        if (tooltip && body) {
-          body.removeChild(tooltip);
+        if (tooltip) {
+          network.removeChild(tooltip);
         }
         network.appendChild(this.menu);
-        const networkHeight = network.clientHeight;
-        const networkWidth = network.clientWidth;
-        const x = event.data.global.x;
-        const y = event.data.global.y + 30;
+        const networkHeight = network.offsetHeight + network.offsetTop;
+        const networkWidth = network.offsetWidth + network.offsetLeft;
+        const x = event.data.global.x  + network.offsetTop;
+        const y = event.data.global.y + network.offsetTop;
         this.menu.style.display = 'block';
         const menuHeight = this.menuItems.length * 30 + 5;
         const menuWidth = this.menu.clientWidth;
@@ -172,9 +171,9 @@ export class PopMenu {
           this.menu.style.left = `${x - menuWidth}px`;
         }
         if (networkHeight - y > menuHeight) {
-          this.menu.style.top = `${y}px`;
+          this.menu.style.top = `${y + 30}px`;
         } else {
-          this.menu.style.top = `${(y - menuHeight)}px`;
+          this.menu.style.top = `${(y - menuHeight - 30)}px`;
         }
         network.addEventListener('click', () => {
           this.hideMenu();

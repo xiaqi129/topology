@@ -25,12 +25,12 @@ export class Edge extends CommonElement {
   public bundleExplosion: boolean = false;
   public labelToggle: boolean = false;
   public brotherEdges: Edge[] = [];
+  public tooltip: Tooltip;
   private labelStyle: any;
   private labelContent: string[];
   private bundleStyle: number = 1; // 0: link style, 1: bezier style
-  private tooltip: Tooltip;
 
-  constructor(startNode: Node | Group, endNode: Node | Group) {
+  constructor(startNode: Node | Group, endNode: Node | Group, domRegex?: string) {
     super();
     this.edge = new PIXI.Graphics();
     this.startNode = startNode;
@@ -38,7 +38,7 @@ export class Edge extends CommonElement {
     this.labelStyle = {};
     this.labelContent = [];
     this.draw();
-    this.tooltip = new Tooltip();
+    this.tooltip = new Tooltip(domRegex);
   }
 
   public getEdge() {

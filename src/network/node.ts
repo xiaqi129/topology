@@ -29,19 +29,20 @@ export class Node extends CommonElement {
   public labelContent: string = '';
   public iconHeight: number = 20;
   public clients: {} = {};
+  public icon: any;
+  public tooltip: Tooltip;
   private parentNode: Group | null = null;
   private data: any;
   private elements: Edge | CommonElement[];
   private selectedNodes: any[] = [];
   private dragging: boolean;
   private last: any;
-  private tooltip: Tooltip;
   private labelStyle: {} = {};
-  private icon: any;
   private markList: IMark[] = [];
 
   constructor(
     elements: CommonElement[],
+    domRegex: string,
     selectedNodes: any[] = [],
     icon?: any) {
     super();
@@ -52,7 +53,7 @@ export class Node extends CommonElement {
     this.selectedNodes = selectedNodes;
     this.icon = icon;
     this.draw();
-    this.tooltip = new Tooltip();
+    this.tooltip = new Tooltip(domRegex);
     this
       .on('mousedown', this.onDragStart)
       .on('mouseup', this.onDragEnd)
@@ -320,7 +321,7 @@ export class Node extends CommonElement {
       this.addChild(border);
     }
     if (sprite.name === 'node_graph') {
-      radius = 4;
+      radius = sprite.width;
       border.drawCircle(0, 0, radius / 2 + 5);
       this.addChild(border);
     }

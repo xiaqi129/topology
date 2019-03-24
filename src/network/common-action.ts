@@ -15,7 +15,6 @@ import { Edge } from './edge';
 import { EdgeBundle } from './edge-bundle';
 import { GroupEdge } from './edge-conn-group';
 import { Group } from './group';
-import { Tooltip } from './tooltip';
 
 export class CommonAction {
   public defaultLineColor: number = 0;
@@ -25,17 +24,15 @@ export class CommonAction {
   private initScale: number | undefined;
   // bundle
   private nodeLabelFlag: boolean = true;
-  private tooltip: Tooltip;
   // drag
   private dragging: boolean = false;
   private last: any;
   private data: any;
 
-  constructor(app: any, topo: ITopo, tooltip: Tooltip) {
+  constructor(app: any, topo: ITopo) {
     this.app = app;
     this.topo = topo;
     this.container = app.container;
-    this.tooltip = tooltip;
     document.addEventListener('mouseup', this.onDragEnd.bind(this));
   }
 

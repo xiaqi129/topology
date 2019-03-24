@@ -18,7 +18,6 @@ import { EdgeBundle } from './edge-bundle';
 import { Group } from './group';
 import { Node } from './node';
 import { PopMenu } from './pop-menu';
-import { Tooltip } from './tooltip';
 import { Topo } from './topo';
 
 export class Network {
@@ -31,8 +30,6 @@ export class Network {
   private drawer: Drawer;
   private app: Application;
   private action: CommonAction;
-  private tooltip: Tooltip;
-  private load: PIXI.loaders.Loader;
   private domRegex: string;
 
   constructor(domRegex: string) {
@@ -42,10 +39,8 @@ export class Network {
     this.topo = new Topo();
     this.drawer = new Drawer(domRegex, this.topo);
     this.app = this.drawer.getWhiteBoard();
-    this.tooltip = new Tooltip();
-    this.action = new CommonAction(this.app, this.topo, this.tooltip);
+    this.action = new CommonAction(this.app, this.topo);
     this.menu = new PopMenu(domRegex, this.app, this.action);
-    this.load = new PIXI.loaders.Loader();
     this.zoom = 1;
     this.isSelect = false;
     this.disableContextMenu(domRegex);
@@ -63,15 +58,8 @@ export class Network {
     });
   }
 
-  public addIconResource(iconList: any) {
-    _.each(iconList, (icon) => {
-      this.load.add(icon.name, icon.url);
-    });
-    this.load.load();
-  }
-
   public createNode(iconName?: string) {
-    return this.topo.createNode(iconName);
+    return this.topo.createNode(this.domRegex, iconName);
   }
 
   public zoomNetworkElements(zoomNum: number) {
@@ -113,7 +101,7 @@ export class Network {
           }
         }
         const scale = NP.divide(this.zoom, zoom);
-        this.moveTopology(scale, e.clientX, e.clientY);
+        this.moveTopology(scale, e.offsetX, e.offsetY);
       });
 
     }
@@ -122,7 +110,7 @@ export class Network {
   public getNetworkSize() {
     const wrapper = document.getElementById(this.domRegex);
     if (wrapper) {
-      return [wrapper.clientWidth, wrapper.clientHeight];
+      return [wrapper.offsetWidth, wrapper.offsetHeight];
     }
   }
 
@@ -135,7 +123,7 @@ export class Network {
   }
 
   public createEdge(startNode: Node | Group, endNode: Node | Group) {
-    return this.topo.createEdge(startNode, endNode);
+    return this.topo.createEdge(startNode, endNode, this.domRegex);
   }
 
   public createArrowLine(start: IPoint, end: IPoint) {
@@ -201,11 +189,11 @@ export class Network {
   public getGroupObj() {
     const groupObj = {};
     const elements = this.topo.getElements();
-    _.each(elements, (element) => {
+    _.each(elements, (element, id) => {
       if (element instanceof Group && element.name) {
         const name: string = element.name;
         _.extend(groupObj, {
-          [name]: element,
+          [`${name}${id}`]: element,
         });
       }
     });
@@ -293,7 +281,14 @@ export class Network {
   }
 
   public setTooltipDisplay(isDisplay: boolean) {
-    this.tooltip.setTooltipDisplay(isDisplay);
+    const nodes = this.getNodeObj();
+    const edges = this.getEdgeObj();
+    _.each(nodes, (node: Node) => {
+      node.tooltip.setTooltipDisplay(isDisplay);
+    });
+    _.each(edges, (edge: Edge) => {
+      edge.tooltip.setTooltipDisplay(isDisplay);
+    });
   }
 
   public groupLabelToggle(labelToggle: boolean) {
@@ -463,14 +458,18 @@ export class Network {
     const nodesObj = this.getNodeObj();
     const edgeObj = this.getEdgeObj();
     const groupObj = this.getGroupObj();
-    _.each(nodesObj, (node: any) => {
-      if (this.zoom < 0.75) {
-        node.setStyle({
-          width: 4,
-        });
-        node.drawGraph();
+    _.each(nodesObj, (node: Node) => {
+      if (node.icon) {
+        if (this.zoom < 0.75) {
+          node.setStyle({
+            width: 4,
+          });
+          node.drawGraph();
+        } else {
+          node.drawSprite(node.icon);
+        }
       } else {
-        node.drawSprite(node.icon);
+        node.drawGraph();
       }
     });
     if (this.zoom < 1) {
