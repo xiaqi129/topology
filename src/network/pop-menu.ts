@@ -158,10 +158,10 @@ export class PopMenu {
           network.removeChild(tooltip);
         }
         network.appendChild(this.menu);
-        const networkHeight = network.offsetHeight + network.offsetTop;
-        const networkWidth = network.offsetWidth + network.offsetLeft;
-        const x = event.data.global.x  + network.offsetTop;
-        const y = event.data.global.y + network.offsetTop;
+        const networkHeight = network.offsetHeight;
+        const networkWidth = network.offsetWidth;
+        const x = event.data.global.x;
+        const y = event.data.global.y;
         this.menu.style.display = 'block';
         const menuHeight = this.menuItems.length * 30 + 5;
         const menuWidth = this.menu.clientWidth;
@@ -173,7 +173,7 @@ export class PopMenu {
         if (networkHeight - y > menuHeight) {
           this.menu.style.top = `${y + 30}px`;
         } else {
-          this.menu.style.top = `${(y - menuHeight - 30)}px`;
+          this.menu.style.top = `${(y - menuHeight)}px`;
         }
         network.addEventListener('click', () => {
           this.hideMenu();

@@ -44,7 +44,6 @@ export class Label extends PIXI.Text {
         break;
       case 1:
         this.position.x = -this.width / 2;
-        this.position.y = 15;
         break;
       case 2:
         this.anchor.set(1.5 * posDisX, 0.55 * posDisY);

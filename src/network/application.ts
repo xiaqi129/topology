@@ -19,7 +19,7 @@ export class Application extends PIXI.Application {
       width: 0,
       autoResize: true,
       resolution: 2,
-      transparent: true,
+      backgroundColor: 0Xffffff,
       forceFXAA: true,
       forceCanvas: true,
     });
@@ -86,7 +86,6 @@ export class Application extends PIXI.Application {
     if (this.domRegex) {
       const wrapper: any = document.getElementById(this.domRegex);
       return wrapper;
-
     }
   }
 

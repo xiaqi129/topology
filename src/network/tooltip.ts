@@ -105,10 +105,10 @@ export class Tooltip {
         } else {
           tooltip.style.left = `${x - tooltipWidth - 40}px`;
         }
-        if (networkHeight - y > tooltipHeight) {
-          tooltip.style.top = `${y + 30}px`;
+        if (networkHeight - y > tooltipHeight + 20) {
+          tooltip.style.top = `${y - 20}px`;
         } else {
-          tooltip.style.top = `${y - tooltipHeight - 30}px`;
+          tooltip.style.top = `${y - tooltipHeight + 20}px`;
         }
       }
     }

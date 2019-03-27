@@ -23,6 +23,7 @@ export class EdgeBundle extends CommonElement {
   private startNode: Node;
   private endNode: Node;
   private style: any;
+  private defaultColor: number;
 
   constructor(edge: Edge) {
     super();
@@ -31,6 +32,7 @@ export class EdgeBundle extends CommonElement {
     this.endNode = edge.endNode;
     this.style = edge.defaultStyle;
     this.addChild(edge);
+    this.defaultColor = _.cloneDeep(edge.defalultColor);
     this.bundleEdge = this.children;
     this.setBundle(edge);
   }
@@ -70,6 +72,7 @@ export class EdgeBundle extends CommonElement {
           // add to elements
           afterBundle.setStyle({
             lineType: 0,
+            lineColor: this.defaultColor,
           });
           this.addChild(afterBundle);
         } else {
@@ -85,7 +88,10 @@ export class EdgeBundle extends CommonElement {
           bundleEdge.draw();
         });
       }
-      this.clearTooltip();
+      const tooltip = document.getElementById('tooltip');
+      if (tooltip) {
+        tooltip.remove();
+      }
     }
   }
 
@@ -155,14 +161,6 @@ export class EdgeBundle extends CommonElement {
           this.lastClickTime = currentTime;
         }
       });
-    }
-  }
-
-  public clearTooltip() {
-    const network = document.getElementsByTagName('body')[0];
-    const tooltip = document.getElementById('tooltip');
-    if (network && tooltip) {
-      network.removeChild(tooltip);
     }
   }
 }

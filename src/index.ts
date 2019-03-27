@@ -335,7 +335,7 @@ const simpleData = function () {
         arrowType: 3,
         arrowWidth: 0.01,
         fillArrow: true,
-        lineColor: 0X0386d2,
+        // lineColor: 0X0386d2,
         lineDistance: 0,
         lineType: 0,
         lineFull: 0,
@@ -432,6 +432,7 @@ const simpleData = function () {
   network.syncView();
   network.setDrag();
   network.setZoom();
+  network.moveCenter();
 };
 network.callback = () => {
   simpleData();

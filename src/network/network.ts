@@ -280,6 +280,13 @@ export class Network {
     this.action.setClick(color);
   }
 
+  public moveCenter() {
+    const vertexPointsList = this.vertexPoints();
+    const analyzeCenter = (new polygon(vertexPointsList)).center();
+    const center = [analyzeCenter.x, analyzeCenter.y];
+    this.moveToCenter(center);
+  }
+
   public setTooltipDisplay(isDisplay: boolean) {
     const nodes = this.getNodeObj();
     const edges = this.getEdgeObj();
@@ -300,6 +307,10 @@ export class Network {
         group.removeChild(group.getChildByName('group_label'));
       }
     });
+  }
+
+  public changeBackgroundColor(color: number) {
+    this.app.renderer.backgroundColor = color;
   }
 
   public edgeLabelToggle(labelToggle: boolean) {
@@ -463,6 +474,7 @@ export class Network {
         if (this.zoom < 0.75) {
           node.setStyle({
             width: 4,
+            fillColor: 0X0386d2,
           });
           node.drawGraph();
         } else {

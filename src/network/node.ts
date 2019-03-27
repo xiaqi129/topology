@@ -90,7 +90,7 @@ export class Node extends CommonElement {
     const graph = new PIXI.Graphics();
     graph.name = 'node_graph';
     graph.lineStyle(style.lineWidth, style.lineColor);
-    graph.beginFill(0X0386d2, style.fillOpacity);
+    graph.beginFill(style.fillColor, style.fillOpacity);
     graph.drawCircle(0, 0, style.width);
     graph.endFill();
     graph.interactive = true;
@@ -352,12 +352,19 @@ export class Node extends CommonElement {
       _.extend(this.labelStyle, style);
     }
     const oldLabel = this.getChildByName('node_label');
+    const sprite: any = this.getChildByName('node_sprite') ?
+      this.getChildByName('node_sprite') : this.getChildByName('node_graph');
     if (oldLabel) {
       (oldLabel as any).setText(content);
       this.labelContent = (oldLabel as any).text;
     } else {
       const label = new Label(content, this.labelStyle);
       label.name = 'node_label';
+      if (sprite.name === 'node_graph') {
+        label.y = this.defaultStyle.width + 10;
+      } else if (sprite.name === 'node_sprite') {
+        label.y = 15;
+      }
       this.addChild(label);
       this.labelContent = label.text;
       return label;
