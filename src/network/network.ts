@@ -341,6 +341,16 @@ export class Network {
     });
   }
 
+  public changeBundleLabelColor(color: number) {
+    _.each(this.getElements(), (element) => {
+      if (element instanceof EdgeBundle) {
+        element.setStyle({
+          fillColor: color,
+        });
+      }
+    });
+  }
+
   public setBundelExpanded(flag: boolean) {
     _.each(this.getElements(), (element) => {
       if (element instanceof EdgeBundle && element.isExpanded !== flag) {

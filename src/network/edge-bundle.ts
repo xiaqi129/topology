@@ -54,8 +54,9 @@ export class EdgeBundle extends CommonElement {
         afterBundle.name = 'bundle_line';
         if (this.bundleData[bundleId]) {
           const graph = new PIXI.Graphics();
+          const style = this.defaultStyle;
           graph.name = 'label_background';
-          graph.beginFill(0X0081cf, 1);
+          graph.beginFill(style.fillColor, 1);
           graph.drawCircle(0, 0, 7);
           graph.endFill();
           afterBundle.addChild(graph);

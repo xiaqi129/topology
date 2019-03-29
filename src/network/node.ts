@@ -387,6 +387,12 @@ export class Node extends CommonElement {
     }
   }
 
+  public setLabelStyle(style: any) {
+    const label: any = this.getChildByName('node_label');
+    _.extend(this.labelStyle, style);
+    label.setStyle(style);
+  }
+
   public changeIcon(icon: string) {
     this.icon = icon;
     this.removeChild(this.getChildByName('node_sprite'));

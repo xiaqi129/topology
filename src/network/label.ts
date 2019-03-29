@@ -30,8 +30,8 @@ export class Label extends PIXI.Text {
     this.text = label;
   }
 
-  public setStyle(key: string, value: string) {
-    _.extend(this.style, { key, value });
+  public setStyle(style: any) {
+    _.extend(this.style, style);
   }
 
   public setPosition(position: number) {
