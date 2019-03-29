@@ -33,7 +33,6 @@ export class CommonAction {
     this.app = app;
     this.topo = topo;
     this.container = app.container;
-    document.addEventListener('mouseup', this.onDragEnd.bind(this));
   }
 
   public getCenter() {
@@ -90,6 +89,10 @@ export class CommonAction {
     this.container.on('mousemove', (event: any) => {
       this.onDragMove(event);
     });
+    this.container.on('mouseup', () => {
+      this.container.cursor = 'default';
+    });
+    document.addEventListener('mouseup', this.onDragEnd.bind(this));
   }
 
   public onDragStart(event: PIXI.interaction.InteractionEvent) {
@@ -127,7 +130,6 @@ export class CommonAction {
 
   public onDragEnd() {
     this.dragging = false;
-    this.container.cursor = 'default';
     this.data = null;
     this.last = null;
     const edges = this.getChildEdges();

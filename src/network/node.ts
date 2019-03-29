@@ -363,7 +363,7 @@ export class Node extends CommonElement {
       if (sprite.name === 'node_graph') {
         label.y = this.defaultStyle.width + 10;
       } else if (sprite.name === 'node_sprite') {
-        label.y = 15;
+        label.y = sprite.height;
       }
       this.addChild(label);
       this.labelContent = label.text;
