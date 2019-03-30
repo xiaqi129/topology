@@ -20,7 +20,7 @@ export class Edge extends CommonElement {
   public startNode: any;
   public endNode: any;
   public edge: PIXI.Graphics;
-  public arrow: PIXI.Graphics | undefined;
+  public arrow: PIXI.Graphics;
   public defalultColor: number = 0;
   public bundleExplosion: boolean = false;
   public labelToggle: boolean = false;
@@ -33,6 +33,7 @@ export class Edge extends CommonElement {
   constructor(startNode: Node | Group, endNode: Node | Group, domRegex?: string) {
     super();
     this.edge = new PIXI.Graphics();
+    this.arrow = new PIXI.Graphics();
     this.startNode = startNode;
     this.endNode = endNode;
     this.labelStyle = {};
@@ -466,7 +467,7 @@ export class Edge extends CommonElement {
 
   public createArrow(position: any, angle: number, reverse: boolean = true) {
     const style = this.defaultStyle;
-    this.arrow = new PIXI.Graphics();
+    this.arrow.name = 'edge_arrow';
     this.arrow.lineStyle(style.arrowWidth, style.arrowColor, 1);
     if (style.fillArrow) {
       this.arrow.beginFill(style.arrowColor);
@@ -485,8 +486,9 @@ export class Edge extends CommonElement {
     }
   }
 
-  public getDistance(size: any, lineDistance: number) {
-    return (_.max([size.width, size.height]) || 0) * 0.5 + lineDistance;
+  public getDistance(node: Node, lineDistance: number) {
+    const result = node.getWidth() > node.getHeight() ? node.getWidth() : node.getHeight();
+    return result * 0.5 + lineDistance;
   }
 
   public createLinkEdge(srcNodePos: any, endNodePos: any, style: any) {
@@ -668,12 +670,10 @@ export class Edge extends CommonElement {
     endNodePos: { [key: string]: number },
     angle: number,
     style: IStyles) {
-    const srcNodePosAdjusted =
-      this.getParallelPoint(srcNodePos, this.defaultStyle.lineDistance, this.getAngle());
-    const endNodePosAdjusted =
-      this.getParallelPoint(endNodePos, this.defaultStyle.lineDistance, this.getAngle());
-    const edge = this.createLinkEdge(srcNodePosAdjusted, endNodePosAdjusted, style);
-    const arrow = this.createLinkArrows(srcNodePosAdjusted, endNodePosAdjusted, angle, style);
+    const srcPos = this.getLineNodePosition(this.startNode);
+    const endPos = this.getLineNodePosition(this.endNode);
+    const edge = this.createLinkEdge(srcPos, endPos, style);
+    const arrow = this.createLinkArrows(srcNodePos, endNodePos, angle, style);
     return [edge, arrow];
   }
 
@@ -752,8 +752,8 @@ export class Edge extends CommonElement {
     this.clearEdgeRelatedGraph();
     const style = this.defaultStyle;
     const lineDistance = style.lineDistance;
-    const srcNodeSize = this.getNodeSize(this.startNode);
-    const endNodeSize = this.getNodeSize(this.endNode);
+    // const srcNodeSize = this.getNodeSize(this.startNode);
+    // const endNodeSize = this.getNodeSize(this.endNode);
     let srcNodePos = this.getLineNodePosition(this.startNode);
     let endNodePos = this.getLineNodePosition(this.endNode);
     const angle = this.getAngle(srcNodePos, endNodePos);
@@ -761,13 +761,13 @@ export class Edge extends CommonElement {
       srcNodePos,
       -1,
       angle,
-      this.getDistance(srcNodeSize, lineDistance),
+      this.getDistance(this.startNode, lineDistance),
     );
     endNodePos = this.getAdjustedLocation(
       endNodePos,
       1,
       angle,
-      this.getDistance(endNodeSize, lineDistance),
+      this.getDistance(this.endNode, lineDistance),
     );
     let elements: any[] = [];
     if (style.lineType === 0 && style.lineFull === 0) {

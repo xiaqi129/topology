@@ -63,7 +63,7 @@ const noData = function () {
       edge.setStyle({
         arrowColor: 0Xc71bd3,
         arrowLength: 15,
-        arrowType: 3,
+        arrowType: 2,
         arrowWidth: 1,
         fillArrow: true,
         lineColor: 0X0386d2,
@@ -331,12 +331,13 @@ const simpleData = function () {
       const edge = network.createEdge(srcNode, destNode);
       edge.setStyle({
         arrowColor: 0X006aad,
-        arrowLength: 13,
+        arrowAngle: 20,
+        arrowMiddleLength: 5,
+        arrowLength: 8,
         arrowType: 3,
-        arrowWidth: 0.01,
         fillArrow: true,
-        // lineColor: 0X0386d2,
-        lineDistance: 0,
+        lineColor: 0X0386d2,
+        // lineDistance: 0,
         lineType: 0,
         lineFull: 0,
         lineWidth: 1,
