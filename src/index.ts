@@ -567,12 +567,26 @@ if (groupLabelToggle) {
 if (body) {
   window.addEventListener('keydown', (e) => {
     if (e.keyCode === 17 && !network.isSelect) {
-      network.setSelect();
+      network.setSelect(false);
     }
   });
   window.addEventListener('keyup', (e) => {
     if (e.keyCode === 17) {
       network.setDrag();
+    }
+  });
+  let pressSpace = true;
+  window.addEventListener('keydown', (e) => {
+    if (e.keyCode === 32 && e.ctrlKey && pressSpace) {
+      network.setSelect(true);
+      pressSpace = false;
+    }
+  });
+
+  window.addEventListener('keyup', (e) => {
+    if (e.keyCode === 32 && e.ctrlKey) {
+      network.setDrag();
+      pressSpace = true;
     }
   });
 }

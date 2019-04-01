@@ -222,9 +222,9 @@ export class Network {
     this.action.dragContainer();
   }
 
-  public setSelect() {
+  public setSelect(isLock: boolean) {
     this.isSelect = true;
-    this.action.setSelect();
+    this.action.setSelect(isLock);
   }
 
   public zoomOver() {

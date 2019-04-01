@@ -99,46 +99,9 @@ export class Node extends CommonElement {
     _.each(this.markList, (mark) => {
       const addSprite: any = this.getChildByName(`node_${mark.name}`);
       if (addSprite) {
-        addSprite.width = 13;
-        addSprite.height = 13;
-        switch (mark.position) {
-          case 'top':
-            addSprite.x = -6.5;
-            addSprite.y = -13;
-            break;
-          case 'left':
-            addSprite.x = -13;
-            addSprite.y = -6.5;
-            break;
-          case 'bottom':
-            addSprite.x = -6.5;
-            addSprite.y = 0;
-            break;
-          case 'right':
-            addSprite.x = 0;
-            addSprite.y = -6.5;
-            break;
-          case 'top-left':
-            addSprite.x = -13;
-            addSprite.y = -13;
-            break;
-          case 'top-right':
-            addSprite.x = 0;
-            addSprite.y = -13;
-            break;
-          case 'bottom-left':
-            addSprite.x = -13;
-            addSprite.y = 0;
-            break;
-          case 'bottom-right':
-            addSprite.x = 0;
-            addSprite.y = 0;
-            break;
-          default:
-            addSprite.x = -6.5;
-            addSprite.y = -13;
-            break;
-        }
+        addSprite.width = mark.width;
+        addSprite.height = mark.height;
+        this.switchPos(addSprite, mark.position);
         this.setChildIndex(addSprite, this.children.length - 1);
       }
     });

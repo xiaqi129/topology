@@ -46,11 +46,11 @@ export class CommonAction {
     this.drag();
   }
 
-  public setSelect() {
+  public setSelect(isLock: boolean) {
     this.container.removeAllListeners();
     this.container.cursor = 'crosshair';
     this.clearHighlight();
-    this.moveSelect();
+    this.moveSelect(isLock);
   }
 
   public getSelectNodes() {
@@ -164,7 +164,7 @@ export class CommonAction {
     });
   }
 
-  public moveSelect() {
+  public moveSelect(isLock: boolean) {
     const rectangle = new PIXI.Graphics();
     const elements = this.topo.getElements();
     let flag = false;
@@ -195,16 +195,24 @@ export class CommonAction {
       flag = false;
       const bounds = rectangle.getLocalBounds();
       _.each(elements, (element) => {
-        if (element instanceof Node && !element.isLock) {
-          const sprite: any = element.getChildByName('node_sprite') ?
-            element.getChildByName('node_sprite') : element.getChildByName('node_graph');
-          const nodeTop = element.y - (sprite.height / 2);
-          const nodeLeft = element.x - (sprite.width / 2);
-          const nodeRight = element.x + (sprite.width / 2);
-          const nodeBottom = element.y + (sprite.height / 2);
+        let node: any;
+        if (element instanceof Node) {
+          if (isLock && element.isLock) {
+            node = element;
+          } else if (!isLock && !element.isLock) {
+            node = element;
+          }
+        }
+        if (node) {
+          const sprite: any = node.getChildByName('node_sprite') ?
+            node.getChildByName('node_sprite') : node.getChildByName('node_graph');
+          const nodeTop = node.y - (sprite.height / 2);
+          const nodeLeft = node.x - (sprite.width / 2);
+          const nodeRight = node.x + (sprite.width / 2);
+          const nodeBottom = node.y + (sprite.height / 2);
           if ((nodeTop >= bounds.top) && (nodeRight <= bounds.right) &&
             (nodeBottom <= bounds.bottom) && (nodeLeft >= bounds.left)) {
-            this.topo.setSelectedNodes(element);
+            this.topo.setSelectedNodes(node);
           }
         }
       });
@@ -293,19 +301,10 @@ export class CommonAction {
 
   public lockElement(element: CommonElement) {
     if (element instanceof Node) {
-      const nodeLock = element.getChildByName('node_lock');
-      if (nodeLock) {
-        element.removeChild(nodeLock);
-      }
-      const lockTexture = PIXI.Texture.fromFrame('lock');
-      const lock = new PIXI.Sprite(lockTexture);
+      element.removeNodeMark('lock');
+      element.addNodeMark('lock', 'top-right', 12, 12);
       element.off('mousemove');
-      lock.width = element.iconWidth / 2;
-      lock.height = element.iconHeight / 2;
-      lock.anchor.set(1.5, 1.5);
-      lock.name = 'node_lock';
       element.isLock = true;
-      element.addChild(lock);
     } else if (element instanceof Group) {
       element.draw();
       const nodes = element.expandedVisibleNodes;
@@ -313,20 +312,11 @@ export class CommonAction {
       const graph = _.find(element.children, (g) => {
         return g instanceof PIXI.Graphics;
       });
-      _.each(nodes, (node) => {
+      _.each(nodes, (node: Node) => {
         node.off('mousemove');
-        const nodeLock = node.getChildByName('node_lock');
-        if (nodeLock) {
-          node.removeChild(nodeLock);
-        }
-        const lockTexture = PIXI.Texture.fromFrame('lock');
-        const lock = new PIXI.Sprite(lockTexture);
-        lock.width = node.iconWidth / 2;
-        lock.height = node.iconHeight / 2;
-        lock.anchor.set(1.5, 1.5);
-        lock.name = 'node_lock';
-        node.isLock = true;
-        node.addChild(lock);
+        node.removeNodeMark('lock');
+        node.addNodeMark('lock', 'top-right', 12, 12);
+        element.isLock = true;
       });
       if (graph) {
         graph.off('mousemove');
@@ -347,24 +337,18 @@ export class CommonAction {
   public unLockElement(element: CommonElement) {
     if (element instanceof Node) {
       element.on('mousemove', element.onDragMove);
-      const lock = element.getChildByName('node_lock');
+      element.removeNodeMark('lock');
       element.isLock = false;
-      if (lock) {
-        lock.destroy();
-      }
     } else if (element instanceof Group) {
       const nodes = element.expandedVisibleNodes;
       const substratumGroups = element.substratumInfo;
       const graph = _.find(element.children, (g) => {
         return g instanceof PIXI.Graphics;
       });
-      _.each(nodes, (node) => {
+      _.each(nodes, (node: Node) => {
         node.on('mousemove', node.onDragMove);
-        const lock = node.getChildByName('node_lock');
         node.isLock = false;
-        if (lock) {
-          lock.destroy();
-        }
+        node.removeNodeMark('lock');
       });
       if (graph) {
         graph.on('mousemove', element.onDragMove.bind(element));
