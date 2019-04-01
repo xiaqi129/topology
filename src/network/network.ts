@@ -383,12 +383,13 @@ export class Network {
     }
     if (element instanceof Node) {
       element.visible = false;
-      const nodeName = element.name;
-      _.each(this.getEdgeObj(), (value: any, key: string) => {
-        // if key contain nodeName, then set value's visible to false
-        if (nodeName && key.indexOf(nodeName) !== -1) {
-          value.visible = false;
+      _.each(this.getEdgeObj(), (edge: Edge) => {
+        if (edge.startNode === element || edge.endNode === element) {
+          edge.visible = false;
         }
+      });
+      _.each(this.getGroupObj(), (group: Group) => {
+        group.draw();
       });
     }
     if (element instanceof Group) {

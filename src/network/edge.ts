@@ -486,7 +486,7 @@ export class Edge extends CommonElement {
     }
   }
 
-  public getDistance(node: Node, lineDistance: number) {
+  public getDistance(node: Node | Group, lineDistance: number) {
     const result = node.getWidth() > node.getHeight() ? node.getWidth() : node.getHeight();
     return result * 0.5 + lineDistance;
   }

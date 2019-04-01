@@ -275,19 +275,15 @@ export class Node extends CommonElement {
   }
 
   public getWidth() {
-    const sprite = this.getChildByName('node_sprite');
-    if (sprite) {
-      return (sprite as any).width;
-    }
-    return 8;
+    const sprite: any = this.getChildByName('node_sprite') ?
+      this.getChildByName('node_sprite') : this.getChildByName('node_graph');
+    return sprite.width;
   }
 
   public getHeight() {
-    const sprite = this.getChildByName('node_sprite');
-    if (sprite) {
-      return (sprite as any).height;
-    }
-    return 8;
+    const sprite: any = this.getChildByName('node_sprite') ?
+      this.getChildByName('node_sprite') : this.getChildByName('node_graph');
+    return sprite.height;
   }
 
   public selectOne(color?: any) {
