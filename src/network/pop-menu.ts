@@ -64,13 +64,13 @@ export class PopMenu {
       const selectedNodes = this.action.getSelectNodes();
       if (selectElement instanceof Node) {
         if (selectedNodes.length < 2) {
-          this.action.removeSelectNodes();
+          this.action.removeHighLight();
           this.action.setSelectNodes(selectElement);
         } else {
           this.action.setSelectNodes(selectElement);
         }
       } else if (selectElement instanceof Edge) {
-        this.action.removeSelectNodes();
+        this.action.removeHighLight();
         this.action.setSelectEdge(selectElement);
         selectElement.selectOn();
       }

@@ -379,14 +379,6 @@ export class Edge extends CommonElement {
     return this.endNode;
   }
 
-  public setStyle(styles: object, redraw: boolean = true) {
-    _.extend(this.defaultStyle, styles);
-    if (redraw) {
-      this.draw();
-    }
-    this.defalultColor = this.defaultStyle.lineColor;
-  }
-
   public getStyle() {
     return this.defaultStyle;
   }
@@ -435,6 +427,7 @@ export class Edge extends CommonElement {
       x: node.x + n * distanceRound * Math.sin(angel),
       y: node.y + n * distanceRound * Math.cos(angel),
     };
+
     return location;
   }
 
@@ -487,7 +480,7 @@ export class Edge extends CommonElement {
   }
 
   public getDistance(node: Node | Group, lineDistance: number) {
-    const result = node.getWidth() > node.getHeight() ? node.getWidth() : node.getHeight();
+    const result = node.getWidth() < node.getHeight() ? node.getWidth() : node.getHeight();
     return result * 0.5 + lineDistance;
   }
 
@@ -665,14 +658,18 @@ export class Edge extends CommonElement {
     this.draw();
   }
 
+  public selectOff() {
+    this.setStyle({
+      lineColor: this.defalultColor,
+    });
+  }
+
   public drawLineEdge(
     srcNodePos: { [key: string]: number },
     endNodePos: { [key: string]: number },
     angle: number,
     style: IStyles) {
-    const srcPos = this.getLineNodePosition(this.startNode);
-    const endPos = this.getLineNodePosition(this.endNode);
-    const edge = this.createLinkEdge(srcPos, endPos, style);
+    const edge = this.createLinkEdge(srcNodePos, endNodePos, style);
     const arrow = this.createLinkArrows(srcNodePos, endNodePos, angle, style);
     return [edge, arrow];
   }
@@ -752,8 +749,6 @@ export class Edge extends CommonElement {
     this.clearEdgeRelatedGraph();
     const style = this.defaultStyle;
     const lineDistance = style.lineDistance;
-    // const srcNodeSize = this.getNodeSize(this.startNode);
-    // const endNodeSize = this.getNodeSize(this.endNode);
     let srcNodePos = this.getLineNodePosition(this.startNode);
     let endNodePos = this.getLineNodePosition(this.endNode);
     const angle = this.getAngle(srcNodePos, endNodePos);

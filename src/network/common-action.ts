@@ -75,10 +75,9 @@ export class CommonAction {
     this.app.moveCenter(x, y);
   }
 
-  public removeSelectNodes() {
+  public removeHighLight() {
     this.cleanEdge();
     this.cleanNode();
-    this.topo.removeSelectedNodes();
   }
 
   public drag() {
@@ -221,7 +220,7 @@ export class CommonAction {
         element.addEventListener('mousedown', (event: PIXI.interaction.InteractionEvent) => {
           event.stopPropagation();
           if (this.getSelectNodes().length < 1) {
-            this.removeSelectNodes();
+            this.removeHighLight();
             element.selectOne(color);
             this.setSelectNodes(element);
           }
@@ -230,8 +229,7 @@ export class CommonAction {
         this.defaultLineColor = element.defaultStyle.lineColor;
         element.addEventListener('mousedown', (event: PIXI.interaction.InteractionEvent) => {
           event.stopPropagation();
-          this.cleanEdge();
-          this.cleanNode();
+          this.removeHighLight();
           this.topo.setSelectedEdge(element);
           element.selectOn();
         });
@@ -240,32 +238,17 @@ export class CommonAction {
           this.defaultLineColor = edges.defaultStyle.lineColor;
           edges.addEventListener('mousedown', (event: PIXI.interaction.InteractionEvent) => {
             event.stopPropagation();
-            this.cleanEdge();
-            this.cleanNode();
+            this.removeHighLight();
             this.topo.setSelectedEdge(edges);
             edges.selectOn();
           });
         });
       } else if (element instanceof Group) {
         element.on('click', (event: PIXI.interaction.InteractionEvent) => {
-          this.cleanEdge();
-          this.cleanNode();
-          this.topo.removeSelectedNodes();
+          this.removeHighLight();
         });
         element.addEventListener('mousedown', () => {
-          this.cleanEdge();
-          this.cleanNode();
-          // node.selectOn();
-        });
-        _.each(element.children, (node) => {
-          if (node instanceof GroupEdge) {
-            node.addEventListener('mousedown', (event: PIXI.interaction.InteractionEvent) => {
-              event.stopPropagation();
-              this.cleanEdge();
-              this.cleanNode();
-              node.selectOn();
-            });
-          }
+          this.removeHighLight();
         });
       }
     });
@@ -274,69 +257,34 @@ export class CommonAction {
 
   public clearHighlight() {
     this.container.on('mousedown', () => {
-      _.each(this.topo.getElements(), (element) => {
-        if (element instanceof Node) {
-          element.selectOff();
-          this.topo.removeSelectedNodes();
-        }
-        if (element instanceof Edge) {
-          element.setStyle({
-            lineColor: element.defalultColor,
-          });
-        }
-        if (element instanceof EdgeBundle) {
-          _.each(element.children, (edges: any) => {
-            edges.setStyle({
-              lineColor: edges.defalultColor,
-            });
-          });
-        }
-        if (element instanceof Group) {
-          _.each(element.children, (node) => {
-            if (node instanceof GroupEdge) {
-              node.setStyle({
-                lineColor: node.defalultColor,
-              });
-            }
-          });
-        }
+      const selectNodes = this.topo.getSelectedNodes();
+      const selectEdge: Edge | undefined = this.topo.getSelectedEdge();
+      _.each(selectNodes, (node: Node) => {
+        node.selectOff();
       });
+      if (selectEdge) {
+        selectEdge.selectOff();
+
+      }
+      this.topo.removeSelectedNodes();
+      this.topo.removeSelectedEdge();
     });
   }
 
   public cleanEdge() {
+    const selectEdge: Edge | undefined = this.topo.getSelectedEdge();
+    if (selectEdge) {
+      selectEdge.selectOff();
+    }
     this.topo.removeSelectedEdge();
-    _.each(this.topo.getElements(), (ele) => {
-      if (ele instanceof Edge) {
-        ele.setStyle({
-          lineColor: ele.defalultColor,
-        });
-      }
-      if (ele instanceof EdgeBundle) {
-        _.each(ele.children, (edge: any) => {
-          edge.setStyle({
-            lineColor: edge.defalultColor,
-          });
-        });
-      }
-      if (ele instanceof Group) {
-        _.each(ele.children, (groupedge) => {
-          if (groupedge instanceof GroupEdge) {
-            groupedge.setStyle({
-              lineColor: groupedge.defalultColor,
-            });
-          }
-        });
-      }
-    });
   }
 
   public cleanNode() {
-    _.each(this.topo.getElements(), (ele) => {
-      if (ele instanceof Node) {
-        ele.selectOff();
-      }
+    const selectNodes = this.topo.getSelectedNodes();
+    _.each(selectNodes, (node: Node) => {
+      node.selectOff();
     });
+    this.topo.removeSelectedNodes();
   }
 
   public toggleLabel() {

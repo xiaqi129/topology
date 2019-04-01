@@ -551,11 +551,11 @@ export class Group extends CommonElement {
   }
 
   public getWidth() {
-    return this.defaultStyle.width + this.defaultStyle.padding;
+    return this.defaultStyle.width * 1.8 + this.defaultStyle.padding;
   }
 
   public getHeight() {
-    return this.defaultStyle.height + this.defaultStyle.padding;
+    return this.defaultStyle.height * 1.8 + this.defaultStyle.padding;
   }
 
   public drawEllipseOutline(graph: PIXI.Graphics, vertexPointsNumber: number[][]) {
