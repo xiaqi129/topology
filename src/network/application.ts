@@ -35,29 +35,29 @@ export class Application extends PIXI.Application {
 
   public initApplication() {
     if (this.viewWrapper) {
-      this.renderer.resize(this.viewWrapper.offsetWidth, this.viewWrapper.offsetHeight);
+      this.renderer.resize(this.viewWrapper.clientWidth, this.viewWrapper.clientHeight);
       this.container = new PIXI.Container();
       this.viewWrapper.appendChild(this.view);
       if (this.container) {
         this.stage.addChild(this.container);
-        this.moveCenter(this.viewWrapper.offsetWidth / 2, this.viewWrapper.offsetHeight / 2);
-        this.container.hitArea = new PIXI.Rectangle(0, 0, this.viewWrapper.offsetWidth, this.viewWrapper.offsetHeight);
+        this.moveCenter(this.viewWrapper.clientWidth / 2, this.viewWrapper.clientHeight / 2);
+        this.container.hitArea = new PIXI.Rectangle(0, 0, this.viewWrapper.clientWidth, this.viewWrapper.clientHeight);
         this.container.interactive = true;
-        (this.container as any).center = [this.viewWrapper.offsetWidth / 2, this.viewWrapper.offsetHeight / 2];
+        (this.container as any).center = [this.viewWrapper.clientWidth / 2, this.viewWrapper.clientHeight / 2];
       }
     }
   }
 
   public moveCenter(x: number, y: number) {
     if (x && y && this.container && this.viewWrapper) {
-      this.container.position.set(this.viewWrapper.offsetWidth / 2 - x, this.viewWrapper.offsetHeight / 2 - y);
+      this.container.position.set(this.viewWrapper.clientWidth / 2 - x, this.viewWrapper.clientHeight / 2 - y);
       return this.container;
     }
   }
 
   public fitWrapperSize() {
     if (this.viewWrapper) {
-      this.renderer.resize(this.viewWrapper.offsetWidth, this.viewWrapper.offsetHeight);
+      this.renderer.resize(this.viewWrapper.clientWidth, this.viewWrapper.clientHeight);
     }
     window.addEventListener('resize', () => {
       if (this.container && this.viewWrapper) {

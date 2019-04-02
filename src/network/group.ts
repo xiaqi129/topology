@@ -84,32 +84,42 @@ export class Group extends CommonElement {
 
   public toggleGroupExpand() {
     const graph = this.getChildByName(this.polygonHullOutlineName);
-    const isBundle = _.every(this.edgeArray, (edge: Edge) => {
-      return edge.parent !== null;
-    });
     graph.on('click', () => {
-      // event.stopPropagation();
       const currentTime = new Date().getTime();
       const includeGroups = this.childrenNode[0].getIncluedGroup();
       this.superstratumInfo = _.slice(includeGroups, 0, _.indexOf(includeGroups, this));
-      if (this.intersection()[0].length === 0) {
-        if (currentTime - this.lastClickTime < 500 && isBundle) {
-          this.isExpanded = !this.isExpanded;
-          this.lastClickTime = 0;
-          this.changeEdgeResource();
-          this.toggleChildNodesVisible(this.isExpanded);
-          if (!this.isExpanded) {
-            this.removeEdgeLabel();
-          } else {
-            this.addEdgeLabel();
-          }
-          this.toggleShowEdges(this.isExpanded);
-          this.redrawGroup(this.isExpanded);
-        } else {
-          this.lastClickTime = currentTime;
-        }
+      if (currentTime - this.lastClickTime < 500) {
+        this.lastClickTime = 0;
+        this.setExpanded();
+      } else {
+        this.lastClickTime = currentTime;
       }
+      // }
     });
+  }
+
+  public setExpanded() {
+    const isBundle = _.every(this.edgeArray, (edge: Edge) => {
+      return edge.parent !== null;
+    });
+    if (this.childrenNode.length > 0) {
+      const includeGroups = this.childrenNode[0].getIncluedGroup();
+      this.superstratumInfo = _.slice(includeGroups, 0, _.indexOf(includeGroups, this));
+    }
+    if (this.intersection()[0].length === 0) {
+      if (isBundle) {
+        this.isExpanded = !this.isExpanded;
+        this.changeEdgeResource();
+        this.toggleChildNodesVisible(this.isExpanded);
+        if (!this.isExpanded) {
+          this.removeEdgeLabel();
+        } else {
+          this.addEdgeLabel();
+        }
+        this.toggleShowEdges(this.isExpanded);
+        this.redrawGroup(this.isExpanded);
+      }
+    }
   }
 
   public getExpandedVisibleNodes() {
