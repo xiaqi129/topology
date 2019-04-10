@@ -78,7 +78,7 @@ export class Application extends PIXI.Application {
   }
 
   public getContainerCenter() {
-    const point = new PIXI.Point(this.viewWrapper.offsetWidth / 2, this.viewWrapper.offsetHeight / 2);
+    const point = new PIXI.Point(this.viewWrapper.clientWidth / 2, this.viewWrapper.clientHeight / 2);
     return point;
   }
 

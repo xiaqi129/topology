@@ -46,7 +46,7 @@ network.initIconResource(iconResource);
 
 // tslint:disable-next-line:only-arrow-functions
 const noData = function () {
-  const num = 3000;
+  const num = 6000;
   for (let i: number = 0, len: number = num; i < len;) {
     i += 1;
     const node = network.createNode('cisco-18');
@@ -63,7 +63,7 @@ const noData = function () {
       edge.setStyle({
         arrowColor: 0Xc71bd3,
         arrowLength: 15,
-        arrowType: 2,
+        arrowType: 3,
         arrowWidth: 1,
         fillArrow: true,
         lineColor: 0X0386d2,
@@ -90,6 +90,8 @@ const noData = function () {
   });
   network.syncView();
   network.setDrag();
+  network.setZoom();
+  network.moveCenter();
 };
 
 // tslint:disable-next-line:only-arrow-functions
