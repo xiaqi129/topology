@@ -435,6 +435,7 @@ const simpleData = function () {
   network.syncView();
   network.setDrag();
   network.setZoom();
+  network.setBundelExpanded(false);
   network.moveCenter();
 };
 network.callback = () => {

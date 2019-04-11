@@ -163,7 +163,7 @@ export class PopMenu {
         const x = event.data.global.x;
         const y = event.data.global.y;
         this.menu.style.display = 'block';
-        const menuHeight = this.menuItems.length * 30 + 5;
+        const menuHeight = this.menuItems.length * 25;
         const menuWidth = this.menu.clientWidth;
         if (networkWidth - x > menuWidth) {
           this.menu.style.left = `${x + 20}px`;
@@ -178,7 +178,7 @@ export class PopMenu {
         network.addEventListener('click', () => {
           this.hideMenu();
         });
-        this.container.on('wheel', () => {
+        network.addEventListener('wheel', () => {
           this.hideMenu();
         });
       }

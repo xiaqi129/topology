@@ -100,6 +100,23 @@ export class EdgeBundle extends CommonElement {
     this.addEdges([edge]);
   }
 
+  public changeLabelSize(size: number) {
+    if (!this.isExpanded) {
+      const edge: any = this.children[0];
+      if (edge && (size < 1.2 && size > 0)) {
+        const bundleLabel = edge.getChildByName('bundle_label');
+        const bundleBackground = edge.getChildByName('label_background');
+        bundleBackground.clear();
+        bundleBackground.beginFill(this.defaultStyle.fillColor, 1);
+        bundleBackground.drawCircle(0, 0, 7 * size);
+        bundleBackground.endFill();
+        bundleLabel.setStyle({
+          fontSize: 10 * size,
+        });
+      }
+    }
+  }
+
   public setExpaned(expanded: boolean) {
     this.isExpanded = expanded;
     this.draw();

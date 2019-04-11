@@ -480,6 +480,7 @@ export class Network {
     const nodesObj = this.getNodeObj();
     const edgeObj = this.getEdgeObj();
     const groupObj = this.getGroupObj();
+    const edgeBundles = this.getEdgeBundles();
     _.each(nodesObj, (node: Node) => {
       if (node.icon) {
         if (this.zoom < 0.75) {
@@ -505,6 +506,9 @@ export class Network {
     } else {
       this.edgeLabelToggle(true);
     }
+    _.each(edgeBundles, (bundle: EdgeBundle) => {
+      bundle.changeLabelSize(this.zoom);
+    });
     _.each(edgeObj, (edge: any) => {
       edge.draw();
     });
@@ -523,6 +527,17 @@ export class Network {
       node.y = node.y + moveY;
     });
     this.reDraw();
+  }
+
+  private getEdgeBundles() {
+    const elements = this.getElements();
+    const bundleEdge: any = [];
+    _.each(elements, (element) => {
+      if (element instanceof EdgeBundle) {
+        bundleEdge.push(element);
+      }
+    });
+    return bundleEdge;
   }
 
   private vertexPoints() {
