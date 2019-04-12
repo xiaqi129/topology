@@ -33,12 +33,8 @@ export class PopMenu {
     const menu = document.createElement('DIV');
     menu.id = 'pop-menu';
     menu.style.zIndex = '100000';
-    menu.style.position = 'absolute';
-    menu.style.background = '#FFFFFF';
-    menu.style.width = 'auto';
-    menu.style.height = 'auto';
     menu.style.border = '1px solid #CCCCCC;';
-    menu.setAttribute('style', 'position:absolute;background:#FFFFFF;width:auto;height:auto;border:1px solid #CCCCCC;-moz-box-shadow: 5px 5px 2px #888;-webkit-box-shadow: 5px 5px 2px #888;box-shadow: 5px 5px 2px #888;-webkit-border-radius: 4px;-moz-border-radius: 4px;border-radius: 4px;');
+    menu.setAttribute('style', 'position:fixed;background:#FFFFFF;width:auto;height:auto;border:1px solid #CCCCCC;-moz-box-shadow: 5px 5px 2px #888;-webkit-box-shadow: 5px 5px 2px #888;box-shadow: 5px 5px 2px #888;-webkit-border-radius: 4px;-moz-border-radius: 4px;border-radius: 4px;');
     return menu;
   }
 
@@ -158,22 +154,24 @@ export class PopMenu {
           network.removeChild(tooltip);
         }
         network.appendChild(this.menu);
-        const networkHeight = network.offsetHeight;
-        const networkWidth = network.offsetWidth;
-        const x = event.data.global.x;
-        const y = event.data.global.y;
+        const top = network.getBoundingClientRect().top;
+        const left = network.getBoundingClientRect().left;
+        const networkHeight = network.offsetHeight + top;
+        const networkWidth = network.offsetWidth + left;
+        const x = event.data.global.x + left;
+        const y = event.data.global.y + top;
         this.menu.style.display = 'block';
-        const menuHeight = this.menuItems.length * 25;
-        const menuWidth = this.menu.clientWidth;
+        const menuHeight = this.menu.offsetHeight;
+        const menuWidth = this.menu.offsetWidth;
         if (networkWidth - x > menuWidth) {
           this.menu.style.left = `${x + 20}px`;
         } else {
-          this.menu.style.left = `${x - menuWidth}px`;
+          this.menu.style.left = `${x - menuWidth - 20}px`;
         }
-        if (networkHeight - y > menuHeight) {
-          this.menu.style.top = `${y + 30}px`;
+        if (networkHeight - y > menuHeight + 20) {
+          this.menu.style.top = `${y - 20}px`;
         } else {
-          this.menu.style.top = `${(y - menuHeight)}px`;
+          this.menu.style.top = `${(y - menuHeight + 20)}px`;
         }
         network.addEventListener('click', () => {
           this.hideMenu();

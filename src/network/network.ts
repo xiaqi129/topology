@@ -423,6 +423,28 @@ export class Network {
     }
   }
 
+  public analyzeInWrapperNodes() {
+    const wrapper = document.getElementById(this.domRegex);
+    const nodes = this.getNodeObj();
+    const inWrapperNodesList: Node[] = [];
+    if (wrapper) {
+      const top = wrapper.offsetTop;
+      const left = wrapper.offsetLeft;
+      const bottom = wrapper.offsetTop + wrapper.offsetHeight;
+      const right = wrapper.offsetLeft + wrapper.offsetWidth;
+      _.each(nodes, (node: Node) => {
+        if (node.visible) {
+          const x = node.x + left;
+          const y = node.y + top;
+          if ((x < right && x > left) && (y < bottom && y > top)) {
+            inWrapperNodesList.push(node);
+          }
+        }
+      });
+    }
+    return inWrapperNodesList;
+  }
+
   private analyzeZoom(isOutsideGroup: Group | undefined) {
     const wrapperContainr = this.app.getWrapperBoundings();
     const center = this.getCenter();
@@ -477,13 +499,14 @@ export class Network {
   }
 
   private reDraw() {
-    const nodesObj = this.getNodeObj();
+    const nodes = this.getNodeObj();
     const edgeObj = this.getEdgeObj();
     const groupObj = this.getGroupObj();
     const edgeBundles = this.getEdgeBundles();
-    _.each(nodesObj, (node: Node) => {
+    const inWrapperNodesList = this.analyzeInWrapperNodes();
+    _.each(nodes, (node: Node) => {
       if (node.icon) {
-        if (this.zoom < 0.75) {
+        if (inWrapperNodesList.length > 300) {
           node.setStyle({
             width: 4,
             fillColor: 0X0386d2,
@@ -492,8 +515,6 @@ export class Network {
         } else {
           node.drawSprite(node.icon);
         }
-      } else {
-        node.drawGraph();
       }
     });
     if (this.zoom < 1) {

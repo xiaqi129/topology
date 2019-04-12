@@ -171,6 +171,7 @@ export class Node extends CommonElement {
     // sprite
     const oldSprite = this.getChildByName('node_sprite');
     const oldgraph = this.getChildByName('node_graph');
+    const oldLabel = this.getChildByName('node_label');
     this.removeChild(oldSprite);
     this.removeChild(oldgraph);
     const texture = PIXI.Texture.fromFrame(icon);
@@ -185,6 +186,9 @@ export class Node extends CommonElement {
     node.buttonMode = true;
     node.name = 'node_sprite';
     this.addChild(node);
+    if (oldLabel) {
+      oldLabel.y = node.height;
+    }
     _.each(this.markList, (mark: IMark) => {
       const markSprite: any = this.getChildByName(`node_${mark.name}`);
       if (markSprite) {
