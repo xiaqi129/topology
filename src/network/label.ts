@@ -13,7 +13,7 @@ export class Label extends PIXI.Text {
     // default styles
     const defaultStyles = new PIXI.TextStyle({
       fontFamily: 'Arial',
-      fontSize: 10,
+      fontSize: 12,
       fill: '0x0386d2',
     });
     if (style) {
@@ -30,7 +30,7 @@ export class Label extends PIXI.Text {
     this.text = label;
   }
 
-  public setStyle(style: any) {
+  public setStyle(style: PIXI.TextStyle) {
     _.extend(this.style, style);
   }
 

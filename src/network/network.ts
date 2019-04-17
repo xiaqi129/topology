@@ -88,16 +88,14 @@ export class Network {
         const zoom = this.zoom;
         this.clearHighlight();
         if (e.deltaY < 0) {
-          if (zoom < 5) {
+          if (zoom + 0.1 < 5) {
             this.zoomNetworkElements(zoom + 0.1);
           }
         } else {
-          if (zoom > 0.1) {
-            if (zoom - 0.1 >= 0.1) {
-              this.zoomNetworkElements(zoom - 0.1);
-            } else {
-              this.zoomNetworkElements(0.1);
-            }
+          if (zoom - 0.1 >= 0.1) {
+            this.zoomNetworkElements(zoom - 0.1);
+          } else {
+            this.zoomNetworkElements(0.1);
           }
         }
         const scale = NP.divide(this.zoom, zoom);
@@ -445,6 +443,59 @@ export class Network {
     return inWrapperNodesList;
   }
 
+  public reDraw() {
+    const nodes = this.getNodeObj();
+    const edgeObj: any = this.getEdgeObj();
+    const groupObj = this.getGroupObj();
+    const edgeBundles = this.getEdgeBundles();
+    const inWrapperNodesList = this.analyzeInWrapperNodes();
+    _.each(nodes, (node: Node) => {
+      if (node.icon) {
+        if (this.zoom < 0.4 && inWrapperNodesList.length > 300) {
+          node.setStyle({
+            width: 4,
+            fillColor: 0X0386d2,
+          });
+          node.drawGraph();
+        } else {
+          if (this.zoom <= 1.5) {
+            node.iconWidth = NP.times(node.defaultWidth, this.zoom);
+            node.iconHeight = NP.times(node.defaultHeight, this.zoom);
+          }
+          node.drawSprite(node.icon);
+        }
+      }
+    });
+    if (this.zoom < 1) {
+      this.nodeLabelToggle(false);
+    } else {
+      this.nodeLabelToggle(true);
+    }
+    if (this.zoom < 2) {
+      this.edgeLabelToggle(false);
+    } else {
+      this.edgeLabelToggle(true);
+    }
+    _.each(edgeBundles, (bundle: EdgeBundle) => {
+      bundle.changeLabelSize(this.zoom);
+    });
+    _.each(edgeObj, (edge: Edge) => {
+      const width = _.cloneDeep(edge.defaultWidth);
+      if (this.zoom < 1) {
+        edge.setStyle({
+          lineWidth: width * this.zoom,
+        });
+      }
+      if (this.zoom > 2 && this.zoom < 3) {
+        const srcLabel = edge.getChildByName('');
+      }
+      edge.draw();
+    });
+    _.each(groupObj, (group: any) => {
+      group.draw();
+    });
+  }
+
   private analyzeZoom(isOutsideGroup: Group | undefined) {
     const wrapperContainr = this.app.getWrapperBoundings();
     const center = this.getCenter();
@@ -496,46 +547,6 @@ export class Network {
         e.preventDefault();
       });
     }
-  }
-
-  private reDraw() {
-    const nodes = this.getNodeObj();
-    const edgeObj = this.getEdgeObj();
-    const groupObj = this.getGroupObj();
-    const edgeBundles = this.getEdgeBundles();
-    const inWrapperNodesList = this.analyzeInWrapperNodes();
-    _.each(nodes, (node: Node) => {
-      if (node.icon) {
-        if (inWrapperNodesList.length > 300) {
-          node.setStyle({
-            width: 4,
-            fillColor: 0X0386d2,
-          });
-          node.drawGraph();
-        } else {
-          node.drawSprite(node.icon);
-        }
-      }
-    });
-    if (this.zoom < 1) {
-      this.nodeLabelToggle(false);
-    } else {
-      this.nodeLabelToggle(true);
-    }
-    if (this.zoom < 2) {
-      this.edgeLabelToggle(false);
-    } else {
-      this.edgeLabelToggle(true);
-    }
-    _.each(edgeBundles, (bundle: EdgeBundle) => {
-      bundle.changeLabelSize(this.zoom);
-    });
-    _.each(edgeObj, (edge: any) => {
-      edge.draw();
-    });
-    _.each(groupObj, (group: any) => {
-      group.draw();
-    });
   }
 
   private moveToCenter(center: number[]) {

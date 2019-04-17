@@ -24,6 +24,7 @@ export class EdgeBundle extends CommonElement {
   private endNode: Node;
   private style: any;
   private defaultColor: number;
+  private defaultWidth: number;
 
   constructor(edge: Edge) {
     super();
@@ -32,7 +33,8 @@ export class EdgeBundle extends CommonElement {
     this.endNode = edge.endNode;
     this.style = edge.defaultStyle;
     this.addChild(edge);
-    this.defaultColor = _.cloneDeep(edge.defalultColor);
+    this.defaultColor = _.cloneDeep(edge.defaultColor);
+    this.defaultWidth = _.cloneDeep(edge.defaultWidth);
     this.bundleEdge = this.children;
     this.setBundle(edge);
   }
@@ -74,6 +76,7 @@ export class EdgeBundle extends CommonElement {
           afterBundle.setStyle({
             lineType: 0,
             lineColor: this.defaultColor,
+            lineWidth: this.defaultWidth,
           });
           this.addChild(afterBundle);
         } else {
@@ -106,6 +109,9 @@ export class EdgeBundle extends CommonElement {
       if (edge && (size < 1.2 && size > 0)) {
         const bundleLabel = edge.getChildByName('bundle_label');
         const bundleBackground = edge.getChildByName('label_background');
+        edge.setStyle({
+          lineWidth: this.defaultWidth * size,
+        });
         bundleBackground.clear();
         bundleBackground.beginFill(this.defaultStyle.fillColor, 1);
         bundleBackground.drawCircle(0, 0, 7 * size);

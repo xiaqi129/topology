@@ -31,6 +31,8 @@ export class Node extends CommonElement {
   public clients: {} = {};
   public icon: any;
   public tooltip: Tooltip;
+  public defaultWidth: number = 0;
+  public defaultHeight: number = 0;
   private parentNode: Group | null = null;
   private data: any;
   private elements: Edge | CommonElement[];
@@ -71,6 +73,14 @@ export class Node extends CommonElement {
 
   public getParentNode() {
     return this.parentNode;
+  }
+
+  public setNodeSize(width: number, height: number) {
+    this.iconWidth = width;
+    this.iconHeight = height;
+    this.defaultWidth = width;
+    this.defaultHeight = height;
+    this.draw();
   }
 
   public draw() {
@@ -161,7 +171,7 @@ export class Node extends CommonElement {
         element.draw();
       }
       // when the group is Expanded redraw it
-      if (element instanceof Group && element.isExpanded) {
+      if (element instanceof Group) {
         element.draw();
       }
     });

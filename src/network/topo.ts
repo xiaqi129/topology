@@ -148,7 +148,8 @@ export class Topo implements ITopo {
   public addElements(elements: CommonElement[]) {
     _.each(elements, (element, i) => {
       if (element instanceof Edge) {
-        element.defalultColor = element.defaultStyle.lineColor;
+        element.defaultColor = element.defaultStyle.lineColor;
+        element.defaultWidth = element.defaultStyle.lineWidth;
         let edgeBundle: EdgeBundle;
         const edges = this.findBrotherEdge(element);
         element.brotherEdges = edges;

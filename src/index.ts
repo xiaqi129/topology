@@ -35,10 +35,7 @@ const commonStyles = {
 };
 
 const nodeLabelStyle = {
-  fontSize: 8,
-  breakWords: true,
-  wordWrap: true,
-  wordWrapWidth: 73,
+  fontSize: 12,
 };
 const network = new Network('network');
 // const labeler = new Labeler();
@@ -46,10 +43,11 @@ network.initIconResource(iconResource);
 
 // tslint:disable-next-line:only-arrow-functions
 const noData = function () {
-  const num = 6000;
+  const num = 350;
   for (let i: number = 0, len: number = num; i < len;) {
     i += 1;
     const node = network.createNode('cisco-18');
+    node.name = `node${i}`;
     network.addElement(node);
     node.x = Math.random() * 1800;
     node.y = Math.random() * 900;
@@ -61,14 +59,16 @@ const noData = function () {
     for (let j = 0; j < 1;) {
       const edge = network.createEdge(srcNode, destNode);
       edge.setStyle({
-        arrowColor: 0Xc71bd3,
-        arrowLength: 15,
+        arrowColor: 0X006aad,
+        arrowAngle: 20,
+        arrowMiddleLength: 5,
+        arrowLength: 8,
         arrowType: 3,
-        arrowWidth: 1,
         fillArrow: true,
         lineColor: 0X0386d2,
-        lineDistance: 5,
+        // lineDistance: 0,
         lineType: 0,
+        lineFull: 0,
         lineWidth: 1,
       });
       network.addElement(edge);
@@ -77,17 +77,17 @@ const noData = function () {
     }
     i += 2;
   }
-  const group = network.createGroup();
-  network.addElement(group);
+  // const group = network.createGroup();
+  // network.addElement(group);
 
-  const groupNodes = _.slice(_.shuffle(_.dropRight(nodes, (num / 2) + 1)), 0, 3);
-  _.each(groupNodes, (node) => {
-    node.setStyle({ lineColor: 0xf55d54 });
-    group.addChildNodes(node);
-    group.setStyle({
-      fillOpacity: 1,
-    });
-  });
+  // const groupNodes = _.slice(_.shuffle(_.dropRight(nodes, (num / 2) + 1)), 0, 3);
+  // _.each(groupNodes, (node) => {
+  //   node.setStyle({ lineColor: 0xf55d54 });
+  //   group.addChildNodes(node);
+  //   group.setStyle({
+  //     fillOpacity: 1,
+  //   });
+  // });
   network.syncView();
   network.setDrag();
   network.setZoom();
@@ -107,10 +107,8 @@ const simpleData = function () {
   _.each(devices, (device: any) => {
     const client = device.clients.User_Mark;
     if (!(client === 'Hidden')) {
-      const node = network.createNode('routerSVG');
-      // node.iconWidth = 50;
-      // node.iconHeight = 50;
-      node.draw();
+      const node = network.createNode('cisco-ASR9');
+      node.setNodeSize(25, 25);
       node.name = device.name;
       node.clients = device.clients;
       const tooltipContent = `
@@ -292,19 +290,19 @@ const simpleData = function () {
   // console.log(labeler.start(1000));
   // create Links
   const nodes = network.getNodeObj();
-  const edgeLabel = {
-    fill: [
-      'red',
-      '#be1432',
-    ],
-    fontFamily: 'Times New Roman',
-    // fontSize: 14,
-    fontWeight: 'bold',
-    letterSpacing: 1,
-    lineJoin: 'bevel',
-    stroke: '#800040',
-    strokeThickness: 1,
-  };
+  // const edgeLabel = {
+  //   fill: [
+  //     'red',
+  //     '#be1432',
+  //   ],
+  //   fontFamily: 'Times New Roman',
+  //   fontSize: 12,
+  //   fontWeight: 'bold',
+  //   letterSpacing: 1,
+  //   lineJoin: 'bevel',
+  //   stroke: '#800040',
+  //   strokeThickness: 1,
+  // };
   _.each(links, (link) => {
     const srcNodeName = link.local_host;
     const destNodeName = link.remote_host;
@@ -374,7 +372,7 @@ const simpleData = function () {
         network.menu.showMenu(event);
       });
       edge.setLabel(link.local_int, link.remote_int, {
-        fontSize: 8,
+        fontSize: 12,
       });
       network.addElement(edge);
     }

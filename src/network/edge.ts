@@ -21,7 +21,8 @@ export class Edge extends CommonElement {
   public endNode: any;
   public edge: PIXI.Graphics;
   public arrow: PIXI.Graphics;
-  public defalultColor: number = 0;
+  public defaultColor: number = 0;
+  public defaultWidth: number = 1;
   public bundleExplosion: boolean = false;
   public labelToggle: boolean = false;
   public brotherEdges: Edge[] = [];
@@ -660,7 +661,7 @@ export class Edge extends CommonElement {
 
   public selectOff() {
     this.setStyle({
-      lineColor: this.defalultColor,
+      lineColor: this.defaultColor,
     });
   }
 
