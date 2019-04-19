@@ -173,6 +173,10 @@ export class Topo implements ITopo {
           this.elements.push(element);
         }
       } else {
+        if (element instanceof Group) {
+          element.defaultOpacity = element.defaultStyle.fillOpacity;
+          element.defaultLineWidth = element.defaultStyle.lineWidth;
+        }
         this.elements.push(element);
       }
       this.refreshEdgesMaps();

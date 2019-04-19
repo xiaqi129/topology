@@ -31,8 +31,8 @@ export class Node extends CommonElement {
   public clients: {} = {};
   public icon: any;
   public tooltip: Tooltip;
-  public defaultWidth: number = 0;
-  public defaultHeight: number = 0;
+  public defaultWidth: number = 20;
+  public defaultHeight: number = 20;
   private parentNode: Group | null = null;
   private data: any;
   private elements: Edge | CommonElement[];

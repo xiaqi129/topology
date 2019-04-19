@@ -38,19 +38,20 @@ const nodeLabelStyle = {
   fontSize: 12,
 };
 const network = new Network('network');
+(window as any).topo = network;
 // const labeler = new Labeler();
 network.initIconResource(iconResource);
-
 // tslint:disable-next-line:only-arrow-functions
 const noData = function () {
-  const num = 350;
+  const num = 500;
   for (let i: number = 0, len: number = num; i < len;) {
     i += 1;
-    const node = network.createNode('cisco-18');
+    const node = network.createNode('cisco-ASR9');
     node.name = `node${i}`;
+    // node.setNodeSize(25,25);
     network.addElement(node);
     node.x = Math.random() * 1800;
-    node.y = Math.random() * 900;
+    node.y = Math.random() * 9000;
   }
   const nodes = network.getNodes();
   for (let i: number = 0, len: number = num; i < len;) {
@@ -96,7 +97,6 @@ const noData = function () {
 
 // tslint:disable-next-line:only-arrow-functions
 const simpleData = function () {
-  (window as any).network = network;
   const devices = topoData.devices;
   const links = topoData.links;
   const groups = topoData.groups;
@@ -382,11 +382,11 @@ const simpleData = function () {
     const newGroup = network.createGroup();
     const children = group.children;
     newGroup.name = group.id;
-    network.addElement(newGroup);
     newGroup.setOutlineStyle(2);
     newGroup.setStyle({
-      fillOpacity: 0.3,
+      fillOpacity: 0.5,
       fillColor: rgb2hex(bgColor),
+      lineColor: 0Xb0bdbf,
     });
     _.each(children, (child) => {
       const node = _.get(nodes, child);
@@ -429,6 +429,7 @@ const simpleData = function () {
       network.menu.setClass('popMenu');
       network.menu.showMenu(event);
     });
+    network.addElement(newGroup);
   });
   network.syncView();
   network.setDrag();
@@ -437,8 +438,8 @@ const simpleData = function () {
   network.moveCenter();
 };
 network.callback = () => {
-  simpleData();
-  // noData();
+  // simpleData();
+  noData();
 };
 const body = document.getElementById('network');
 const zoomIn = document.querySelector('button.btn_zoomIn');

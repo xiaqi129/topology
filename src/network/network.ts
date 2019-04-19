@@ -31,6 +31,7 @@ export class Network {
   private app: Application;
   private action: CommonAction;
   private domRegex: string;
+  private zoomRate: number;
 
   constructor(domRegex: string) {
     PIXI.utils.skipHello();
@@ -42,6 +43,7 @@ export class Network {
     this.action = new CommonAction(this.app, this.topo);
     this.menu = new PopMenu(domRegex, this.app, this.action);
     this.zoom = 1;
+    this.zoomRate = 1;
     this.isSelect = false;
     this.disableContextMenu(domRegex);
   }
@@ -83,19 +85,26 @@ export class Network {
 
   public setZoom() {
     const wrapper = document.getElementById(this.domRegex);
+    const zoomRate = this.analyzeZoom();
     if (wrapper) {
       wrapper.addEventListener('wheel', (e) => {
         const zoom = this.zoom;
         this.clearHighlight();
         if (e.deltaY < 0) {
-          if (zoom + 0.1 < 5) {
+          if (zoom + 0.1 < 5 && zoom + 0.1 > 0.2) {
             this.zoomNetworkElements(zoom + 0.1);
+          } else if (zoom + 0.01 <= 0.11 && zoom + 0.01 > 0.01) {
+            if (zoom * zoomRate < 0.1) {
+              this.zoomNetworkElements(zoom + 0.01);
+            }
           }
         } else {
-          if (zoom - 0.1 >= 0.1) {
+          if (zoom - 0.1 < 5 && zoom - 0.1 > 0.1) {
             this.zoomNetworkElements(zoom - 0.1);
-          } else {
-            this.zoomNetworkElements(0.1);
+          } else if (zoom - 0.01 <= 0.11 && zoom - 0.01 > 0.01) {
+            if (zoom * zoomRate < 0.1) {
+              this.zoomNetworkElements(zoom - 0.01);
+            }
           }
         }
         const scale = NP.divide(this.zoom, zoom);
@@ -227,12 +236,15 @@ export class Network {
 
   public zoomOver() {
     let center: number[] = [];
+    const zoomRate = this.analyzeZoom();
+    this.zoom = this.zoom * zoomRate;
     const nodes = this.getNodeObj();
-    const groups = this.getGroupObj();
-    const isOutsideGroup: any = _.find(groups, (group: Group) => {
-      return group.getChildNodes().length === _.size(nodes);
+    _.each(nodes, (node: Node) => {
+      node.x = node.x * zoomRate;
+      node.y = node.y * zoomRate;
     });
-    this.analyzeZoom(isOutsideGroup);
+    this.reDraw();
+    const isOutsideGroup = this.getIsOutsideGroup();
     if (isOutsideGroup) {
       center = isOutsideGroup.centerPoint;
     } else {
@@ -450,22 +462,21 @@ export class Network {
     const edgeBundles = this.getEdgeBundles();
     const inWrapperNodesList = this.analyzeInWrapperNodes();
     _.each(nodes, (node: Node) => {
-      if (node.icon) {
-        if (this.zoom < 0.4 && inWrapperNodesList.length > 300) {
-          node.setStyle({
-            width: 4,
-            fillColor: 0X0386d2,
-          });
-          node.drawGraph();
-        } else {
-          if (this.zoom <= 1.5) {
-            node.iconWidth = NP.times(node.defaultWidth, this.zoom);
-            node.iconHeight = NP.times(node.defaultHeight, this.zoom);
-          }
-          node.drawSprite(node.icon);
-        }
-      }
+      this.drawNode(node, inWrapperNodesList);
     });
+    _.each(edgeBundles, (bundle: EdgeBundle) => {
+      bundle.changeLabelSize(this.zoom);
+    });
+    _.each(edgeObj, (edge: Edge) => {
+      this.drawEdge(edge);
+    });
+    _.each(groupObj, (group: Group) => {
+      this.drawGroup(group);
+    });
+    this.toggleLabel();
+  }
+
+  private toggleLabel() {
     if (this.zoom < 1) {
       this.nodeLabelToggle(false);
     } else {
@@ -476,30 +487,53 @@ export class Network {
     } else {
       this.edgeLabelToggle(true);
     }
-    _.each(edgeBundles, (bundle: EdgeBundle) => {
-      bundle.changeLabelSize(this.zoom);
-    });
-    _.each(edgeObj, (edge: Edge) => {
-      const width = _.cloneDeep(edge.defaultWidth);
-      if (this.zoom < 1) {
-        edge.setStyle({
-          lineWidth: width * this.zoom,
-        });
-      }
-      if (this.zoom > 2 && this.zoom < 3) {
-        const srcLabel = edge.getChildByName('');
-      }
-      edge.draw();
-    });
-    _.each(groupObj, (group: any) => {
-      group.draw();
-    });
   }
 
-  private analyzeZoom(isOutsideGroup: Group | undefined) {
+  private drawNode(node: Node, inWrapperNodesList: Node[]) {
+    if (node.icon) {
+      if (this.zoom < 0.4 && inWrapperNodesList.length > 300) {
+        _.extend(node.defaultStyle, ({
+          width: 4,
+          fillColor: 0X0386d2,
+        }));
+        node.drawGraph();
+      } else {
+        if (this.zoom <= 1.5) {
+          node.iconWidth = NP.times(node.defaultWidth, this.zoom);
+          node.iconHeight = NP.times(node.defaultHeight, this.zoom);
+        }
+        node.drawSprite(node.icon);
+      }
+    }
+  }
+
+  private drawEdge(edge: Edge) {
+    const width = edge.defaultWidth;
+    if (this.zoom < 1) {
+      _.extend(edge.defaultStyle, ({
+        lineWidth: width * this.zoom,
+      }));
+    }
+    edge.draw();
+  }
+
+  private drawGroup(group: Group) {
+    const defaultOpacity = group.defaultOpacity;
+    const defaultLineWidth = group.defaultLineWidth;
+    if (this.zoom < 1 && this.zoom > 0.5) {
+      group.setStyle({
+        fillOpacity: defaultOpacity * this.zoom,
+        lineWidth: defaultLineWidth / this.zoom,
+      });
+    }
+    group.draw();
+  }
+
+  private analyzeZoom() {
     const wrapperContainr = this.app.getWrapperBoundings();
-    const center = this.getCenter();
     const nodes = this.getNodeObj();
+    const isOutsideGroup = this.getIsOutsideGroup();
+    const center = this.getCenter();
     let rateX: number;
     let rateY: number;
     let scale: number;
@@ -532,12 +566,16 @@ export class Network {
       scale = rateX > rateY ? rateX : rateY;
     }
     zoomRate = 1 / scale;
-    this.zoom = this.zoom * zoomRate;
-    _.each(nodes, (node: Node) => {
-      node.x = node.x * zoomRate;
-      node.y = node.y * zoomRate;
+    return zoomRate;
+  }
+
+  private getIsOutsideGroup() {
+    const nodes = this.getNodeObj();
+    const groups = this.getGroupObj();
+    const isOutsideGroup: any = _.find(groups, (group: Group) => {
+      return group.getChildNodes().length === _.size(nodes);
     });
-    this.reDraw();
+    return isOutsideGroup;
   }
 
   private disableContextMenu(domRegex: string) {

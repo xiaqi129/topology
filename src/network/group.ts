@@ -50,6 +50,8 @@ export class Group extends CommonElement {
   public superstratumInfo: Group[] = [];
   public substratumInfo: Group[] = [];
   public labelContent: string = '';
+  public defaultOpacity: number = 1;
+  public defaultLineWidth: number = 1;
   private edgeResource: IedgeResource[] = [];
   private labelStyle: any;
   private toggleExpanded: boolean = false;
@@ -86,13 +88,15 @@ export class Group extends CommonElement {
     const graph = this.getChildByName(this.polygonHullOutlineName);
     graph.on('click', () => {
       const currentTime = new Date().getTime();
-      const includeGroups = this.childrenNode[0].getIncluedGroup();
-      this.superstratumInfo = _.slice(includeGroups, 0, _.indexOf(includeGroups, this));
-      if (currentTime - this.lastClickTime < 500) {
-        this.lastClickTime = 0;
-        this.setExpanded();
-      } else {
-        this.lastClickTime = currentTime;
+      if (this.childrenNode[0]) {
+        const includeGroups = this.childrenNode[0].getIncluedGroup();
+        this.superstratumInfo = _.slice(includeGroups, 0, _.indexOf(includeGroups, this));
+        if (currentTime - this.lastClickTime < 500) {
+          this.lastClickTime = 0;
+          this.setExpanded();
+        } else {
+          this.lastClickTime = currentTime;
+        }
       }
       // }
     });
@@ -304,7 +308,7 @@ export class Group extends CommonElement {
     this.childrenNode.push(element);
     this.emptyObj = undefined;
     this.edgeArray = _.difference(this.filterEdge(), this.filterInsideEdge());
-    if (!preventDraw) {
+    if (this.childrenNode) {
       this.draw();
     }
   }
@@ -532,13 +536,15 @@ export class Group extends CommonElement {
   }
 
   public drawPolygonOutline(graph: PIXI.Graphics, vertexPointsNumber: number[][]) {
+    const size = this.getNodesMaxSize();
+    const padding = size + this.defaultStyle.padding;
     if (vertexPointsNumber.length > 2) {
       this.drawHull(graph, vertexPointsNumber);
     } else {
       const nodes = this.expandedVisibleNodes;
       let ellipseX = 0;
       let ellipseY = 0;
-      if (nodes.length === 2) {
+      if (vertexPointsNumber.length > 1) {
         const nodesCoordinatesList = _.map(nodes, (node) => {
           if (!node) {
             return [0, 0];
@@ -550,12 +556,11 @@ export class Group extends CommonElement {
         vertexPointsNumber.push([ellipseX, ellipseY + 0.5]);
         this.drawHull(graph, vertexPointsNumber);
       } else {
-        let size = this.getMaxSize(nodes);
-        const node = nodes.pop();
-        const x = node ? node.x : 0;
-        const y = node ? node.y : 0;
-        size += this.defaultStyle.padding;
-        graph.drawEllipse(x, y, size, size);
+        const x = vertexPointsNumber[0][0];
+        const y = vertexPointsNumber[0][1];
+        const radius = size + padding / 2;
+        graph.drawCircle(x, y, radius);
+        graph.endFill();
       }
     }
   }
