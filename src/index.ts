@@ -438,8 +438,8 @@ const simpleData = function () {
   network.moveCenter();
 };
 network.callback = () => {
-  // simpleData();
-  noData();
+  simpleData();
+  // noData();
 };
 const body = document.getElementById('network');
 const zoomIn = document.querySelector('button.btn_zoomIn');

@@ -1,8 +1,8 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
-var CopyWebpackPlugin = require('copy-webpack-plugin');
+// const ExtractTextPlugin = require("extract-text-webpack-plugin");
+// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+// const CopyWebpackPlugin = require('copy-webpack-plugin');
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 module.exports = {
@@ -105,14 +105,5 @@ module.exports = {
             'Access-Control-Allow-Origin': "*"
         },
         historyApiFallback: true,
-        'proxy': {
-            '/api/**': {
-                'target': 'https://eagleeye-tool.cisco.com:8000/project/',
-                'pathRewrite': { '^/api': '' },
-                'changeOrigin': true,
-                secure: false,
-                rejectUnauthorized: false
-            }
-        }
     }
 };

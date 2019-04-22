@@ -85,26 +85,29 @@ export class Network {
 
   public setZoom() {
     const wrapper = document.getElementById(this.domRegex);
-    const zoomRate = this.analyzeZoom();
     if (wrapper) {
       wrapper.addEventListener('wheel', (e) => {
         const zoom = this.zoom;
         this.clearHighlight();
         if (e.deltaY < 0) {
-          if (zoom + 0.1 < 5 && zoom + 0.1 > 0.2) {
+          if (zoom < 1 && zoom >= 0.1) {
             this.zoomNetworkElements(zoom + 0.1);
-          } else if (zoom + 0.01 <= 0.11 && zoom + 0.01 > 0.01) {
-            if (zoom * zoomRate < 0.1) {
-              this.zoomNetworkElements(zoom + 0.01);
-            }
+          } else if (zoom <= 4.8 && zoom >= 1) {
+            this.zoomNetworkElements(zoom + 0.2);
+          } else if (zoom < 0.1 && zoom >= 0.01) {
+            this.zoomNetworkElements(zoom + 0.01);
+          } else if (zoom > 4.8 && zoom <= 5) {
+            this.zoomNetworkElements(zoom + 0.2);
           }
         } else {
-          if (zoom - 0.1 < 5 && zoom - 0.1 > 0.1) {
+          if (zoom <= 1 && zoom > 0.11) {
             this.zoomNetworkElements(zoom - 0.1);
-          } else if (zoom - 0.01 <= 0.11 && zoom - 0.01 > 0.01) {
-            if (zoom * zoomRate < 0.1) {
-              this.zoomNetworkElements(zoom - 0.01);
-            }
+          } else if (zoom <= 5 && zoom >= 1) {
+            this.zoomNetworkElements(zoom - 0.2);
+          } else if (zoom <= 0.11 && zoom >= 0.02) {
+            this.zoomNetworkElements(zoom - 0.01);
+          } else if (zoom > 5) {
+            this.zoomNetworkElements(zoom - 0.2);
           }
         }
         const scale = NP.divide(this.zoom, zoom);
@@ -524,6 +527,11 @@ export class Network {
       group.setStyle({
         fillOpacity: defaultOpacity * this.zoom,
         lineWidth: defaultLineWidth / this.zoom,
+      });
+    } else if (this.zoom <= 0.5) {
+      group.setStyle({
+        fillOpacity: defaultOpacity * 0.5,
+        lineWidth: defaultLineWidth / 0.5,
       });
     }
     group.draw();

@@ -4,8 +4,8 @@
   "description": "web network topology lib",
   "main": "index.js",
   "scripts": {
-    "start": "webpack-dev-server --open",
-    "build": "webpack -p",
+    "start": "webpack-dev-server --open --config webpack.dev.config.js",
+    "build": "webpack -p --config webpack.build.config.js",
     "analyz": "NODE_ENV=production npm_config_report=true npm run build",
     "test": "mocha -r ts-node/register -r jsdom-global/register test/**/*.ts",
     "precommit-msg": "echo 'Pre-commit checks...' && exit 0",
