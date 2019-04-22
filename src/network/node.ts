@@ -6,14 +6,12 @@
  */
 
 import * as _ from 'lodash';
-import { CommonElement, IStyles } from './common-element';
-
+import { CommonElement } from './common-element';
+import { Edge } from './edge';
+import { EdgeBundle } from './edge-bundle';
 import { Group } from './group';
 import { Label } from './label';
 import { Tooltip } from './tooltip';
-
-import { Edge } from './edge';
-import { EdgeBundle } from './edge-bundle';
 
 export interface IMark {
   name: string;

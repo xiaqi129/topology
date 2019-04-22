@@ -64,6 +64,7 @@ export abstract class CommonElement extends PIXI.Container {
     width: 15,
     clickColor: 0X00e5ff,
   };
+  public invariableStyles: any;
   public id: string = _.uniqueId('element_');
 
   constructor() {
@@ -110,11 +111,15 @@ export abstract class CommonElement extends PIXI.Container {
     return this.name;
   }
 
-  public setStyle(styles: any, draw: boolean = true) {
+  public setStyle(styles: any) {
     _.extend(this.defaultStyle, styles);
-    if (draw) {
-      this.draw();
-    }
+    this.draw();
+  }
+
+  public initStyle(styles: any) {
+    _.extend(this.defaultStyle, styles);
+    this.invariableStyles = _.cloneDeep(this.defaultStyle);
+    this.draw();
   }
 
   public abstract draw(): void;

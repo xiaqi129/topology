@@ -15,7 +15,6 @@ import { EdgeBundle } from './edge-bundle';
 import { Label } from './label';
 import ConvexHullGrahamScan from './lib/convex-hull';
 import { Node } from './node';
-import { ITopo } from './topo';
 
 interface IEvent {
   [event: string]: (edges: Edge[]) => {};
@@ -50,8 +49,6 @@ export class Group extends CommonElement {
   public superstratumInfo: Group[] = [];
   public substratumInfo: Group[] = [];
   public labelContent: string = '';
-  public defaultOpacity: number = 1;
-  public defaultLineWidth: number = 1;
   private edgeResource: IedgeResource[] = [];
   private labelStyle: any;
   private toggleExpanded: boolean = false;

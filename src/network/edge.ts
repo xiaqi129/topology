@@ -5,9 +5,7 @@
  * Author: gsp-dalian-ued@cisco.com
  */
 
-import Bezier from 'bezier-js/lib/bezier';
 import * as _ from 'lodash';
-import { DisplayObject } from 'pixi.js';
 import { CommonElement, IStyles } from './common-element';
 import { Group } from './group';
 import { Label } from './label';
@@ -22,7 +20,6 @@ export class Edge extends CommonElement {
   public edge: PIXI.Graphics;
   public arrow: PIXI.Graphics;
   public defaultColor: number = 0;
-  public defaultWidth: number = 1;
   public bundleExplosion: boolean = false;
   public labelToggle: boolean = false;
   public brotherEdges: Edge[] = [];

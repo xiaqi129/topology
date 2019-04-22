@@ -7,14 +7,12 @@
 
 import * as _ from 'lodash';
 import { Application } from './application';
-import { Node } from './node';
-import { ITopo } from './topo';
-
 import { CommonElement } from './common-element';
 import { Edge } from './edge';
 import { EdgeBundle } from './edge-bundle';
-import { GroupEdge } from './edge-conn-group';
 import { Group } from './group';
+import { Node } from './node';
+import { ITopo } from './topo';
 
 export class CommonAction {
   public defaultLineColor: number = 0;

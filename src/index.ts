@@ -329,7 +329,7 @@ const simpleData = function () {
       </table>`;
     if (srcNode && destNode) {
       const edge = network.createEdge(srcNode, destNode);
-      edge.setStyle({
+      edge.initStyle({
         arrowColor: 0X006aad,
         arrowAngle: 20,
         arrowMiddleLength: 5,
@@ -383,7 +383,7 @@ const simpleData = function () {
     const children = group.children;
     newGroup.name = group.id;
     newGroup.setOutlineStyle(2);
-    newGroup.setStyle({
+    newGroup.initStyle({
       fillOpacity: 0.5,
       fillColor: rgb2hex(bgColor),
       lineColor: 0Xb0bdbf,

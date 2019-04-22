@@ -149,7 +149,6 @@ export class Topo implements ITopo {
     _.each(elements, (element, i) => {
       if (element instanceof Edge) {
         element.defaultColor = element.defaultStyle.lineColor;
-        element.defaultWidth = element.defaultStyle.lineWidth;
         let edgeBundle: EdgeBundle;
         const edges = this.findBrotherEdge(element);
         element.brotherEdges = edges;
@@ -173,10 +172,6 @@ export class Topo implements ITopo {
           this.elements.push(element);
         }
       } else {
-        if (element instanceof Group) {
-          element.defaultOpacity = element.defaultStyle.fillOpacity;
-          element.defaultLineWidth = element.defaultStyle.lineWidth;
-        }
         this.elements.push(element);
       }
       this.refreshEdgesMaps();

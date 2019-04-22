@@ -11,8 +11,6 @@ import { Edge } from './edge';
 import { Label } from './label';
 import { Node } from './node';
 
-const Point = PIXI.Point;
-
 export class EdgeBundle extends CommonElement {
   public isExpanded: boolean = true;
   public bundleEdge: any[] = [];
@@ -34,7 +32,7 @@ export class EdgeBundle extends CommonElement {
     this.style = edge.defaultStyle;
     this.addChild(edge);
     this.defaultColor = _.cloneDeep(edge.defaultColor);
-    this.defaultWidth = _.cloneDeep(edge.defaultWidth);
+    this.defaultWidth = edge.invariableStyles.lineWidth;
     this.bundleEdge = this.children;
     this.setBundle(edge);
   }
@@ -73,7 +71,7 @@ export class EdgeBundle extends CommonElement {
           afterBundle.setChildIndex(label, afterBundle.children.length - 1);
           afterBundle.setChildIndex(graph, afterBundle.children.length - 2);
           // add to elements
-          afterBundle.setStyle({
+          afterBundle.initStyle({
             lineType: 0,
             lineColor: this.defaultColor,
             lineWidth: this.defaultWidth,

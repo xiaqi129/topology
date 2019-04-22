@@ -511,7 +511,7 @@ export class Network {
   }
 
   private drawEdge(edge: Edge) {
-    const width = edge.defaultWidth;
+    const width = edge.invariableStyles.lineWidth;
     if (this.zoom < 1) {
       _.extend(edge.defaultStyle, ({
         lineWidth: width * this.zoom,
@@ -521,8 +521,8 @@ export class Network {
   }
 
   private drawGroup(group: Group) {
-    const defaultOpacity = group.defaultOpacity;
-    const defaultLineWidth = group.defaultLineWidth;
+    const defaultOpacity = group.invariableStyles.fillOpacity;
+    const defaultLineWidth = group.invariableStyles.lineWidth;
     if (this.zoom < 1 && this.zoom > 0.5) {
       group.setStyle({
         fillOpacity: defaultOpacity * this.zoom,
