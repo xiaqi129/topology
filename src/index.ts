@@ -450,6 +450,7 @@ const bundleToggle = document.querySelector('button.btn_bundleLabelToggle');
 const nodeLabelToggle = document.querySelector('button.btn_nodeLabelToggle');
 const groupLabelToggle = document.querySelector('button.btn_groupLabelToggle');
 const linkLabelToggle = document.querySelector('button.btn_linkLabelToggle');
+const searchNode = document.querySelector('button.btn_search_node');
 if (zoomIn) {
   zoomIn.addEventListener('click', () => {
     const zoom = network.zoom;
@@ -516,6 +517,16 @@ if (linkLabelToggle) {
   linkLabelToggle.addEventListener('click', () => {
     edgeLabelToggle = !edgeLabelToggle;
     network.edgeLabelToggle(edgeLabelToggle);
+  });
+}
+if (searchNode) {
+  searchNode.addEventListener('click', () => {
+    const searchInput = document.querySelector('input.input_search_node') as HTMLInputElement;
+    _.each(network.getNodes(), (node) => {
+      if (node.getUID() === `element_${searchInput.value}`) {
+        node.selectOn();
+      }
+    });
   });
 }
 

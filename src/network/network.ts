@@ -31,7 +31,7 @@ export class Network {
   private app: Application;
   private action: CommonAction;
   private domRegex: string;
-  private zoomRate: number;
+  private deltaY: number;
 
   constructor(domRegex: string) {
     PIXI.utils.skipHello();
@@ -43,7 +43,7 @@ export class Network {
     this.action = new CommonAction(this.app, this.topo);
     this.menu = new PopMenu(domRegex, this.app, this.action);
     this.zoom = 1;
-    this.zoomRate = 1;
+    this.deltaY = 0;
     this.isSelect = false;
     this.disableContextMenu(domRegex);
   }
@@ -89,25 +89,26 @@ export class Network {
       wrapper.addEventListener('wheel', (e) => {
         const zoom = this.zoom;
         this.clearHighlight();
+        this.deltaY = e.deltaY;
         if (e.deltaY < 0) {
           if (zoom < 1 && zoom >= 0.1) {
-            this.zoomNetworkElements(zoom + 0.1);
+            this.zoomNetworkElements(NP.plus(zoom, 0.1));
           } else if (zoom <= 4.8 && zoom >= 1) {
-            this.zoomNetworkElements(zoom + 0.2);
+            this.zoomNetworkElements(NP.plus(zoom, 0.2));
           } else if (zoom < 0.1 && zoom >= 0.01) {
-            this.zoomNetworkElements(zoom + 0.01);
+            this.zoomNetworkElements(NP.plus(zoom, 0.01));
           } else if (zoom > 4.8 && zoom <= 5) {
-            this.zoomNetworkElements(zoom + 0.2);
+            this.zoomNetworkElements(NP.plus(zoom, 0.2));
           }
         } else {
           if (zoom <= 1 && zoom > 0.11) {
-            this.zoomNetworkElements(zoom - 0.1);
+            this.zoomNetworkElements(NP.minus(zoom, 0.1));
           } else if (zoom <= 5 && zoom >= 1) {
-            this.zoomNetworkElements(zoom - 0.2);
+            this.zoomNetworkElements(NP.minus(zoom, 0.2));
           } else if (zoom <= 0.11 && zoom >= 0.02) {
-            this.zoomNetworkElements(zoom - 0.01);
+            this.zoomNetworkElements(NP.minus(zoom, 0.01));
           } else if (zoom > 5) {
-            this.zoomNetworkElements(zoom - 0.2);
+            this.zoomNetworkElements(NP.minus(zoom, 0.2));
           }
         }
         const scale = NP.divide(this.zoom, zoom);
@@ -420,11 +421,15 @@ export class Network {
     }
     if (element instanceof Node) {
       element.visible = true;
-      const nodeName = element.name;
-      _.each(this.getEdgeObj(), (value: any, key: string) => {
-        if (nodeName && key.indexOf(nodeName) !== -1) {
-          value.visible = true;
+      _.each(this.getEdgeObj(), (edge: Edge) => {
+        if (edge.startNode === element || edge.endNode === element) {
+          if (edge.startNode.visible && edge.endNode.visible) {
+            edge.visible = true;
+          }
         }
+      });
+      _.each(this.getGroupObj(), (group: Group) => {
+        group.draw();
       });
     }
     if (element instanceof Group) {
@@ -523,12 +528,52 @@ export class Network {
   private drawGroup(group: Group) {
     const defaultOpacity = group.invariableStyles.fillOpacity;
     const defaultLineWidth = group.invariableStyles.lineWidth;
-    if (this.zoom < 1 && this.zoom > 0.5) {
+    let zoom;
+    if (this.deltaY >= 0) {
+      zoom = this.zoom;
+    } else {
+      zoom = this.zoom - 0.1;
+    }
+    if (zoom > 1) {
+      group.setStyle({
+        fillOpacity: defaultOpacity,
+        lineWidth: defaultLineWidth,
+      });
+    } else if (zoom <= 1 && zoom > 0.5) {
       group.setStyle({
         fillOpacity: defaultOpacity * this.zoom,
         lineWidth: defaultLineWidth / this.zoom,
       });
-    } else if (this.zoom <= 0.5) {
+    } else {
+      if (group.substratumInfo.length === 0) {
+        const length = group.childNodesList.length;
+        if (length > 1) {
+          const index = length - 1;
+          let last: Node[] = [];
+          if (zoom <= 0.5 && zoom > 0.4) {
+            last = group.childNodesList[index];
+          }
+          if (zoom <= 0.4 && index - 1 > 0 && zoom > 0.3) {
+            last = group.childNodesList[index - 1];
+          } else if (zoom <= 0.3 && index - 2 > 0 && zoom > 0.2) {
+            last = group.childNodesList[index - 2];
+          } else if (zoom <= 0.2 && index - 3 && zoom > 0.1) {
+            last = group.childNodesList[index - 3];
+          }
+          if (last) {
+            if (this.deltaY > 0) {
+              _.each(last, (node: Node) => {
+                this.hideElement(node);
+              });
+            } else {
+              zoom = NP.minus(this.zoom, 0.1);
+              _.each(last, (node: Node) => {
+                this.showElement(node);
+              });
+            }
+          }
+        }
+      }
       group.setStyle({
         fillOpacity: defaultOpacity * 0.5,
         lineWidth: defaultLineWidth / 0.5,
