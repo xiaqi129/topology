@@ -397,12 +397,10 @@ export class Network {
     }
     if (element instanceof Node) {
       element.visible = false;
-      _.each(this.getEdgeObj(), (edge: Edge) => {
-        if (edge.startNode === element || edge.endNode === element) {
-          edge.visible = false;
-        }
+      _.each(element.linksArray, (edge: Edge) => {
+        edge.visible = false;
       });
-      _.each(this.getGroupObj(), (group: Group) => {
+      _.each(element.incluedGroups, (group: Group) => {
         group.draw();
       });
     }
@@ -421,14 +419,12 @@ export class Network {
     }
     if (element instanceof Node) {
       element.visible = true;
-      _.each(this.getEdgeObj(), (edge: Edge) => {
-        if (edge.startNode === element || edge.endNode === element) {
-          if (edge.startNode.visible && edge.endNode.visible) {
-            edge.visible = true;
-          }
+      _.each(element.linksArray, (edge: Edge) => {
+        if (edge.startNode.visible && edge.endNode.visible) {
+          edge.visible = true;
         }
       });
-      _.each(this.getGroupObj(), (group: Group) => {
+      _.each(element.incluedGroups, (group: Group) => {
         group.draw();
       });
     }
@@ -528,52 +524,52 @@ export class Network {
   private drawGroup(group: Group) {
     const defaultOpacity = group.invariableStyles.fillOpacity;
     const defaultLineWidth = group.invariableStyles.lineWidth;
-    let zoom;
-    if (this.deltaY >= 0) {
-      zoom = this.zoom;
-    } else {
-      zoom = this.zoom - 0.1;
-    }
-    if (zoom > 1) {
+    if (this.zoom > 1) {
       group.setStyle({
         fillOpacity: defaultOpacity,
         lineWidth: defaultLineWidth,
       });
-    } else if (zoom <= 1 && zoom > 0.5) {
+    } else if (this.zoom <= 1 && this.zoom > 0.5) {
       group.setStyle({
         fillOpacity: defaultOpacity * this.zoom,
         lineWidth: defaultLineWidth / this.zoom,
       });
+      // if (this.zoom <= 0.6 && this.zoom > 0.5) {
+      //   const showNodesList = _.drop(group.childNodesList);
+      //   if (showNodesList) {
+      //     const showNodes = _.flattenDeep(showNodesList);
+      //     _.each(showNodes, (node) => {
+      //       this.showElement(node);
+      //     });
+      //   }
+      // }
     } else {
-      if (group.substratumInfo.length === 0) {
-        const length = group.childNodesList.length;
-        if (length > 1) {
-          const index = length - 1;
-          let last: Node[] = [];
-          if (zoom <= 0.5 && zoom > 0.4) {
-            last = group.childNodesList[index];
-          }
-          if (zoom <= 0.4 && index - 1 > 0 && zoom > 0.3) {
-            last = group.childNodesList[index - 1];
-          } else if (zoom <= 0.3 && index - 2 > 0 && zoom > 0.2) {
-            last = group.childNodesList[index - 2];
-          } else if (zoom <= 0.2 && index - 3 && zoom > 0.1) {
-            last = group.childNodesList[index - 3];
-          }
-          if (last) {
-            if (this.deltaY > 0) {
-              _.each(last, (node: Node) => {
-                this.hideElement(node);
-              });
-            } else {
-              zoom = NP.minus(this.zoom, 0.1);
-              _.each(last, (node: Node) => {
-                this.showElement(node);
-              });
-            }
-          }
-        }
-      }
+      // if (group.substratumInfo.length === 0 && group.childNodesList.length > 1) {
+      //   const showNodesList = _.drop(group.childNodesList);
+      //   if (showNodesList) {
+      //     const showNodes = _.flattenDeep(showNodesList);
+      //     _.each(showNodes, (node) => {
+      //       this.showElement(node);
+      //     });
+      //   }
+      //   const index = showNodesList.length;
+      //   let hideNodeList: any[] = [];
+      //   if (this.zoom <= 0.5 && index > 0 && this.zoom > 0.3) {
+      //     hideNodeList = _.flattenDeep(_.takeRight(showNodesList));
+      //   } else if (this.zoom <= 0.3 && index - 1 > 0 && this.zoom > 0.2) {
+      //     hideNodeList = _.flattenDeep(_.takeRight(showNodesList, 2));
+      //   } else if (this.zoom <= 0.2 && index - 2 > 0 && this.zoom > 0.1) {
+      //     hideNodeList = _.flattenDeep(_.takeRight(showNodesList, 3));
+      //   } else if (this.zoom <= 0.1) {
+      //     hideNodeList = _.flattenDeep(showNodesList);
+      //   }
+      //   if (hideNodeList.length === 0 && this.zoom < 0.5) {
+      //     hideNodeList = _.flattenDeep(showNodesList);
+      //   }
+      //   _.each(hideNodeList, (node: Node) => {
+      //     this.hideElement(node);
+      //   });
+      // }
       group.setStyle({
         fillOpacity: defaultOpacity * 0.5,
         lineWidth: defaultLineWidth / 0.5,

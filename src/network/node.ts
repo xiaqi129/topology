@@ -31,6 +31,7 @@ export class Node extends CommonElement {
   public tooltip: Tooltip;
   public defaultWidth: number = 20;
   public defaultHeight: number = 20;
+  public linksArray: Edge[] = [];
   private parentNode: Group | null = null;
   private data: any;
   private elements: Edge | CommonElement[];

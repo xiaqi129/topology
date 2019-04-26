@@ -34,6 +34,8 @@ export class Edge extends CommonElement {
     this.arrow = new PIXI.Graphics();
     this.startNode = startNode;
     this.endNode = endNode;
+    startNode.linksArray.push(this);
+    endNode.linksArray.push(this);
     this.labelStyle = {};
     this.labelContent = [];
     this.draw();

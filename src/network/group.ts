@@ -51,7 +51,7 @@ export class Group extends CommonElement {
   public labelContent: string = '';
   // analyze children nodes array
   public childNodesList: Node[][] = [];
-
+  public linksArray: Edge[] = [];
   private edgeResource: IedgeResource[] = [];
   private labelStyle: any;
   private toggleExpanded: boolean = false;
@@ -87,7 +87,7 @@ export class Group extends CommonElement {
   public analyzeChildNodesList() {
     const childNodesList: Node[][] = [];
     const outsideEdges: Edge[] = this.edgeArray;
-    const nodes = this.childrenNode;
+    const nodes = this.getAllVisibleNodes();
     let insideEdge: Edge[] = this.filterInsideEdge();
     let fatherNode: Node[] = [];
     _.each(outsideEdges, (edge: Edge) => {
@@ -146,7 +146,6 @@ export class Group extends CommonElement {
           this.lastClickTime = currentTime;
         }
       }
-      // }
     });
   }
 
@@ -356,9 +355,7 @@ export class Group extends CommonElement {
     this.childrenNode.push(element);
     this.emptyObj = undefined;
     this.edgeArray = _.difference(this.filterEdge(), this.filterInsideEdge());
-    if (this.substratumInfo.length === 0) {
-      this.analyzeChildNodesList();
-    }
+    // this.analyzeChildNodesList();
     if (this.childrenNode) {
       this.draw();
     }
@@ -465,7 +462,6 @@ export class Group extends CommonElement {
       const parent = this.parent.toLocal(event.data.global);
       this.dragging = true;
       this.last = { parents: parent };
-      this.analyzeChildNodesList();
     }
   }
 
@@ -482,7 +478,7 @@ export class Group extends CommonElement {
       const intersectionGroup = this.intersection()[1];
       if (this.childrenNode.length > 0) {
         _.each(this.childrenNode, (element) => {
-          if (element instanceof Node) {
+          if (element instanceof Node && !element.isLock) {
             element.position.x += newPosition.x - this.last.parents.x;
             element.position.y += newPosition.y - this.last.parents.y;
           }
@@ -728,6 +724,7 @@ export class Group extends CommonElement {
       if (!this.isLock) {
         graphic.on('mousemove', this.onDragMove, this);
       }
+      this.analyzeChildNodesList();
     }
   }
 
