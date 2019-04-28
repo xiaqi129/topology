@@ -15,6 +15,7 @@ import { CommonElement, IPosition } from './common-element';
 import { Drawer } from './drawer';
 import { Edge } from './edge';
 import { EdgeBundle } from './edge-bundle';
+import { EdgeGroup } from './edge-group';
 import { Group } from './group';
 import { Node } from './node';
 import { PopMenu } from './pop-menu';
@@ -141,6 +142,10 @@ export class Network {
     return this.topo.createArrowLine(start, end);
   }
 
+  public createEdgeGroup() {
+    return this.topo.createEdgeGroup();
+  }
+
   public clear() {
     const elements = this.topo.getElements();
     _.each(elements, (element) => {
@@ -211,7 +216,18 @@ export class Network {
     return groupObj;
   }
 
-  public addElement(element: Node | Group | Edge) {
+  public getEdgeGroup() {
+    const edgeGroup: EdgeGroup[] = [];
+    const elements = this.topo.getElements();
+    _.each(elements, (element) => {
+      if (element instanceof EdgeGroup) {
+        edgeGroup.push(element);
+      }
+    });
+    return edgeGroup;
+  }
+
+  public addElement(element: Node | Group | Edge | EdgeGroup) {
     this.topo.addElement(element);
   }
 
@@ -464,6 +480,7 @@ export class Network {
     const edgeObj: any = this.getEdgeObj();
     const groupObj = this.getGroupObj();
     const edgeBundles = this.getEdgeBundles();
+    const edgeGroups = this.getEdgeGroup();
     const inWrapperNodesList = this.analyzeInWrapperNodes();
     _.each(nodes, (node: Node) => {
       this.drawNode(node, inWrapperNodesList);
@@ -476,6 +493,9 @@ export class Network {
     });
     _.each(groupObj, (group: Group) => {
       this.drawGroup(group);
+    });
+    _.each(edgeGroups, (edgeGroup: EdgeGroup) => {
+      this.drawEdgeGroup(edgeGroup);
     });
     this.toggleLabel();
   }
@@ -576,6 +596,16 @@ export class Network {
       });
     }
     group.draw();
+  }
+
+  private drawEdgeGroup(edgeGroup: EdgeGroup) {
+    const defaultMargin = edgeGroup.invariableStyles.margin;
+    if (this.zoom <= 1) {
+      edgeGroup.setStyle({
+        margin: defaultMargin * this.zoom,
+      });
+    }
+    edgeGroup.draw();
   }
 
   private analyzeZoom() {

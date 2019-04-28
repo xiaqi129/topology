@@ -10,6 +10,7 @@ import { ArrowLine, IPoint } from './arrow-line';
 import { CommonElement } from './common-element';
 import { Edge } from './edge';
 import { EdgeBundle } from './edge-bundle';
+import { EdgeGroup } from './edge-group';
 import { Group } from './group';
 import { Label } from './label';
 import { Node } from './node';
@@ -68,7 +69,7 @@ export class Topo implements ITopo {
 
   private edgesGroupByNodes: { [key: string]: Edge[] } = {};
 
-  public addElement(element: Node | Group | Edge) {
+  public addElement(element: Node | Group | Edge | EdgeGroup) {
     this.addElements([element]);
   }
 
@@ -231,6 +232,10 @@ export class Topo implements ITopo {
 
   public createEdge(startNode: Node | Group, endNode: Node | Group, domRegex?: string): Edge {
     return new Edge(startNode, endNode, domRegex);
+  }
+
+  public createEdgeGroup() {
+    return new EdgeGroup(this.elements);
   }
 
   public createArrowLine(start: IPoint, end: IPoint) {

@@ -7,6 +7,7 @@
 
 import * as _ from 'lodash';
 import { CommonElement, IStyles } from './common-element';
+import { EdgeGroup } from './edge-group';
 import { Group } from './group';
 import { Label } from './label';
 import { Node } from './node';
@@ -24,6 +25,8 @@ export class Edge extends CommonElement {
   public labelToggle: boolean = false;
   public brotherEdges: Edge[] = [];
   public tooltip: Tooltip;
+  public polygonData: number[] = [];
+  public includeGroup: EdgeGroup[] = [];
   private labelStyle: any;
   private labelContent: string[];
   private bundleStyle: number = 1; // 0: link style, 1: bezier style
@@ -31,7 +34,9 @@ export class Edge extends CommonElement {
   constructor(startNode: Node | Group, endNode: Node | Group, domRegex?: string) {
     super();
     this.edge = new PIXI.Graphics();
+    this.edge.name = 'edge_line';
     this.arrow = new PIXI.Graphics();
+    this.arrow.name = 'edge_arrow';
     this.startNode = startNode;
     this.endNode = endNode;
     startNode.linksArray.push(this);
@@ -304,7 +309,7 @@ export class Edge extends CommonElement {
       endLabel.y = points[3];
     }
     graph.bezierCurveTo.apply(graph, points);
-
+    this.polygonData = _.take(graph.currentPath.shape.points, 42);
     const echoDistance = style.lineWidth * 1.5; // curve width
     const echoPoints = [];
     const echoSrc = this.getParallelPoint(
@@ -324,7 +329,6 @@ export class Edge extends CommonElement {
     echoPoints.reverse();
     graph.lineTo(echoPoints.shift(), echoPoints.shift());
     graph.bezierCurveTo.apply(graph, echoPoints);
-
     graph.endFill();
     return [parallelPoint.x, parallelPoint.y].concat(points);
   }
@@ -354,6 +358,7 @@ export class Edge extends CommonElement {
       endLabel.y = points[3];
     }
     bezier.bezierCurveTo.apply(bezier, points);
+    this.polygonData = bezier.currentPath.shape.points;
     const calcPoints = _.chunk(bezier.currentPath.shape.points, 4);
     _.each(calcPoints, (point) => {
       const srcX = Number(point[0]);
@@ -488,13 +493,25 @@ export class Edge extends CommonElement {
     const points = this.calcEdgePoints(
       srcNodePos, endNodePos, style.lineWidth);
     this.drawEdge(this.edge, points);
+    const polygonData: number[] = [];
+    _.each(points, (point) => {
+      polygonData.push(point.x, point.y);
+    });
+    this.polygonData = polygonData;
     return this.edge;
   }
 
   public createImaginaryEdge(srcNodePos: any, endNodePos: any, style: any) {
-    const points = this.calcDottedEdgePoints(
+    const pointsList = this.calcDottedEdgePoints(
       srcNodePos, endNodePos, style.lineWidth);
-    this.drawImaginaryLink(this.edge, points);
+    const polygonData: number[] = [];
+    const points = this.calcEdgePoints(
+      srcNodePos, endNodePos, style.lineWidth);
+    _.each(points, (point) => {
+      polygonData.push(point.x, point.y);
+    });
+    this.polygonData = polygonData;
+    this.drawImaginaryLink(this.edge, pointsList);
     return this.edge;
   }
 
@@ -776,6 +793,10 @@ export class Edge extends CommonElement {
     }
     this.addChildren(elements);
     this.addOthers();
+  }
+
+  public setIncluedGroup(group: EdgeGroup) {
+    this.includeGroup.push(group);
   }
 
   public setTooltip(content?: string, style?: any) {

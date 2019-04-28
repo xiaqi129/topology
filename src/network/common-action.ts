@@ -10,6 +10,7 @@ import { Application } from './application';
 import { CommonElement } from './common-element';
 import { Edge } from './edge';
 import { EdgeBundle } from './edge-bundle';
+import { EdgeGroup } from './edge-group';
 import { Group } from './group';
 import { Node } from './node';
 import { ITopo } from './topo';
@@ -158,7 +159,7 @@ export class CommonAction {
   public getAllGroup() {
     const elements: any = this.topo.getElements();
     return _.filter(elements, (element: CommonElement) => {
-      return element instanceof Group;
+      return element instanceof Group || element instanceof EdgeGroup;
     });
   }
 
@@ -220,6 +221,7 @@ export class CommonAction {
 
   public setClick(color?: any) {
     const elements = this.topo.getElements();
+    const groups = this.getAllGroup();
     _.each(elements, (element) => {
       if (element instanceof Node) {
         element.defaultStyle.clickColor = color;
@@ -249,14 +251,15 @@ export class CommonAction {
             edges.selectOn();
           });
         });
-      } else if (element instanceof Group) {
-        element.on('click', (event: PIXI.interaction.InteractionEvent) => {
-          this.removeHighLight();
-        });
-        element.addEventListener('mousedown', () => {
-          this.removeHighLight();
-        });
       }
+    });
+    _.each(groups, (group) => {
+      group.on('click', (event: PIXI.interaction.InteractionEvent) => {
+        this.removeHighLight();
+      });
+      group.addEventListener('mousedown', () => {
+        this.removeHighLight();
+      });
     });
     this.clearHighlight();
   }

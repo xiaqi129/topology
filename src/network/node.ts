@@ -160,17 +160,12 @@ export class Node extends CommonElement {
 
   public redrawEdge() {
     _.each(this.elements, (element: any) => {
-      // redraw all of the EdgeBundle and Edge
+      // redraw elements
       if (element instanceof EdgeBundle) {
         _.each(element.children, (edge: any) => {
           edge.draw();
         });
-      }
-      if (element instanceof Edge) {
-        element.draw();
-      }
-      // when the group is Expanded redraw it
-      if (element instanceof Group) {
+      } else {
         element.draw();
       }
     });
