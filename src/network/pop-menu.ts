@@ -171,7 +171,11 @@ export class PopMenu {
         if (networkHeight - y > menuHeight + 20) {
           this.menu.style.top = `${y - 20}px`;
         } else {
-          this.menu.style.top = `${(y - menuHeight + 20)}px`;
+          if (y - menuHeight > 0) {
+            this.menu.style.top = `${(y - menuHeight + 20)}px`;
+          } else {
+            this.menu.style.top = `${top + 20}px`;
+          }
         }
         network.addEventListener('click', () => {
           this.hideMenu();

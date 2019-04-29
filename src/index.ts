@@ -515,6 +515,11 @@ const simpleData = function () {
           { label: 'Print Node', id: '4' },
           { label: 'Mark Node', id: '5' },
           { label: 'unMark Node', id: '6' },
+          { label: 'Disaggregate selected group', id: '5' },
+          { label: 'Extened a group', id: '6' },
+          { label: 'Lock/Unlock Group', id: '7' },
+          { label: 'Remove Group', id: '8' },
+          { label: 'Debug', id: '9' },
         ]);
         network.menu.menuOnAction = (id) => {
           if (id === '0') {
@@ -764,9 +769,9 @@ const simpleData = function () {
   network.moveCenter();
 };
 network.callback = () => {
-  // simpleData();
+  simpleData();
   // noData();
-  edgeGroupDemo();
+  // edgeGroupDemo();
 };
 const body = document.getElementById('network');
 const zoomIn = document.querySelector('button.btn_zoomIn');

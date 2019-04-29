@@ -292,7 +292,7 @@ export class Node extends CommonElement {
       border.drawCircle(0, 0, radius / 2 + 5);
       this.addChild(border);
     }
-
+    this.hitArea = new PIXI.Circle(0, 0, radius / 2 + 5);
     this.scale.set(1.5);
   }
 
