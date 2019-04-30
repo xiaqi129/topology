@@ -32,7 +32,7 @@ export class Network {
   private app: Application;
   private action: CommonAction;
   private domRegex: string;
-  private deltaY: number;
+  private isLayer: boolean = false;
 
   constructor(domRegex: string) {
     PIXI.utils.skipHello();
@@ -44,7 +44,6 @@ export class Network {
     this.action = new CommonAction(this.app, this.topo);
     this.menu = new PopMenu(domRegex, this.app, this.action);
     this.zoom = 1;
-    this.deltaY = 0;
     this.isSelect = false;
     this.disableContextMenu(domRegex);
   }
@@ -90,7 +89,6 @@ export class Network {
       wrapper.addEventListener('wheel', (e) => {
         const zoom = this.zoom;
         this.clearHighlight();
-        this.deltaY = e.deltaY;
         if (e.deltaY < 0) {
           if (zoom < 1 && zoom >= 0.1) {
             this.zoomNetworkElements(NP.plus(zoom, 0.1));
@@ -166,7 +164,7 @@ export class Network {
     return nodes;
   }
 
-  public getNodeObj() {
+  public getNodeObj(): { [key: string]: Node } {
     const nodeObj = {};
     const elements = this.topo.getElements();
     _.each(elements, (node) => {
@@ -180,7 +178,7 @@ export class Network {
     return nodeObj;
   }
 
-  public getEdgeObj() {
+  public getEdgeObj(): { [key: string]: Edge } {
     const edgeObj = {};
     const elements = this.topo.getElements();
     _.each(elements, (element) => {
@@ -202,7 +200,7 @@ export class Network {
     return edgeObj;
   }
 
-  public getGroupObj() {
+  public getGroupObj(): { [key: string]: Group } {
     const groupObj = {};
     const elements = this.topo.getElements();
     _.each(elements, (element, id) => {
@@ -493,11 +491,67 @@ export class Network {
     });
     _.each(groupObj, (group: Group) => {
       this.drawGroup(group);
+      if (this.isLayer) {
+        this.layerGroup(group);
+      }
     });
     _.each(edgeGroups, (edgeGroup: EdgeGroup) => {
       this.drawEdgeGroup(edgeGroup);
     });
     this.toggleLabel();
+  }
+
+  set layerHide(flag: boolean) {
+    this.isLayer = flag;
+    this.reDraw();
+  }
+
+  private layerGroup(group: Group) {
+    if (this.zoom <= 0.6) {
+      if (group.substratumInfo.length === 0 && group.childNodesList.length > 1) {
+        const showNodesList = _.drop(group.childNodesList);
+        let showEdgeList: Edge[] = [];
+        let groups: Group[] = [];
+        if (showNodesList) {
+          const showNodes: any = _.flattenDeep(showNodesList);
+          _.each(showNodes, (node: Node) => {
+            node.visible = true;
+            showEdgeList = _.concat(showEdgeList, node.linksArray);
+            groups = _.concat(groups, node.incluedGroups);
+          });
+          _.each(showEdgeList, (edge: Edge) => {
+            edge.visible = true;
+          });
+          groups = _.uniq(groups);
+          const index = showNodesList.length;
+          let hideNodeList: any[] = [];
+          let hideEdge: Edge[] = [];
+          if (this.zoom <= 0.5 && index > 0 && this.zoom > 0.3) {
+            hideNodeList = _.flattenDeep(_.takeRight(showNodesList));
+          } else if (this.zoom <= 0.3 && index - 1 > 0 && this.zoom > 0.2) {
+            hideNodeList = _.flattenDeep(_.takeRight(showNodesList, 2));
+          } else if (this.zoom <= 0.2 && index - 2 > 0 && this.zoom > 0.1) {
+            hideNodeList = _.flattenDeep(_.takeRight(showNodesList, 3));
+          } else if (this.zoom <= 0.1) {
+            hideNodeList = _.flattenDeep(showNodesList);
+          }
+          if (hideNodeList.length === 0 && this.zoom < 0.5) {
+            hideNodeList = _.flattenDeep(showNodesList);
+          }
+          _.each(hideNodeList, (node: Node) => {
+            node.visible = false;
+            hideEdge = _.concat(hideEdge, node.linksArray);
+
+          });
+          _.each(hideEdge, (edge: Edge) => {
+            edge.visible = false;
+          });
+        }
+        _.each(groups, (g: Group) => {
+          g.draw();
+        });
+      }
+    }
   }
 
   private toggleLabel() {
@@ -554,42 +608,8 @@ export class Network {
         fillOpacity: defaultOpacity * this.zoom,
         lineWidth: defaultLineWidth / this.zoom,
       });
-      // if (this.zoom <= 0.6 && this.zoom > 0.5) {
-      //   const showNodesList = _.drop(group.childNodesList);
-      //   if (showNodesList) {
-      //     const showNodes = _.flattenDeep(showNodesList);
-      //     _.each(showNodes, (node) => {
-      //       this.showElement(node);
-      //     });
-      //   }
-      // }
+
     } else {
-      // if (group.substratumInfo.length === 0 && group.childNodesList.length > 1) {
-      //   const showNodesList = _.drop(group.childNodesList);
-      //   if (showNodesList) {
-      //     const showNodes = _.flattenDeep(showNodesList);
-      //     _.each(showNodes, (node) => {
-      //       this.showElement(node);
-      //     });
-      //   }
-      //   const index = showNodesList.length;
-      //   let hideNodeList: any[] = [];
-      //   if (this.zoom <= 0.5 && index > 0 && this.zoom > 0.3) {
-      //     hideNodeList = _.flattenDeep(_.takeRight(showNodesList));
-      //   } else if (this.zoom <= 0.3 && index - 1 > 0 && this.zoom > 0.2) {
-      //     hideNodeList = _.flattenDeep(_.takeRight(showNodesList, 2));
-      //   } else if (this.zoom <= 0.2 && index - 2 > 0 && this.zoom > 0.1) {
-      //     hideNodeList = _.flattenDeep(_.takeRight(showNodesList, 3));
-      //   } else if (this.zoom <= 0.1) {
-      //     hideNodeList = _.flattenDeep(showNodesList);
-      //   }
-      //   if (hideNodeList.length === 0 && this.zoom < 0.5) {
-      //     hideNodeList = _.flattenDeep(showNodesList);
-      //   }
-      //   _.each(hideNodeList, (node: Node) => {
-      //     this.hideElement(node);
-      //   });
-      // }
       group.setStyle({
         fillOpacity: defaultOpacity * 0.5,
         lineWidth: defaultLineWidth / 0.5,

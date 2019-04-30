@@ -434,6 +434,8 @@ const simpleData = function () {
     const client = device.clients.User_Mark;
     if (!(client === 'Hidden')) {
       const node = network.createNode('cisco-ASR9');
+      const sprite: any = node.getChildByName('node_sprite');
+      sprite.tint = 0x000000;
       node.setNodeSize(25, 25);
       node.name = device.name;
       node.clients = device.clients;
@@ -762,6 +764,7 @@ const simpleData = function () {
     });
     network.addElement(newGroup);
   });
+  network.layerHide = true;
   network.syncView();
   network.setDrag();
   network.setZoom();

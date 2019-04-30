@@ -7,10 +7,8 @@
 import * as _ from 'lodash';
 import polygon from 'polygon';
 import Offset from 'polygon-offset/dist/offset';
-import { CommonElement, IPosition } from './common-element';
+import { CommonElement } from './common-element';
 import { Edge } from './edge';
-import { EdgeBundle } from './edge-bundle';
-import { Label } from './label';
 import ConvexHullGrahamScan from './lib/convex-hull';
 import { Node } from './node';
 
