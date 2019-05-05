@@ -264,6 +264,7 @@ export class EdgeGroup extends CommonElement {
       const edges = this.childrenEdge;
       const allEdgeGroups = this.getEdgeGroup();
       let nodesLinkEdges: any[] = [];
+      let nodesList: Node[] = [];
       let includeGroups: EdgeGroup[] = [];
       if (edges.length > 0) {
         _.each(edges, (edge: Edge) => {
@@ -271,15 +272,14 @@ export class EdgeGroup extends CommonElement {
           const endNode: Node = edge.endNode;
           includeGroups = _.concat(includeGroups, edge.includeGroup);
           nodesLinkEdges = _.concat(nodesLinkEdges, startNode.linksArray, endNode.linksArray);
-          if (!startNode.isLock) {
-            startNode.position.x += newPosition.x - this.last.parents.x;
-            startNode.position.y += newPosition.y - this.last.parents.y;
+          nodesList.push(startNode, endNode);
+        });
+        nodesList = _.uniq(nodesList);
+        _.each(nodesList, (node: Node) => {
+          if (!node.isLock) {
+            node.position.x += newPosition.x - this.last.parents.x;
+            node.position.y += newPosition.y - this.last.parents.y;
           }
-          if (!endNode.isLock) {
-            endNode.position.x += newPosition.x - this.last.parents.x;
-            endNode.position.y += newPosition.y - this.last.parents.y;
-          }
-          edge.draw();
         });
         _.each(nodesLinkEdges, (edge: Edge) => {
           edge.draw();
