@@ -413,6 +413,7 @@ const edgeGroupDemo = function () {
       edgeGroup.addChildEdges(edge);
     });
     edgeGroup.initStyle(group.style);
+    edgeGroup.setLabel('1111111111');
   });
   network.syncView();
   network.setDrag();
@@ -772,9 +773,9 @@ const simpleData = function () {
   network.moveCenter();
 };
 network.callback = () => {
-  simpleData();
+  // simpleData();
   // noData();
-  // edgeGroupDemo();
+  edgeGroupDemo();
 };
 const body = document.getElementById('network');
 const zoomIn = document.querySelector('button.btn_zoomIn');

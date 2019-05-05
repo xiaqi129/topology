@@ -7,19 +7,20 @@
 import * as _ from 'lodash';
 import polygon from 'polygon';
 import Offset from 'polygon-offset/dist/offset';
-import { CommonElement } from './common-element';
+import { CommonElement, IPosition } from './common-element';
 import { Edge } from './edge';
+import { Label } from './label';
 import ConvexHullGrahamScan from './lib/convex-hull';
 import { Node } from './node';
-
-export interface IPoint {
-  x: number;
-  y: number;
-}
 
 export class EdgeGroup extends CommonElement {
   public childrenEdge: Edge[] = [];
   public polygon: PIXI.Graphics;
+  // label
+  public labelContent: string = '';
+  public centerPoint: IPosition = { x: 0, y: 0 };
+  private labelStyle: any;
+  private labelPosition: string = 'Center';
   // drag
   private dragging: boolean = false;
   private last: any;
@@ -45,6 +46,143 @@ export class EdgeGroup extends CommonElement {
     this.initPolygonOutline();
     const pointsList = this.getPolygonPoints();
     this.drawPolygon(pointsList);
+    this.updateLabelPos();
+    this.updateLabelSize();
+  }
+
+  // Set Group Label
+  public setLabel(content?: string, position?: string, style?: PIXI.TextStyleOptions) {
+    const groupLabel = this.getChildByName('group_label');
+    if (groupLabel) {
+      groupLabel.destroy();
+    }
+    const graph: any = this.getChildByName('edge_group');
+    if (this.width !== 0 && content && graph) {
+      const size = _.floor(graph.width / 20) + 1;
+      this.labelStyle = {
+        fontSize: size,
+        fill: [
+          '#0776da',
+          '#5146d9',
+        ],
+        fontFamily: 'Georgia',
+        fontWeight: 'bold',
+        letterSpacing: 1,
+      };
+      if (style) {
+        _.extend(this.labelStyle, style);
+      }
+      if (content.length > 25) {
+        _.extend(this.labelStyle, {
+          breakWords: true,
+          wordWrap: true,
+        });
+      }
+      const label = new Label(content || undefined, this.labelStyle);
+      label.anchor.set(0.5, 0.5);
+      label.name = 'group_label';
+      label.alpha = 0.8;
+      label.interactive = false;
+      label.buttonMode = false;
+      if (position) {
+        this.labelPosition = position;
+      }
+      const labelPos = this.getLabelPos();
+      label.x = labelPos.x;
+      label.y = labelPos.y;
+      this.addChild(label);
+      this.labelContent = label.text;
+    }
+  }
+
+  public getLabelPos() {
+    let height = 0;
+    const graph: any = this.getChildByName('edge_group');
+    if (graph) {
+      height = graph.height;
+    }
+    const labelPositionData: any = {
+      Center: {
+        x: 0,
+        y: 0,
+      },
+      Above: {
+        x: 0,
+        y: -(height / 2),
+      },
+      Below: {
+        x: 0,
+        y: (height / 2),
+      },
+    };
+    const labelPos = { x: 0, y: 0 };
+    labelPos.x = this.centerPoint.x + labelPositionData[this.labelPosition].x;
+    labelPos.y = this.centerPoint.y + labelPositionData[this.labelPosition].y;
+    return labelPos;
+  }
+
+  public getLabelContent() {
+    return this.labelContent;
+  }
+
+  public getLabelStyle() {
+    return this.labelStyle;
+  }
+
+  public getLabelPosition() {
+    return this.labelPosition;
+  }
+
+  public setLabelText(content: string) {
+    const label: any = this.getChildByName('group_label');
+    const graph: any = this.getChildByName('edge_group');
+    if (label && graph) {
+      label.setText(content);
+      label.style.fontSize = _.floor(graph.width / 20) + 1;
+      label.style.breakWords = true;
+      label.style.wordWrap = true;
+      label.style.wordWrapWidth = graph.width / 2;
+      this.labelContent = content;
+    }
+  }
+
+  private updateLabelPos() {
+    const label = this.getChildByName('group_label');
+    let angle: number = 0;
+    let oppositeAngle: number = 0;
+    if (label) {
+      if (this.childrenEdge.length === 1) {
+        const edge: Edge = this.childrenEdge[0];
+        angle = Math.atan2(edge.startNode.y - edge.endNode.y, edge.startNode.x - edge.endNode.x);
+        oppositeAngle = Math.atan2(edge.endNode.y - edge.startNode.y, edge.endNode.x - edge.startNode.x);
+        if (edge.startNode.x > edge.endNode.x) {
+          label.rotation = angle;
+          label.rotation = angle;
+        } else {
+          label.rotation = oppositeAngle;
+          label.rotation = oppositeAngle;
+        }
+      }
+      const labelPos = this.getLabelPos();
+      label.x = labelPos.x;
+      label.y = labelPos.y;
+      this.setChildIndex(label, this.children.length - 1);
+    }
+  }
+
+  private updateLabelSize() {
+    const label: any = this.getChildByName('group_label');
+    const graph: any = this.getChildByName('edge_group');
+    const nodeWidth = this.defaultStyle.width;
+    if (label && graph) {
+      if (this.width !== 0) {
+        label.style.fontSize = _.floor(graph.width / 20) + 1;
+        label.style.wordWrapWidth = graph.width / 2;
+      } else {
+        const textLength = _.ceil(label.text.length / 2);
+        label.style.fontSize = nodeWidth / textLength;
+      }
+    }
   }
 
   private initPolygonOutline(): void {
@@ -72,6 +210,7 @@ export class EdgeGroup extends CommonElement {
     const graph = this.polygon;
     const style = this.defaultStyle;
     const polygonObject: any = new polygon(vertexPoints);
+    this.centerPoint = polygonObject.center();
     const rectVertexPoints = polygonObject.toArray();
     const hulls = this.getHulls(rectVertexPoints);
     const marginedPolygon: any = this.marginPolygon(hulls, style.margin | 5);
