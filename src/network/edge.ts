@@ -479,9 +479,7 @@ export class Edge extends CommonElement {
 
   public clearEdgeRelatedGraph() {
     this.edge.clear();
-    if (this.arrow) {
-      this.arrow.clear();
-    }
+    this.arrow.clear();
   }
 
   public getDistance(node: Node | Group, lineDistance: number) {

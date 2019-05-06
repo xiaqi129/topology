@@ -387,6 +387,28 @@ const edgeGroupDemo = function () {
     if (srcNode && destNode) {
       const edge = network.createEdge(srcNode, destNode);
       edge.name = link.name;
+      edge.edge.on('rightclick', (event: any) => {
+        network.menu.setMenuItems([
+          { label: 'Hide Edge', id: '0' },
+          { label: 'Remove Link', id: '1' },
+          { label: 'Print line Info', id: '2' },
+        ]);
+        network.menu.menuOnAction = (id) => {
+          if (id === '0') {
+            edge.visible = false;
+            _.each(edge.includeGroup, (edgeGroup: any) => {
+              edgeGroup.draw();
+            });
+          } else if (id === '1') {
+            network.removeElements(edge);
+          } else if (id === '2') {
+            // tslint:disable-next-line: no-console
+            console.log(edge);
+          }
+        };
+        network.menu.setClass('popMenu');
+        network.menu.showMenu(event);
+      });
       edge.initStyle({
         arrowColor: 0X006aad,
         arrowAngle: 20,
@@ -413,7 +435,23 @@ const edgeGroupDemo = function () {
       edgeGroup.addChildEdges(edge);
     });
     edgeGroup.initStyle(group.style);
-    edgeGroup.setLabel('1111111111');
+    edgeGroup.setLabel(`${group.name}`);
+    edgeGroup.on('rightclick', (event: any) => {
+      network.menu.setMenuItems([
+        { label: 'Remove Group', id: '0' },
+        { label: 'Debug', id: '1' },
+      ]);
+      network.menu.menuOnAction = (id) => {
+        if (id === '0') {
+          network.removeElements(edgeGroup);
+        } else if (id === '1') {
+          // tslint:disable-next-line:no-console
+          console.log(edgeGroup);
+        }
+      };
+      network.menu.setClass('popMenu');
+      network.menu.showMenu(event);
+    });
   });
   network.syncView();
   network.setDrag();
@@ -518,11 +556,7 @@ const simpleData = function () {
           { label: 'Print Node', id: '4' },
           { label: 'Mark Node', id: '5' },
           { label: 'unMark Node', id: '6' },
-          { label: 'Disaggregate selected group', id: '5' },
-          { label: 'Extened a group', id: '6' },
-          { label: 'Lock/Unlock Group', id: '7' },
-          { label: 'Remove Group', id: '8' },
-          { label: 'Debug', id: '9' },
+          { label: 'Remove Node', id: '7' },
         ]);
         network.menu.menuOnAction = (id) => {
           if (id === '0') {
@@ -573,6 +607,8 @@ const simpleData = function () {
             const a = node.addNodeMark('mapSVG', 'top');
           } else if (id === '6') {
             node.removeNodeMark('mapSVG');
+          } else if (id === '7') {
+            network.removeElements(node);
           }
         };
         network.menu.setClass('popMenu');

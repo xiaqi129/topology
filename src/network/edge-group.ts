@@ -146,6 +146,13 @@ export class EdgeGroup extends CommonElement {
     }
   }
 
+  public removeChildEdge(edge: Edge): void {
+    _.remove(this.childrenEdge, (e) => {
+      return e === edge;
+    });
+    this.draw();
+  }
+
   private updateLabelPos() {
     const label = this.getChildByName('group_label');
     let angle: number = 0;
@@ -199,7 +206,9 @@ export class EdgeGroup extends CommonElement {
     let pointsList: number[] = [];
     if (this.childrenEdge) {
       _.each(this.childrenEdge, (edge: Edge) => {
-        pointsList = _.concat(pointsList, edge.polygonData);
+        if (edge.visible) {
+          pointsList = _.concat(pointsList, edge.polygonData);
+        }
       });
     }
     const vertexPoints: number[][] = _.chunk(pointsList, 2);
@@ -209,14 +218,16 @@ export class EdgeGroup extends CommonElement {
   private drawPolygon(vertexPoints: number[][]): void {
     const graph = this.polygon;
     const style = this.defaultStyle;
-    const polygonObject: any = new polygon(vertexPoints);
-    this.centerPoint = polygonObject.center();
-    const rectVertexPoints = polygonObject.toArray();
-    const hulls = this.getHulls(rectVertexPoints);
-    const marginedPolygon: any = this.marginPolygon(hulls, style.margin | 5);
-    const coordinates: number[] = _.flattenDeep(marginedPolygon);
-    graph.drawPolygon(coordinates);
-    graph.endFill();
+    if (vertexPoints.length > 0) {
+      const polygonObject: any = new polygon(vertexPoints);
+      this.centerPoint = polygonObject.center();
+      const rectVertexPoints = polygonObject.toArray();
+      const hulls = this.getHulls(rectVertexPoints);
+      const marginedPolygon: any = this.marginPolygon(hulls, style.margin | 5);
+      const coordinates: number[] = _.flattenDeep(marginedPolygon);
+      graph.drawPolygon(coordinates);
+      graph.endFill();
+    }
   }
 
   private getHulls(rectVertexPoints: number[][]) {

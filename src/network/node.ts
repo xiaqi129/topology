@@ -248,13 +248,17 @@ export class Node extends CommonElement {
   public getWidth() {
     const sprite: any = this.getChildByName('node_sprite') ?
       this.getChildByName('node_sprite') : this.getChildByName('node_graph');
-    return sprite.width;
+    if (sprite) {
+      return sprite.width;
+    }
   }
 
   public getHeight() {
     const sprite: any = this.getChildByName('node_sprite') ?
       this.getChildByName('node_sprite') : this.getChildByName('node_graph');
-    return sprite.height;
+    if (sprite) {
+      return sprite.height;
+    }
   }
 
   public selectOne(color?: any) {
@@ -299,10 +303,12 @@ export class Node extends CommonElement {
   public selectOff() {
     const sprite: any = this.getChildByName('node_sprite') ?
       this.getChildByName('node_sprite') : this.getChildByName('node_graph');
-    if (sprite.name === 'node_sprite') {
-      this.removeChild(this.getChildByName('node_border'));
-    } else if (sprite.name === 'node_graph') {
-      this.removeChild(this.getChildByName('node_border'));
+    if (sprite) {
+      if (sprite.name === 'node_sprite') {
+        this.removeChild(this.getChildByName('node_border'));
+      } else if (sprite.name === 'node_graph') {
+        this.removeChild(this.getChildByName('node_border'));
+      }
     }
     // this.removeChild(this.getChildByName('node_map-greenSVG'));
 
@@ -327,10 +333,12 @@ export class Node extends CommonElement {
     } else {
       const label = new Label(content, this.labelStyle);
       label.name = 'node_label';
-      if (sprite.name === 'node_graph') {
-        label.y = this.defaultStyle.width + 10;
-      } else if (sprite.name === 'node_sprite') {
-        label.y = sprite.height;
+      if (sprite) {
+        if (sprite.name === 'node_graph') {
+          label.y = this.defaultStyle.width + 10;
+        } else if (sprite.name === 'node_sprite') {
+          label.y = sprite.height;
+        }
       }
       this.addChild(label);
       this.labelContent = label.text;
