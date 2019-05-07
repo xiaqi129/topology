@@ -165,7 +165,7 @@ export class Node extends CommonElement {
         _.each(element.children, (edge: any) => {
           edge.draw();
         });
-      } else {
+      } else if (!(element instanceof Node)) {
         element.draw();
       }
     });

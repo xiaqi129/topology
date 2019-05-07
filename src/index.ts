@@ -43,7 +43,7 @@ const network = new Network('network');
 network.initIconResource(iconResource);
 // tslint:disable-next-line:only-arrow-functions
 const noData = function () {
-  const num = 4;
+  const num = 1000;
   for (let i: number = 0, len: number = num; i < len;) {
     i += 1;
     const node = network.createNode('cisco-ASR9');
@@ -51,7 +51,7 @@ const noData = function () {
     // node.setNodeSize(25,25);
     network.addElement(node);
     node.x = Math.random() * 1800;
-    node.y = Math.random() * 500;
+    node.y = Math.random() * 9000;
   }
   const nodes = network.getNodes();
   for (let i: number = 0, len: number = num; i < len;) {
@@ -68,7 +68,7 @@ const noData = function () {
         fillArrow: true,
         lineColor: 0X0386d2,
         // lineDistance: 0,
-        lineType: 1,
+        lineType: 0,
         lineFull: 0,
         lineWidth: 1,
       });
@@ -77,19 +77,6 @@ const noData = function () {
     }
     i += 2;
   }
-  const edgeGroup = network.createEdgeGroup();
-  network.addElement(edgeGroup);
-  _.each(network.getEdgeObj(), (edge) => {
-    edgeGroup.addChildEdges(edge);
-  });
-  // const simpleEdge: any = _.sample(network.getEdgeObj());
-  // edgeGroup.addChildEdges(simpleEdge);
-  edgeGroup.initStyle({
-    fillColor: 0xf55d54,
-    fillOpacity: 0,
-    lineColor: 0xf55d54,
-    margin: 8,
-  });
   // const group = network.createGroup();
   // network.addElement(group);
 
@@ -353,6 +340,7 @@ const edgeGroupDemo = function () {
           lineColor: 0Xfcc242,
           lineWidth: 2,
         },
+        // children: ['1', '4', '10', '11', '12', '13', '14'],
         children: ['12', '13'],
       },
       {
@@ -809,9 +797,9 @@ const simpleData = function () {
   network.moveCenter();
 };
 network.callback = () => {
-  // simpleData();
+  simpleData();
   // noData();
-  edgeGroupDemo();
+  // edgeGroupDemo();
 };
 const body = document.getElementById('network');
 const zoomIn = document.querySelector('button.btn_zoomIn');
@@ -851,16 +839,6 @@ if (zoomOver) {
   // let isZoom = true;
   zoomOver.addEventListener('click', () => {
     network.zoomOver();
-    // const container = network.getContainer();
-    // const wrapperContainr = network.getNetworkSize();
-    // if (container && wrapperContainr) {
-    //   const scaleX = container.width < wrapperContainr[0] ? container.width / wrapperContainr[0] : wrapperContainr[0] / container.width;
-    //   const scaleY = container.height < wrapperContainr[1] ? container.height / wrapperContainr[1] : wrapperContainr[1] / container.height;
-    //   const zoom = scaleX > scaleY ? scaleY : scaleX;
-    //   network.zoomNetworkElements(zoom);
-    //   network.moveTopology(network.zoom / zoom, wrapperContainr[0] / 2, wrapperContainr[1] / 2);
-    // }
-    // isZoom = !isZoom;
   });
 }
 if (tooltipToggle) {
