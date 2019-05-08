@@ -82,16 +82,6 @@ export class Edge extends CommonElement {
     return { x, y };
   }
 
-  public getNodeSize(node: Node | Group) {
-    let width = 0;
-    let height = 0;
-    if (node instanceof Group) {
-      width = node.getWidth();
-      height = node.getHeight();
-    }
-    return { width, height };
-  }
-
   public calcEdgePoints(start: any, end: any, lineWidth: number) {
     const half = lineWidth * 0.5;
     let sLeft = {};

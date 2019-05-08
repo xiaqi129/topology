@@ -6,8 +6,8 @@
  */
 
 import * as _ from 'lodash';
-import { ArrowLine, IPoint } from './arrow-line';
 import { CommonElement } from './common-element';
+import { DataFlow } from './data-flow';
 import { Edge } from './edge';
 import { EdgeBundle } from './edge-bundle';
 import { EdgeGroup } from './edge-group';
@@ -25,7 +25,7 @@ export interface ITopo {
 
   createNode(domRegex: string, texture: string): Node;
 
-  createArrowLine(start: Node, end: IPoint): ArrowLine;
+  createDataFlow(start: Node, end: Node): DataFlow;
 
   createGroup(): Group;
 
@@ -69,7 +69,7 @@ export class Topo implements ITopo {
 
   private edgesGroupByNodes: { [key: string]: Edge[] } = {};
 
-  public addElement(element: Node | Group | Edge | EdgeGroup) {
+  public addElement(element: CommonElement) {
     this.addElements([element]);
   }
 
@@ -243,8 +243,8 @@ export class Topo implements ITopo {
     return new EdgeGroup(this.elements);
   }
 
-  public createArrowLine(start: IPoint, end: IPoint) {
-    return new ArrowLine(start, end);
+  public createDataFlow(start: Node, end: Node) {
+    return new DataFlow(start, end);
   }
 
   public createLabel(text?: string, style?: PIXI.TextStyleOptions, canvas?: HTMLCanvasElement) {

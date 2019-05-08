@@ -9,9 +9,9 @@ import * as _ from 'lodash';
 import NP from 'number-precision';
 import polygon from 'polygon';
 import { Application } from './application';
-import { IPoint } from './arrow-line';
 import { CommonAction } from './common-action';
 import { CommonElement, IPosition } from './common-element';
+import { DataFlow } from './data-flow';
 import { Drawer } from './drawer';
 import { Edge } from './edge';
 import { EdgeBundle } from './edge-bundle';
@@ -136,8 +136,8 @@ export class Network {
     return this.topo.createEdge(startNode, endNode, this.domRegex);
   }
 
-  public createArrowLine(start: IPoint, end: IPoint) {
-    return this.topo.createArrowLine(start, end);
+  public createDataFlow(start: Node, end: Node) {
+    return this.topo.createDataFlow(start, end);
   }
 
   public createEdgeGroup() {
@@ -215,17 +215,22 @@ export class Network {
   }
 
   public getEdgeGroup() {
-    const edgeGroup: EdgeGroup[] = [];
     const elements = this.topo.getElements();
-    _.each(elements, (element) => {
-      if (element instanceof EdgeGroup) {
-        edgeGroup.push(element);
-      }
+    const edgeGroup: EdgeGroup[] = _.filter(elements, (element) => {
+      return element instanceof EdgeGroup;
     });
     return edgeGroup;
   }
 
-  public addElement(element: Node | Group | Edge | EdgeGroup) {
+  public getDataFlow() {
+    const elements = this.topo.getElements();
+    const edgeGroup: DataFlow[] = _.filter(elements, (element) => {
+      return element instanceof DataFlow;
+    });
+    return edgeGroup;
+  }
+
+  public addElement(element: CommonElement) {
     this.topo.addElement(element);
   }
 
@@ -479,6 +484,7 @@ export class Network {
     const groupObj = this.getGroupObj();
     const edgeBundles = this.getEdgeBundles();
     const edgeGroups = this.getEdgeGroup();
+    const dataFlowList = this.getDataFlow();
     const inWrapperNodesList = this.analyzeInWrapperNodes();
     _.each(nodes, (node: Node) => {
       this.drawNode(node, inWrapperNodesList);
@@ -497,6 +503,9 @@ export class Network {
     });
     _.each(edgeGroups, (edgeGroup: EdgeGroup) => {
       this.drawEdgeGroup(edgeGroup);
+    });
+    _.each(dataFlowList, (dataFlow: DataFlow) => {
+      dataFlow.draw();
     });
     this.toggleLabel();
   }

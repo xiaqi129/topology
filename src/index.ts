@@ -93,7 +93,31 @@ const noData = function () {
   network.setZoom();
   network.moveCenter();
 };
-
+// tslint:disable-next-line:only-arrow-functions
+const dataFlowDemo = function () {
+  const node1 = network.createNode('cisco-ASR9');
+  const node2 = network.createNode('cisco-ASR9');
+  node1.x = 100;
+  node1.y = 100;
+  node2.x = 200;
+  node2.y = 200;
+  node1.name = '1';
+  node2.name = '2';
+  network.addElement(node1);
+  network.addElement(node2);
+  const nodes = network.getNodes();
+  const srcNode = nodes[0];
+  const endNode = nodes[1];
+  const dataFlow = network.createDataFlow(srcNode, endNode);
+  // dataFlow.initStyle({
+  //   lineColor: 0Xff0000,
+  // });
+  network.addElement(dataFlow);
+  network.syncView();
+  network.setDrag();
+  network.setZoom();
+  network.moveCenter();
+};
 // tslint:disable-next-line: only-arrow-functions
 const edgeGroupDemo = function () {
   const data = {
@@ -800,6 +824,7 @@ network.callback = () => {
   simpleData();
   // noData();
   // edgeGroupDemo();
+  // dataFlowDemo();
 };
 const body = document.getElementById('network');
 const zoomIn = document.querySelector('button.btn_zoomIn');

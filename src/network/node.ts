@@ -324,6 +324,13 @@ export class Node extends CommonElement {
     if (style) {
       _.extend(this.labelStyle, style);
     }
+    if (content && content.length > 30) {
+      _.extend(this.labelStyle, {
+        breakWords: true,
+        wordWrap: true,
+        wordWrapWidth: content.length * 2.5,
+      });
+    }
     const oldLabel = this.getChildByName('node_label');
     const sprite: any = this.getChildByName('node_sprite') ?
       this.getChildByName('node_sprite') : this.getChildByName('node_graph');

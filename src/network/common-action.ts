@@ -8,6 +8,7 @@
 import * as _ from 'lodash';
 import { Application } from './application';
 import { CommonElement } from './common-element';
+import { DataFlow } from './data-flow';
 import { Edge } from './edge';
 import { EdgeBundle } from './edge-bundle';
 import { EdgeGroup } from './edge-group';
@@ -106,7 +107,7 @@ export class CommonAction {
       const distX = event.data.global.x;
       const distY = event.data.global.y;
       const edges = this.getChildEdges();
-      const groups = this.getAllGroup();
+      const groups = this.getOtherElements();
       const elements: any = this.topo.getElements();
       _.each(elements, (element: CommonElement) => {
         if (element instanceof Node && !element.isLock) {
@@ -131,7 +132,7 @@ export class CommonAction {
     this.data = null;
     this.last = null;
     const edges = this.getChildEdges();
-    const groups = this.getAllGroup();
+    const groups = this.getOtherElements();
     _.each(groups, (group) => {
       group.draw();
     });
@@ -156,11 +157,13 @@ export class CommonAction {
     return edges;
   }
 
-  public getAllGroup() {
+  public getOtherElements() {
     const elements: any = this.topo.getElements();
-    return _.filter(elements, (element: CommonElement) => {
-      return element instanceof Group || element instanceof EdgeGroup;
+    const instanceList = [Group, EdgeGroup, DataFlow];
+    const filterElements = _.filter(elements, (element: CommonElement) => {
+      return _.indexOf(instanceList, element.constructor) > -1;
     });
+    return filterElements;
   }
 
   public moveSelect(isLock: boolean) {
@@ -221,7 +224,7 @@ export class CommonAction {
 
   public setClick(color?: any) {
     const elements = this.topo.getElements();
-    const groups = this.getAllGroup();
+    const groups = this.getOtherElements();
     _.each(elements, (element) => {
       if (element instanceof Node) {
         element.defaultStyle.clickColor = color;
