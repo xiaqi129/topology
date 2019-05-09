@@ -9,7 +9,7 @@ import * as _ from 'lodash';
 import NP from 'number-precision';
 import polygon from 'polygon';
 import { Application } from './application';
-import { CommonAction } from './common-action';
+import { CommonAction, ICondition } from './common-action';
 import { CommonElement, IPosition } from './common-element';
 import { DataFlow } from './data-flow';
 import { Drawer } from './drawer';
@@ -252,9 +252,9 @@ export class Network {
     this.action.dragContainer();
   }
 
-  public setSelect(isLock: boolean) {
+  public setSelect(condition: ICondition) {
     this.isSelect = true;
-    this.action.setSelect(isLock);
+    this.action.setSelect(condition);
   }
 
   public zoomOver() {
@@ -296,9 +296,7 @@ export class Network {
   }
 
   public clearHighlight() {
-    this.action.cleanEdge();
-    this.action.cleanNode();
-    this.topo.removeSelectedNodes();
+    this.action.removeHighLight();
   }
 
   public syncView() {
@@ -309,8 +307,8 @@ export class Network {
     }
   }
 
-  public setClick(color?: number) {
-    this.action.setClick(color);
+  public setClick() {
+    this.action.setClick();
   }
 
   public moveCenter() {

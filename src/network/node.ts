@@ -261,28 +261,28 @@ export class Node extends CommonElement {
     }
   }
 
-  public selectOne(color?: any) {
+  public selectOne() {
     const isInSelect = _.find(this.selectedNodes, (node) => {
       return node === this;
     });
     if (this.selectedNodes.length > 0 && isInSelect) {
-      this.selectOn(color);
+      this.selectOn();
     } else {
       _.each(this.elements, (element: any) => {
         if (element instanceof Node) {
           element.selectOff();
         }
       });
-      this.selectOn(color);
+      this.selectOn();
     }
   }
 
-  public selectOn(color?: any) {
+  public selectOn() {
     this.selectOff();
     const border = new PIXI.Graphics();
     const lineWidth = 2;
     let radius = 0;
-    border.lineStyle(lineWidth, color || 0Xf5bd71, 1);
+    border.lineStyle(lineWidth, 0Xf5bd71, 1);
     border.name = 'node_border';
     const sprite: any = this.getChildByName('node_sprite') ?
       this.getChildByName('node_sprite') : this.getChildByName('node_graph');

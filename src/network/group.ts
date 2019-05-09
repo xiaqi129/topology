@@ -504,6 +504,21 @@ export class Group extends CommonElement {
     }
   }
 
+  public selectOn() {
+    this.setStyle({
+      lineColor: 0Xf5bd71,
+      lineWidth: 3,
+    });
+  }
+
+  public selectOff() {
+    const initStyle = this.invariableStyles;
+    this.setStyle({
+      lineColor: initStyle.lineColor,
+      lineWidth: initStyle.lineWidth,
+    });
+  }
+
   /**
    * 1: polygon, 2: ellipse
    */

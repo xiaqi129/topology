@@ -541,7 +541,7 @@ const simpleData = function () {
       network.addElement(node);
       node.x = device.location.x;
       node.y = device.location.y;
-      const label = node.setLabel(device.name, nodeLabelStyle);
+      const label = node.setLabel(`${device.name}`, nodeLabelStyle);
       // const sprite: any = node.getChildByName('node_sprite');
       // const radius = sprite.width > sprite.height ? sprite.width : sprite.height;
       // if (label && sprite) {
@@ -953,28 +953,36 @@ if (groupLabelToggle) {
   });
 }
 if (body) {
+  let pressSpace = true;
+  let pressAlt = true;
+  const condition = {
+    isLock: false,
+    isSelectGroup: false,
+  };
   window.addEventListener('keydown', (e) => {
     if (e.keyCode === 17 && !network.isSelect) {
-      network.setSelect(false);
+      condition.isLock = false;
+      condition.isSelectGroup = false;
+      network.setSelect(condition);
+    }
+    if (e.keyCode === 32 && e.ctrlKey && pressSpace) {
+      condition.isLock = true;
+      condition.isSelectGroup = false;
+      pressSpace = false;
+      network.setSelect(condition);
+    }
+    if (e.altKey && e.ctrlKey && pressAlt) {
+      pressAlt = false;
+      condition.isLock = false;
+      condition.isSelectGroup = true;
+      network.setSelect(condition);
     }
   });
   window.addEventListener('keyup', (e) => {
     if (e.keyCode === 17) {
       network.setDrag();
-    }
-  });
-  let pressSpace = true;
-  window.addEventListener('keydown', (e) => {
-    if (e.keyCode === 32 && e.ctrlKey && pressSpace) {
-      network.setSelect(true);
-      pressSpace = false;
-    }
-  });
-
-  window.addEventListener('keyup', (e) => {
-    if (e.keyCode === 32 && e.ctrlKey) {
-      network.setDrag();
       pressSpace = true;
+      pressAlt = true;
     }
   });
 }

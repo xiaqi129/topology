@@ -49,6 +49,12 @@ export interface ITopo {
 
   removeSelectedEdge(): void;
 
+  setSelectedGroups(group: Group): void;
+
+  getSelectedGroups(): Group[];
+
+  removeSelectedGroups(): void;
+
   removeEdgeBundleByName(name: string): void;
 
   removeElement(element: CommonElement): void;
@@ -64,6 +70,8 @@ export class Topo implements ITopo {
   private selectedNodes: Node[] = [];
 
   private selectedEdge: Edge | undefined;
+
+  private selectedGroup: Group[] = [];
 
   private elements: any[] = [];
 
@@ -261,11 +269,10 @@ export class Topo implements ITopo {
   }
 
   public setSelectedNodes(element: Node) {
-    const clickColor = element.defaultStyle.clickColor;
     const isinclude = _.includes(this.selectedNodes, element);
     if (!isinclude) {
       this.selectedNodes.push(element);
-      element.selectOn(clickColor);
+      element.selectOn();
     }
   }
 
@@ -287,5 +294,21 @@ export class Topo implements ITopo {
 
   public removeSelectedEdge() {
     this.selectedEdge = undefined;
+  }
+
+  public setSelectedGroups(group: Group) {
+    const isinclude = _.includes(this.selectedGroup, group);
+    if (!isinclude) {
+      this.selectedGroup.push(group);
+      group.selectOn();
+    }
+  }
+
+  public getSelectedGroups(): Group[] {
+    return this.selectedGroup;
+  }
+
+  public removeSelectedGroups() {
+    return _.remove(this.selectedGroup);
   }
 }
