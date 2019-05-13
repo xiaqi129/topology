@@ -385,6 +385,74 @@ export class DataFlow extends CommonElement {
         result.eRight = startRight;
         result.eLeft = startLeft;
       }
+    } else if (sY === eY && sX <= eX) {
+      if (result.eRight.x >= endRight.x) {
+        result.eRight = endRight;
+        result.eLeft = endLeft;
+      }
+      if (result.sRight.x >= endRight.x) {
+        result.sRight = endRight;
+        result.sLeft = endLeft;
+      }
+      if (result.sRight.x <= startRight.x) {
+        result.sRight = startRight;
+        result.sLeft = startLeft;
+      }
+      if (result.eRight.x <= startRight.x) {
+        result.eRight = startRight;
+        result.eLeft = startLeft;
+      }
+    } else if (sY === eY && sX > eX) {
+      if (result.eRight.x < endRight.x) {
+        result.eRight = endRight;
+        result.eLeft = endLeft;
+      }
+      if (result.sRight.x < endRight.x) {
+        result.sRight = endRight;
+        result.sLeft = endLeft;
+      }
+      if (result.sRight.x > startRight.x) {
+        result.sRight = startRight;
+        result.sLeft = startLeft;
+      }
+      if (result.eRight.x > startRight.x) {
+        result.eRight = startRight;
+        result.eLeft = startLeft;
+      }
+    } else if (sX === eX && sY < eY) {
+      if (result.eRight.y > endRight.y) {
+        result.eRight = endRight;
+        result.eLeft = endLeft;
+      }
+      if (result.sRight.y > endRight.y) {
+        result.sRight = endRight;
+        result.sLeft = endLeft;
+      }
+      if (result.sRight.y < startRight.y) {
+        result.sRight = startRight;
+        result.sLeft = startLeft;
+      }
+      if (result.eRight.y < startRight.y) {
+        result.eRight = startRight;
+        result.eLeft = startLeft;
+      }
+    } else if (sX === eX && sY > eY) {
+      if (result.eRight.y <= endRight.y) {
+        result.eRight = endRight;
+        result.eLeft = endLeft;
+      }
+      if (result.sRight.y <= endRight.y) {
+        result.sRight = endRight;
+        result.sLeft = endLeft;
+      }
+      if (result.sRight.y >= startRight.y) {
+        result.sRight = startRight;
+        result.sLeft = startLeft;
+      }
+      if (result.eRight.y >= startRight.y) {
+        result.eRight = startRight;
+        result.eLeft = startLeft;
+      }
     }
     return result;
   }

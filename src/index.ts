@@ -95,24 +95,231 @@ const noData = function () {
 };
 // tslint:disable-next-line:only-arrow-functions
 const dataFlowDemo = function () {
-  const node1 = network.createNode('cisco-ASR9');
-  const node2 = network.createNode('cisco-ASR9');
-  node1.x = 100;
-  node1.y = 100;
-  node2.x = 200;
-  node2.y = 200;
-  node1.name = '1';
-  node2.name = '2';
-  network.addElement(node1);
-  network.addElement(node2);
-  const nodes = network.getNodes();
-  const srcNode = nodes[0];
-  const endNode = nodes[1];
-  const dataFlow = network.createDataFlow(srcNode, endNode);
-  dataFlow.initStyle({
-    fillColor: 0Xff0000,
+  // const node1 = network.createNode('cisco-ASR9');
+  // const node2 = network.createNode('cisco-ASR9');
+  // node1.x = 100;
+  // node1.y = 100;
+  // node2.x = 200;
+  // node2.y = 200;
+  // node1.name = '1';
+  // node2.name = '2';
+  // network.addElement(node1);
+  // network.addElement(node2);
+  // const nodes = network.getNodes();
+  // const srcNode = nodes[0];
+  // const endNode = nodes[1];
+  // const dataFlow = network.createDataFlow(srcNode, endNode);
+  // dataFlow.initStyle({
+  //   fillColor: 0Xff0000,
+  // });
+  // network.addElement(dataFlow);
+  const data = {
+    devices: [
+      {
+        name: 'name-1',
+        location: {
+          x: 200,
+          y: 200,
+        },
+      },
+      {
+        name: 'name-2',
+        location: {
+          x: 350,
+          y: 250,
+        },
+      },
+      {
+        name: 'name-3',
+        location: {
+          x: 500,
+          y: 320,
+        },
+      },
+      {
+        name: 'name-4',
+        location: {
+          x: 430,
+          y: 450,
+        },
+      },
+      {
+        name: 'name-5',
+        location: {
+          x: 270,
+          y: 500,
+        },
+      },
+      {
+        name: 'name-6',
+        location: {
+          x: 150,
+          y: 400,
+        },
+      },
+      {
+        name: 'name-7',
+        location: {
+          x: 50,
+          y: 300,
+        },
+      },
+      {
+        name: 'name-8',
+        location: {
+          x: 0,
+          y: 500,
+        },
+      },
+
+    ],
+    links: [
+      {
+        name: '1',
+        local_host: 'name-1',
+        remote_host: 'name-2',
+        style: {
+          fillColor: 0Xff0000,
+        },
+      },
+      {
+        name: '2',
+        local_host: 'name-2',
+        remote_host: 'name-3',
+        style: {
+          fillColor: 0Xffff00,
+        },
+      },
+      {
+        name: '3',
+        local_host: 'name-1',
+        remote_host: 'name-4',
+        style: {
+          fillColor: 0X0000ff,
+        },
+      },
+      {
+        name: '4',
+        local_host: 'name-1',
+        remote_host: 'name-7',
+        style: {
+          fillColor: 0Xffff00,
+        },
+      },
+      {
+        name: '5',
+        local_host: 'name-2',
+        remote_host: 'name-4',
+        style: {
+          fillColor: 0Xffff00,
+        },
+      },
+      {
+        name: '6',
+        local_host: 'name-3',
+        remote_host: 'name-7',
+        style: {
+          fillColor: 0Xffff00,
+        },
+      },
+      {
+        name: '7',
+        local_host: 'name-3',
+        remote_host: 'name-6',
+        style: {
+          fillColor: 0Xffff00,
+        },
+      },
+      {
+        name: '8',
+        local_host: 'name-3',
+        remote_host: 'name-8',
+        style: {
+          fillColor: 0Xff0000,
+          lineColor: 0xEEEEEE,
+        },
+      },
+      {
+        name: '9',
+        local_host: 'name-3',
+        remote_host: 'name-4',
+        style: {
+          fillColor: 0Xff0000,
+          lineColor: 0xEEEEEE,
+        },
+      },
+      {
+        name: '10',
+        local_host: 'name-6',
+        remote_host: 'name-5',
+        style: {
+          fillColor: 0Xff0000,
+          lineColor: 0xEEEEEE,
+        },
+      },
+      {
+        name: '11',
+        local_host: 'name-6',
+        remote_host: 'name-7',
+        style: {
+          fillColor: 0Xff0000,
+          lineColor: 0xEEEEEE,
+        },
+      },
+      {
+        name: '12',
+        local_host: 'name-6',
+        remote_host: 'name-8',
+        style: {
+          fillColor: 0Xffff00,
+        },
+      },
+      {
+        name: '13',
+        local_host: 'name-5',
+        remote_host: 'name-8',
+        style: {
+          fillColor: 0Xff0000,
+          lineColor: 0xEEEEEE,
+        },
+      },
+      {
+        name: '14',
+        local_host: 'name-7',
+        remote_host: 'name-8',
+        style: {
+          fillColor: 0Xff0000,
+          lineColor: 0xEEEEEE,
+        },
+      },
+
+    ],
+  };
+  const devices = data.devices;
+  const links = data.links;
+  _.each(devices, (device: any) => {
+    const node = network.createNode('cisco-ASR9');
+    node.name = device.name;
+    node.x = device.location.x;
+    node.y = device.location.y;
+    network.addElement(node);
   });
-  network.addElement(dataFlow);
+  const nodes = network.getNodeObj();
+  _.each(links, (link: any) => {
+    const srcNodeName = link.local_host;
+    const destNodeName = link.remote_host;
+    const srcNode = _.get(nodes, srcNodeName);
+    const destNode = _.get(nodes, destNodeName);
+    if (srcNode && destNode) {
+      const dataFlow = network.createDataFlow(srcNode, destNode);
+      dataFlow.name = link.name;
+      dataFlow.initStyle({
+        fillColor: link.style.fillColor,
+        lineColor: link.style.lineColor,
+      });
+      network.addElement(dataFlow);
+    }
+  });
   network.syncView();
   network.setDrag();
   network.setZoom();
