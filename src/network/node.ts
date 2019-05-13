@@ -353,6 +353,14 @@ export class Node extends CommonElement {
     }
   }
 
+  public getSprite() {
+    const sprite = this.getChildByName('node_sprite') ?
+      this.getChildByName('node_sprite') : this.getChildByName('node_graph');
+    if (sprite) {
+      return sprite;
+    }
+  }
+
   public getLabelContent() {
     return this.labelContent;
   }

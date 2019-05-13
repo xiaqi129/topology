@@ -6,6 +6,7 @@
  */
 
 import * as _ from 'lodash';
+import { Application } from './application';
 import { CommonElement } from './common-element';
 import { DataFlow } from './data-flow';
 import { Edge } from './edge';
@@ -25,7 +26,7 @@ export interface ITopo {
 
   createNode(domRegex: string, texture: string): Node;
 
-  createDataFlow(start: Node, end: Node): DataFlow;
+  createDataFlow(start: Node, end: Node, app: Application): DataFlow;
 
   createGroup(): Group;
 

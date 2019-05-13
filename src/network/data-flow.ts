@@ -5,7 +5,7 @@
  * Author: gsp-dalian-ued@cisco.com
  */
 import * as _ from 'lodash';
-import { CommonElement, IStyles } from './common-element';
+import { CommonElement } from './common-element';
 import { Node } from './node';
 
 export interface IPoint {
@@ -20,10 +20,17 @@ export interface IResultsPoints {
   eLeft: IPoint;
 }
 
+export interface IAdjustedNodePosition {
+  srcNode: IPoint;
+  endNode: IPoint;
+}
+
 const Point = PIXI.Point;
 export class DataFlow extends CommonElement {
   public background: PIXI.Graphics;
   public neon: PIXI.Graphics;
+  public flowLength: number = 30;
+  private moveDistance: number = 0;
   private start: Node;
   private end: Node;
   constructor(start: Node, end: Node) {
@@ -32,24 +39,32 @@ export class DataFlow extends CommonElement {
     this.end = end;
     this.background = new PIXI.Graphics();
     this.neon = new PIXI.Graphics();
-    this.draw();
-    this.background.on('click', () => {
-      // console.log('click!!11');
-    });
+    this.gameLoop();
   }
 
   // basic draw
   public draw(): void {
     this.clearRelatedGraph();
+    const nodePos = this.adustNodePos();
+    const points = this.calcDottedEdgePoints(nodePos.srcNode, nodePos.endNode);
+    this.createBackground(nodePos.srcNode, nodePos.endNode);
+    this.drawImaginaryLink(points);
+  }
+
+  // adjust draw line's rectangle position
+  private adustNodePos(): IAdjustedNodePosition {
     const style = this.defaultStyle;
+    const nodePos: IAdjustedNodePosition = {
+      srcNode: { x: 0, y: 0 },
+      endNode: { x: 0, y: 0 },
+    };
     const startDistance = this.getDistance(this.start, style.lineDistance);
     const endDistance = this.getDistance(this.end, style.lineDistance);
-    let srcNodePos = this.getNodePosition(this.start);
-    let endNodePos = this.getNodePosition(this.end);
-    srcNodePos = this.getAdjustedLocation(srcNodePos, -1, startDistance);
-    endNodePos = this.getAdjustedLocation(endNodePos, 1, endDistance);
-    this.createBackground(srcNodePos, endNodePos);
-    this.drawImaginaryLink(srcNodePos, endNodePos);
+    const srcNodePos = this.getNodePosition(this.start);
+    const endNodePos = this.getNodePosition(this.end);
+    nodePos.srcNode = this.getAdjustedLocation(srcNodePos, -1, startDistance);
+    nodePos.endNode = this.getAdjustedLocation(endNodePos, 1, endDistance);
+    return nodePos;
   }
 
   // clear data flow graph
@@ -107,7 +122,7 @@ export class DataFlow extends CommonElement {
     const graph = this.background;
     const points = this.calcEdgePoints(srcNodePos, endNodePos);
     let lineColor;
-    if (this.invariableStyles && this.invariableStyles.lineColor) {
+    if (this.invariableStyles && this.invariableStyles.lineColor && this.invariableStyles.lineColor !== 0xEEEEEE) {
       lineColor = this.invariableStyles.lineColor;
     } else {
       lineColor = 0X2c3e50;
@@ -123,21 +138,33 @@ export class DataFlow extends CommonElement {
     this.addChild(graph);
   }
 
-  private drawImaginaryLink(srcNodePos: IPoint, endNodePos: IPoint) {
+  /**
+   * draw neon of the data flow
+   * @param {IResultsPoints[]} points points list of the neon
+   */
+  private drawImaginaryLink(points: IResultsPoints[]) {
     const style = this.defaultStyle;
-    const points = this.calcDottedEdgePoints(srcNodePos, endNodePos);
-    const graph = this.neon;
-    graph.interactive = true;
-    _.each(points, (point) => {
-      graph.beginFill(0Xffff00, style.fillOpacity);
-      graph.moveTo(point.sLeft.x, point.sLeft.y);
-      graph.lineTo(point.sRight.x, point.sRight.y);
-      graph.lineTo(point.eRight.x, point.eRight.y);
-      graph.lineTo(point.eLeft.x, point.eLeft.y);
-      graph.endFill();
-    });
-    this.background.addChild(graph);
-    // this.addChild(graph);
+    const isHit = this.hitTestRectangle(this.start, this.end);
+    if (!isHit) {
+      const graph = this.neon;
+      graph.interactive = true;
+      let fillColor: number;
+      if (this.invariableStyles && this.invariableStyles.fillColor) {
+        fillColor = this.invariableStyles.fillColor;
+      } else {
+        fillColor = 0Xffff00;
+      }
+      _.each(points, (point) => {
+        graph.beginFill(fillColor, style.fillOpacity);
+        graph.moveTo(point.sLeft.x, point.sLeft.y);
+        graph.lineTo(point.sRight.x, point.sRight.y);
+        graph.lineTo(point.eRight.x, point.eRight.y);
+        graph.lineTo(point.eLeft.x, point.eLeft.y);
+        graph.endFill();
+      });
+      this.background.addChild(graph);
+
+    }
   }
 
   /**
@@ -149,19 +176,20 @@ export class DataFlow extends CommonElement {
     const lineWidth = this.defaultStyle.lineWidth;
     const angle = this.getAngle();
     const half = lineWidth * 4;
-    let sLeft = {};
-    let sRight = {};
-    let eRight: any = {};
-    let eLeft: any = {};
     const sX = start.x;
     const sY = start.y;
     const eX = end.x;
     const eY = end.y;
-    const results: any = {};
-    sLeft = new Point(sX - Math.cos(angle) * half, sY + Math.sin(angle) * half);
-    sRight = new Point(sX + Math.cos(angle) * half, sY - Math.sin(angle) * half);
-    eRight = new Point(eX + Math.cos(angle) * half, eY - Math.sin(angle) * half);
-    eLeft = new Point(eX - Math.cos(angle) * half, eY + Math.sin(angle) * half);
+    const results: IResultsPoints = {
+      sLeft: { x: 0, y: 0 },
+      sRight: { x: 0, y: 0 },
+      eRight: { x: 0, y: 0 },
+      eLeft: { x: 0, y: 0 },
+    };
+    const sLeft = new Point(sX - Math.cos(angle) * half, sY + Math.sin(angle) * half);
+    const sRight = new Point(sX + Math.cos(angle) * half, sY - Math.sin(angle) * half);
+    const eRight = new Point(eX + Math.cos(angle) * half, eY - Math.sin(angle) * half);
+    const eLeft = new Point(eX - Math.cos(angle) * half, eY + Math.sin(angle) * half);
     results.sLeft = sLeft;
     results.sRight = sRight;
     results.eRight = eRight;
@@ -169,81 +197,38 @@ export class DataFlow extends CommonElement {
     return results;
   }
 
+  /**
+   * Calculate by the line, rectangle points position list
+   * @param {IPoint} start start node location
+   * @param {IPoint} end end node location
+   */
   private calcDottedEdgePoints(start: IPoint, end: IPoint): IResultsPoints[] {
     const lineWidth = this.defaultStyle.lineWidth;
     const half = lineWidth * 4;
-    const neonLength = 30;
-    const breakNum = 2;
-    const breakLength = 30;
-    const pointsList = [];
     const angle = this.getAngle();
-    const breakX = breakLength * Math.sin(angle);
-    const breakY = breakLength * Math.cos(angle);
-    const distanceX = Math.abs(start.x - end.x) / breakNum - Math.abs(breakX);
-    const distanceY = Math.abs(start.y - end.y) / breakNum - Math.abs(breakY);
-    let sLeft = {};
-    let sRight = {};
-    let eRight: any = {};
-    let eLeft: any = {};
+    const flowLength = this.flowLength;
+    const xLength = start.x - end.x;
+    const yLength = start.y - end.y;
+    const distance = Math.sqrt(xLength * xLength + yLength * yLength);
+    const segmentNum = (distance / flowLength / 2);
+    const moveX = flowLength * Math.sin(angle);
+    const moveY = flowLength * Math.cos(angle);
+    const pointsList = [];
     let sX = start.x;
     let sY = start.y;
-    const eX = end.x;
-    const eY = end.y;
-    for (let index = 0; index < breakNum; index = index + 1) {
-      const result: any = {};
-      if (sX > eX && sY > eY && (sX - distanceX > eX) && (sY - distanceY > eY)) {
-        sLeft = new Point(sX - half, sY + half);
-        sRight = new Point(sX + half, sY - half);
-        eRight = new Point(sX + half - distanceX, sY - half - distanceY);
-        eLeft = new Point(sX - half - distanceX, sY + half - distanceY);
-        sX = sX - distanceX - breakX;
-        sY = sY - distanceY - breakY;
-      } else if (sX < eX && sY < eY && (sX + distanceX < eX) && (sY + distanceY < eY)) {
-        sLeft = new Point(sX - half, sY + half);
-        sRight = new Point(sX + half, sY - half);
-        eRight = new Point(sX + half + distanceX, sY - half + distanceY);
-        eLeft = new Point(sX - half + distanceX, sY + half + distanceY);
-        sX = sX + distanceX - breakX;
-        sY = sY + distanceY - breakY;
-      } else if (sX > eX && sY < eY && (sX - distanceX > eX) && (sY + distanceY < eY)) {
-        sLeft = new Point(sX - half, sY - half);
-        sRight = new Point(sX + half, sY + half);
-        eRight = new Point(sX + half - distanceX, sY + half + distanceY);
-        eLeft = new Point(sX - half - distanceX, sY - half + distanceY);
-        sX = sX - distanceX - breakX;
-        sY = sY + distanceY - breakY;
-      } else if (sX < eX && sY > eY && (sX + distanceX < eX) && (sY - distanceY > eY)) {
-        sLeft = new Point(sX - half, sY - half);
-        sRight = new Point(sX + half, sY + half);
-        eRight = new Point(sX + half + distanceX, sY + half - distanceY);
-        eLeft = new Point(sX - half + distanceX, sY - half - distanceY);
-        sX = sX + distanceX - breakX;
-        sY = sY - distanceY - breakY;
-      } else if (sX === eX && sY > eY && (sY - distanceY > eY)) {
-        sLeft = new Point(sX - half, sY);
-        sRight = new Point(sX + half, sY);
-        eRight = new Point(eX + half, sY - distanceY);
-        eLeft = new Point(eX - half, sY - distanceY);
-        sY = sY - distanceY - breakY;
-      } else if (sX === eX && sY < eY && (sY + distanceY < eY)) {
-        sLeft = new Point(sX - half, sY);
-        sRight = new Point(sX + half, sY);
-        eRight = new Point(eX + half, sY + distanceY);
-        eLeft = new Point(eX - half, sY + distanceY);
-        sY = sY + distanceY - breakY;
-      } else if (sY === eY && sX < eX && (sX + distanceX < eX)) {
-        sLeft = new Point(sX, sY + half);
-        sRight = new Point(sX, sY - half);
-        eRight = new Point(sX + distanceX, eY - half);
-        eLeft = new Point(sX + distanceX, eY + half);
-        sX = sX + distanceX - breakX;
-      } else if (sY === eY && sX > eX && (sX - distanceX > eX)) {
-        sLeft = new Point(sX, sY + half);
-        sRight = new Point(sX, sY - half);
-        eRight = new Point(sX - distanceX, eY - half);
-        eLeft = new Point(sX - distanceX, eY + half);
-        sX = sX - distanceX - breakX;
-      }
+    for (let index = 0; index < segmentNum; index = index + 1) {
+      const result: IResultsPoints = {
+        sLeft: { x: 0, y: 0 },
+        sRight: { x: 0, y: 0 },
+        eRight: { x: 0, y: 0 },
+        eLeft: { x: 0, y: 0 },
+      };
+      const sLeft = new Point(sX - Math.cos(angle) * half, sY + Math.sin(angle) * half);
+      const sRight = new Point(sX + Math.cos(angle) * half, sY - Math.sin(angle) * half);
+      const eRight = new Point(sX - moveX + Math.cos(angle) * half, sY - moveY - Math.sin(angle) * half);
+      const eLeft = new Point(sX - moveX - Math.cos(angle) * half, sY - moveY + Math.sin(angle) * half);
+      sX = sX - moveX * 2;
+      sY = sY - moveY * 2;
       result.sLeft = sLeft;
       result.sRight = sRight;
       result.eRight = eRight;
@@ -251,6 +236,157 @@ export class DataFlow extends CommonElement {
       pointsList.push(result);
     }
     return pointsList;
+  }
+
+  // Collision detection function
+  private hitTestRectangle(r1: any, r2: any) {
+    let hit;
+    let combinedHalfWidths;
+    let combinedHalfHeights;
+    let vx;
+    let vy;
+    hit = false;
+    r1.centerX = r1.x + r1.iconWidth / 2;
+    r1.centerY = r1.y + r1.iconHeight / 2;
+    r2.centerX = r2.x + r2.iconWidth / 2;
+    r2.centerY = r2.y + r2.iconHeight / 2;
+    r1.halfWidth = r1.iconWidth / 2;
+    r1.halfHeight = r1.iconHeight / 2;
+    r2.halfWidth = r2.iconWidth / 2;
+    r2.halfHeight = r2.iconHeight / 2;
+    vx = r1.centerX - r2.centerX;
+    vy = r1.centerY - r2.centerY;
+    combinedHalfWidths = r1.halfWidth + r2.halfWidth;
+    combinedHalfHeights = r1.halfHeight + r2.halfHeight;
+    if (Math.abs(vx) < combinedHalfWidths) {
+      if (Math.abs(vy) < combinedHalfHeights) {
+        hit = true;
+      } else {
+        hit = false;
+      }
+    } else {
+      hit = false;
+    }
+    return hit;
+  }
+
+  // animate the data flow
+  private gameLoop(): void {
+    requestAnimationFrame(this.gameLoop.bind(this));
+    this.moveDistance += 1;
+    const nodePos = this.adustNodePos();
+    const points = this.calcDottedEdgePoints(nodePos.srcNode, nodePos.endNode);
+    if (this.moveDistance === this.flowLength + 1) {
+      this.moveDistance = -(this.flowLength + 1);
+    }
+    this.movePoints(points);
+  }
+
+  // animate the data flow with move points
+  private movePoints(points: IResultsPoints[]): void {
+    const angle = this.getAngle();
+    const moveX = this.moveDistance * Math.sin(angle);
+    const moveY = this.moveDistance * Math.cos(angle);
+    const adustedPoints = _.each(points, (point: IResultsPoints) => {
+      point.sLeft = new Point(point.sLeft.x - moveX, point.sLeft.y - moveY);
+      point.sRight = new Point(point.sRight.x - moveX, point.sRight.y - moveY);
+      point.eLeft = new Point(point.eLeft.x - moveX, point.eLeft.y - moveY);
+      point.eRight = new Point(point.eRight.x - moveX, point.eRight.y - moveY);
+      // tslint:disable-next-line: no-parameter-reassignment
+      point = this.adjustedPoints(point);
+    });
+    this.neon.clear();
+    this.drawImaginaryLink(adustedPoints);
+  }
+
+  /**
+   * adusted the data flow points, remove two spare parts
+   * @param {IResultsPoints} point prepare to adjusted points
+   */
+  private adjustedPoints(point: IResultsPoints): IResultsPoints {
+    const result = point;
+    const nodePos = this.adustNodePos();
+    const lineWidth = this.defaultStyle.lineWidth;
+    const half = lineWidth * 4;
+    const angle = this.getAngle();
+    const sX = nodePos.srcNode.x;
+    const sY = nodePos.srcNode.y;
+    const eX = nodePos.endNode.x;
+    const eY = nodePos.endNode.y;
+    const startLeft = new Point(sX - Math.cos(angle) * half, sY + Math.sin(angle) * half);
+    const startRight = new Point(sX + Math.cos(angle) * half, sY - Math.sin(angle) * half);
+    const endRight = new Point(eX + Math.cos(angle) * half, eY - Math.sin(angle) * half);
+    const endLeft = new Point(eX - Math.cos(angle) * half, eY + Math.sin(angle) * half);
+    if (sX <= eX && sY <= eY) {
+      if (result.eRight.x >= endRight.x && result.eRight.y >= endRight.y) {
+        result.eRight = endRight;
+        result.eLeft = endLeft;
+      }
+      if (result.sRight.x >= endRight.x && result.sRight.y >= endRight.y) {
+        result.sRight = endRight;
+        result.sLeft = endLeft;
+      }
+      if (result.sRight.x <= startRight.x && result.sRight.y <= startRight.y) {
+        result.sRight = startRight;
+        result.sLeft = startLeft;
+      }
+      if (result.eRight.x <= startRight.x && result.eRight.y <= startRight.y) {
+        result.eRight = startRight;
+        result.eLeft = startLeft;
+      }
+    } else if (sX > eX && sY < eY) {
+      if (result.eRight.x <= endRight.x && result.eRight.y >= endRight.y) {
+        result.eRight = endRight;
+        result.eLeft = endLeft;
+      }
+      if (result.sRight.x <= endRight.x && result.sRight.y >= endRight.y) {
+        result.sRight = endRight;
+        result.sLeft = endLeft;
+      }
+      if (result.sRight.x >= startRight.x && result.sRight.y <= startRight.y) {
+        result.sRight = startRight;
+        result.sLeft = startLeft;
+      }
+      if (result.eRight.x >= startRight.x && result.eRight.y <= startRight.y) {
+        result.eRight = startRight;
+        result.eLeft = startLeft;
+      }
+    } else if (sX > eX && sY > eY) {
+      if (result.eRight.x <= endRight.x && result.eRight.y <= endRight.y) {
+        result.eRight = endRight;
+        result.eLeft = endLeft;
+      }
+      if (result.sRight.x <= endRight.x && result.sRight.y <= endRight.y) {
+        result.sRight = endRight;
+        result.sLeft = endLeft;
+      }
+      if (result.sRight.x >= startRight.x && result.sRight.y >= startRight.y) {
+        result.sRight = startRight;
+        result.sLeft = startLeft;
+      }
+      if (result.eRight.x >= startRight.x && result.eRight.y >= startRight.y) {
+        result.eRight = startRight;
+        result.eLeft = startLeft;
+      }
+    } else if (sX < eX && sY > eY) {
+      if (result.eRight.x >= endRight.x && result.eRight.y <= endRight.y) {
+        result.eRight = endRight;
+        result.eLeft = endLeft;
+      }
+      if (result.sRight.x >= endRight.x && result.sRight.y <= endRight.y) {
+        result.sRight = endRight;
+        result.sLeft = endLeft;
+      }
+      if (result.sRight.x <= startRight.x && result.sRight.y >= startRight.y) {
+        result.sRight = startRight;
+        result.sLeft = startLeft;
+      }
+      if (result.eRight.x <= startRight.x && result.eRight.y >= startRight.y) {
+        result.eRight = startRight;
+        result.eLeft = startLeft;
+      }
+    }
+    return result;
   }
 
 }

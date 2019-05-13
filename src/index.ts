@@ -109,9 +109,9 @@ const dataFlowDemo = function () {
   const srcNode = nodes[0];
   const endNode = nodes[1];
   const dataFlow = network.createDataFlow(srcNode, endNode);
-  // dataFlow.initStyle({
-  //   lineColor: 0Xff0000,
-  // });
+  dataFlow.initStyle({
+    fillColor: 0Xff0000,
+  });
   network.addElement(dataFlow);
   network.syncView();
   network.setDrag();
@@ -821,10 +821,10 @@ const simpleData = function () {
   network.moveCenter();
 };
 network.callback = () => {
-  simpleData();
+  // simpleData();
   // noData();
   // edgeGroupDemo();
-  // dataFlowDemo();
+  dataFlowDemo();
 };
 const body = document.getElementById('network');
 const zoomIn = document.querySelector('button.btn_zoomIn');

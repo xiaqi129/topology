@@ -290,9 +290,17 @@ export class Network {
     this.topo.setSelectedEdge(edge);
   }
 
+  public setSelectGroups(group: Group) {
+    this.topo.setSelectedGroups(group);
+  }
+
   public getSelectEdge() {
     const selectEdge = this.topo.getSelectedEdge();
     return selectEdge;
+  }
+
+  public getSelectGroups() {
+    return this.topo.getSelectedGroups();
   }
 
   public clearHighlight() {
