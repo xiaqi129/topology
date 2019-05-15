@@ -95,24 +95,6 @@ const noData = function () {
 };
 // tslint:disable-next-line:only-arrow-functions
 const dataFlowDemo = function () {
-  // const node1 = network.createNode('cisco-ASR9');
-  // const node2 = network.createNode('cisco-ASR9');
-  // node1.x = 100;
-  // node1.y = 100;
-  // node2.x = 200;
-  // node2.y = 200;
-  // node1.name = '1';
-  // node2.name = '2';
-  // network.addElement(node1);
-  // network.addElement(node2);
-  // const nodes = network.getNodes();
-  // const srcNode = nodes[0];
-  // const endNode = nodes[1];
-  // const dataFlow = network.createDataFlow(srcNode, endNode);
-  // dataFlow.initStyle({
-  //   fillColor: 0Xff0000,
-  // });
-  // network.addElement(dataFlow);
   const data = {
     devices: [
       {
@@ -179,7 +161,8 @@ const dataFlowDemo = function () {
         local_host: 'name-1',
         remote_host: 'name-2',
         style: {
-          fillColor: 0Xff0000,
+          fillColor: 0xf55d54,
+          lineWidth: 1,
         },
       },
       {
@@ -187,7 +170,8 @@ const dataFlowDemo = function () {
         local_host: 'name-2',
         remote_host: 'name-3',
         style: {
-          fillColor: 0Xffff00,
+          fillColor: 0Xa3d89f,
+          lineWidth: 0.8,
         },
       },
       {
@@ -195,7 +179,8 @@ const dataFlowDemo = function () {
         local_host: 'name-1',
         remote_host: 'name-4',
         style: {
-          fillColor: 0X0000ff,
+          fillColor: 0Xfcc242,
+          lineWidth: 0.5,
         },
       },
       {
@@ -203,7 +188,8 @@ const dataFlowDemo = function () {
         local_host: 'name-1',
         remote_host: 'name-7',
         style: {
-          fillColor: 0Xffff00,
+          fillColor: 0xf55d54,
+          lineWidth: 1,
         },
       },
       {
@@ -211,7 +197,8 @@ const dataFlowDemo = function () {
         local_host: 'name-2',
         remote_host: 'name-4',
         style: {
-          fillColor: 0Xffff00,
+          fillColor: 0Xa3d89f,
+          lineWidth: 1,
         },
       },
       {
@@ -219,7 +206,8 @@ const dataFlowDemo = function () {
         local_host: 'name-3',
         remote_host: 'name-7',
         style: {
-          fillColor: 0Xffff00,
+          fillColor: 0Xfcc242,
+          lineWidth: 1,
         },
       },
       {
@@ -227,7 +215,8 @@ const dataFlowDemo = function () {
         local_host: 'name-3',
         remote_host: 'name-6',
         style: {
-          fillColor: 0Xffff00,
+          fillColor: 0xf55d54,
+          lineWidth: 2,
         },
       },
       {
@@ -235,8 +224,9 @@ const dataFlowDemo = function () {
         local_host: 'name-3',
         remote_host: 'name-8',
         style: {
-          fillColor: 0Xff0000,
+          fillColor: 0Xa3d89f,
           lineColor: 0xEEEEEE,
+          lineWidth: 1.2,
         },
       },
       {
@@ -244,8 +234,9 @@ const dataFlowDemo = function () {
         local_host: 'name-3',
         remote_host: 'name-4',
         style: {
-          fillColor: 0Xff0000,
+          fillColor: 0Xfcc242,
           lineColor: 0xEEEEEE,
+          lineWidth: 1,
         },
       },
       {
@@ -253,8 +244,9 @@ const dataFlowDemo = function () {
         local_host: 'name-6',
         remote_host: 'name-5',
         style: {
-          fillColor: 0Xff0000,
+          fillColor: 0xf55d54,
           lineColor: 0xEEEEEE,
+          lineWidth: 1,
         },
       },
       {
@@ -262,8 +254,9 @@ const dataFlowDemo = function () {
         local_host: 'name-6',
         remote_host: 'name-7',
         style: {
-          fillColor: 0Xff0000,
+          fillColor: 0Xa3d89f,
           lineColor: 0xEEEEEE,
+          lineWidth: 1,
         },
       },
       {
@@ -271,7 +264,8 @@ const dataFlowDemo = function () {
         local_host: 'name-6',
         remote_host: 'name-8',
         style: {
-          fillColor: 0Xffff00,
+          fillColor: 0Xfcc242,
+          lineWidth: 1,
         },
       },
       {
@@ -279,8 +273,9 @@ const dataFlowDemo = function () {
         local_host: 'name-5',
         remote_host: 'name-8',
         style: {
-          fillColor: 0Xff0000,
+          fillColor: 0xf55d54,
           lineColor: 0xEEEEEE,
+          lineWidth: 1,
         },
       },
       {
@@ -288,8 +283,9 @@ const dataFlowDemo = function () {
         local_host: 'name-7',
         remote_host: 'name-8',
         style: {
-          fillColor: 0Xff0000,
+          fillColor: 0Xa3d89f,
           lineColor: 0xEEEEEE,
+          // lineWidth: 1,
         },
       },
 
@@ -302,6 +298,9 @@ const dataFlowDemo = function () {
     node.name = device.name;
     node.x = device.location.x;
     node.y = device.location.y;
+    node.initStyle({
+      fillColor: 0Xff00000,
+    });
     network.addElement(node);
   });
   const nodes = network.getNodeObj();
@@ -316,6 +315,7 @@ const dataFlowDemo = function () {
       dataFlow.initStyle({
         fillColor: link.style.fillColor,
         lineColor: link.style.lineColor,
+        // lineWidth: link.style.lineWidth,
       });
       network.addElement(dataFlow);
     }
@@ -1028,10 +1028,10 @@ const simpleData = function () {
   network.moveCenter();
 };
 network.callback = () => {
-  // simpleData();
+  simpleData();
   // noData();
   // edgeGroupDemo();
-  dataFlowDemo();
+  // dataFlowDemo();
 };
 const body = document.getElementById('network');
 const zoomIn = document.querySelector('button.btn_zoomIn');

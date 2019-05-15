@@ -56,7 +56,7 @@ export class CommonAction {
     this.drag();
   }
 
-  public setSelect(condition: any) {
+  public setSelect(condition?: any) {
     this.container.removeAllListeners();
     this.container.cursor = 'crosshair';
     this.moveSelect(condition);
@@ -188,9 +188,11 @@ export class CommonAction {
     return groups;
   }
 
-  public moveSelect(condition: ICondition) {
-    this.isLock = condition.isLock;
-    this.isSelectGroup = condition.isSelectGroup;
+  public moveSelect(condition?: ICondition) {
+    if (condition) {
+      this.isLock = condition.isLock;
+      this.isSelectGroup = condition.isSelectGroup;
+    }
     this.container.on('mousedown', (event: any) => {
       this.onSelectStart(event);
     });
@@ -415,7 +417,5 @@ export class CommonAction {
       });
     }
     this.rectangle.clear();
-    this.isLock = false;
-    this.isSelectGroup = false;
   }
 }

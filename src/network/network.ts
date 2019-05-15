@@ -252,7 +252,7 @@ export class Network {
     this.action.dragContainer();
   }
 
-  public setSelect(condition: ICondition) {
+  public setSelect(condition?: ICondition) {
     this.isSelect = true;
     this.action.setSelect(condition);
   }
@@ -511,6 +511,17 @@ export class Network {
       this.drawEdgeGroup(edgeGroup);
     });
     _.each(dataFlowList, (dataFlow: DataFlow) => {
+      let defaultWidth;
+      if (dataFlow.invariableStyles && dataFlow.invariableStyles.lineWidth) {
+        defaultWidth = dataFlow.invariableStyles.lineWidth;
+      } else {
+        defaultWidth = dataFlow.defaultStyle.lineWidth;
+      }
+      if (this.zoom <= 1) {
+        dataFlow.setStyle({
+          lineWidth: defaultWidth * this.zoom,
+        });
+      }
       dataFlow.draw();
     });
     this.toggleLabel();
