@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import { CommonAction } from './common-action';
 import { Edge } from './edge';
+import { Group } from './group';
 import { Node } from './node';
 
 /**
@@ -56,20 +57,7 @@ export class PopMenu {
     if (this.isVisible) {
       const network = document.getElementById(this.domId);
       const idList: any = [];
-      const selectElement = event.target.parent;
-      const selectedNodes = this.action.getSelectNodes();
-      if (selectElement instanceof Node) {
-        if (selectedNodes.length < 2) {
-          this.action.removeHighLight();
-          this.action.setSelectNodes(selectElement);
-        } else {
-          this.action.setSelectNodes(selectElement);
-        }
-      } else if (selectElement instanceof Edge) {
-        this.action.removeHighLight();
-        this.action.setSelectEdge(selectElement);
-        selectElement.selectOn();
-      }
+      this.highlightElement(event);
       _.each(this.menuItems, (menu: any) => {
         idList.push(menu.id);
       });
@@ -191,5 +179,30 @@ export class PopMenu {
 
   public setMenuItems(menuItems: any) {
     this.menuItems = menuItems;
+  }
+
+  private highlightElement(event: any) {
+    const selectElement = event.target.parent;
+    const selectedNodes = this.action.getSelectNodes();
+    const selectGroups = this.action.getSelectGroups();
+    if (selectElement instanceof Node) {
+      if (selectedNodes.length < 2) {
+        this.action.removeHighLight();
+        this.action.setSelectNodes(selectElement);
+      } else {
+        this.action.setSelectNodes(selectElement);
+      }
+    } else if (selectElement instanceof Edge) {
+      this.action.removeHighLight();
+      this.action.setSelectEdge(selectElement);
+      selectElement.selectOn();
+    } else if (selectElement instanceof Group) {
+      if (selectGroups.length < 2) {
+        this.action.removeHighLight();
+        this.action.setSelectGroups(selectElement);
+      } else {
+        this.action.setSelectGroups(selectElement);
+      }
+    }
   }
 }

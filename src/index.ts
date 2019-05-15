@@ -944,7 +944,7 @@ const simpleData = function () {
             const node: any = network.getNodeObj();
             const startNode = node[edge.startNode.name];
             const endNode = node[edge.endNode.name];
-            network.clearHighlight();
+            // network.clearHighlight();
             network.setSelectNodes(startNode);
             network.setSelectNodes(endNode);
           } else if (id === '1') {

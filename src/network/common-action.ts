@@ -71,9 +71,18 @@ export class CommonAction {
     this.topo.setSelectedNodes(node);
   }
 
+  public setSelectGroups(group: Group) {
+    this.topo.setSelectedGroups(group);
+  }
+
   public getSelectEdge() {
     const selectEdge = this.topo.getSelectedEdge();
     return selectEdge;
+  }
+
+  public getSelectGroups() {
+    const selectGroups = this.topo.getSelectedGroups();
+    return selectGroups;
   }
 
   public setSelectEdge(edge: Edge) {
@@ -370,52 +379,55 @@ export class CommonAction {
   }
 
   private onSelectEnd() {
-    this.dragging = false;
-    this.isSelect = false;
-    this.data = null;
-    this.last = null;
-    const bounds = this.rectangle.getLocalBounds();
-    const elements = this.topo.getElements();
-    const groups = this.getGroups();
-    const selectNodes: Node[] = [];
-    _.each(elements, (element) => {
-      let node: any;
-      if (element instanceof Node) {
-        if (this.isLock && element.isLock) {
-          node = element;
-        } else if (!this.isLock && !element.isLock) {
-          node = element;
-        }
-      }
-      if (node) {
-        const sprite: any = node.getChildByName('node_sprite') ?
-          node.getChildByName('node_sprite') : node.getChildByName('node_graph');
-        if (sprite) {
-          const nodeTop = node.y - (sprite.height / 2);
-          const nodeLeft = node.x - (sprite.width / 2);
-          const nodeRight = node.x + (sprite.width / 2);
-          const nodeBottom = node.y + (sprite.height / 2);
-          if ((nodeTop >= bounds.top) && (nodeRight <= bounds.right) &&
-            (nodeBottom <= bounds.bottom) && (nodeLeft >= bounds.left)) {
-            this.topo.setSelectedNodes(node);
-            selectNodes.push(node);
+    if (event && (event as any).button === 0) {
+      this.dragging = false;
+      this.isSelect = false;
+      this.data = null;
+      this.last = null;
+      const bounds = this.rectangle.getLocalBounds();
+      const elements = this.topo.getElements();
+      const groups = this.getGroups();
+      const selectNodes: Node[] = [];
+      _.each(elements, (element) => {
+        let node: any;
+        if (element instanceof Node) {
+          if (this.isLock && element.isLock) {
+            node = element;
+          } else if (!this.isLock && !element.isLock) {
+            node = element;
           }
         }
-      }
-    });
-    if (this.isSelectGroup) {
-      const filterGroup = _.filter(groups, (group: Group) => {
-        const childNodes = group.getChildNodes();
-        return _.every(childNodes, (node: any) => {
-          const isInclude = _.includes(selectNodes, node);
-          return isInclude;
+        if (node) {
+          const sprite: any = node.getChildByName('node_sprite') ?
+            node.getChildByName('node_sprite') : node.getChildByName('node_graph');
+          if (sprite) {
+            const nodeTop = node.y - (sprite.height / 2);
+            const nodeLeft = node.x - (sprite.width / 2);
+            const nodeRight = node.x + (sprite.width / 2);
+            const nodeBottom = node.y + (sprite.height / 2);
+            if ((nodeTop >= bounds.top) && (nodeRight <= bounds.right) &&
+              (nodeBottom <= bounds.bottom) && (nodeLeft >= bounds.left)) {
+              this.topo.setSelectedNodes(node);
+              selectNodes.push(node);
+            }
+          }
+        }
+      });
+      if (this.isSelectGroup) {
+        const filterGroup = _.filter(groups, (group: Group) => {
+          const childNodes = group.getChildNodes();
+          return _.every(childNodes, (node: any) => {
+            const isInclude = _.includes(selectNodes, node);
+            return isInclude;
+          });
         });
-      });
-      this.removeHighLight();
-      _.each(filterGroup, (group: Group) => {
-        this.topo.setSelectedGroups(group);
-      });
+        this.removeHighLight();
+        _.each(filterGroup, (group: Group) => {
+          this.topo.setSelectedGroups(group);
+        });
+      }
+      this.rectangle.clear();
+
     }
-    this.rectangle.clear();
   }
 }
