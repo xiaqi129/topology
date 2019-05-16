@@ -41,7 +41,7 @@ export class Network {
     this.topo = new Topo();
     this.drawer = new Drawer(domRegex, this.topo);
     this.app = this.drawer.getWhiteBoard();
-    this.action = new CommonAction(this.app, this.topo);
+    this.action = new CommonAction(this.app, this.topo, domRegex);
     this.menu = new PopMenu(domRegex, this.app, this.action);
     this.zoom = 1;
     this.isSelect = false;

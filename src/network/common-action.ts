@@ -26,7 +26,6 @@ export class CommonAction {
   public container: PIXI.Container;
   private app: Application;
   private topo: ITopo;
-  private initScale: number | undefined;
   // bundle
   private nodeLabelFlag: boolean = true;
   // drag
@@ -39,11 +38,14 @@ export class CommonAction {
   private isSelect: boolean = false;
   private isLock: boolean = false;
   private isSelectGroup: boolean = false;
-  constructor(app: any, topo: ITopo) {
+  private domRegex: string;
+  private containerUp: boolean = false;
+  constructor(app: any, topo: ITopo, domRegex: string) {
     this.app = app;
     this.topo = topo;
     this.container = app.container;
-    document.addEventListener('mouseup', this.onSelectEnd.bind(this));
+    this.domRegex = domRegex;
+    document.addEventListener('mouseup', this.ondocumentEnd.bind(this), true);
   }
 
   public getCenter() {
@@ -206,6 +208,7 @@ export class CommonAction {
       this.onSelectStart(event);
     });
     this.container.on('mousemove', this.onSelectMove.bind(this));
+    this.container.on('mouseup', this.onSelectEnd.bind(this));
   }
 
   public setClick() {
@@ -358,6 +361,7 @@ export class CommonAction {
       this.isSelect = true;
       this.data = event.data;
       this.last = { parents: parent };
+      this.containerUp = false;
     }
   }
 
@@ -365,10 +369,29 @@ export class CommonAction {
     if (this.dragging && this.isSelect) {
       this.rectangle.clear();
       const newPosition = this.data.getLocalPosition(this.container.parent);
+      const network = document.getElementById(this.domRegex);
+      let adjustedX = newPosition.x;
+      let adjustedY = newPosition.y;
+      if (network) {
+        const borderTop = 1;
+        const borderRight = network.clientWidth - 1;
+        const borderBottom = network.clientHeight - 1;
+        const borderLeft = 1;
+        if (newPosition.x <= borderLeft) {
+          adjustedX = borderLeft;
+        } else if (newPosition.x >= borderRight) {
+          adjustedX = borderRight;
+        }
+        if (newPosition.y <= borderTop) {
+          adjustedY = borderTop;
+        } else if (newPosition.y >= borderBottom) {
+          adjustedY = borderBottom;
+        }
+      }
       const oldLeft = this.last.parents.x;
       const oldTop = this.last.parents.y;
-      const width = newPosition.x - oldLeft;
-      const height = newPosition.y - oldTop;
+      const width = adjustedX - oldLeft;
+      const height = adjustedY - oldTop;
       this.rectangle.lineStyle(1, 0X024997, 1);
       this.rectangle.alpha = 0.8;
       this.rectangle.drawRect(oldLeft, oldTop, width, height);
@@ -378,56 +401,57 @@ export class CommonAction {
     }
   }
 
-  private onSelectEnd() {
+  private ondocumentEnd() {
     if (event && (event as any).button === 0) {
       this.dragging = false;
       this.isSelect = false;
       this.data = null;
       this.last = null;
-      const bounds = this.rectangle.getLocalBounds();
-      const elements = this.topo.getElements();
-      const groups = this.getGroups();
-      const selectNodes: Node[] = [];
-      _.each(elements, (element) => {
-        let node: any;
-        if (element instanceof Node) {
-          if (this.isLock && element.isLock) {
-            node = element;
-          } else if (!this.isLock && !element.isLock) {
-            node = element;
-          }
-        }
-        if (node) {
-          const sprite: any = node.getChildByName('node_sprite') ?
-            node.getChildByName('node_sprite') : node.getChildByName('node_graph');
-          if (sprite) {
-            const nodeTop = node.y - (sprite.height / 2);
-            const nodeLeft = node.x - (sprite.width / 2);
-            const nodeRight = node.x + (sprite.width / 2);
-            const nodeBottom = node.y + (sprite.height / 2);
-            if ((nodeTop >= bounds.top) && (nodeRight <= bounds.right) &&
-              (nodeBottom <= bounds.bottom) && (nodeLeft >= bounds.left)) {
-              this.topo.setSelectedNodes(node);
-              selectNodes.push(node);
-            }
-          }
-        }
-      });
-      if (this.isSelectGroup) {
-        const filterGroup = _.filter(groups, (group: Group) => {
-          const childNodes = group.getChildNodes();
-          return _.every(childNodes, (node: any) => {
-            const isInclude = _.includes(selectNodes, node);
-            return isInclude;
-          });
-        });
-        this.removeHighLight();
-        _.each(filterGroup, (group: Group) => {
-          this.topo.setSelectedGroups(group);
-        });
+      if (!this.containerUp) {
+        this.onSelectEnd();
       }
       this.rectangle.clear();
+    }
+  }
 
+  private onSelectEnd() {
+    const bounds = this.rectangle.getLocalBounds();
+    const elements = this.topo.getElements();
+    const groups = this.getGroups();
+    const selectNodes: Node[] = [];
+    this.containerUp = true;
+    _.each(elements, (element) => {
+      if (element instanceof Node) {
+        const sprite: any = element.getSprite();
+        if (sprite) {
+          const nodeTop = element.y - (sprite.height / 2);
+          const nodeLeft = element.x - (sprite.width / 2);
+          const nodeRight = element.x + (sprite.width / 2);
+          const nodeBottom = element.y + (sprite.height / 2);
+          if ((nodeTop >= bounds.top) && (nodeRight <= bounds.right) &&
+            (nodeBottom <= bounds.bottom) && (nodeLeft >= bounds.left)) {
+            selectNodes.push(element);
+          }
+        }
+      }
+    });
+    _.each(selectNodes, (node: Node) => {
+      if (this.isLock === node.isLock) {
+        this.topo.setSelectedNodes(node);
+      }
+    });
+    if (this.isSelectGroup) {
+      const filterGroup = _.filter(groups, (group: Group) => {
+        const childNodes = group.getChildNodes();
+        return _.every(childNodes, (node: any) => {
+          const isInclude = _.includes(selectNodes, node);
+          return isInclude;
+        });
+      });
+      this.removeHighLight();
+      _.each(filterGroup, (group: Group) => {
+        this.topo.setSelectedGroups(group);
+      });
     }
   }
 }
