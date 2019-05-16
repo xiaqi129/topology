@@ -504,7 +504,7 @@ export class Network {
     _.each(groupObj, (group: Group) => {
       this.drawGroup(group);
       if (this.isLayer) {
-        this.layerGroup(group);
+        group.layerHideNodes(this.zoom);
       }
     });
     _.each(edgeGroups, (edgeGroup: EdgeGroup) => {
@@ -530,54 +530,6 @@ export class Network {
   set layerHide(flag: boolean) {
     this.isLayer = flag;
     this.reDraw();
-  }
-
-  private layerGroup(group: Group) {
-    if (this.zoom <= 0.6) {
-      if (group.substratumInfo.length === 0 && group.childNodesList.length > 1) {
-        const showNodesList = _.drop(group.childNodesList);
-        let showEdgeList: Edge[] = [];
-        let groups: Group[] = [];
-        if (showNodesList) {
-          const showNodes: any = _.flattenDeep(showNodesList);
-          _.each(showNodes, (node: Node) => {
-            node.visible = true;
-            showEdgeList = _.concat(showEdgeList, node.linksArray);
-            groups = _.concat(groups, node.incluedGroups);
-          });
-          _.each(showEdgeList, (edge: Edge) => {
-            edge.visible = true;
-          });
-          groups = _.uniq(groups);
-          const index = showNodesList.length;
-          let hideNodeList: any[] = [];
-          let hideEdge: Edge[] = [];
-          if (this.zoom <= 0.5 && index > 0 && this.zoom > 0.3) {
-            hideNodeList = _.flattenDeep(_.takeRight(showNodesList));
-          } else if (this.zoom <= 0.3 && index - 1 > 0 && this.zoom > 0.2) {
-            hideNodeList = _.flattenDeep(_.takeRight(showNodesList, 2));
-          } else if (this.zoom <= 0.2 && index - 2 > 0 && this.zoom > 0.1) {
-            hideNodeList = _.flattenDeep(_.takeRight(showNodesList, 3));
-          } else if (this.zoom <= 0.1) {
-            hideNodeList = _.flattenDeep(showNodesList);
-          }
-          if (hideNodeList.length === 0 && this.zoom < 0.5) {
-            hideNodeList = _.flattenDeep(showNodesList);
-          }
-          _.each(hideNodeList, (node: Node) => {
-            node.visible = false;
-            hideEdge = _.concat(hideEdge, node.linksArray);
-
-          });
-          _.each(hideEdge, (edge: Edge) => {
-            edge.visible = false;
-          });
-        }
-        _.each(groups, (g: Group) => {
-          g.draw();
-        });
-      }
-    }
   }
 
   private toggleLabel() {

@@ -52,6 +52,8 @@ export class Group extends CommonElement {
   // analyze children nodes array
   public childNodesList: Node[][] = [];
   public linksArray: Edge[] = [];
+  // layer hide nodes
+  public isLayer: boolean = true;
   private edgeResource: IedgeResource[] = [];
   private labelStyle: any;
   private toggleExpanded: boolean = false;
@@ -1000,6 +1002,56 @@ export class Group extends CommonElement {
       } else {
         const textLength = _.ceil(label.text.length / 2);
         label.style.fontSize = nodeWidth / textLength;
+      }
+    }
+  }
+
+  public layerHideNodes(zoom: number) {
+    if (zoom <= 0.6) {
+      if (this.substratumInfo.length === 0 && this.childNodesList.length > 1) {
+        const showNodesList = _.drop(this.childNodesList);
+        let showEdgeList: Edge[] = [];
+        let groups: Group[] = [];
+        if (showNodesList) {
+          const showNodes: any = _.flattenDeep(showNodesList);
+          _.each(showNodes, (node: Node) => {
+            node.visible = true;
+            showEdgeList = _.concat(showEdgeList, node.linksArray);
+            groups = _.concat(groups, node.incluedGroups);
+          });
+          _.each(showEdgeList, (edge: Edge) => {
+            edge.visible = true;
+          });
+          groups = _.uniq(groups);
+          const index = showNodesList.length;
+          let hideNodeList: any[] = [];
+          let hideEdge: Edge[] = [];
+          if (this.isLayer) {
+            if (zoom <= 0.5 && index > 0 && zoom > 0.3) {
+              hideNodeList = _.flattenDeep(_.takeRight(showNodesList));
+            } else if (zoom <= 0.3 && index - 1 > 0 && zoom > 0.2) {
+              hideNodeList = _.flattenDeep(_.takeRight(showNodesList, 2));
+            } else if (zoom <= 0.2 && index - 2 > 0 && zoom > 0.1) {
+              hideNodeList = _.flattenDeep(_.takeRight(showNodesList, 3));
+            } else if (zoom <= 0.1) {
+              hideNodeList = _.flattenDeep(showNodesList);
+            }
+            if (hideNodeList.length === 0 && zoom < 0.5) {
+              hideNodeList = _.flattenDeep(showNodesList);
+            }
+            _.each(hideNodeList, (node: Node) => {
+              node.visible = false;
+              hideEdge = _.concat(hideEdge, node.linksArray);
+
+            });
+            _.each(hideEdge, (edge: Edge) => {
+              edge.visible = false;
+            });
+          }
+        }
+        _.each(groups, (g: Group) => {
+          g.draw();
+        });
       }
     }
   }

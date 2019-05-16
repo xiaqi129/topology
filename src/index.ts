@@ -992,7 +992,8 @@ const simpleData = function () {
         { label: 'Extened a group', id: '1' },
         { label: 'Lock/Unlock Group', id: '2' },
         { label: 'Remove Group', id: '3' },
-        { label: 'Debug', id: '4' },
+        { label: 'Not Layer Hide Nodes', id: '4' },
+        { label: 'Debug', id: '5' },
       ]);
       network.menu.menuOnAction = (id) => {
         if (id === '0') {
@@ -1011,6 +1012,9 @@ const simpleData = function () {
         } else if (id === '3') {
           network.removeElements(newGroup);
         } else if (id === '4') {
+          newGroup.isLayer = false;
+          newGroup.layerHideNodes(network.zoom);
+        } else if (id === '5') {
           // tslint:disable-next-line:no-console
           console.log(newGroup);
         }
