@@ -573,6 +573,9 @@ export class Network {
         if (this.zoom <= 1.5 && this.zoom >= 0.3) {
           node.iconWidth = NP.times(node.defaultWidth, this.zoom);
           node.iconHeight = NP.times(node.defaultHeight, this.zoom);
+        } else if (this.zoom < 0.3) {
+          node.iconWidth = NP.times(node.defaultWidth, 0.3);
+          node.iconHeight = NP.times(node.defaultHeight, 0.3);
         }
         node.drawSprite(node.icon);
       }
