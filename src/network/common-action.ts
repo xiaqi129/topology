@@ -293,17 +293,16 @@ export class CommonAction {
       element.off('mousemove');
       element.isLock = true;
     } else if (element instanceof Group) {
-      element.draw();
       const nodes = element.expandedVisibleNodes;
       const substratumGroups = element.substratumInfo;
       const graph = _.find(element.children, (g) => {
         return g instanceof PIXI.Graphics;
       });
       _.each(nodes, (node: Node) => {
-        node.off('mousemove');
         node.removeNodeMark('lock');
         node.addNodeMark('lock', 'top-right', 12, 12);
-        element.isLock = true;
+        node.off('mousemove');
+        node.isLock = true;
       });
       if (graph) {
         graph.off('mousemove');

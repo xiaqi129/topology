@@ -32,6 +32,7 @@ export class Node extends CommonElement {
   public defaultWidth: number = 20;
   public defaultHeight: number = 20;
   public linksArray: Edge[] = [];
+  public markList: IMark[] = [];
   private parentNode: Group | null = null;
   private data: any;
   private elements: Edge | CommonElement[];
@@ -39,7 +40,6 @@ export class Node extends CommonElement {
   private dragging: boolean;
   private last: any;
   private labelStyle: {} = {};
-  private markList: IMark[] = [];
 
   constructor(
     elements: CommonElement[],
@@ -401,6 +401,9 @@ export class Node extends CommonElement {
     const excessSprite = this.getChildByName(`node_${icon}`);
     if (excessSprite) {
       this.removeChild(excessSprite);
+      _.remove(this.markList, (mark: IMark) => {
+        return mark.name === icon;
+      });
     }
     const txture = PIXI.Texture.fromFrame(icon);
     const addSprite = new PIXI.Sprite(txture);

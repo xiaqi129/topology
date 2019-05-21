@@ -532,16 +532,32 @@ export class Network {
     this.reDraw();
   }
 
-  private toggleLabel() {
-    if (this.zoom < 1) {
-      this.nodeLabelToggle(false);
+  private toggleLabel(nodeVisibleZoom?: number, edgeVisibleZoom?: number) {
+    if (nodeVisibleZoom) {
+      if (this.zoom < nodeVisibleZoom) {
+        this.nodeLabelToggle(false);
+      } else {
+        this.nodeLabelToggle(true);
+      }
     } else {
-      this.nodeLabelToggle(true);
+      if (this.zoom < 1) {
+        this.nodeLabelToggle(false);
+      } else {
+        this.nodeLabelToggle(true);
+      }
     }
-    if (this.zoom < 2) {
-      this.edgeLabelToggle(false);
+    if (edgeVisibleZoom) {
+      if (this.zoom < edgeVisibleZoom) {
+        this.edgeLabelToggle(false);
+      } else {
+        this.edgeLabelToggle(true);
+      }
     } else {
-      this.edgeLabelToggle(true);
+      if (this.zoom < 2) {
+        this.edgeLabelToggle(false);
+      } else {
+        this.edgeLabelToggle(true);
+      }
     }
   }
 
@@ -574,22 +590,22 @@ export class Network {
   }
 
   private drawGroup(group: Group) {
-    const defaultOpacity = group.invariableStyles.fillOpacity;
+    // const defaultOpacity = group.invariableStyles.fillOpacity;
     const defaultLineWidth = group.invariableStyles.lineWidth;
     if (this.zoom > 1) {
       group.setStyle({
-        fillOpacity: defaultOpacity,
+        // fillOpacity: defaultOpacity,
         lineWidth: defaultLineWidth,
       });
     } else if (this.zoom <= 1 && this.zoom > 0.5) {
       group.setStyle({
-        fillOpacity: defaultOpacity * this.zoom,
+        // fillOpacity: defaultOpacity * this.zoom,
         lineWidth: defaultLineWidth / this.zoom,
       });
 
     } else {
       group.setStyle({
-        fillOpacity: defaultOpacity * 0.5,
+        // fillOpacity: defaultOpacity * 0.5,
         lineWidth: defaultLineWidth / 0.5,
       });
     }
