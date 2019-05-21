@@ -53,13 +53,17 @@ export class CommonAction {
   }
 
   public dragContainer() {
-    this.container.removeAllListeners();
+    this.container.removeListener('mousedown');
+    this.container.removeListener('mousemove');
+    this.container.removeListener('mouseup');
     this.container.cursor = 'default';
     this.drag();
   }
 
   public setSelect(condition?: any) {
-    this.container.removeAllListeners();
+    this.container.removeListener('mousedown');
+    this.container.removeListener('mousemove');
+    this.container.removeListener('mouseup');
     this.container.cursor = 'crosshair';
     this.moveSelect(condition);
   }
@@ -108,22 +112,19 @@ export class CommonAction {
 
   public drag() {
     this.container.on('mousedown', (event: any) => {
-      this.removeHighLight();
-      this.cleanGroup();
       this.onDragStart(event);
-      this.container.cursor = 'move';
     });
     this.container.on('mousemove', (event: any) => {
       this.onDragMove(event);
-    });
-    this.container.on('mouseup', () => {
-      this.container.cursor = 'default';
     });
     this.container.on('mouseup', this.onDragEnd.bind(this));
   }
 
   public onDragStart(event: PIXI.interaction.InteractionEvent) {
     const parent = this.container.parent.toLocal(event.data.global);
+    this.removeHighLight();
+    this.cleanGroup();
+    this.container.cursor = 'move';
     this.dragging = true;
     this.data = event.data;
     this.last = { parents: parent };
@@ -156,6 +157,7 @@ export class CommonAction {
   }
 
   public onDragEnd() {
+    this.container.cursor = 'default';
     const edges = this.getChildEdges();
     const groups = this.getOtherElements();
     _.each(groups, (group) => {

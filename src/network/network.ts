@@ -570,7 +570,7 @@ export class Network {
         }));
         node.drawGraph();
       } else {
-        if (this.zoom <= 1.5) {
+        if (this.zoom <= 1.5 && this.zoom >= 0.3) {
           node.iconWidth = NP.times(node.defaultWidth, this.zoom);
           node.iconHeight = NP.times(node.defaultHeight, this.zoom);
         }
