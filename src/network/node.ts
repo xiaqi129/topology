@@ -324,13 +324,6 @@ export class Node extends CommonElement {
     if (style) {
       _.extend(this.labelStyle, style);
     }
-    if (content && content.length > 30) {
-      _.extend(this.labelStyle, {
-        breakWords: true,
-        wordWrap: true,
-        wordWrapWidth: content.length * 2.5,
-      });
-    }
     const oldLabel = this.getChildByName('node_label');
     const sprite: any = this.getChildByName('node_sprite') ?
       this.getChildByName('node_sprite') : this.getChildByName('node_graph');
@@ -341,11 +334,7 @@ export class Node extends CommonElement {
       const label = new Label(content, this.labelStyle);
       label.name = 'node_label';
       if (sprite) {
-        if (sprite.name === 'node_graph') {
-          label.y = this.defaultStyle.width + 10;
-        } else if (sprite.name === 'node_sprite') {
-          label.y = sprite.height;
-        }
+        label.anchor.set(0.5, 0.5);
       }
       this.addChild(label);
       this.labelContent = label.text;
