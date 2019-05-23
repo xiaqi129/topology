@@ -94,7 +94,7 @@ export class Network {
             this.zoomNetworkElements(NP.plus(zoom, 0.1));
           } else if (zoom <= 4.8 && zoom >= 1) {
             this.zoomNetworkElements(NP.plus(zoom, 0.2));
-          } else if (zoom < 0.1 && zoom >= 0.01) {
+          } else if (zoom < 0.1 && zoom >= 0) {
             this.zoomNetworkElements(NP.plus(zoom, 0.01));
           } else if (zoom > 4.8 && zoom <= 5) {
             this.zoomNetworkElements(NP.plus(zoom, 0.2));
@@ -309,7 +309,6 @@ export class Network {
 
   public syncView() {
     this.drawer.syncView();
-    this.action.setClick();
     if (this.zoom < 3) {
       this.edgeLabelToggle(false);
     }

@@ -124,6 +124,7 @@ export class Node extends CommonElement {
     if (!(this.selectedNodes.length > 0 && isInSelect)) {
       _.remove(this.selectedNodes);
     }
+    event.stopPropagation();
     this.dragging = true;
     this.data = event.data;
     this.last = { parents: parent, x: event.data.global.x, y: event.data.global.y };

@@ -1,6 +1,5 @@
 import * as _ from 'lodash';
 import NP from 'number-precision';
-// import { Labeler } from './network/lib/labeler';
 import { Network } from './network/network';
 import { data as topoData } from './simpleData';
 const iconResource = {
@@ -43,7 +42,7 @@ const network = new Network('network');
 network.initIconResource(iconResource);
 // tslint:disable-next-line:only-arrow-functions
 const noData = function () {
-  const num = 1000;
+  const num = 6000;
   for (let i: number = 0, len: number = num; i < len;) {
     i += 1;
     const node = network.createNode('cisco-ASR9');
@@ -1028,6 +1027,7 @@ const simpleData = function () {
   network.syncView();
   network.setDrag();
   network.setZoom();
+  network.setClick();
   network.setBundelExpanded(false);
   network.moveCenter();
 };
