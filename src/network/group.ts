@@ -573,7 +573,7 @@ export class Group extends CommonElement {
     return graph;
   }
 
-  public getMaxSize(nodes: Node[]) {
+  public getMinSize(nodes: Node[]) {
     const nodeSize = _.map(nodes, (node) => {
       if (node instanceof Node) {
         if (!node) {
@@ -582,17 +582,17 @@ export class Group extends CommonElement {
         return [node.getWidth(), node.getHeight()];
       }
     });
-    return _.max(_.flatten(nodeSize)) || 0;
+    return _.min(_.flatten(nodeSize)) || 0;
   }
 
-  public getNodesMaxSize() {
+  public getNodesMinSize() {
     const nodes = this.expandedVisibleNodes;
-    const size = this.getMaxSize(nodes);
+    const size = this.getMinSize(nodes);
     return size;
   }
 
   public drawHull(graph: PIXI.Graphics, vertexPointsNumber: number[][]) {
-    const size = this.getNodesMaxSize();
+    const size = this.getNodesMinSize();
     const polygonObject: any = new polygon(vertexPointsNumber);
     const rectVertexPoints = polygonObject.toArray();
     const hulls = this.getHulls(rectVertexPoints);
@@ -603,7 +603,7 @@ export class Group extends CommonElement {
   }
 
   public drawPolygonOutline(graph: PIXI.Graphics, vertexPointsNumber: number[][]) {
-    const size = this.getNodesMaxSize();
+    const size = this.getNodesMinSize();
     const padding = size + this.defaultStyle.padding;
     if (vertexPointsNumber.length > 2) {
       this.drawHull(graph, vertexPointsNumber);
@@ -641,7 +641,7 @@ export class Group extends CommonElement {
   }
 
   public drawEllipseOutline(graph: PIXI.Graphics, vertexPointsNumber: number[][]) {
-    const size = this.getNodesMaxSize();
+    const size = this.getNodesMinSize();
     const padding = size + this.defaultStyle.padding;
     if (vertexPointsNumber.length > 1) {
       const polygonObject: any = new polygon(vertexPointsNumber);
@@ -666,7 +666,7 @@ export class Group extends CommonElement {
   }
 
   public drawRectOutline(graph: PIXI.Graphics, vertexPointsNumber: number[][]) {
-    const size = this.getNodesMaxSize();
+    const size = this.getNodesMinSize();
     const padding = size + this.defaultStyle.padding;
     if (vertexPointsNumber.length > 1) {
       const polygonObject: any = new polygon(vertexPointsNumber);
