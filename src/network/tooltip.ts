@@ -20,17 +20,17 @@ export class Tooltip {
 
   public addTooltip(ele: CommonElement, content: string, style?: any) {
     if (ele instanceof Node) {
-      ele.addEventListener('mouseover', (event: any) => {
+      ele.on('mouseover', (event: any) => {
         this.nodeTooltipOn(content, style);
         this.tooltipMove(event);
       });
     } else if (ele instanceof Edge) {
-      ele.addEventListener('mouseover', (event: any) => {
+      ele.on('mouseover', (event: any) => {
         this.edgeTooltipOn(content, style);
         this.tooltipMove(event);
       });
     }
-    ele.addEventListener('mouseout', (event: any) => {
+    ele.on('mouseout', (event: any) => {
       this.clearTooltip();
     });
   }

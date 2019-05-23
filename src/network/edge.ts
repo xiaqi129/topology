@@ -43,6 +43,8 @@ export class Edge extends CommonElement {
     endNode.linksArray.push(this);
     this.labelStyle = {};
     this.labelContent = [];
+    this.interactive = true;
+    this.buttonMode = true;
     this.draw();
     this.tooltip = new Tooltip(domRegex);
   }
@@ -788,7 +790,8 @@ export class Edge extends CommonElement {
   }
 
   public setTooltip(content?: string, style?: any) {
-    this.removeAllListeners();
+    this.removeListener('mouseover');
+    this.removeListener('mouseout');
     this.tooltip.addTooltip(this, content || `${this.startNode.id}  >>>>  ${this.endNode.id}`, style);
   }
 

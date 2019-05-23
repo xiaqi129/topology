@@ -82,6 +82,8 @@ export class Group extends CommonElement {
     this.labelStyle = {};
     this.emptyObj = emptyObj;
     this.edgeResource = this.getEdgeResource();
+    this.interactive = true;
+    this.buttonMode = true;
     this.draw();
     document.addEventListener('mouseup', this.onDragEnd.bind(this));
   }
@@ -691,7 +693,6 @@ export class Group extends CommonElement {
     const vertexPointsNumber = this.getGroupVertexNumber();
     const pointsCount = vertexPointsNumber.length;
     const graph = this.createOutlineGraphic();
-    this.interactive = true;
     this.setOutlineGraphicStyle(graph);
     if (pointsCount === 0) {
       return false;
@@ -775,7 +776,6 @@ export class Group extends CommonElement {
       const emptyInfo = this.emptyObj;
       const style = this.defaultStyle;
       graph.name = this.polygonHullOutlineName;
-      this.interactive = true;
       graph.interactive = true;
       graph.buttonMode = true;
       this.addChild(graph);

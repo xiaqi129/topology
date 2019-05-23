@@ -55,6 +55,8 @@ export class Node extends CommonElement {
     this.icon = icon;
     this.draw();
     this.tooltip = new Tooltip(domRegex);
+    this.interactive = true;
+    this.buttonMode = true;
     this
       .on('mousedown', this.onDragStart)
       .on('mouseup', this.onDragEnd)
@@ -317,6 +319,8 @@ export class Node extends CommonElement {
   }
 
   public setTooltip(content: string, style?: any) {
+    this.removeListener('mouseover');
+    this.removeListener('mouseout');
     this.tooltip.addTooltip(this, content, style);
   }
 

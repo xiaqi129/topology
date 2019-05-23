@@ -691,8 +691,8 @@ const simpleData = function () {
     const client = device.clients.User_Mark;
     if (!(client === 'Hidden')) {
       const node = network.createNode('cisco-ASR9');
-      const sprite: any = node.getChildByName('node_sprite');
-      sprite.tint = 0x000000;
+      // const sprite: any = node.getChildByName('node_sprite');
+      // sprite.tint = 0x000000;
       node.setNodeSize(25, 25);
       node.name = device.name;
       node.clients = device.clients;
@@ -764,7 +764,7 @@ const simpleData = function () {
       //     r: radius,
       //   });
       // }
-      node.setTooltip(tooltipContent, commonStyles);
+      // node.setTooltip(tooltipContent, commonStyles);
       node.on('rightclick', (event: any) => {
         network.menu.setMenuItems([
           { label: 'Aggregated as a group', id: '0' },
@@ -931,7 +931,7 @@ const simpleData = function () {
         lineWidth: 1,
       });
       edge.setTooltip(linkTooltipContent, commonStyles);
-      edge.edge.on('rightclick', (event: any) => {
+      edge.on('rightclick', (event: any) => {
         network.menu.setMenuItems([
           { label: 'Select its neighbors', id: '0' },
           { label: 'Hide/Unhide this links', id: '1' },
@@ -1027,7 +1027,7 @@ const simpleData = function () {
   network.syncView();
   network.setDrag();
   network.setZoom();
-  network.setClick();
+  // network.setClick();
   network.setBundelExpanded(false);
   network.moveCenter();
 };
