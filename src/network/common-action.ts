@@ -193,10 +193,11 @@ export class CommonAction {
     return filterElements;
   }
 
-  public getGroups(): Group[] {
+  public getGroups() {
     const elements: any = this.topo.getElements();
     const groups = _.filter(elements, (element) => {
-      return element instanceof Group && element.getChildNodes().length > 0;
+      return ((element instanceof Group && element.getChildNodes().length > 0) ||
+        element instanceof EdgeGroup && element.childrenEdge.length > 0);
     });
     return groups;
   }
@@ -244,7 +245,7 @@ export class CommonAction {
             edges.selectOn();
           });
         });
-      } else if (element instanceof Group) {
+      } else if (element instanceof Group || element instanceof EdgeGroup) {
         element.addEventListener('click', (event: PIXI.interaction.InteractionEvent) => {
           event.stopPropagation();
           this.removeHighLight();
@@ -278,7 +279,7 @@ export class CommonAction {
 
   public cleanGroup() {
     const selectGroups = this.topo.getSelectedGroups();
-    _.each(selectGroups, (group: Group) => {
+    _.each(selectGroups, (group: any) => {
       group.selectOff();
     });
     this.topo.removeSelectedGroups();
@@ -442,7 +443,7 @@ export class CommonAction {
       }
     });
     if (this.isSelectGroup) {
-      const filterGroup = _.filter(groups, (group: Group) => {
+      const filterGroup = _.filter(groups, (group: any) => {
         const childNodes = group.getChildNodes();
         return _.every(childNodes, (node: any) => {
           const isInclude = _.includes(selectNodes, node);

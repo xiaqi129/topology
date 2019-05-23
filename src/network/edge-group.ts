@@ -30,6 +30,8 @@ export class EdgeGroup extends CommonElement {
     this.elements = elements;
     this.polygon = new PIXI.Graphics();
     this.polygon.name = 'edge_group';
+    this.interactive = true;
+    this.buttonMode = true;
     this.setDrag();
   }
 
@@ -152,6 +154,30 @@ export class EdgeGroup extends CommonElement {
       return e === edge;
     });
     this.draw();
+  }
+
+  public selectOn() {
+    this.setStyle({
+      lineColor: 0Xf5bd71,
+      lineWidth: 3,
+    });
+  }
+
+  public selectOff() {
+    const initStyle = this.invariableStyles;
+    this.setStyle({
+      lineColor: initStyle.lineColor,
+      lineWidth: initStyle.lineWidth,
+    });
+  }
+
+  public getChildNodes() {
+    const nodes: Node[] = [];
+    _.each(this.childrenEdge, (edge: Edge) => {
+      nodes.push(edge.startNode);
+      nodes.push(edge.endNode);
+    });
+    return _.uniq(nodes);
   }
 
   private updateLabelPos() {

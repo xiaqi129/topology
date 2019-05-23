@@ -674,6 +674,7 @@ const edgeGroupDemo = function () {
   network.syncView();
   network.setDrag();
   network.setZoom();
+  network.setClick();
   network.setBundelExpanded(false);
   network.moveCenter();
 };
@@ -1032,9 +1033,9 @@ const simpleData = function () {
   network.moveCenter();
 };
 network.callback = () => {
-  simpleData();
+  // simpleData();
   // noData();
-  // edgeGroupDemo();
+  edgeGroupDemo();
   // dataFlowDemo();
 };
 const body = document.getElementById('network');
