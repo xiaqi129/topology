@@ -92,6 +92,7 @@ export class EdgeGroup extends CommonElement {
       label.y = labelPos.y;
       this.addChild(label);
       this.labelContent = label.text;
+      return label;
     }
   }
 

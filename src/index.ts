@@ -1027,7 +1027,7 @@ const simpleData = function () {
   network.syncView();
   network.setDrag();
   network.setZoom();
-  // network.setClick();
+  network.setClick();
   network.setBundelExpanded(false);
   network.moveCenter();
 };
