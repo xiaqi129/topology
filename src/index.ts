@@ -1021,9 +1021,9 @@ const simpleData = function () {
   network.moveCenter();
 };
 network.callback = () => {
-  simpleData();
+  // simpleData();
   // noData();
-  // edgeGroupDemo();
+  edgeGroupDemo();
   // dataFlowDemo();
 };
 const body = document.getElementById('network');
