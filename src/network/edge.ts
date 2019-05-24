@@ -13,6 +13,18 @@ import { Label } from './label';
 import { Node } from './node';
 import { Tooltip } from './tooltip';
 
+export interface IPoint {
+  x: number;
+  y: number;
+}
+
+export interface IResultsPoints {
+  sLeft: IPoint;
+  sRight: IPoint;
+  eRight: IPoint;
+  eLeft: IPoint;
+}
+
 const Point = PIXI.Point;
 
 export class Edge extends CommonElement {
@@ -84,47 +96,33 @@ export class Edge extends CommonElement {
     return { x, y };
   }
 
-  public calcEdgePoints(start: any, end: any, lineWidth: number) {
+  public calcEdgePoints(start: any, end: any) {
+    const lineWidth = this.defaultStyle.lineWidth;
+    const lineDistance = this.defaultStyle.bezierLineDistance;
+    const angle = this.getAngle();
     const half = lineWidth * 0.5;
-    let sLeft = {};
-    let sRight = {};
-    let eRight: any = {};
-    let eLeft: any = {};
-    const sX = start.x;
-    const sY = start.y;
-    const eX = end.x;
-    const eY = end.y;
-    const results: any = {};
-    if ((sX < eX && sY < eY) ||
-      (sX > eX && sY > eY)) {
-      sLeft = new Point(sX - half, sY + half);
-      sRight = new Point(sX + half, sY - half);
-      eRight = new Point(eX + half, eY - half);
-      eLeft = new Point(eX - half, eY + half);
-    } else if ((sX > eX && sY < eY) ||
-      (sX < eX && sY > eY)) {
-      sLeft = new Point(sX - half, sY - half);
-      sRight = new Point(sX + half, sY + half);
-      eRight = new Point(eX + half, eY + half);
-      eLeft = new Point(eX - half, eY - half);
-    } else if (sX === eX &&
-      (sY > eY || sY < eY)) {
-      sLeft = new Point(sX - half, sY);
-      sRight = new Point(sX + half, sY);
-      eRight = new Point(eX + half, eY);
-      eLeft = new Point(eX - half, eY);
-    } else if (sY === eY &&
-      (sX < eX || sX > eX)) {
-      sLeft = new Point(sX, sY + half);
-      sRight = new Point(sX, sY - half);
-      eRight = new Point(eX, eY - half);
-      eLeft = new Point(eX, eY + half);
-    }
+    let sX = start.x;
+    let sY = start.y;
+    let eX = end.x;
+    let eY = end.y;
+    sX = start.x + Math.cos(angle) * lineDistance;
+    sY = start.y - Math.sin(angle) * lineDistance;
+    eX = end.x + Math.cos(angle) * lineDistance;
+    eY = end.y - Math.sin(angle) * lineDistance;
+    const results: IResultsPoints = {
+      sLeft: { x: 0, y: 0 },
+      sRight: { x: 0, y: 0 },
+      eRight: { x: 0, y: 0 },
+      eLeft: { x: 0, y: 0 },
+    };
+    const sLeft = new Point(sX - Math.cos(angle) * half, sY + Math.sin(angle) * half);
+    const sRight = new Point(sX + Math.cos(angle) * half, sY - Math.sin(angle) * half);
+    const eRight = new Point(eX + Math.cos(angle) * half, eY - Math.sin(angle) * half);
+    const eLeft = new Point(eX - Math.cos(angle) * half, eY + Math.sin(angle) * half);
     results.sLeft = sLeft;
     results.sRight = sRight;
     results.eRight = eRight;
     results.eLeft = eLeft;
-
     return results;
   }
 
@@ -274,7 +272,7 @@ export class Edge extends CommonElement {
   }
 
   public drawBezierCurve(
-    graph: any, points: any, angle: number, curveDistance: number = 10, curveDegree: number = 50) {
+    graph: any, points: any, angle: number, curveDistance: number, curveDegree: number) {
     const style = this.defaultStyle;
     graph.lineStyle(0, style.lineColor);
     // const srcPointX = points.shift() + curveDistance * Math.cos(angle);
@@ -357,7 +355,7 @@ export class Edge extends CommonElement {
       const srcY = Number(point[1]);
       const endX = Number(point[2]);
       const endY = Number(point[3]);
-      const linePoints = this.calcEdgePoints({ x: srcX, y: srcY }, { x: endX, y: endY }, style.lineWidth);
+      const linePoints = this.calcEdgePoints({ x: srcX, y: srcY }, { x: endX, y: endY });
       graph.lineStyle(1, style.lineColor);
       graph.beginFill(style.lineColor, style.bezierOacity);
       graph.moveTo(linePoints.sLeft.x, linePoints.sLeft.y);
@@ -481,7 +479,7 @@ export class Edge extends CommonElement {
 
   public createLinkEdge(srcNodePos: any, endNodePos: any, style: any) {
     const points = this.calcEdgePoints(
-      srcNodePos, endNodePos, style.lineWidth);
+      srcNodePos, endNodePos);
     this.drawEdge(this.edge, points);
     const polygonData: number[] = [];
     _.each(points, (point) => {
@@ -496,7 +494,7 @@ export class Edge extends CommonElement {
       srcNodePos, endNodePos, style.lineWidth);
     const polygonData: number[] = [];
     const points = this.calcEdgePoints(
-      srcNodePos, endNodePos, style.lineWidth);
+      srcNodePos, endNodePos);
     _.each(points, (point) => {
       polygonData.push(point.x, point.y);
     });

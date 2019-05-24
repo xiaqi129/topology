@@ -169,6 +169,7 @@ export class Topo implements ITopo {
         element.brotherEdges = edges;
         if (edges.length > 0) {
           edgeBundle = new EdgeBundle(element);
+          edgeBundle.defaultStyle = element.defaultStyle;
           edgeBundle.setStyle({
             fillColor: 0X0081cf,
           });

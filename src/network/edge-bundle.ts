@@ -137,11 +137,15 @@ export class EdgeBundle extends CommonElement {
 
   public setBundleEdgesPosition() {
     const edges = this.children;
+    const bundleStyle = this.defaultStyle.bundleStyle;
     const distance = 2;
     const degree = 15;
-    const distanceStep = 1;
     const degreeStep = 8;
     const values: number[][] = [];
+    let distanceStep = 4;
+    if (bundleStyle === 1) {
+      distanceStep = 0;
+    }
     const isSameDirection = _.every(edges, (edg: Edge) => {
       return edg.startNode === this.startNode;
     });
@@ -156,12 +160,21 @@ export class EdgeBundle extends CommonElement {
     });
     _.each(this.children, (edge, i) => {
       if (edge instanceof Edge) {
-        edge.setStyle({
-          bezierLineDistance: values[i][0],
-          bezierLineDegree: values[i][1],
-          lineType: 1,
-          arrowType: 3,
-        });
+        if (bundleStyle === 1) {
+          edge.setStyle({
+            bezierLineDistance: values[i][0],
+            bezierLineDegree: values[i][1],
+            lineType: 1,
+            arrowType: 3,
+          });
+        } else {
+          edge.setStyle({
+            bezierLineDistance: values[i][0],
+            bezierLineDegree: values[i][1],
+            lineType: 0,
+            arrowType: 3,
+          });
+        }
       }
     });
   }

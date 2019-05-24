@@ -42,21 +42,21 @@ const network = new Network('network');
 network.initIconResource(iconResource);
 // tslint:disable-next-line:only-arrow-functions
 const noData = function () {
-  const num = 6000;
+  const num = 2;
   for (let i: number = 0, len: number = num; i < len;) {
     i += 1;
     const node = network.createNode('cisco-ASR9');
     node.name = `node${i}`;
     // node.setNodeSize(25,25);
     network.addElement(node);
-    node.x = Math.random() * 1800;
-    node.y = Math.random() * 9000;
+    node.x = Math.random() * 500;
+    node.y = Math.random() * 500;
   }
   const nodes = network.getNodes();
   for (let i: number = 0, len: number = num; i < len;) {
     const srcNode = nodes[i];
     const destNode = nodes[i + 1];
-    for (let j = 0; j < 1;) {
+    for (let j = 0; j < 4;) {
       const edge = network.createEdge(srcNode, destNode);
       edge.initStyle({
         arrowColor: 0X006aad,
@@ -70,6 +70,7 @@ const noData = function () {
         lineType: 0,
         lineFull: 0,
         lineWidth: 1,
+        bundleStyle: 0,
       });
       network.addElement(edge);
       j += 1;
@@ -90,6 +91,7 @@ const noData = function () {
   network.syncView();
   network.setDrag();
   network.setZoom();
+  network.setClick();
   network.moveCenter();
 };
 // tslint:disable-next-line:only-arrow-functions
@@ -691,7 +693,7 @@ const simpleData = function () {
   _.each(devices, (device: any) => {
     const client = device.clients.User_Mark;
     if (!(client === 'Hidden')) {
-      const node = network.createNode();
+      const node = network.createNode('ROUTER-CISCO');
       // const graph: any = node.getChildByName('node_graph');
       // graph.clear();
       // graph.lineStyle(2, 0xFFFFFF, 1);
@@ -1037,8 +1039,8 @@ const simpleData = function () {
   network.moveCenter();
 };
 network.callback = () => {
-  simpleData();
-  // noData();
+  // simpleData();
+  noData();
   // edgeGroupDemo();
   // dataFlowDemo();
 };
