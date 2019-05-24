@@ -172,11 +172,13 @@ export class EdgeGroup extends CommonElement {
     });
   }
 
-  public getChildNodes() {
+  public getVisibleNodes() {
     const nodes: Node[] = [];
     _.each(this.childrenEdge, (edge: Edge) => {
-      nodes.push(edge.startNode);
-      nodes.push(edge.endNode);
+      if (edge.visible) {
+        nodes.push(edge.startNode);
+        nodes.push(edge.endNode);
+      }
     });
     return _.uniq(nodes);
   }

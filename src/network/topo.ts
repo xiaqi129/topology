@@ -6,7 +6,6 @@
  */
 
 import * as _ from 'lodash';
-import { Application } from './application';
 import { CommonElement } from './common-element';
 import { DataFlow } from './data-flow';
 import { Edge } from './edge';
@@ -26,7 +25,7 @@ export interface ITopo {
 
   createNode(domRegex: string, texture: string): Node;
 
-  createDataFlow(start: Node, end: Node, app: Application): DataFlow;
+  createDataFlow(start: Node, end: Node): DataFlow;
 
   createGroup(): Group;
 
@@ -57,8 +56,6 @@ export interface ITopo {
   removeSelectedGroups(): void;
 
   removeEdgeBundleByName(name: string): void;
-
-  removeElement(element: CommonElement): void;
 
   clearObject(obj: { [key: string]: any }): void;
 
@@ -92,39 +89,6 @@ export class Topo implements ITopo {
       return true;
     }
     return false;
-  }
-
-  public removeElement(element: CommonElement) {
-    const elements = this.getElements();
-    _.remove(elements, (elem: CommonElement) => {
-      return element === elem;
-    });
-    if (element instanceof Node) {
-      element.removeChildren(0, element.children.length);
-      element.labelContent = '';
-    } else {
-      if (element instanceof Edge) {
-        this.clearObject(this.getEdgesGroup());
-        if (element.parent instanceof EdgeBundle) {
-          _.remove(element.parent.bundleEdge, (edge) => {
-            return edge === element;
-          });
-          if (element.parent.bundleEdge.length < 2) {
-            if (element.parent.bundleEdge[0]) {
-              element.parent.bundleEdge[0].setStyle({
-                lineType: 0,
-              });
-            }
-          }
-        }
-        if (element.includeGroup) {
-          _.each(element.includeGroup, (edgeGroup: EdgeGroup) => {
-            edgeGroup.removeChildEdge(element);
-          });
-        }
-      }
-      element.destroy();
-    }
   }
 
   // find brother edge not in edge bundle

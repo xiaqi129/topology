@@ -197,15 +197,17 @@ export class EdgeBundle extends CommonElement {
     return this.bundleID;
   }
 
-  public setBundle(edge: any) {
+  public setBundle(edge: Edge) {
     if (this.toggleBundle) {
       edge.addEventListener('mousedown', (event: PIXI.interaction.InteractionEvent) => {
         // event.stopPropagation();
         const currentTime = new Date().getTime();
         // double click
         if (currentTime - this.lastClickTime < 500) {
-          this.isExpanded = !this.isExpanded;
-          this.draw();
+          if (edge.parent instanceof EdgeBundle) {
+            this.isExpanded = !this.isExpanded;
+            this.draw();
+          }
         } else {
           this.lastClickTime = currentTime;
         }

@@ -378,7 +378,7 @@ export class CommonAction {
     });
     if (this.isSelectGroup) {
       const filterGroup = _.filter(groups, (group: any) => {
-        const childNodes = group.getChildNodes();
+        const childNodes = group.getVisibleNodes();
         return _.every(childNodes, (node: any) => {
           const isInclude = _.includes(selectNodes, node);
           return isInclude;
