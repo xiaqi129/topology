@@ -407,14 +407,6 @@ export class Network {
     });
   }
 
-  public lockElement(element: CommonElement) {
-    this.action.lockElement(element);
-  }
-
-  public unlockElement(element: CommonElement) {
-    this.action.unLockElement(element);
-  }
-
   public hideElement(element: any) {
     if (element instanceof Edge) {
       element.visible = false;
@@ -575,6 +567,9 @@ export class Network {
         } else if (this.zoom < 0.3) {
           node.iconWidth = NP.times(node.defaultWidth, 0.3);
           node.iconHeight = NP.times(node.defaultHeight, 0.3);
+        } else if (this.zoom > 1.5) {
+          node.iconWidth = NP.times(node.defaultWidth, 1.5);
+          node.iconHeight = NP.times(node.defaultHeight, 1.5);
         }
         node.drawSprite(node.icon);
       }
@@ -583,9 +578,13 @@ export class Network {
 
   private drawEdge(edge: Edge) {
     const width = edge.invariableStyles.lineWidth;
-    if (this.zoom < 1) {
+    if (this.zoom <= 1.2) {
       _.extend(edge.defaultStyle, ({
         lineWidth: width * this.zoom,
+      }));
+    } else {
+      _.extend(edge.defaultStyle, ({
+        lineWidth: width * 1.2,
       }));
     }
     edge.draw();

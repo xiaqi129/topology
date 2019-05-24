@@ -15,6 +15,7 @@ export class EdgeBundle extends CommonElement {
   public isExpanded: boolean = true;
   public bundleEdge: any[] = [];
   public toggleBundle: boolean = true;
+  public type: string = 'EdgeBundle';
   private bundleID: string = '';
   private lastClickTime: number = 0;
   private bundleData: any = {};
@@ -104,19 +105,32 @@ export class EdgeBundle extends CommonElement {
   public changeLabelSize(size: number) {
     if (!this.isExpanded) {
       const edge: any = this.children[0];
-      if (edge && (size < 1.2 && size > 0)) {
+      if (edge) {
         const bundleLabel = edge.getChildByName('bundle_label');
         const bundleBackground = edge.getChildByName('label_background');
-        edge.setStyle({
-          lineWidth: this.defaultWidth * size,
-        });
-        bundleBackground.clear();
-        bundleBackground.beginFill(this.defaultStyle.fillColor, 1);
-        bundleBackground.drawCircle(0, 0, 7 * size);
-        bundleBackground.endFill();
-        bundleLabel.setStyle({
-          fontSize: 10 * size,
-        });
+        if (size <= 1.2 && size >= 0) {
+          edge.setStyle({
+            lineWidth: this.defaultWidth * size,
+          });
+          bundleBackground.clear();
+          bundleBackground.beginFill(this.defaultStyle.fillColor, 1);
+          bundleBackground.drawCircle(0, 0, 7 * size);
+          bundleBackground.endFill();
+          bundleLabel.setStyle({
+            fontSize: 10 * size,
+          });
+        } else {
+          edge.setStyle({
+            lineWidth: this.defaultWidth * 1.2,
+          });
+          bundleBackground.clear();
+          bundleBackground.beginFill(this.defaultStyle.fillColor, 1);
+          bundleBackground.drawCircle(0, 0, 7 * 1.2);
+          bundleBackground.endFill();
+          bundleLabel.setStyle({
+            fontSize: 10 * 1.2,
+          });
+        }
       }
     }
   }
@@ -138,13 +152,13 @@ export class EdgeBundle extends CommonElement {
   public setBundleEdgesPosition() {
     const edges = this.children;
     const bundleStyle = this.defaultStyle.bundleStyle;
-    const distance = 2;
     const degree = 15;
     const degreeStep = 8;
     const values: number[][] = [];
+    const distance = 2;
     let distanceStep = 4;
     if (bundleStyle === 1) {
-      distanceStep = 0;
+      distanceStep = 1;
     }
     const isSameDirection = _.every(edges, (edg: Edge) => {
       return edg.startNode === this.startNode;

@@ -29,6 +29,7 @@ export class Node extends CommonElement {
   public clients: {} = {};
   public icon: any;
   public tooltip: Tooltip;
+  public type: string = 'Node';
   public defaultWidth: number = 20;
   public defaultHeight: number = 20;
   public linksArray: Edge[] = [];

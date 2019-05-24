@@ -30,6 +30,7 @@ export class DataFlow extends CommonElement {
   public background: PIXI.Graphics;
   public neon: PIXI.Graphics;
   public flowLength: number = 30;
+  public type: string = 'DataFlow';
   private moveDistance: number = 0;
   private start: Node;
   private end: Node;

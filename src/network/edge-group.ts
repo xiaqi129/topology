@@ -16,6 +16,7 @@ import { Node } from './node';
 export class EdgeGroup extends CommonElement {
   public childrenEdge: Edge[] = [];
   public polygon: PIXI.Graphics;
+  public type: string = 'EdgeGroup';
   // label
   public labelContent: string = '';
   public centerPoint: IPosition = { x: 0, y: 0 };

@@ -49,6 +49,7 @@ export class Group extends CommonElement {
   public superstratumInfo: Group[] = [];
   public substratumInfo: Group[] = [];
   public labelContent: string = '';
+  public type: string = 'Group';
   // analyze children nodes array
   public childNodesList: Node[][] = [];
   public linksArray: Edge[] = [];

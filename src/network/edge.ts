@@ -39,6 +39,7 @@ export class Edge extends CommonElement {
   public tooltip: Tooltip;
   public polygonData: number[] = [];
   public includeGroup: EdgeGroup[] = [];
+  public type: string = 'Edge';
   private labelStyle: any;
   private labelContent: string[];
   private bundleStyle: number = 1; // 0: link style, 1: bezier style

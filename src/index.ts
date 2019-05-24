@@ -66,7 +66,6 @@ const noData = function () {
         arrowType: 3,
         fillArrow: true,
         lineColor: 0X0386d2,
-        // lineDistance: 0,
         lineType: 0,
         lineFull: 0,
         lineWidth: 1,
@@ -777,7 +776,6 @@ const simpleData = function () {
           { label: 'Aggregated as a group', id: '0' },
           { label: 'Hide the Node', id: '1' },
           { label: 'Change Switch Icon', id: '2' },
-          { label: 'Lock/Unlock Node', id: '3' },
           { label: 'Print Node', id: '4' },
           { label: 'Mark Node', id: '5' },
           { label: 'unMark Node', id: '6' },
@@ -816,15 +814,6 @@ const simpleData = function () {
             // node.iconWidth = 40;
             // node.iconHeight = 60;
             node.changeIcon('cisco-18');
-          } else if (id === '3') {
-            const selectNodes = network.getSelectedNodes();
-            _.each(selectNodes, (selectNode) => {
-              if (!selectNode.isLock) {
-                network.lockElement(selectNode);
-              } else {
-                network.unlockElement(selectNode);
-              }
-            });
           } else if (id === '4') {
             // tslint:disable-next-line:no-console
             console.log(node);
@@ -996,7 +985,6 @@ const simpleData = function () {
       network.menu.setMenuItems([
         { label: 'Disaggregate selected group', id: '0' },
         { label: 'Extened a group', id: '1' },
-        { label: 'Lock/Unlock Group', id: '2' },
         { label: 'Remove Group', id: '3' },
         { label: 'Not Layer Hide Nodes', id: '4' },
         { label: 'Debug', id: '5' },
@@ -1009,12 +997,6 @@ const simpleData = function () {
             padding: 50,
           });
           newGroup.draw();
-        } else if (id === '2') {
-          if (!newGroup.isLock) {
-            network.lockElement(newGroup);
-          } else {
-            network.unlockElement(newGroup);
-          }
         } else if (id === '3') {
           network.removeElements(newGroup);
         } else if (id === '4') {
@@ -1039,8 +1021,8 @@ const simpleData = function () {
   network.moveCenter();
 };
 network.callback = () => {
-  // simpleData();
-  noData();
+  simpleData();
+  // noData();
   // edgeGroupDemo();
   // dataFlowDemo();
 };
