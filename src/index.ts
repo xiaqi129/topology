@@ -5,6 +5,7 @@ import { data as topoData } from './simpleData';
 const iconResource = {
   resources: { name: 'resources', url: './pic/imageDict.json' },
 };
+const sourcesEdge: any[] = [];
 const keySort = (obj: any) => {
   const keys = Object.keys(obj).sort();
   const sortedObj: any = {};
@@ -913,6 +914,9 @@ const simpleData = function () {
       </table>`;
     if (srcNode && destNode) {
       const edge = network.createEdge(srcNode, destNode);
+      if (srcNode.name === 'mykul-cmp-west-r-cr02' && destNode.name === 'mykul-cmp-west-f-wlc2') {
+        sourcesEdge.push(edge);
+      }
       edge.initStyle({
         arrowColor: 0X006aad,
         arrowAngle: 20,
@@ -1035,6 +1039,7 @@ const bundleToggle = document.querySelector('button.btn_bundleLabelToggle');
 const nodeLabelToggle = document.querySelector('button.btn_nodeLabelToggle');
 const groupLabelToggle = document.querySelector('button.btn_groupLabelToggle');
 const linkLabelToggle = document.querySelector('button.btn_linkLabelToggle');
+const btnAaddEdge = document.querySelector('button.btn_addEdge');
 const searchNode = document.querySelector('button.btn_search_node');
 if (zoomIn) {
   zoomIn.addEventListener('click', () => {
@@ -1092,6 +1097,14 @@ if (linkLabelToggle) {
   linkLabelToggle.addEventListener('click', () => {
     edgeLabelToggle = !edgeLabelToggle;
     network.edgeLabelToggle(edgeLabelToggle);
+  });
+}
+if (btnAaddEdge) {
+  btnAaddEdge.addEventListener('click', () => {
+    // console.log(sourcesEdge);
+    network.addElements(sourcesEdge);
+    network.setClick();
+    network.syncView();
   });
 }
 if (searchNode) {

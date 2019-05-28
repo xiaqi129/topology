@@ -183,7 +183,7 @@ export class Network {
     const elements = this.topo.getElements();
     _.each(elements, (element) => {
       if (element instanceof EdgeBundle) {
-        _.each(element.children, (edge, index) => {
+        _.each(element.bundleData, (edge, index) => {
           const name: string = `${(edge as Edge).startNode.name}=>${(edge as Edge).endNode.name}-${index + 1}ofBundle`;
           _.extend(edgeObj, {
             [name]: edge,
@@ -248,42 +248,33 @@ export class Network {
     _.remove(elements, (elem: CommonElement) => {
       return element === elem;
     });
-    if (element instanceof Node) {
-      element.removeChildren(0, element.children.length);
-      element.labelContent = '';
-    } else {
-      if (element instanceof Edge) {
-        this.topo.clearObject(this.topo.getEdgesGroup());
-        if (element.parent instanceof EdgeBundle) {
-          _.remove(element.parent.bundleEdge, (edge) => {
-            return edge === element;
+    if (element instanceof Edge) {
+      this.topo.clearObject(this.topo.getEdgesGroup());
+      if (element.parent instanceof EdgeBundle) {
+        _.remove(element.parent.bundleEdge, (edge) => {
+          return edge === element;
+        });
+        if (element.parent.bundleEdge.length === 1 && element.parent.bundleEdge[0]) {
+          const edge = element.parent.bundleEdge[0];
+          _.remove(elements, (elem: CommonElement) => {
+            return element.parent === elem;
           });
-          if (element.parent.bundleEdge.length === 1) {
-            if (element.parent.bundleEdge[0]) {
-              const edge: Edge = element.parent.bundleEdge[0];
-              const container = this.getContainer();
-              _.remove(elements, (elem: CommonElement) => {
-                return element.parent === elem;
-              });
-              element.parent.destroy();
-              if (container) {
-                this.addElement(edge);
-                container.addChild(edge);
-                edge.setStyle({
-                  lineType: 0,
-                });
-              }
-            }
-          }
-        }
-        if (element.includeGroup) {
-          _.each(element.includeGroup, (edgeGroup: EdgeGroup) => {
-            edgeGroup.removeChildEdge(element);
+          this.addElement(edge);
+          edge.setStyle({
+            lineType: 0,
           });
         }
       }
-      element.destroy();
+      element.setStyle({
+        lineColor: element.defaultColor,
+      });
+      if (element.includeGroup) {
+        _.each(element.includeGroup, (edgeGroup: EdgeGroup) => {
+          edgeGroup.removeChildEdge(element);
+        });
+      }
     }
+    this.syncView();
   }
 
   public setDrag() {

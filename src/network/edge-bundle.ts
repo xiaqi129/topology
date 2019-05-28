@@ -16,9 +16,9 @@ export class EdgeBundle extends CommonElement {
   public bundleEdge: any[] = [];
   public toggleBundle: boolean = true;
   public type: string = 'EdgeBundle';
+  public bundleData: any[] = [];
   private bundleID: string = '';
   private lastClickTime: number = 0;
-  private bundleData: any = {};
   private startNode: Node;
   private endNode: Node;
   private style: any;
@@ -40,20 +40,19 @@ export class EdgeBundle extends CommonElement {
 
   public draw() {
     if (this.toggleBundle) {
-      const bundleId = this.getBundleID();
       if (!this.isExpanded) {
         // collapse
         if (this.children.length > 1) {
-          this.bundleData[bundleId] = [];
+          this.bundleData = [];
           _.each(this.children, (child) => {
-            this.bundleData[bundleId].push(child);
+            this.bundleData.push(child);
           });
         }
         this.removeChildren(0, this.children.length);
         const afterBundle = new Edge(this.startNode, this.endNode);
         afterBundle.setStyle(this.style);
         afterBundle.name = 'bundle_line';
-        if (this.bundleData[bundleId]) {
+        if (this.bundleData.length > 0) {
           const graph = new PIXI.Graphics();
           const style = this.defaultStyle;
           graph.name = 'label_background';
@@ -61,7 +60,7 @@ export class EdgeBundle extends CommonElement {
           graph.drawCircle(0, 0, 7);
           graph.endFill();
           afterBundle.addChild(graph);
-          const label = new Label(`${this.bundleData[bundleId].length}`, {
+          const label = new Label(`${this.bundleData.length}`, {
             fill: 0Xffffff,
             fontFamily: 'Times New Roman',
             fontWeight: 'bold',
@@ -85,7 +84,7 @@ export class EdgeBundle extends CommonElement {
       } else {
         // expand
         this.removeChild(this.getChildByName('bundle_line'));
-        const edges = this.bundleData[bundleId];
+        const edges = this.bundleData;
         _.each(edges, (bundleEdge) => {
           this.addChild(bundleEdge);
           bundleEdge.draw();
