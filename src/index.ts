@@ -1025,8 +1025,8 @@ const simpleData = function () {
   network.moveCenter();
 };
 network.callback = () => {
-  // simpleData();
-  noData();
+  simpleData();
+  // noData();
   // edgeGroupDemo();
   // dataFlowDemo();
 };
