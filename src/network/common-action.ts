@@ -53,18 +53,22 @@ export class CommonAction {
   }
 
   public dragContainer() {
-    this.container.removeListener('mousedown');
-    this.container.removeListener('mousemove');
-    this.container.removeListener('mouseup');
-    this.container.cursor = 'default';
+    if (this.container) {
+      this.container.removeListener('mousedown');
+      this.container.removeListener('mousemove');
+      this.container.removeListener('mouseup');
+      this.container.cursor = 'default';
+    }
     this.drag();
   }
 
   public setSelect(condition?: any) {
-    this.container.removeListener('mousedown');
-    this.container.removeListener('mousemove');
-    this.container.removeListener('mouseup');
-    this.container.cursor = 'crosshair';
+    if (this.container) {
+      this.container.removeListener('mousedown');
+      this.container.removeListener('mousemove');
+      this.container.removeListener('mouseup');
+      this.container.cursor = 'crosshair';
+    }
     this.moveSelect(condition);
   }
 

@@ -183,7 +183,7 @@ export class Network {
     const elements = this.topo.getElements();
     _.each(elements, (element) => {
       if (element instanceof EdgeBundle) {
-        _.each(element.bundleData, (edge, index) => {
+        _.each(element.children, (edge, index) => {
           const name: string = `${(edge as Edge).startNode.name}=>${(edge as Edge).endNode.name}-${index + 1}ofBundle`;
           _.extend(edgeObj, {
             [name]: edge,
@@ -604,7 +604,12 @@ export class Network {
   }
 
   private drawEdge(edge: Edge) {
-    const width = edge.invariableStyles.lineWidth;
+    let width;
+    if (edge.invariableStyles && edge.invariableStyles.lineWidth) {
+      width = edge.invariableStyles.lineWidth;
+    } else {
+      width = 1;
+    }
     if (this.zoom <= 1.2) {
       _.extend(edge.defaultStyle, ({
         lineWidth: width * this.zoom,
@@ -619,7 +624,12 @@ export class Network {
 
   private drawGroup(group: Group) {
     // const defaultOpacity = group.invariableStyles.fillOpacity;
-    const defaultLineWidth = group.invariableStyles.lineWidth;
+    let defaultLineWidth;
+    if (group.invariableStyles && group.invariableStyles.lineWidth) {
+      defaultLineWidth = group.invariableStyles.lineWidth;
+    } else {
+      defaultLineWidth = 1;
+    }
     if (this.zoom > 1) {
       group.setStyle({
         // fillOpacity: defaultOpacity,
@@ -641,7 +651,12 @@ export class Network {
   }
 
   private drawEdgeGroup(edgeGroup: EdgeGroup) {
-    const defaultMargin = edgeGroup.invariableStyles.margin;
+    let defaultMargin;
+    if (edgeGroup.invariableStyles && edgeGroup.invariableStyles.lineWidth) {
+      defaultMargin = edgeGroup.invariableStyles.margin;
+    } else {
+      defaultMargin = 8;
+    }
     if (this.zoom <= 1) {
       edgeGroup.setStyle({
         margin: defaultMargin * this.zoom,
