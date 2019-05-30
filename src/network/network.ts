@@ -88,7 +88,7 @@ export class Network {
     if (wrapper) {
       wrapper.addEventListener('wheel', (e) => {
         const zoom = this.zoom;
-        this.clearHighlight();
+        // this.clearHighlight();
         if (e.deltaY < 0) {
           if (zoom < 1 && zoom >= 0.1) {
             this.zoomNetworkElements(NP.plus(zoom, 0.1));
@@ -542,7 +542,6 @@ export class Network {
       }
       dataFlow.draw();
     });
-    this.toggleLabel();
   }
 
   set layerHide(flag: boolean) {
@@ -550,32 +549,16 @@ export class Network {
     this.reDraw();
   }
 
-  private toggleLabel(nodeVisibleZoom?: number, edgeVisibleZoom?: number) {
-    if (nodeVisibleZoom) {
-      if (this.zoom < nodeVisibleZoom) {
-        this.nodeLabelToggle(false);
-      } else {
-        this.nodeLabelToggle(true);
-      }
+  public toggleLabel(nodeVisibleZoom: number, edgeVisibleZoom: number) {
+    if (this.zoom < nodeVisibleZoom) {
+      this.nodeLabelToggle(false);
     } else {
-      if (this.zoom < 1) {
-        this.nodeLabelToggle(false);
-      } else {
-        this.nodeLabelToggle(true);
-      }
+      this.nodeLabelToggle(true);
     }
-    if (edgeVisibleZoom) {
-      if (this.zoom < edgeVisibleZoom) {
-        this.edgeLabelToggle(false);
-      } else {
-        this.edgeLabelToggle(true);
-      }
+    if (this.zoom < edgeVisibleZoom) {
+      this.edgeLabelToggle(false);
     } else {
-      if (this.zoom < 2) {
-        this.edgeLabelToggle(false);
-      } else {
-        this.edgeLabelToggle(true);
-      }
+      this.edgeLabelToggle(true);
     }
   }
 
@@ -601,6 +584,10 @@ export class Network {
         node.drawSprite(node.icon);
       }
     }
+    const border = node.getChildByName('node_border');
+    if (border) {
+      node.selectOn();
+    }
   }
 
   private drawEdge(edge: Edge) {
@@ -623,7 +610,6 @@ export class Network {
   }
 
   private drawGroup(group: Group) {
-    // const defaultOpacity = group.invariableStyles.fillOpacity;
     let defaultLineWidth;
     if (group.invariableStyles && group.invariableStyles.lineWidth) {
       defaultLineWidth = group.invariableStyles.lineWidth;
@@ -632,20 +618,19 @@ export class Network {
     }
     if (this.zoom > 1) {
       group.setStyle({
-        // fillOpacity: defaultOpacity,
         lineWidth: defaultLineWidth,
       });
     } else if (this.zoom <= 1 && this.zoom > 0.5) {
       group.setStyle({
-        // fillOpacity: defaultOpacity * this.zoom,
         lineWidth: defaultLineWidth / this.zoom,
       });
-
     } else {
       group.setStyle({
-        // fillOpacity: defaultOpacity * 0.5,
         lineWidth: defaultLineWidth / 0.5,
       });
+    }
+    if (group.isSelected) {
+      group.selectOn();
     }
     group.draw();
   }
@@ -661,6 +646,9 @@ export class Network {
       edgeGroup.setStyle({
         margin: defaultMargin * this.zoom,
       });
+    }
+    if (edgeGroup.isSelected) {
+      edgeGroup.selectOn();
     }
     edgeGroup.draw();
   }

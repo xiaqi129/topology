@@ -20,6 +20,7 @@ export class EdgeGroup extends CommonElement {
   // label
   public labelContent: string = '';
   public centerPoint: IPosition = { x: 0, y: 0 };
+  public isSelected: boolean = false;
   private labelStyle: any;
   private labelPosition: string = 'Center';
   // drag
@@ -158,6 +159,7 @@ export class EdgeGroup extends CommonElement {
   }
 
   public selectOn() {
+    this.isSelected = true;
     this.setStyle({
       lineColor: 0Xf5bd71,
       lineWidth: 3,
@@ -166,6 +168,7 @@ export class EdgeGroup extends CommonElement {
 
   public selectOff() {
     const initStyle = this.invariableStyles;
+    this.isSelected = false;
     this.setStyle({
       lineColor: initStyle.lineColor,
       lineWidth: initStyle.lineWidth,
@@ -306,15 +309,16 @@ export class EdgeGroup extends CommonElement {
       const allEdgeGroups = this.getEdgeGroup();
       let nodesLinkEdges: any[] = [];
       let nodesList: Node[] = [];
-      let includeGroups: EdgeGroup[] = [];
       if (edges.length > 0) {
+        let nodesGroup: any[] = [];
         _.each(edges, (edge: Edge) => {
           const startNode: Node = edge.startNode;
           const endNode: Node = edge.endNode;
-          includeGroups = _.concat(includeGroups, edge.includeGroup);
+          nodesGroup.push(startNode.incluedGroups, endNode.incluedGroups);
           nodesLinkEdges = _.concat(nodesLinkEdges, startNode.linksArray, endNode.linksArray);
           nodesList.push(startNode, endNode);
         });
+        nodesGroup = _.uniq(_.flattenDeep(nodesGroup));
         nodesList = _.uniq(nodesList);
         _.each(nodesList, (node: Node) => {
           if (!node.isLock) {
@@ -325,10 +329,10 @@ export class EdgeGroup extends CommonElement {
         _.each(nodesLinkEdges, (edge: Edge) => {
           edge.draw();
         });
-        _.each(includeGroups, (group) => {
+        _.each(allEdgeGroups, (group) => {
           group.draw();
         });
-        _.each(allEdgeGroups, (group) => {
+        _.each(nodesGroup, (group) => {
           group.draw();
         });
       }

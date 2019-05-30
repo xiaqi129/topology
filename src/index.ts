@@ -517,7 +517,7 @@ const edgeGroupDemo = function () {
       },
 
     ],
-    groups: [
+    edgeGroups: [
       {
         name: 'group1',
         style: {
@@ -587,9 +587,21 @@ const edgeGroupDemo = function () {
         children: ['6'],
       },
     ],
+    groups: [
+      {
+        name: 'nodeGroup',
+        children: ['name-1', 'name-2', 'name-3'],
+        style: {
+          fillColor: 0X0984e3,
+          lineColor: 0X0984e3,
+          lineWidth: 1,
+        },
+      },
+    ],
   };
   const devices = data.devices;
   const links = data.links;
+  const edgeGroups = data.edgeGroups;
   const groups = data.groups;
   _.each(devices, (device: any) => {
     const node = network.createNode('cisco-ASR9');
@@ -645,7 +657,7 @@ const edgeGroupDemo = function () {
     }
   });
   const edges = network.getEdgeObj();
-  _.each(groups, (group) => {
+  _.each(edgeGroups, (group) => {
     const edgeGroup = network.createEdgeGroup();
     network.addElement(edgeGroup);
     _.each(group.children, (child) => {
@@ -667,6 +679,35 @@ const edgeGroupDemo = function () {
         } else if (id === '1') {
           // tslint:disable-next-line:no-console
           console.log(edgeGroup);
+        }
+      };
+      network.menu.setClass('popMenu');
+      network.menu.showMenu(event);
+    });
+  });
+  _.each(groups, (g) => {
+    const group = network.createGroup();
+    network.addElement(group);
+    _.each(g.children, (child) => {
+      const node: any = _.find(nodes, (e: any) => {
+        return e.name === child;
+      });
+      group.addChildNodes(node);
+    });
+    group.name = g.name;
+    group.initStyle(g.style);
+    group.setLabel(`${g.name}`);
+    group.on('rightclick', (event: any) => {
+      network.menu.setMenuItems([
+        { label: 'Remove Group', id: '0' },
+        { label: 'Debug', id: '1' },
+      ]);
+      network.menu.menuOnAction = (id) => {
+        if (id === '0') {
+          network.removeElements(group);
+        } else if (id === '1') {
+          // tslint:disable-next-line:no-console
+          console.log(group);
         }
       };
       network.menu.setClass('popMenu');
@@ -1023,11 +1064,12 @@ const simpleData = function () {
   network.setClick();
   network.setBundelExpanded(false);
   network.moveCenter();
+  network.toggleLabel(1, 2);
 };
 network.callback = () => {
-  simpleData();
+  // simpleData();
   // noData();
-  // edgeGroupDemo();
+  edgeGroupDemo();
   // dataFlowDemo();
 };
 const body = document.getElementById('network');
@@ -1172,6 +1214,9 @@ if (body) {
     isLock: false,
     isSelectGroup: false,
   };
+  body.addEventListener('wheel', () => {
+    network.toggleLabel(1, 2);
+  });
   window.addEventListener('keydown', (e) => {
     if (e.keyCode === 17 && !network.isSelect) {
       condition.isLock = false;

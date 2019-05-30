@@ -12,6 +12,7 @@ import Offset from 'polygon-offset/dist/offset';
 import { CommonElement, IPosition } from './common-element';
 import { Edge } from './edge';
 import { EdgeBundle } from './edge-bundle';
+import { EdgeGroup } from './edge-group';
 import { Label } from './label';
 import ConvexHullGrahamScan from './lib/convex-hull';
 import { Node } from './node';
@@ -53,6 +54,7 @@ export class Group extends CommonElement {
   // analyze children nodes array
   public childNodesList: Node[][] = [];
   public linksArray: Edge[] = [];
+  public isSelected: boolean = false;
   // layer hide nodes
   public isLayer: boolean = true;
   private edgeResource: IedgeResource[] = [];
@@ -479,6 +481,7 @@ export class Group extends CommonElement {
     if (this.dragging) {
       const newPosition = this.parent.toLocal(event.data.global);
       const edges = this.getChildEdges();
+      const edgeGroups = this.getEdgeGroups();
       const intersectionNodes = this.intersection()[0];
       const intersectionGroup = this.intersection()[1];
       if (this.childrenNode.length > 0) {
@@ -490,6 +493,9 @@ export class Group extends CommonElement {
         });
         _.each(edges, (edge: Edge) => {
           edge.draw();
+        });
+        _.each(edgeGroups, (edgeGroup: EdgeGroup) => {
+          edgeGroup.draw();
         });
         if (intersectionNodes) {
           _.each(intersectionGroup, (group) => {
@@ -510,6 +516,7 @@ export class Group extends CommonElement {
   }
 
   public selectOn() {
+    this.isSelected = true;
     this.setStyle({
       lineColor: 0Xf5bd71,
       lineWidth: 3,
@@ -518,6 +525,7 @@ export class Group extends CommonElement {
 
   public selectOff() {
     const initStyle = this.invariableStyles;
+    this.isSelected = false;
     this.setStyle({
       lineColor: initStyle.lineColor,
       lineWidth: initStyle.lineWidth,
@@ -1056,5 +1064,13 @@ export class Group extends CommonElement {
         });
       }
     }
+  }
+
+  private getEdgeGroups() {
+    const elements = this.elements;
+    const edgeGroup = _.filter(elements, (ele) => {
+      return ele instanceof EdgeGroup;
+    });
+    return edgeGroup;
   }
 }
