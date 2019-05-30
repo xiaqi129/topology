@@ -1067,9 +1067,9 @@ const simpleData = function () {
   network.toggleLabel(1, 2);
 };
 network.callback = () => {
-  // simpleData();
+  simpleData();
   // noData();
-  edgeGroupDemo();
+  // edgeGroupDemo();
   // dataFlowDemo();
 };
 const body = document.getElementById('network');

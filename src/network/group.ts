@@ -928,9 +928,7 @@ export class Group extends CommonElement {
     }
     const graph: any = this.getChildByName(this.polygonHullOutlineName);
     if (this.width !== 0 && content && graph) {
-      const size = _.floor(graph.width / 25) + 1;
       this.labelStyle = {
-        fontSize: size,
         fill: [
           '#0776da',
           '#5146d9',
@@ -984,11 +982,17 @@ export class Group extends CommonElement {
     const graph: any = this.getChildByName(this.polygonHullOutlineName);
     if (label && graph) {
       label.setText(content);
-      label.style.fontSize = _.floor(graph.width / 25) + 1;
-      label.style.breakWords = true;
-      label.style.wordWrap = true;
-      label.style.wordWrapWidth = graph.width - 10;
       this.labelContent = content;
+      if (this.expandedVisibleNodes.length !== 1) {
+        label.style.fontSize = _.floor(graph.width / 20) + 1;
+        label.style.breakWords = true;
+        label.style.wordWrap = true;
+        label.style.wordWrapWidth = graph.width - 10;
+      } else {
+        label.style.wordWrap = false;
+        label.style.breakWords = false;
+        label.style.fontSize = 10;
+      }
     }
   }
 
@@ -1007,8 +1011,15 @@ export class Group extends CommonElement {
     const nodeWidth = this.defaultStyle.width;
     if (label && graph) {
       if (this.width !== 0 && this.isExpanded) {
-        label.style.fontSize = _.floor(graph.width / 25) + 1;
+        label.style.fontSize = _.floor(graph.width / 10) + 1;
+        label.style.breakWords = true;
+        label.style.wordWrap = true;
         label.style.wordWrapWidth = graph.width - 10;
+        if (this.expandedVisibleNodes.length === 1) {
+          label.style.breakWords = false;
+          label.style.wordWrap = false;
+          label.style.fontSize = 10;
+        }
       } else {
         const textLength = _.ceil(label.text.length / 2);
         label.style.fontSize = nodeWidth / textLength;
