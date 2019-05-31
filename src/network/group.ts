@@ -25,8 +25,6 @@ export interface IEmptyGroup {
   type: string;
   location: { x: number, y: number };
   size: number;
-  color: number;
-  opacity: number;
 }
 
 export interface InodeResource {

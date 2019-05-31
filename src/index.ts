@@ -685,35 +685,35 @@ const edgeGroupDemo = function () {
       network.menu.showMenu(event);
     });
   });
-  _.each(groups, (g) => {
-    const group = network.createGroup();
-    network.addElement(group);
-    _.each(g.children, (child) => {
-      const node: any = _.find(nodes, (e: any) => {
-        return e.name === child;
-      });
-      group.addChildNodes(node);
-    });
-    group.name = g.name;
-    group.initStyle(g.style);
-    group.setLabel(`${g.name}`);
-    group.on('rightclick', (event: any) => {
-      network.menu.setMenuItems([
-        { label: 'Remove Group', id: '0' },
-        { label: 'Debug', id: '1' },
-      ]);
-      network.menu.menuOnAction = (id) => {
-        if (id === '0') {
-          network.removeElements(group);
-        } else if (id === '1') {
-          // tslint:disable-next-line:no-console
-          console.log(group);
-        }
-      };
-      network.menu.setClass('popMenu');
-      network.menu.showMenu(event);
-    });
-  });
+  // _.each(groups, (g) => {
+  //   const group = network.createGroup();
+  //   network.addElement(group);
+  //   _.each(g.children, (child) => {
+  //     const node: any = _.find(nodes, (e: any) => {
+  //       return e.name === child;
+  //     });
+  //     group.addChildNodes(node);
+  //   });
+  //   group.name = g.name;
+  //   group.initStyle(g.style);
+  //   group.setLabel(`${g.name}`);
+  //   group.on('rightclick', (event: any) => {
+  //     network.menu.setMenuItems([
+  //       { label: 'Remove Group', id: '0' },
+  //       { label: 'Debug', id: '1' },
+  //     ]);
+  //     network.menu.menuOnAction = (id) => {
+  //       if (id === '0') {
+  //         network.removeElements(group);
+  //       } else if (id === '1') {
+  //         // tslint:disable-next-line:no-console
+  //         console.log(group);
+  //       }
+  //     };
+  //     network.menu.setClass('popMenu');
+  //     network.menu.showMenu(event);
+  //   });
+  // });
   network.syncView();
   network.setDrag();
   network.setZoom();
@@ -1085,25 +1085,15 @@ const btnAaddEdge = document.querySelector('button.btn_addEdge');
 const searchNode = document.querySelector('button.btn_search_node');
 if (zoomIn) {
   zoomIn.addEventListener('click', () => {
-    const zoom = network.zoom;
-    const networkSize = network.getNetworkSize();
     if (network.zoom < 4) {
       network.zoomNetworkElements(NP.plus(network.zoom, 0.1));
-    }
-    if (networkSize) {
-      network.moveTopology(network.zoom / zoom, networkSize[0] / 2, networkSize[1] / 2);
     }
   });
 }
 if (zoomOut) {
   zoomOut.addEventListener('click', () => {
-    const zoom = network.zoom;
-    const networkSize = network.getNetworkSize();
     if (network.zoom > 0.4) {
       network.zoomNetworkElements(NP.minus(network.zoom, 0.1));
-    }
-    if (networkSize) {
-      network.moveTopology(network.zoom / zoom, networkSize[0] / 2, networkSize[1] / 2);
     }
   });
 }
@@ -1165,8 +1155,6 @@ const emptyObj = {
   type: 'square',
   location: { x: 100, y: 100 },
   size: 100,
-  color: 0X00ff00,
-  opacity: 0.5,
 };
 if (groupLabelToggle) {
   groupLabelToggle.addEventListener('click', () => {

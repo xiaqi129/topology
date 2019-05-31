@@ -26,12 +26,13 @@ export class Network {
   public callback: any;
   public zoom: number;
   public isSelect: boolean;
-  private loader = PIXI.loader;
   private topo: Topo;
   private drawer: Drawer;
   private app: Application;
   private action: CommonAction;
   private domRegex: string;
+  private nodeLabel: number = 0;
+  private edgeLabel: number = 0;
   private isLayer: boolean = false;
 
   constructor(domRegex: string) {
@@ -48,6 +49,7 @@ export class Network {
     this.disableContextMenu(domRegex);
   }
 
+  // Init icon resource from iconList
   public initIconResource(iconList: any) {
     PIXI.loader.reset();
     PIXI.utils.clearTextureCache();
@@ -60,29 +62,74 @@ export class Network {
     });
   }
 
+  // Create Node
   public createNode(iconName?: string) {
     return this.topo.createNode(this.domRegex, iconName);
   }
 
-  public zoomNetworkElements(zoomNum: number) {
-    const nodesObj = this.getNodeObj();
-    const zoomScale = NP.divide(zoomNum, this.zoom);
-    _.each(nodesObj, (node: any) => {
-      node.position.set(NP.times(node.x, zoomScale), NP.times(node.y, zoomScale));
-    });
-    this.zoom = zoomNum;
+  /**
+   * Create Group that includes nodes
+   * @param emptyObj create an empty group set of required properties
+   */
+  public createGroup(emptyObj?: any) {
+    return this.topo.createGroup(emptyObj);
   }
 
-  public moveTopology(zoom: number, originx: number, originy: number) {
-    const moveOriginX = NP.times(originx, NP.minus(1, zoom));
-    const moveOriginY = NP.times(originy, NP.minus(1, zoom));
-    const nodesObj = this.getNodeObj();
-    _.each(nodesObj, (node: any) => {
-      node.position.set(node.x + moveOriginX, node.y + moveOriginY);
-    });
-    this.reDraw();
+  /**
+   * Create Edge use two nodes
+   * @param startNode the node of original
+   * @param endNode the node of destination
+   */
+  public createEdge(startNode: Node | Group, endNode: Node | Group) {
+    return this.topo.createEdge(startNode, endNode, this.domRegex);
   }
 
+  /**
+   * Create a data flow with two nodes
+   * @param start the node of destination
+   * @param end the node of destination
+   */
+  public createDataFlow(start: Node, end: Node) {
+    return this.topo.createDataFlow(start, end);
+  }
+
+  // Create a group includes with edges
+  public createEdgeGroup() {
+    return this.topo.createEdgeGroup();
+  }
+  // Get outside container
+  public getContainer() {
+    return this.app.getContainer();
+  }
+
+  // Add an element
+  public addElement(element: CommonElement) {
+    this.topo.addElement(element);
+  }
+
+  // Add more elemnts
+  public addElements(elements: CommonElement[]) {
+    this.topo.addElements(elements);
+  }
+
+  // Synchronize all add elements to the canvas
+  public syncView() {
+    this.drawer.syncView();
+  }
+
+  // Setup topology can drag
+  public setDrag() {
+    this.isSelect = false;
+    this.action.dragContainer();
+  }
+
+  // Setup topology can select more nodes
+  public setSelect(condition?: ICondition) {
+    this.isSelect = true;
+    this.action.setSelect(condition);
+  }
+
+  // Setup topology can zoom in and zoom out with mouse wheel
   public setZoom() {
     const wrapper = document.getElementById(this.domRegex);
     if (wrapper) {
@@ -91,23 +138,23 @@ export class Network {
         // this.clearHighlight();
         if (e.deltaY < 0) {
           if (zoom < 1 && zoom >= 0.1) {
-            this.zoomNetworkElements(NP.plus(zoom, 0.1));
+            this.zoomElements(NP.plus(zoom, 0.1));
           } else if (zoom <= 4.8 && zoom >= 1) {
-            this.zoomNetworkElements(NP.plus(zoom, 0.2));
+            this.zoomElements(NP.plus(zoom, 0.2));
           } else if (zoom < 0.1 && zoom >= 0) {
-            this.zoomNetworkElements(NP.plus(zoom, 0.01));
+            this.zoomElements(NP.plus(zoom, 0.01));
           } else if (zoom > 4.8 && zoom <= 5) {
-            this.zoomNetworkElements(NP.plus(zoom, 0.2));
+            this.zoomElements(NP.plus(zoom, 0.2));
           }
         } else {
           if (zoom <= 1 && zoom > 0.11) {
-            this.zoomNetworkElements(NP.minus(zoom, 0.1));
+            this.zoomElements(NP.minus(zoom, 0.1));
           } else if (zoom <= 5 && zoom >= 1) {
-            this.zoomNetworkElements(NP.minus(zoom, 0.2));
+            this.zoomElements(NP.minus(zoom, 0.2));
           } else if (zoom <= 0.11 && zoom >= 0.02) {
-            this.zoomNetworkElements(NP.minus(zoom, 0.01));
+            this.zoomElements(NP.minus(zoom, 0.01));
           } else if (zoom > 5) {
-            this.zoomNetworkElements(NP.minus(zoom, 0.2));
+            this.zoomElements(NP.minus(zoom, 0.2));
           }
         }
         const scale = NP.divide(this.zoom, zoom);
@@ -117,33 +164,28 @@ export class Network {
     }
   }
 
-  public getNetworkSize() {
-    const wrapper = document.getElementById(this.domRegex);
-    if (wrapper) {
-      return [wrapper.offsetWidth, wrapper.offsetHeight];
+  // Setup in the topology element click highlight effect
+  public setClick() {
+    this.action.setClick();
+  }
+
+  // Zoom topoloy with the size of the speciflc
+  public zoomNetworkElements(zoomNum: number) {
+    const nodesObj = this.getNodeObj();
+    const zoomScale = NP.divide(zoomNum, this.zoom);
+    const networkSize = this.getNetworkSize();
+    const originZoom = _.cloneDeep(this.zoom);
+    _.each(nodesObj, (node: any) => {
+      node.position.set(NP.times(node.x, zoomScale), NP.times(node.y, zoomScale));
+    });
+    this.zoom = zoomNum;
+    if (networkSize) {
+      this.moveTopology(this.zoom / originZoom, networkSize[0] / 2, networkSize[1] / 2);
+      this.toggleLabel(this.nodeLabel, this.edgeLabel);
     }
   }
 
-  public getContainer() {
-    return this.app.getContainer();
-  }
-
-  public createGroup(emptyObj?: any) {
-    return this.topo.createGroup(emptyObj);
-  }
-
-  public createEdge(startNode: Node | Group, endNode: Node | Group) {
-    return this.topo.createEdge(startNode, endNode, this.domRegex);
-  }
-
-  public createDataFlow(start: Node, end: Node) {
-    return this.topo.createDataFlow(start, end);
-  }
-
-  public createEdgeGroup() {
-    return this.topo.createEdgeGroup();
-  }
-
+  // Clear the entire topology
   public clear() {
     const elements = this.topo.getElements();
     _.each(elements, (element) => {
@@ -152,6 +194,7 @@ export class Network {
     _.remove(elements, undefined);
   }
 
+  // Get all elements in the topology
   public getElements() {
     return this.topo.getElements();
   }
@@ -164,6 +207,7 @@ export class Network {
     return nodes;
   }
 
+  // Get all nodes object
   public getNodeObj(): { [key: string]: Node } {
     const nodeObj = {};
     const elements = this.topo.getElements();
@@ -178,6 +222,7 @@ export class Network {
     return nodeObj;
   }
 
+  // Get all edges object
   public getEdgeObj(): { [key: string]: Edge } {
     const edgeObj = {};
     const elements = this.topo.getElements();
@@ -200,6 +245,7 @@ export class Network {
     return edgeObj;
   }
 
+  // Get all groups object
   public getGroupObj(): { [key: string]: Group } {
     const groupObj = {};
     const elements = this.topo.getElements();
@@ -214,6 +260,7 @@ export class Network {
     return groupObj;
   }
 
+  // Get all edge groups array
   public getEdgeGroup() {
     const elements = this.topo.getElements();
     const edgeGroup: EdgeGroup[] = _.filter(elements, (element) => {
@@ -222,6 +269,7 @@ export class Network {
     return edgeGroup;
   }
 
+  // Get all data flow array
   public getDataFlow() {
     const elements = this.topo.getElements();
     const edgeGroup: DataFlow[] = _.filter(elements, (element) => {
@@ -230,19 +278,7 @@ export class Network {
     return edgeGroup;
   }
 
-  public addElement(element: CommonElement) {
-    this.topo.addElement(element);
-  }
-
-  public addElements(elements: Node[] | Group[] | Edge[]) {
-    this.topo.addElements(elements);
-  }
-
-  public getSelectedNodes() {
-    const selectedNodes = this.topo.getSelectedNodes();
-    return selectedNodes;
-  }
-
+  // Delete specified elements in topology
   public removeElements(element: CommonElement) {
     const elements = this.getElements();
     _.remove(elements, (elem: CommonElement) => {
@@ -277,14 +313,9 @@ export class Network {
     this.syncView();
   }
 
-  public setDrag() {
-    this.isSelect = false;
-    this.action.dragContainer();
-  }
-
-  public setSelect(condition?: ICondition) {
-    this.isSelect = true;
-    this.action.setSelect(condition);
+  public getSelectedNodes() {
+    const selectedNodes = this.topo.getSelectedNodes();
+    return selectedNodes;
   }
 
   public zoomOver() {
@@ -306,6 +337,7 @@ export class Network {
       center = [analyzeCenter.x, analyzeCenter.y];
     }
     this.moveToCenter(center);
+    this.toggleLabel(this.nodeLabel, this.edgeLabel);
   }
 
   public getCenter() {
@@ -335,14 +367,6 @@ export class Network {
 
   public clearHighlight() {
     this.action.removeHighLight();
-  }
-
-  public syncView() {
-    this.drawer.syncView();
-  }
-
-  public setClick() {
-    this.action.setClick();
   }
 
   public moveCenter() {
@@ -480,28 +504,6 @@ export class Network {
     }
   }
 
-  public analyzeInWrapperNodes() {
-    const wrapper = document.getElementById(this.domRegex);
-    const nodes = this.getNodeObj();
-    const inWrapperNodesList: Node[] = [];
-    if (wrapper) {
-      const top = wrapper.offsetTop;
-      const left = wrapper.offsetLeft;
-      const bottom = wrapper.offsetTop + wrapper.offsetHeight;
-      const right = wrapper.offsetLeft + wrapper.offsetWidth;
-      _.each(nodes, (node: Node) => {
-        if (node.visible) {
-          const x = node.x + left;
-          const y = node.y + top;
-          if ((x < right && x > left) && (y < bottom && y > top)) {
-            inWrapperNodesList.push(node);
-          }
-        }
-      });
-    }
-    return inWrapperNodesList;
-  }
-
   public reDraw() {
     const nodes = this.getNodeObj();
     const edgeObj: any = this.getEdgeObj();
@@ -550,6 +552,8 @@ export class Network {
   }
 
   public toggleLabel(nodeVisibleZoom: number, edgeVisibleZoom: number) {
+    this.nodeLabel = nodeVisibleZoom;
+    this.edgeLabel = edgeVisibleZoom;
     if (this.zoom < nodeVisibleZoom) {
       this.nodeLabelToggle(false);
     } else {
@@ -560,6 +564,54 @@ export class Network {
     } else {
       this.edgeLabelToggle(true);
     }
+  }
+
+  private getNetworkSize() {
+    const wrapper = document.getElementById(this.domRegex);
+    if (wrapper) {
+      return [wrapper.offsetWidth, wrapper.offsetHeight];
+    }
+  }
+
+  private moveTopology(zoom: number, originx: number, originy: number) {
+    const moveOriginX = NP.times(originx, NP.minus(1, zoom));
+    const moveOriginY = NP.times(originy, NP.minus(1, zoom));
+    const nodesObj = this.getNodeObj();
+    _.each(nodesObj, (node: any) => {
+      node.position.set(node.x + moveOriginX, node.y + moveOriginY);
+    });
+    this.reDraw();
+  }
+
+  private zoomElements(zoomNum: number) {
+    const nodesObj = this.getNodeObj();
+    const zoomScale = NP.divide(zoomNum, this.zoom);
+    _.each(nodesObj, (node: any) => {
+      node.position.set(NP.times(node.x, zoomScale), NP.times(node.y, zoomScale));
+    });
+    this.zoom = zoomNum;
+  }
+
+  private analyzeInWrapperNodes() {
+    const wrapper = document.getElementById(this.domRegex);
+    const nodes = this.getNodeObj();
+    const inWrapperNodesList: Node[] = [];
+    if (wrapper) {
+      const top = wrapper.offsetTop;
+      const left = wrapper.offsetLeft;
+      const bottom = wrapper.offsetTop + wrapper.offsetHeight;
+      const right = wrapper.offsetLeft + wrapper.offsetWidth;
+      _.each(nodes, (node: Node) => {
+        if (node.visible) {
+          const x = node.x + left;
+          const y = node.y + top;
+          if ((x < right && x > left) && (y < bottom && y > top)) {
+            inWrapperNodesList.push(node);
+          }
+        }
+      });
+    }
+    return inWrapperNodesList;
   }
 
   private drawNode(node: Node, inWrapperNodesList: Node[]) {
@@ -671,6 +723,8 @@ export class Network {
       let minX: number = center.x;
       let maxY: number = center.y;
       let minY: number = center.y;
+      let width: number = 0;
+      let height: number = 0;
       if (_.size(nodes) !== 0) {
         maxX = minX = this.getNodes()[0].x;
         maxY = minY = this.getNodes()[0].y;
@@ -679,14 +733,19 @@ export class Network {
         if (node.visible) {
           const x = node.x;
           const y = node.y;
+          const w = node.getWidth();
+          const h = node.getHeight();
           maxX = maxX > x ? maxX : x;
           minX = minX < x ? minX : x;
           maxY = maxY > y ? maxY : y;
           minY = minY < y ? minY : y;
+          width = width > w ? width : w;
+          height = height > h ? height : h;
         }
       });
-      rateX = Math.abs((maxX - minX) / wrapperContainr[0]);
-      rateY = Math.abs((maxY - minY) / wrapperContainr[1]);
+      const maxNum = width > height ? width : height;
+      rateX = Math.abs((maxX - minX + maxNum) / wrapperContainr[0]);
+      rateY = Math.abs((maxY - minY + maxNum) / wrapperContainr[1]);
       scale = rateX > rateY ? rateX : rateY;
     }
     zoomRate = 1 / scale;
