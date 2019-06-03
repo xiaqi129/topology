@@ -395,16 +395,16 @@ const edgeGroupDemo = function () {
         remote_host: 'name-2',
         style: {
           lineType: 0,
-          lineFull: 0,
+          lineFull: 1,
         },
       },
       {
         name: '1_1',
-        local_host: 'name-1',
-        remote_host: 'name-2',
+        local_host: 'name-2',
+        remote_host: 'name-1',
         style: {
           lineType: 0,
-          lineFull: 0,
+          lineFull: 1,
         },
       },
       {
@@ -1076,9 +1076,9 @@ const simpleData = function () {
   network.toggleLabel(1, 2);
 };
 network.callback = () => {
-  // simpleData();
+  simpleData();
   // noData();
-  edgeGroupDemo();
+  // edgeGroupDemo();
   // dataFlowDemo();
 };
 const body = document.getElementById('network');
