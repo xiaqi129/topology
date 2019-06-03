@@ -313,11 +313,7 @@ export class Network {
     this.syncView();
   }
 
-  public getSelectedNodes() {
-    const selectedNodes = this.topo.getSelectedNodes();
-    return selectedNodes;
-  }
-
+  // Full screen the whole network topology
   public zoomOver() {
     let center: number[] = [];
     const zoomRate = this.analyzeZoom();
@@ -340,8 +336,15 @@ export class Network {
     this.toggleLabel(this.nodeLabel, this.edgeLabel);
   }
 
+  // Get Container's center
   public getCenter() {
     return this.action.getCenter();
+  }
+
+  // Get all selected nodes
+  public getSelectedNodes() {
+    const selectedNodes = this.topo.getSelectedNodes();
+    return selectedNodes;
   }
 
   public setSelectNodes(node: Node) {

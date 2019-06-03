@@ -9,6 +9,7 @@ import polygon from 'polygon';
 import Offset from 'polygon-offset/dist/offset';
 import { CommonElement, IPosition } from './common-element';
 import { Edge } from './edge';
+import { EdgeBundle } from './edge-bundle';
 import { Label } from './label';
 import ConvexHullGrahamScan from './lib/convex-hull';
 import { Node } from './node';
@@ -38,7 +39,12 @@ export class EdgeGroup extends CommonElement {
   }
 
   public addChildEdges(edge: Edge) {
-    this.childrenEdge.push(edge);
+    if (edge.bundleParent) {
+      this.childrenEdge.push(edge.bundleParent);
+    } else {
+      this.childrenEdge.push(edge);
+    }
+    this.childrenEdge = _.uniq(this.childrenEdge);
     edge.setIncluedGroup(this);
     if (this.childrenEdge) {
       this.draw();
@@ -238,9 +244,13 @@ export class EdgeGroup extends CommonElement {
   private getPolygonPoints(): number[][] {
     let pointsList: number[] = [];
     if (this.childrenEdge) {
-      _.each(this.childrenEdge, (edge: Edge) => {
-        if (edge.visible) {
+      _.each(this.childrenEdge, (edge: any) => {
+        if (edge instanceof Edge && edge.visible) {
           pointsList = _.concat(pointsList, edge.polygonData);
+        } else if (edge instanceof EdgeBundle) {
+          _.each(edge.children, (e: any) => {
+            pointsList = _.concat(pointsList, e.polygonData);
+          });
         }
       });
     }

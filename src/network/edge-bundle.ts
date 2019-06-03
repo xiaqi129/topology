@@ -197,6 +197,7 @@ export class EdgeBundle extends CommonElement {
   }
 
   public setBundle(edge: Edge) {
+    edge.bundleParent = this;
     if (this.toggleBundle) {
       edge.addEventListener('mousedown', (event: PIXI.interaction.InteractionEvent) => {
         // event.stopPropagation();

@@ -21,16 +21,15 @@ export class Edge extends CommonElement {
   public edge: PIXI.Graphics;
   public arrow: PIXI.Graphics;
   public defaultColor: number = 0;
-  public bundleExplosion: boolean = false;
   public labelToggle: boolean = false;
   public brotherEdges: Edge[] = [];
   public tooltip: Tooltip;
   public polygonData: number[] = [];
   public includeGroup: EdgeGroup[] = [];
   public type: string = 'Edge';
+  public bundleParent: any;
   private labelStyle: any;
   private labelContent: string[];
-  private bundleStyle: number = 1; // 0: link style, 1: bezier style
 
   constructor(startNode: Node | Group, endNode: Node | Group, domRegex?: string) {
     super();
@@ -52,16 +51,6 @@ export class Edge extends CommonElement {
 
   public getEdge() {
     return this.edge;
-  }
-
-  public setBundleStyle(styleNumber: number) {
-    if (this.parent instanceof Edge) {
-      this.parent.bundleStyle = styleNumber;
-      this.parent.draw();
-    } else {
-      this.bundleStyle = styleNumber;
-      this.draw();
-    }
   }
 
   public getLineNodePosition(node: Node | Group) {
