@@ -143,7 +143,7 @@ export class CommonAction {
       const groups = this.getOtherElements();
       const elements: any = this.topo.getElements();
       _.each(elements, (element: CommonElement) => {
-        if (element instanceof Node && !element.isLock) {
+        if (element instanceof Node) {
           element.position.x += (newPosition.x - this.last.parents.x);
           element.position.y += (newPosition.y - this.last.parents.y);
         }

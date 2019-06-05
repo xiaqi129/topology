@@ -712,7 +712,7 @@ export class Group extends CommonElement {
       const intersectionGroup = this.intersection()[1];
       if (this.childrenNode.length > 0) {
         _.each(this.childrenNode, (element) => {
-          if (element instanceof Node && !element.isLock) {
+          if (element instanceof Node) {
             element.position.x += newPosition.x - this.last.parents.x;
             element.position.y += newPosition.y - this.last.parents.y;
           }
