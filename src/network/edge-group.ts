@@ -15,9 +15,9 @@ import ConvexHullGrahamScan from './lib/convex-hull';
 import { Node } from './node';
 
 export class EdgeGroup extends CommonElement {
+  public type: string = 'EdgeGroup';
   public childrenEdge: Edge[] = [];
   public polygon: PIXI.Graphics;
-  public type: string = 'EdgeGroup';
   // label
   public labelContent: string = '';
   public centerPoint: IPosition = { x: 0, y: 0 };
@@ -106,44 +106,6 @@ export class EdgeGroup extends CommonElement {
     }
   }
 
-  public getLabelPos() {
-    let height = 0;
-    const graph: any = this.getChildByName('edge_group');
-    if (graph) {
-      height = graph.height;
-    }
-    const labelPositionData: any = {
-      Center: {
-        x: 0,
-        y: 0,
-      },
-      Above: {
-        x: 0,
-        y: -(height / 2),
-      },
-      Below: {
-        x: 0,
-        y: (height / 2),
-      },
-    };
-    const labelPos = { x: 0, y: 0 };
-    labelPos.x = this.centerPoint.x + labelPositionData[this.labelPosition].x;
-    labelPos.y = this.centerPoint.y + labelPositionData[this.labelPosition].y;
-    return labelPos;
-  }
-
-  public getLabelContent() {
-    return this.labelContent;
-  }
-
-  public getLabelStyle() {
-    return this.labelStyle;
-  }
-
-  public getLabelPosition() {
-    return this.labelPosition;
-  }
-
   public setLabelText(content: string) {
     const label: any = this.getChildByName('group_label');
     const graph: any = this.getChildByName('edge_group');
@@ -190,6 +152,32 @@ export class EdgeGroup extends CommonElement {
       }
     });
     return _.uniq(nodes);
+  }
+
+  private getLabelPos() {
+    let height = 0;
+    const graph: any = this.getChildByName('edge_group');
+    if (graph) {
+      height = graph.height;
+    }
+    const labelPositionData: any = {
+      Center: {
+        x: 0,
+        y: 0,
+      },
+      Above: {
+        x: 0,
+        y: -(height / 2),
+      },
+      Below: {
+        x: 0,
+        y: (height / 2),
+      },
+    };
+    const labelPos = { x: 0, y: 0 };
+    labelPos.x = this.centerPoint.x + labelPositionData[this.labelPosition].x;
+    labelPos.y = this.centerPoint.y + labelPositionData[this.labelPosition].y;
+    return labelPos;
   }
 
   private updateLabelPos() {

@@ -1076,9 +1076,9 @@ const simpleData = function () {
   network.toggleLabel(1, 2);
 };
 network.callback = () => {
-  simpleData();
+  // simpleData();
   // noData();
-  // edgeGroupDemo();
+  edgeGroupDemo();
   // dataFlowDemo();
 };
 const body = document.getElementById('network');
@@ -1165,34 +1165,37 @@ const emptyObj = {
   location: { x: 100, y: 100 },
   size: 100,
 };
+let groupLabel = true;
 if (groupLabelToggle) {
   groupLabelToggle.addEventListener('click', () => {
-    const emptyGroup = network.createGroup(emptyObj);
-    emptyGroup.defaultStyle.fillColor = 0X00ff00;
-    emptyGroup.defaultStyle.fillOpacity = 0.5;
-    emptyGroup.draw();
-    network.addElement(emptyGroup);
-    emptyGroup.setLabel('text', 'Center');
-    network.syncView();
-    emptyGroup.on('rightclick', (event: any) => {
-      network.menu.setMenuItems([
-        { label: 'add child node', id: '0' },
-        { label: 'change style', id: '1' },
-      ]);
-      network.menu.menuOnAction = (id) => {
-        if (id === '0') {
-          const node1 = _.get(network.getNodeObj(), '192.168.30.0/24');
-          const node2 = _.get(network.getNodeObj(), '192.168.40.0/24');
-          emptyGroup.addChildNodes(node1);
-          emptyGroup.addChildNodes(node2);
-        } else if (id === '1') {
-          emptyGroup.defaultStyle.fillColor = 0Xff0000;
-          emptyGroup.draw();
-        }
-      };
-      network.menu.setClass('popMenu');
-      network.menu.showMenu(event);
-    });
+    groupLabel = !groupLabel;
+    network.groupLabelToggle(groupLabel);
+    // const emptyGroup = network.createGroup(emptyObj);
+    // emptyGroup.defaultStyle.fillColor = 0X00ff00;
+    // emptyGroup.defaultStyle.fillOpacity = 0.5;
+    // emptyGroup.draw();
+    // network.addElement(emptyGroup);
+    // emptyGroup.setLabel('text', 'Center');
+    // network.syncView();
+    // emptyGroup.on('rightclick', (event: any) => {
+    //   network.menu.setMenuItems([
+    //     { label: 'add child node', id: '0' },
+    //     { label: 'change style', id: '1' },
+    //   ]);
+    //   network.menu.menuOnAction = (id) => {
+    //     if (id === '0') {
+    //       const node1 = _.get(network.getNodeObj(), '192.168.30.0/24');
+    //       const node2 = _.get(network.getNodeObj(), '192.168.40.0/24');
+    //       emptyGroup.addChildNodes(node1);
+    //       emptyGroup.addChildNodes(node2);
+    //     } else if (id === '1') {
+    //       emptyGroup.defaultStyle.fillColor = 0Xff0000;
+    //       emptyGroup.draw();
+    //     }
+    //   };
+    //   network.menu.setClass('popMenu');
+    //   network.menu.showMenu(event);
+    // });
     // grouptitleToggle = !grouptitleToggle;
     // const node = network.getNodeObj();
     // _.each(node, (n: any) => {

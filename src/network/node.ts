@@ -246,14 +246,6 @@ export class Node extends CommonElement {
     }
   }
 
-  public getLabelContent() {
-    return this.labelContent;
-  }
-
-  public getLabelStyle() {
-    return this.labelStyle;
-  }
-
   public setLabelText(content: string) {
     const label: any = this.getChildByName('node_label');
     if (label) {

@@ -141,16 +141,6 @@ export class Edge extends CommonElement {
     }
   }
 
-  // Get label content on the edge
-  public getLabelContent() {
-    return this.labelContent;
-  }
-
-  // Get label style on the edge
-  public getLabelStyle() {
-    return this.labelStyle;
-  }
-
   // Get edge group included this edge
   public setIncluedGroup(group: EdgeGroup) {
     this.includeGroup.push(group);
@@ -160,6 +150,14 @@ export class Edge extends CommonElement {
   public edgeNodesSortUIDStr(edge?: Edge) {
     const edgeTmp = edge ? edge : this;
     return [edgeTmp.startNode.getUID(), edgeTmp.endNode.getUID()].sort().join();
+  }
+
+  public getSrcNode() {
+    return this.startNode;
+  }
+
+  public getTargetNode() {
+    return this.endNode;
   }
 
   // Get origin position with nodes or groups
@@ -174,8 +172,8 @@ export class Edge extends CommonElement {
     if (node instanceof Group) {
       const position = node.getGroupPosition();
       if (position) {
-        x = position[0];
-        y = position[1];
+        x = position.x;
+        y = position.y;
       } else {
         x = 0;
         y = 0;

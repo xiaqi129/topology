@@ -27,10 +27,10 @@ export interface IAdjustedNodePosition {
 
 const Point = PIXI.Point;
 export class DataFlow extends CommonElement {
-  public background: PIXI.Graphics;
-  public neon: PIXI.Graphics;
-  public flowLength: number = 30;
   public type: string = 'DataFlow';
+  public flowLength: number = 30;
+  private background: PIXI.Graphics;
+  private neon: PIXI.Graphics;
   private moveDistance: number = 0;
   private start: Node;
   private end: Node;

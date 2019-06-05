@@ -315,7 +315,7 @@ export class Network {
 
   // Full screen the whole network topology
   public zoomOver() {
-    let center: number[] = [];
+    let center: IPosition = { x: 0, y: 0 };
     const zoomRate = this.analyzeZoom();
     this.zoom = this.zoom * zoomRate;
     const nodes = this.getNodeObj();
@@ -330,7 +330,7 @@ export class Network {
     } else {
       const vertexPointsList = this.vertexPoints();
       const analyzeCenter = (new polygon(vertexPointsList)).center();
-      center = [analyzeCenter.x, analyzeCenter.y];
+      center = analyzeCenter;
     }
     this.moveToCenter(center);
     this.toggleLabel(this.nodeLabel, this.edgeLabel);
@@ -382,8 +382,7 @@ export class Network {
   public moveCenter() {
     const vertexPointsList = this.vertexPoints();
     const analyzeCenter = (new polygon(vertexPointsList)).center();
-    const center = [analyzeCenter.x, analyzeCenter.y];
-    this.moveToCenter(center);
+    this.moveToCenter(analyzeCenter);
   }
 
   // Set up tooltip show or hide
@@ -402,10 +401,20 @@ export class Network {
   public groupLabelToggle(labelToggle: boolean) {
     const groups = this.getGroupObj();
     _.each(groups, (group: Group) => {
-      if (labelToggle) {
-        group.setLabel(group.getLabelContent(), group.getLabelPosition(), group.getLabelStyle());
-      } else {
-        group.removeChild(group.getChildByName('group_label'));
+      const groupLabel = group.getChildByName('group_label');
+      if (groupLabel) {
+        groupLabel.visible = labelToggle;
+      }
+    });
+  }
+
+  // Set up show or hide edge group's label
+  public edgeGroupLabelToggle(labelToggle: boolean) {
+    const groups = this.getEdgeGroup();
+    _.each(groups, (group: EdgeGroup) => {
+      const groupLabel = group.getChildByName('group_label');
+      if (groupLabel) {
+        groupLabel.visible = labelToggle;
       }
     });
   }
@@ -794,11 +803,11 @@ export class Network {
     }
   }
 
-  private moveToCenter(center: number[]) {
+  private moveToCenter(center: IPosition) {
     const wrapperCenter = this.getCenter();
     const nodes = this.getNodeObj();
-    const moveX = wrapperCenter.x - center[0];
-    const moveY = wrapperCenter.y - center[1];
+    const moveX = wrapperCenter.x - center.x;
+    const moveY = wrapperCenter.y - center.y;
     _.each(nodes, (node: Node) => {
       node.x = node.x + moveX;
       node.y = node.y + moveY;
