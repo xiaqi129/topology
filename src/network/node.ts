@@ -21,24 +21,23 @@ export interface IMark {
 }
 
 export class Node extends CommonElement {
-  public isLock: boolean = false;
-  public incluedGroups: Group[] = [];
-  public iconWidth: number = 20;
-  public labelContent: string = '';
-  public iconHeight: number = 20;
-  public clients: {} = {};
-  public icon: any;
-  public tooltip: Tooltip;
   public type: string = 'Node';
-  public defaultWidth: number = 20;
-  public defaultHeight: number = 20;
+  public icon: string = '';
+  public includedGroups: Group[] = [];
   public linksArray: Edge[] = [];
+  public iconWidth: number = 20;
+  public iconHeight: number = 20;
   public markList: IMark[] = [];
-  private parentNode: Group | null = null;
-  private data: any;
+  public tooltip: Tooltip;
+  public isLock: boolean = false;
+  public clients: {} = {};
+  private defaultWidth: number = 20;
+  private defaultHeight: number = 20;
+  private labelContent: string = '';
+  private data: any = null;
   private elements: Edge | CommonElement[];
   private selectedNodes: any[] = [];
-  private dragging: boolean;
+  private dragging: boolean = false;
   private last: any;
   private labelStyle: {} = {};
 
@@ -48,33 +47,12 @@ export class Node extends CommonElement {
     selectedNodes: any[] = [],
     icon?: any) {
     super();
-    this.data = null;
-    this.labelStyle = {};
-    this.dragging = false;
     this.elements = elements;
     this.selectedNodes = selectedNodes;
     this.icon = icon;
-    this.draw();
     this.tooltip = new Tooltip(domRegex);
-    this.interactive = true;
-    this.buttonMode = true;
-    this
-      .on('mousedown', this.onDragStart)
-      .on('mouseup', this.onDragEnd)
-      .on('mouseupoutside', this.onDragEnd)
-      .on('mousemove', this.onDragMove);
-  }
-
-  public setParentNode(node: Group) {
-    this.parentNode = node;
-  }
-
-  public getChildNode() {
-    return this.children[0];
-  }
-
-  public getParentNode() {
-    return this.parentNode;
+    this.setDrag();
+    this.draw();
   }
 
   public setNodeSize(width: number, height: number) {
@@ -83,6 +61,14 @@ export class Node extends CommonElement {
     this.defaultWidth = width;
     this.defaultHeight = height;
     this.draw();
+  }
+
+  public getDefaultSize() {
+    const result = {
+      width: this.defaultWidth,
+      height: this.defaultHeight,
+    };
+    return result;
   }
 
   public draw() {
@@ -117,62 +103,7 @@ export class Node extends CommonElement {
         this.setChildIndex(addSprite, this.children.length - 1);
       }
     });
-  }
-
-  public onDragStart(event: PIXI.interaction.InteractionEvent) {
-    const parent = this.parent.toLocal(event.data.global);
-    const isInSelect = _.find(this.selectedNodes, (node) => {
-      return node === this;
-    });
-    if (!(this.selectedNodes.length > 0 && isInSelect)) {
-      _.remove(this.selectedNodes);
-    }
-    event.stopPropagation();
-    this.dragging = true;
-    this.data = event.data;
-    this.last = { parents: parent, x: event.data.global.x, y: event.data.global.y };
-  }
-
-  public onDragEnd() {
-    this.dragging = false;
-    this.data = null;
-    this.last = null;
-  }
-
-  public onDragMove(event: PIXI.interaction.InteractionEvent) {
-    if (this.dragging) {
-      const newPosition = this.data.getLocalPosition(this.parent);
-      const isInSelect = _.find(this.selectedNodes, (node) => {
-        return node === this;
-      });
-      if (this.selectedNodes.length > 0 && isInSelect
-        && this.last) {
-        const distX = event.data.global.x;
-        const distY = event.data.global.y;
-        _.each(this.selectedNodes, (node) => {
-          node.position.x += (newPosition.x - this.last.parents.x);
-          node.position.y += (newPosition.y - this.last.parents.y);
-        });
-        this.last = { parents: newPosition, x: distX, y: distY };
-      } else {
-        this.position.x = newPosition.x;
-        this.position.y = newPosition.y;
-      }
-      this.redrawEdge();
-    }
-  }
-
-  public redrawEdge() {
-    _.each(this.elements, (element: any) => {
-      // redraw elements
-      if (element instanceof EdgeBundle) {
-        _.each(element.children, (edge: any) => {
-          edge.draw();
-        });
-      } else if (!(element instanceof Node)) {
-        element.draw();
-      }
-    });
+    return graph;
   }
 
   public drawSprite(icon: any) {
@@ -206,60 +137,18 @@ export class Node extends CommonElement {
         this.setChildIndex(markSprite, this.children.length - 1);
       }
     });
-  }
-
-  public switchPos(addSprite: any, pos: string) {
-    switch (pos) {
-      case 'top':
-        addSprite.x = -(addSprite.width / 2);
-        addSprite.y = -addSprite.height;
-        break;
-      case 'left':
-        addSprite.x = -addSprite.width;
-        addSprite.y = -(addSprite.height / 2);
-        break;
-      case 'bottom':
-        addSprite.x = -(addSprite.width / 2);
-        addSprite.y = 0;
-        break;
-      case 'right':
-        addSprite.x = 0;
-        addSprite.y = -(addSprite.height / 2);
-        break;
-      case 'top-left':
-        addSprite.x = -addSprite.width;
-        addSprite.y = -addSprite.height;
-        break;
-      case 'top-right':
-        addSprite.x = 0;
-        addSprite.y = -addSprite.height;
-        break;
-      case 'bottom-left':
-        addSprite.x = -addSprite.width;
-        addSprite.y = 0;
-        break;
-      case 'bottom-right':
-        addSprite.x = 0;
-        addSprite.y = 0;
-        break;
-      default:
-        addSprite.x = -(addSprite.width / 2);
-        addSprite.y = -addSprite.height;
-        break;
-    }
+    return node;
   }
 
   public getWidth() {
-    const sprite: any = this.getChildByName('node_sprite') ?
-      this.getChildByName('node_sprite') : this.getChildByName('node_graph');
+    const sprite: any = this.getSprite();
     if (sprite) {
       return sprite.width;
     }
   }
 
   public getHeight() {
-    const sprite: any = this.getChildByName('node_sprite') ?
-      this.getChildByName('node_sprite') : this.getChildByName('node_graph');
+    const sprite: any = this.getSprite();
     if (sprite) {
       return sprite.height;
     }
@@ -323,10 +212,11 @@ export class Node extends CommonElement {
     this.removeListener('mouseover');
     this.removeListener('mouseout');
     this.tooltip.addTooltip(this, content, style);
+    return this.tooltip;
   }
 
   // Set Node Label
-  public setLabel(content?: string, style?: PIXI.TextStyleOptions) {
+  public setLabel(content: string, style?: PIXI.TextStyleOptions) {
     if (style) {
       _.extend(this.labelStyle, style);
     }
@@ -370,26 +260,29 @@ export class Node extends CommonElement {
       label.setText(content);
       this.labelContent = content;
     }
+    return label;
   }
 
   public setLabelStyle(style: any) {
     const label: any = this.getChildByName('node_label');
     _.extend(this.labelStyle, style);
     label.setStyle(style);
+    return label;
   }
 
   public changeIcon(icon: string) {
     this.icon = icon;
     this.removeChild(this.getChildByName('node_sprite'));
-    this.drawSprite(icon);
+    const node = this.drawSprite(icon);
+    return node;
   }
 
   public setIncluedGroup(group: Group) {
-    this.incluedGroups.push(group);
+    this.includedGroups.push(group);
   }
 
   public getIncluedGroup() {
-    return this.incluedGroups;
+    return this.includedGroups;
   }
   // add and remove node mark at node around
   public addNodeMark(icon: string, pos: string, iconWidth?: number, iconHeight?: number) {
@@ -440,6 +333,113 @@ export class Node extends CommonElement {
         return mark.name === icon;
       });
     }
+  }
+
+  private switchPos(addSprite: any, pos: string) {
+    switch (pos) {
+      case 'top':
+        addSprite.x = -(addSprite.width / 2);
+        addSprite.y = -addSprite.height;
+        break;
+      case 'left':
+        addSprite.x = -addSprite.width;
+        addSprite.y = -(addSprite.height / 2);
+        break;
+      case 'bottom':
+        addSprite.x = -(addSprite.width / 2);
+        addSprite.y = 0;
+        break;
+      case 'right':
+        addSprite.x = 0;
+        addSprite.y = -(addSprite.height / 2);
+        break;
+      case 'top-left':
+        addSprite.x = -addSprite.width;
+        addSprite.y = -addSprite.height;
+        break;
+      case 'top-right':
+        addSprite.x = 0;
+        addSprite.y = -addSprite.height;
+        break;
+      case 'bottom-left':
+        addSprite.x = -addSprite.width;
+        addSprite.y = 0;
+        break;
+      case 'bottom-right':
+        addSprite.x = 0;
+        addSprite.y = 0;
+        break;
+      default:
+        addSprite.x = -(addSprite.width / 2);
+        addSprite.y = -addSprite.height;
+        break;
+    }
+  }
+  // set node can be draged
+  private setDrag() {
+    this.interactive = true;
+    this.buttonMode = true;
+    this
+      .on('mousedown', this.onDragStart)
+      .on('mouseup', this.onDragEnd)
+      .on('mouseupoutside', this.onDragEnd)
+      .on('mousemove', this.onDragMove);
+  }
+
+  private onDragStart(event: PIXI.interaction.InteractionEvent) {
+    const parent = this.parent.toLocal(event.data.global);
+    const isInSelect = _.find(this.selectedNodes, (node) => {
+      return node === this;
+    });
+    if (!(this.selectedNodes.length > 0 && isInSelect)) {
+      _.remove(this.selectedNodes);
+    }
+    event.stopPropagation();
+    this.dragging = true;
+    this.data = event.data;
+    this.last = { parents: parent, x: event.data.global.x, y: event.data.global.y };
+  }
+
+  private onDragEnd() {
+    this.dragging = false;
+    this.data = null;
+    this.last = null;
+  }
+
+  private onDragMove(event: PIXI.interaction.InteractionEvent) {
+    if (this.dragging) {
+      const newPosition = this.data.getLocalPosition(this.parent);
+      const isInSelect = _.find(this.selectedNodes, (node) => {
+        return node === this;
+      });
+      if (this.selectedNodes.length > 0 && isInSelect
+        && this.last) {
+        const distX = event.data.global.x;
+        const distY = event.data.global.y;
+        _.each(this.selectedNodes, (node) => {
+          node.position.x += (newPosition.x - this.last.parents.x);
+          node.position.y += (newPosition.y - this.last.parents.y);
+        });
+        this.last = { parents: newPosition, x: distX, y: distY };
+      } else {
+        this.position.x = newPosition.x;
+        this.position.y = newPosition.y;
+      }
+      this.redrawEdge();
+    }
+  }
+
+  private redrawEdge() {
+    _.each(this.elements, (element: any) => {
+      // redraw elements
+      if (element instanceof EdgeBundle) {
+        _.each(element.children, (edge: any) => {
+          edge.draw();
+        });
+      } else if (!(element instanceof Node)) {
+        element.draw();
+      }
+    });
   }
 
 }

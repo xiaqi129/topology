@@ -96,8 +96,8 @@ export class Group extends CommonElement {
     let insideEdge: Edge[] = this.filterInsideEdge();
     let fatherNode: Node[] = [];
     _.each(outsideEdges, (edge: Edge) => {
-      const srcNode = edge.getSrcNode();
-      const targetNode = edge.getTargetNode();
+      const srcNode = edge.startNode;
+      const targetNode = edge.endNode;
       if (_.includes(nodes, srcNode) && !(_.includes(nodes, targetNode))) {
         if (!(_.includes(fatherNode, srcNode))) {
           fatherNode.push(srcNode);
@@ -113,8 +113,8 @@ export class Group extends CommonElement {
       const childNode: Node[] = [];
       const removeEdge: Edge[] = [];
       _.each(insideEdge, (edge: Edge) => {
-        const srcNode = edge.getSrcNode();
-        const targetNode = edge.getTargetNode();
+        const srcNode = edge.startNode;
+        const targetNode = edge.endNode;
         if (_.includes(fatherNode, srcNode) && !(_.includes(childNode, targetNode))) {
           childNode.push(targetNode);
           removeEdge.push(edge);
@@ -206,8 +206,8 @@ export class Group extends CommonElement {
     let subStratum: any = [];
     this.substratumInfo = [];
     _.each(this.childrenNode, (node: Node) => {
-      const index = _.indexOf(node.incluedGroups, this) + 1;
-      const sliceList = _.slice(node.incluedGroups, index);
+      const index = _.indexOf(node.includedGroups, this) + 1;
+      const sliceList = _.slice(node.includedGroups, index);
       subStratum = _.concat(subStratum, sliceList);
     });
     this.substratumInfo = _.union(subStratum);
@@ -830,8 +830,8 @@ export class Group extends CommonElement {
     });
 
     edges = _.filter(edges, (edge: Edge) => {
-      const srcNode = edge.getSrcNode();
-      const targetNode = edge.getTargetNode();
+      const srcNode = edge.startNode;
+      const targetNode = edge.endNode;
       if (_.includes(nodes, srcNode) || (_.includes(nodes, targetNode))) {
         return true;
       }
@@ -847,8 +847,8 @@ export class Group extends CommonElement {
     });
     nodes = _.concat(nodes, this.substratumInfo);
     edges = _.filter(edges, (edge: Edge) => {
-      const srcNode = edge.getSrcNode();
-      const targetNode = edge.getTargetNode();
+      const srcNode = edge.startNode;
+      const targetNode = edge.endNode;
       return _.includes(nodes, srcNode) && _.includes(nodes, targetNode);
     });
     return edges;
@@ -1036,7 +1036,7 @@ export class Group extends CommonElement {
           _.each(showNodes, (node: Node) => {
             node.visible = true;
             showEdgeList = _.concat(showEdgeList, node.linksArray);
-            groups = _.concat(groups, node.incluedGroups);
+            groups = _.concat(groups, node.includedGroups);
           });
           _.each(showEdgeList, (edge: Edge) => {
             edge.visible = true;

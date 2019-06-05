@@ -16,18 +16,17 @@ import { Tooltip } from './tooltip';
 const Point = PIXI.Point;
 
 export class Edge extends CommonElement {
+  public type: string = 'Edge';
   public startNode: any;
   public endNode: any;
   public edge: PIXI.Graphics;
   public arrow: PIXI.Graphics;
-  public defaultColor: number = 0;
-  public labelToggle: boolean = false;
-  public brotherEdges: Edge[] = [];
-  public tooltip: Tooltip;
-  public polygonData: number[] = [];
-  public includeGroup: EdgeGroup[] = [];
-  public type: string = 'Edge';
   public bundleParent: any;
+  public includeGroup: EdgeGroup[] = [];
+  public tooltip: Tooltip;
+  public brotherEdges: Edge[] = [];
+  public defaultColor: number = 0;
+  public polygonData: number[] = [];
   private labelStyle: any;
   private labelContent: string[];
 
@@ -49,11 +48,122 @@ export class Edge extends CommonElement {
     this.tooltip = new Tooltip(domRegex);
   }
 
-  public getEdge() {
-    return this.edge;
+  // Basic draw
+  public draw() {
+    this.clearEdgeRelatedGraph();
+    const style = this.defaultStyle;
+    const lineDistance = style.lineDistance;
+    let srcNodePos = this.getLineNodePosition(this.startNode);
+    let endNodePos = this.getLineNodePosition(this.endNode);
+    const angle = this.getAngle(srcNodePos, endNodePos);
+    srcNodePos = this.getAdjustedLocation(
+      srcNodePos,
+      -1,
+      angle,
+      this.getDistance(this.startNode, lineDistance),
+    );
+    endNodePos = this.getAdjustedLocation(
+      endNodePos,
+      1,
+      angle,
+      this.getDistance(this.endNode, lineDistance),
+    );
+    let elements: any[] = [];
+    if (style.lineType === 0 && style.lineFull === 0) {
+      elements = this.drawLineEdge(srcNodePos, endNodePos, angle, this.defaultStyle);
+    } else if (style.lineType === 1 && style.lineFull === 0) {
+      elements = this.drawBezierEdge(srcNodePos, endNodePos, this.defaultStyle);
+    } else if (style.lineType === 0 && style.lineFull === 1) {
+      elements = this.drawImaginaryEdge(srcNodePos, endNodePos, this.defaultStyle);
+    } else if (style.lineType === 1 && style.lineFull === 1) {
+      elements = this.drawDottedEdge(srcNodePos, endNodePos, this.defaultStyle);
+    }
+    this.addChildren(elements);
+    this.addOthers();
   }
 
-  public getLineNodePosition(node: Node | Group) {
+  // Selected an edge
+  public selectOn() {
+    const highLight = {
+      lineColor: 0X024997,
+    };
+    _.extend(this.defaultStyle, highLight);
+    this.draw();
+  }
+
+  // Cancle selected on the edge
+  public selectOff() {
+    this.setStyle({
+      lineColor: this.defaultColor,
+    });
+  }
+
+  // Set up tooltip on the edge
+  public setTooltip(content: string, style?: any) {
+    this.removeListener('mouseover');
+    this.removeListener('mouseout');
+    this.tooltip.addTooltip(this, content || `${this.startNode.id}  >>>>  ${this.endNode.id}`, style);
+    return this.tooltip;
+  }
+
+  // Set up label on the edge
+  public setLabel(srcContent: string, endContent: string, style?: PIXI.TextStyleOptions) {
+    if (style) {
+      _.extend(this.labelStyle, style);
+    }
+    const oldSrc = this.getChildByName('edge_srclabel');
+    const oldEnd = this.getChildByName('edge_endlabel');
+    if (oldSrc || oldEnd) {
+      oldSrc.destroy();
+      oldEnd.destroy();
+    }
+    if (srcContent || endContent) {
+      const srcLabel = new Label(srcContent, this.labelStyle);
+      const endLabel = new Label(endContent, this.labelStyle);
+      this.labelContent.push(srcContent);
+      this.labelContent.push(endContent);
+      this.labelContent = _.uniq(this.labelContent);
+      srcLabel.setPosition(0);
+      endLabel.setPosition(0);
+      srcLabel.name = 'edge_srclabel';
+      endLabel.name = 'edge_endlabel';
+      this.setLabelPosition(srcLabel, endLabel);
+      this.addChild(srcLabel);
+      this.addChild(endLabel);
+      if (this.defaultStyle.lineType === 1) {
+        this.draw();
+      }
+      const result = {
+        src: srcLabel,
+        end: endLabel,
+      };
+      return result;
+    }
+  }
+
+  // Get label content on the edge
+  public getLabelContent() {
+    return this.labelContent;
+  }
+
+  // Get label style on the edge
+  public getLabelStyle() {
+    return this.labelStyle;
+  }
+
+  // Get edge group included this edge
+  public setIncluedGroup(group: EdgeGroup) {
+    this.includeGroup.push(group);
+  }
+
+  // Get Nodes sort UID string with this edge
+  public edgeNodesSortUIDStr(edge?: Edge) {
+    const edgeTmp = edge ? edge : this;
+    return [edgeTmp.startNode.getUID(), edgeTmp.endNode.getUID()].sort().join();
+  }
+
+  // Get origin position with nodes or groups
+  private getLineNodePosition(node: Node | Group) {
     let x: number = 0;
     let y: number = 0;
     if (node instanceof Node) {
@@ -74,7 +184,8 @@ export class Edge extends CommonElement {
     return { x, y };
   }
 
-  public calcEdgePoints(start: any, end: any) {
+  // Get line points
+  private calcEdgePoints(start: any, end: any) {
     const lineWidth = this.defaultStyle.lineWidth;
     const lineDistance = this.defaultStyle.bezierLineDistance;
     const angle = this.getAngle();
@@ -120,7 +231,8 @@ export class Edge extends CommonElement {
     return results;
   }
 
-  public calcDottedEdgePoints(start: any, end: any, lineWidth: number) {
+  // Get imaginary line points
+  private calcDottedEdgePoints(start: any, end: any, lineWidth: number) {
     const half = lineWidth * 0.5;
     const breakNum = 15;
     const breakLength = 5;
@@ -202,7 +314,8 @@ export class Edge extends CommonElement {
     return pointsList;
   }
 
-  public drawEdge(graph: any, points: any) {
+  // Draw edge with line points
+  private drawEdge(graph: any, points: any) {
     const style = this.defaultStyle;
     graph.interactive = true;
     graph.lineStyle(style.lineWidth, style.lineColor);
@@ -214,7 +327,8 @@ export class Edge extends CommonElement {
     graph.endFill();
   }
 
-  public drawImaginaryLink(graph: any, points: any) {
+  // Draw imaginary line with imaginary line points
+  private drawImaginaryLink(graph: any, points: any) {
     const style = this.defaultStyle;
     graph.interactive = true;
     _.each(points, (point) => {
@@ -228,18 +342,21 @@ export class Edge extends CommonElement {
     });
   }
 
-  public edgeLength(sx: number, sy: number, ex: number, ey: number) {
+  // The length of the Pythagorean theorem to get the line
+  private edgeLength(sx: number, sy: number, ex: number, ey: number) {
     return Math.pow(Math.pow(sx - ex, 2) + Math.pow(sy - ey, 2), 0.5);
   }
 
-  public getAngle(
+  // Get start node and end node angle
+  private getAngle(
     srcNodeLocation?: { [key: string]: number }, endNodeLocation?: { [key: string]: number }) {
     const srcNodePos = srcNodeLocation || this.getLineNodePosition(this.startNode);
     const endNodePos = endNodeLocation || this.getLineNodePosition(this.endNode);
     return Math.atan2(srcNodePos.x - endNodePos.x, srcNodePos.y - endNodePos.y);
   }
 
-  public getControlPoint(
+  // Get the center of the curve
+  private getControlPoint(
     srcNodePos: { [key: string]: number },
     endNodePos: { [key: string]: number },
   ) {
@@ -256,7 +373,8 @@ export class Edge extends CommonElement {
     return [sxc, syc, exc, eyc];
   }
 
-  public getParallelPoint(edge: { [key: string]: number }, lineSpace: number, angle: number) {
+  // Get parallel points
+  private getParallelPoint(edge: { [key: string]: number }, lineSpace: number, angle: number) {
     const x = _.get(edge, 'x', 0);
     const y = _.get(edge, 'y', 0);
     return {
@@ -265,7 +383,8 @@ export class Edge extends CommonElement {
     };
   }
 
-  public drawBezierCurve(
+  // Draw curve
+  private drawBezierCurve(
     graph: any, points: any, angle: number, curveDistance: number, curveDegree: number) {
     const style = this.defaultStyle;
     graph.lineStyle(0, style.lineColor);
@@ -317,7 +436,8 @@ export class Edge extends CommonElement {
     return [parallelPoint.x, parallelPoint.y].concat(points);
   }
 
-  public drawDottedBezierCurve(
+  // Draw imaginary curve
+  private drawDottedBezierCurve(
     graph: any, points: any, angle: number, curveDistance: number = 10, curveDegree: number = 50) {
     const style = this.defaultStyle;
     const bezier = new PIXI.Graphics();
@@ -360,58 +480,8 @@ export class Edge extends CommonElement {
     });
   }
 
-  public getSrcNode() {
-    return this.startNode;
-  }
-
-  public getTargetNode() {
-    return this.endNode;
-  }
-
-  public getStyle() {
-    return this.defaultStyle;
-  }
-
-  public setNodes(startNode: Node | Group, endNode: Node | Group) {
-    this.startNode = startNode;
-    this.endNode = endNode;
-  }
-
-  public setStartNode(node: Node | Group) {
-    this.startNode = node;
-  }
-
-  public setEndNode(node: Node | Group) {
-    this.endNode = node;
-  }
-
-  /**
-   * set arrow type
-   * :0 from --> to
-   * :1 from <-- to
-   * :2 from <-> to
-   */
-  public setArrowStyle(type: number) {
-    this.defaultStyle.arrowType = type;
-  }
-
-  public getLineFromNodePos(startNode: any) {
-    const nodePos = {
-      x: startNode.x,
-      y: startNode.y,
-    };
-    return nodePos;
-  }
-
-  public getLineendNodePos(endNode: any) {
-    const nodePos = {
-      x: endNode.x,
-      y: endNode.y,
-    };
-    return nodePos;
-  }
-
-  public getAdjustedLocation(node: any, n: number, angel: number, distanceRound: number) {
+  // Get adjusted position with start node and end node
+  private getAdjustedLocation(node: any, n: number, angel: number, distanceRound: number) {
     const location = {
       x: node.x + n * distanceRound * Math.sin(angel),
       y: node.y + n * distanceRound * Math.cos(angel),
@@ -420,7 +490,8 @@ export class Edge extends CommonElement {
     return location;
   }
 
-  public getArrowPints(pos: any, angle: number, direction: boolean = true) {
+  // Get the path of the arrow
+  private getArrowPints(pos: any, angle: number, direction: boolean = true) {
     const arrowAngel = this.defaultStyle.arrowAngle;
     const middleLength = this.defaultStyle.arrowMiddleLength;
     const angelT = angle + _.divide(arrowAngel * Math.PI, 180);
@@ -447,7 +518,8 @@ export class Edge extends CommonElement {
     };
   }
 
-  public createArrow(position: any, angle: number, reverse: boolean = true) {
+  // Create arrow
+  private createArrow(position: any, angle: number, reverse: boolean = true) {
     const style = this.defaultStyle;
     this.arrow.name = 'edge_arrow';
     this.arrow.lineStyle(style.arrowWidth, style.arrowColor, 1);
@@ -461,17 +533,20 @@ export class Edge extends CommonElement {
     return this.arrow;
   }
 
-  public clearEdgeRelatedGraph() {
+  // Clear edge and arrow
+  private clearEdgeRelatedGraph() {
     this.edge.clear();
     this.arrow.clear();
   }
 
-  public getDistance(node: Node | Group, lineDistance: number) {
+  // Get distance to adjusted node position
+  private getDistance(node: Node | Group, lineDistance: number) {
     const result = node.getWidth() < node.getHeight() ? node.getWidth() : node.getHeight();
     return result * 0.5 + lineDistance;
   }
 
-  public createLinkEdge(srcNodePos: any, endNodePos: any, style: any) {
+  // Complete generated edge
+  private createLinkEdge(srcNodePos: any, endNodePos: any, style: any) {
     const points = this.calcEdgePoints(
       srcNodePos, endNodePos);
     this.drawEdge(this.edge, points);
@@ -483,7 +558,8 @@ export class Edge extends CommonElement {
     return this.edge;
   }
 
-  public createImaginaryEdge(srcNodePos: any, endNodePos: any, style: any) {
+  // Complete generated imaginary line
+  private createImaginaryEdge(srcNodePos: any, endNodePos: any, style: any) {
     const pointsList = this.calcDottedEdgePoints(
       srcNodePos, endNodePos, style.lineWidth);
     const polygonData: number[] = [];
@@ -497,7 +573,8 @@ export class Edge extends CommonElement {
     return this.edge;
   }
 
-  public createLinkArrows(
+  // Complete genneated arrow
+  private createLinkArrows(
     srcNodePos: any, endNodePos: any, angle: any, style: any) {
     const arrowsDirections = [[true], [false], [true, false], [undefined]];
     const directions = arrowsDirections[style.arrowType];
@@ -510,49 +587,8 @@ export class Edge extends CommonElement {
     return this.arrow;
   }
 
-  public getBrotherEdges() {
-    return this.brotherEdges;
-  }
-
-  public removeBrotherEdge(edge: Edge) {
-    const edges = _.remove(this.brotherEdges, (brotherEdge: Edge) => {
-      return brotherEdge === edge;
-    });
-    if (edges) {
-      this.draw();
-    }
-  }
-
-  public edgeNodesSortUIDStr(edge?: Edge) {
-    const edgeTmp = edge ? edge : this;
-    return [edgeTmp.getSrcNode().getUID(), edgeTmp.getTargetNode().getUID()].sort().join();
-  }
-
-  public addEdgesToBundle(edge: Edge) {
-    if (
-      edge instanceof Edge &&
-      edge.getBrotherEdges.length === 0
-    ) {
-      const edgeNodesIDStr = this.edgeNodesSortUIDStr(edge);
-      const currentEdgeNodesIDStr = this.edgeNodesSortUIDStr(this);
-      if (edgeNodesIDStr === currentEdgeNodesIDStr) {
-        this.brotherEdges.push(edge);
-        this.draw();
-      } else {
-        throw Error('Brother edges added, must drawn between same nodes.');
-      }
-    } else {
-      throw Error(
-        'The element must be intance of Edge and should be without other brother edges.');
-    }
-  }
-
-  public getChildEdges() {
-    const children = this.brotherEdges;
-    // _.filter()
-  }
-
-  public createBezierEdge(
+  // Complete generated curve
+  private createBezierEdge(
     srcNodePos: any,
     endNodePos: any,
     controlPoints: any,
@@ -584,17 +620,20 @@ export class Edge extends CommonElement {
     return [this.edge, curveEnds];
   }
 
-  public bezierTangent(a: number, b: number, c: number, d: number, t: number) {
+  // Calculate bezier tangent
+  private bezierTangent(a: number, b: number, c: number, d: number, t: number) {
     return 3 * t * t * (-a + 3 * b - 3 * c + d) + 6 * t * (a - 2 * b + c) + 3 * (-a + b);
   }
 
-  public getTangentAngle(start: any, cps: any, end: any, t: any) {
+  // Get bezier angle
+  private getTangentAngle(start: any, cps: any, end: any, t: any) {
     const tx = this.bezierTangent(start.x, cps[0], cps[2], end.x, t);
     const ty = this.bezierTangent(start.y, cps[1], cps[3], end.y, t);
     return Math.atan2(tx, ty) + Math.PI;
   }
 
-  public bezierArrowPoints(
+  // Get curve's arrow points
+  private bezierArrowPoints(
     pos: any,
     angleLine: any,
     endArrow: any,
@@ -624,7 +663,8 @@ export class Edge extends CommonElement {
     };
   }
 
-  public createBezierArrows(
+  // Complete generated curve's arrow
+  private createBezierArrows(
     srcNodePos: any,
     endNodePos: any,
     controlPoints: any,
@@ -649,21 +689,8 @@ export class Edge extends CommonElement {
     return this.arrow;
   }
 
-  public selectOn() {
-    const highLight = {
-      lineColor: 0X024997,
-    };
-    _.extend(this.defaultStyle, highLight);
-    this.draw();
-  }
-
-  public selectOff() {
-    this.setStyle({
-      lineColor: this.defaultColor,
-    });
-  }
-
-  public drawLineEdge(
+  // Draw line edge
+  private drawLineEdge(
     srcNodePos: { [key: string]: number },
     endNodePos: { [key: string]: number },
     angle: number,
@@ -673,7 +700,8 @@ export class Edge extends CommonElement {
     return [edge, arrow];
   }
 
-  public drawBezierEdge(
+  // Draw bezier edge
+  private drawBezierEdge(
     srcNodePos: { [key: string]: number },
     endNodePos: { [key: string]: number },
     style: IStyles,
@@ -699,7 +727,8 @@ export class Edge extends CommonElement {
     return [edgeRelated[0], arrow];
   }
 
-  public drawImaginaryEdge(
+  // Draw imaginary edge
+  private drawImaginaryEdge(
     srcNodePos: any,
     endNodePos: any,
     style: any,
@@ -712,7 +741,8 @@ export class Edge extends CommonElement {
     return [edge];
   }
 
-  public drawDottedEdge(
+  // Draw imaginary curve
+  private drawDottedEdge(
     srcNodePos: any,
     endNodePos: any,
     style: any,
@@ -744,50 +774,8 @@ export class Edge extends CommonElement {
     return [this.edge];
   }
 
-  public draw() {
-    this.clearEdgeRelatedGraph();
-    const style = this.defaultStyle;
-    const lineDistance = style.lineDistance;
-    let srcNodePos = this.getLineNodePosition(this.startNode);
-    let endNodePos = this.getLineNodePosition(this.endNode);
-    const angle = this.getAngle(srcNodePos, endNodePos);
-    srcNodePos = this.getAdjustedLocation(
-      srcNodePos,
-      -1,
-      angle,
-      this.getDistance(this.startNode, lineDistance),
-    );
-    endNodePos = this.getAdjustedLocation(
-      endNodePos,
-      1,
-      angle,
-      this.getDistance(this.endNode, lineDistance),
-    );
-    let elements: any[] = [];
-    if (style.lineType === 0 && style.lineFull === 0) {
-      elements = this.drawLineEdge(srcNodePos, endNodePos, angle, this.defaultStyle);
-    } else if (style.lineType === 1 && style.lineFull === 0) {
-      elements = this.drawBezierEdge(srcNodePos, endNodePos, this.defaultStyle);
-    } else if (style.lineType === 0 && style.lineFull === 1) {
-      elements = this.drawImaginaryEdge(srcNodePos, endNodePos, this.defaultStyle);
-    } else if (style.lineType === 1 && style.lineFull === 1) {
-      elements = this.drawDottedEdge(srcNodePos, endNodePos, this.defaultStyle);
-    }
-    this.addChildren(elements);
-    this.addOthers();
-  }
-
-  public setIncluedGroup(group: EdgeGroup) {
-    this.includeGroup.push(group);
-  }
-
-  public setTooltip(content?: string, style?: any) {
-    this.removeListener('mouseover');
-    this.removeListener('mouseout');
-    this.tooltip.addTooltip(this, content || `${this.startNode.id}  >>>>  ${this.endNode.id}`, style);
-  }
-
-  public addOthers() {
+  // Add label and so on after draw
+  private addOthers() {
     const bundleLabel = this.getChildByName('bundle_label');
     const bundleBackground = this.getChildByName('label_background');
     const srcLabel = this.getChildByName('edge_srclabel');
@@ -805,44 +793,8 @@ export class Edge extends CommonElement {
     }
   }
 
-  public setLabel(srcContent: string, endContent: string, style?: PIXI.TextStyleOptions) {
-    if (style) {
-      _.extend(this.labelStyle, style);
-    }
-    const oldSrc = this.getChildByName('edge_srclabel');
-    const oldEnd = this.getChildByName('edge_endlabel');
-    if (oldSrc || oldEnd) {
-      oldSrc.destroy();
-      oldEnd.destroy();
-    }
-    if (srcContent || endContent) {
-      const srcLabel = new Label(srcContent, this.labelStyle);
-      const endLabel = new Label(endContent, this.labelStyle);
-      this.labelContent.push(srcContent);
-      this.labelContent.push(endContent);
-      this.labelContent = _.uniq(this.labelContent);
-      srcLabel.setPosition(0);
-      endLabel.setPosition(0);
-      srcLabel.name = 'edge_srclabel';
-      endLabel.name = 'edge_endlabel';
-      this.setLabelPosition(srcLabel, endLabel);
-      this.addChild(srcLabel);
-      this.addChild(endLabel);
-      if (this.defaultStyle.lineType === 1) {
-        this.draw();
-      }
-    }
-  }
-
-  public getLabelContent() {
-    return this.labelContent;
-  }
-
-  public getLabelStyle() {
-    return this.labelStyle;
-  }
-
-  public setLabelPosition(srcLabel: PIXI.DisplayObject, endLabel: PIXI.DisplayObject) {
+  // Set label position
+  private setLabelPosition(srcLabel: PIXI.DisplayObject, endLabel: PIXI.DisplayObject) {
     const len = this.edgeLength(this.startNode.x, this.startNode.y, this.endNode.x, this.endNode.y) * 0.2;
     const angle = Math.atan2(this.startNode.y - this.endNode.y, this.startNode.x - this.endNode.x);
     if (this.defaultStyle.lineType !== 1) {
@@ -859,4 +811,5 @@ export class Edge extends CommonElement {
       endLabel.rotation = Math.atan2(this.endNode.y - this.startNode.y, this.endNode.x - this.startNode.x);
     }
   }
+
 }

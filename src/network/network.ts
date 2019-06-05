@@ -347,31 +347,38 @@ export class Network {
     return selectedNodes;
   }
 
+  // Set up some node to be selected
   public setSelectNodes(node: Node) {
     this.topo.setSelectedNodes(node);
   }
 
+  // Set up an edge to be selected
   public setSelectEdge(edge: Edge) {
     this.topo.setSelectedEdge(edge);
   }
 
+  // Set up some groups to be selected
   public setSelectGroups(group: Group) {
     this.topo.setSelectedGroups(group);
   }
 
+  // Get the selected edge
   public getSelectEdge() {
     const selectEdge = this.topo.getSelectedEdge();
     return selectEdge;
   }
 
+  // Get all selected groups
   public getSelectGroups() {
     return this.topo.getSelectedGroups();
   }
 
+  // Clean all selected elements
   public clearHighlight() {
     this.action.removeHighLight();
   }
 
+  // move topology to the center of screen
   public moveCenter() {
     const vertexPointsList = this.vertexPoints();
     const analyzeCenter = (new polygon(vertexPointsList)).center();
@@ -379,6 +386,7 @@ export class Network {
     this.moveToCenter(center);
   }
 
+  // Set up tooltip show or hide
   public setTooltipDisplay(isDisplay: boolean) {
     const nodes = this.getNodeObj();
     const edges = this.getEdgeObj();
@@ -390,6 +398,7 @@ export class Network {
     });
   }
 
+  // Set up show or hide group's label
   public groupLabelToggle(labelToggle: boolean) {
     const groups = this.getGroupObj();
     _.each(groups, (group: Group) => {
@@ -401,10 +410,12 @@ export class Network {
     });
   }
 
+  // Set up the background color of the canvas
   public changeBackgroundColor(color: number) {
     this.app.renderer.backgroundColor = color;
   }
 
+  // Set up show or hide edge's label
   public edgeLabelToggle(labelToggle: boolean) {
     const edges = this.getEdgeObj();
     _.each(edges, (edge: Edge) => {
@@ -417,6 +428,7 @@ export class Network {
     });
   }
 
+  // Set up show or hide bundle edge label
   public bundleLabelToggle(flag: boolean) {
     _.each(this.getElements(), (element) => {
       if (element instanceof EdgeBundle && !element.isExpanded) {
@@ -433,6 +445,7 @@ export class Network {
     });
   }
 
+  // Set up the color of the bundle edge label's background
   public changeBundleLabelColor(color: number) {
     _.each(this.getElements(), (element) => {
       if (element instanceof EdgeBundle) {
@@ -443,7 +456,8 @@ export class Network {
     });
   }
 
-  public setBundelExpanded(flag: boolean) {
+  // Set up bundle edge closed or expanded
+  public setBundleExpanded(flag: boolean) {
     _.each(this.getElements(), (element) => {
       if (element instanceof EdgeBundle && element.isExpanded !== flag) {
         element.setExpaned(flag);
@@ -451,6 +465,7 @@ export class Network {
     });
   }
 
+  // Set up show or hide node's label
   public nodeLabelToggle(labelToggle: boolean) {
     const nodes = this.getNodeObj();
     _.each(nodes, (node: Node) => {
@@ -461,6 +476,7 @@ export class Network {
     });
   }
 
+  // hide element
   public hideElement(element: any) {
     if (element instanceof Edge) {
       element.visible = false;
@@ -470,7 +486,7 @@ export class Network {
       _.each(element.linksArray, (edge: Edge) => {
         edge.visible = false;
       });
-      _.each(element.incluedGroups, (group: Group) => {
+      _.each(element.includedGroups, (group: Group) => {
         group.draw();
       });
     }
@@ -483,6 +499,7 @@ export class Network {
     }
   }
 
+  // show element
   public showElement(element: any) {
     if (element instanceof Edge) {
       element.visible = true;
@@ -494,7 +511,7 @@ export class Network {
           edge.visible = true;
         }
       });
-      _.each(element.incluedGroups, (group: Group) => {
+      _.each(element.includedGroups, (group: Group) => {
         group.draw();
       });
     }
@@ -507,6 +524,7 @@ export class Network {
     }
   }
 
+  // basic reDraw elements on canvas
   public reDraw() {
     const nodes = this.getNodeObj();
     const edgeObj: any = this.getEdgeObj();
@@ -554,6 +572,7 @@ export class Network {
     this.reDraw();
   }
 
+  // Based on the zoom number to show or hide node's and edge's label
   public toggleLabel(nodeVisibleZoom: number, edgeVisibleZoom: number) {
     this.nodeLabel = nodeVisibleZoom;
     this.edgeLabel = edgeVisibleZoom;
@@ -619,6 +638,8 @@ export class Network {
 
   private drawNode(node: Node, inWrapperNodesList: Node[]) {
     if (node.icon) {
+      const defaultWidth = node.getDefaultSize().width;
+      const defaultHeight = node.getDefaultSize().height;
       if (this.zoom < 0.4 && inWrapperNodesList.length > 300) {
         _.extend(node.defaultStyle, ({
           width: 4,
@@ -627,14 +648,14 @@ export class Network {
         node.drawGraph();
       } else {
         if (this.zoom <= 1.5 && this.zoom >= 0.3) {
-          node.iconWidth = NP.times(node.defaultWidth, this.zoom);
-          node.iconHeight = NP.times(node.defaultHeight, this.zoom);
+          node.iconWidth = NP.times(defaultWidth, this.zoom);
+          node.iconHeight = NP.times(defaultHeight, this.zoom);
         } else if (this.zoom < 0.3) {
-          node.iconWidth = NP.times(node.defaultWidth, 0.3);
-          node.iconHeight = NP.times(node.defaultHeight, 0.3);
+          node.iconWidth = NP.times(defaultWidth, 0.3);
+          node.iconHeight = NP.times(defaultHeight, 0.3);
         } else if (this.zoom > 1.5) {
-          node.iconWidth = NP.times(node.defaultWidth, 1.5);
-          node.iconHeight = NP.times(node.defaultHeight, 1.5);
+          node.iconWidth = NP.times(defaultWidth, 1.5);
+          node.iconHeight = NP.times(defaultHeight, 1.5);
         }
         node.drawSprite(node.icon);
       }

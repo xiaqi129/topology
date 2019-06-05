@@ -324,7 +324,7 @@ export class EdgeGroup extends CommonElement {
         _.each(edges, (edge: Edge) => {
           const startNode: Node = edge.startNode;
           const endNode: Node = edge.endNode;
-          nodesGroup.push(startNode.incluedGroups, endNode.incluedGroups);
+          nodesGroup.push(startNode.includedGroups, endNode.includedGroups);
           nodesLinkEdges = _.concat(nodesLinkEdges, startNode.linksArray, endNode.linksArray);
           nodesList.push(startNode, endNode);
         });

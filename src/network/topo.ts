@@ -79,18 +79,6 @@ export class Topo implements ITopo {
     this.addElements([element]);
   }
 
-  public addBrotherEdge(edge: Edge) {
-    const edgesFound: Edge[] = _.get(this.edgesGroupByNodes, edge.edgeNodesSortUIDStr());
-    if (edgesFound) {
-      const edgeFound: Edge | undefined = edgesFound.shift();
-      if (edgeFound) {
-        edgeFound.addEdgesToBundle(edge);
-      }
-      return true;
-    }
-    return false;
-  }
-
   // find brother edge not in edge bundle
   public findBrotherEdge(edge: Edge) {
     const edgesFound: Edge[] = _.get(this.edgesGroupByNodes, edge.edgeNodesSortUIDStr(), []);
@@ -159,7 +147,7 @@ export class Topo implements ITopo {
   }
 
   public getSortNodesUID(edge: Edge) {
-    const nodes = [edge.getSrcNode(), edge.getTargetNode()];
+    const nodes = [edge.startNode, edge.endNode];
     return [nodes[0].getUID(), nodes[1].getUID()].sort().join();
   }
 

@@ -727,7 +727,7 @@ const edgeGroupDemo = function () {
   network.setDrag();
   network.setZoom();
   network.setClick();
-  network.setBundelExpanded(false);
+  network.setBundleExpanded(false);
   network.moveCenter();
 };
 
@@ -744,13 +744,13 @@ const simpleData = function () {
     const client = device.clients.User_Mark;
     if (!(client === 'Hidden')) {
       const node = network.createNode('ROUTER-CISCO');
-      // const graph: any = node.getChildByName('node_graph');
+      // const graph = node.drawGraph();
       // graph.clear();
       // graph.lineStyle(2, 0xFFFFFF, 1);
       // graph.beginFill(0xAA4F08);
       // graph.drawRect(-30, -20, 60, 40);
       // graph.endFill();
-      // node.setNodeSize(25, 25);
+      // node.setNodeSize(35, 35);
       node.name = device.name;
       node.clients = device.clients;
       const tooltipContent = `
@@ -821,7 +821,7 @@ const simpleData = function () {
       //     r: radius,
       //   });
       // }
-      // node.setTooltip(tooltipContent, commonStyles);
+      node.setTooltip(tooltipContent, commonStyles);
       node.on('rightclick', (event: any) => {
         network.menu.setMenuItems([
           { label: 'Aggregated as a group', id: '0' },
@@ -1071,7 +1071,7 @@ const simpleData = function () {
   network.setDrag();
   network.setZoom();
   network.setClick();
-  network.setBundelExpanded(false);
+  network.setBundleExpanded(false);
   network.moveCenter();
   network.toggleLabel(1, 2);
 };
@@ -1130,7 +1130,7 @@ let bundleLabelToggle = true;
 if (bundleToggle) {
   bundleToggle.addEventListener('click', () => {
     bundleLabelToggle = !bundleLabelToggle;
-    network.setBundelExpanded(bundleLabelToggle);
+    network.setBundleExpanded(bundleLabelToggle);
   });
 }
 let edgeLabelToggle = true;
