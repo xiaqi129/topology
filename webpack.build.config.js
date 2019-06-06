@@ -1,6 +1,7 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 module.exports = {
@@ -90,7 +91,17 @@ module.exports = {
             statsFilename: 'stats.json',
             statsOptions: null,
             logLevel: 'info'
-        })
+        }),
+        new UglifyJsPlugin({
+            parallel: 4,
+            uglifyOptions: {
+                output: {
+                    comments: false,
+                    beautify: false,
+                },
+            },
+            cache: true,
+        }),
     ],
     devServer: {
         host: 'localhost',

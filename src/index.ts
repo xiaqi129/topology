@@ -43,7 +43,7 @@ const network = new Network('network');
 network.initIconResource(iconResource);
 // tslint:disable-next-line:only-arrow-functions
 const noData = function () {
-  const num = 2;
+  const num = 1000;
   for (let i: number = 0, len: number = num; i < len;) {
     i += 1;
     const node = network.createNode('cisco-ASR9');
@@ -89,10 +89,10 @@ const noData = function () {
   //   });
   // });
   network.syncView();
-  network.setDrag();
-  network.setZoom();
-  network.setClick();
-  network.moveCenter();
+  // network.setDrag();
+  // network.setZoom();
+  // network.setClick();
+  // network.moveCenter();
 };
 // tslint:disable-next-line:only-arrow-functions
 const dataFlowDemo = function () {
@@ -1077,8 +1077,8 @@ const simpleData = function () {
 };
 network.callback = () => {
   // simpleData();
-  // noData();
-  edgeGroupDemo();
+  noData();
+  // edgeGroupDemo();
   // dataFlowDemo();
 };
 const body = document.getElementById('network');
