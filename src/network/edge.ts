@@ -44,6 +44,7 @@ export class Edge extends CommonElement {
     this.labelContent = [];
     this.interactive = true;
     this.buttonMode = true;
+    this.analysisBrotherEdge();
     this.draw();
     this.tooltip = new Tooltip(domRegex);
   }
@@ -158,6 +159,16 @@ export class Edge extends CommonElement {
 
   public getTargetNode() {
     return this.endNode;
+  }
+
+  private analysisBrotherEdge() {
+    const edgeList = this.startNode.linksArray;
+    this.brotherEdges = _.filter(edgeList, (edge: Edge) => {
+      return edge.startNode === this.startNode && edge.endNode === this.endNode;
+    });
+    _.remove(this.brotherEdges, (edge: Edge) => {
+      return edge === this;
+    });
   }
 
   // Get origin position with nodes or groups

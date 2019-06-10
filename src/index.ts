@@ -43,7 +43,7 @@ const network = new Network('network');
 network.initIconResource(iconResource);
 // tslint:disable-next-line:only-arrow-functions
 const noData = function () {
-  const num = 1000;
+  const num = 2;
   for (let i: number = 0, len: number = num; i < len;) {
     i += 1;
     const node = network.createNode('cisco-ASR9');
@@ -57,7 +57,7 @@ const noData = function () {
   for (let i: number = 0, len: number = num; i < len;) {
     const srcNode = nodes[i];
     const destNode = nodes[i + 1];
-    for (let j = 0; j < 2;) {
+    for (let j = 0; j < 4;) {
       const edge = network.createEdge(srcNode, destNode);
       edge.initStyle({
         arrowColor: 0X006aad,
@@ -70,7 +70,7 @@ const noData = function () {
         lineType: 0,
         lineFull: 0,
         lineWidth: 1,
-        bundleStyle: 0,
+        bundleStyle: 1,
       });
       network.addElement(edge);
       j += 1;
@@ -80,19 +80,15 @@ const noData = function () {
   // const group = network.createGroup();
   // network.addElement(group);
 
-  // const groupNodes = _.slice(_.shuffle(_.dropRight(nodes, (num / 2) + 1)), 0, 3);
+  // const groupNodes = _.slice(_.shuffle(_.dropRight(nodes, (num / 2) + 1)), 0, 300);
   // _.each(groupNodes, (node) => {
-  //   node.setStyle({ lineColor: 0xf55d54 });
   //   group.addChildNodes(node);
-  //   group.setStyle({
-  //     fillOpacity: 1,
-  //   });
   // });
   network.syncView();
-  // network.setDrag();
-  // network.setZoom();
-  // network.setClick();
-  // network.moveCenter();
+  network.setDrag();
+  network.setZoom();
+  network.setClick();
+  network.moveCenter();
 };
 // tslint:disable-next-line:only-arrow-functions
 const dataFlowDemo = function () {
@@ -1076,8 +1072,8 @@ const simpleData = function () {
   network.toggleLabel(1, 2);
 };
 network.callback = () => {
-  // simpleData();
-  noData();
+  simpleData();
+  // noData();
   // edgeGroupDemo();
   // dataFlowDemo();
 };
@@ -1165,37 +1161,43 @@ const emptyObj = {
   location: { x: 100, y: 100 },
   size: 100,
 };
-let groupLabel = true;
+// let groupLabel = true;
 if (groupLabelToggle) {
   groupLabelToggle.addEventListener('click', () => {
-    groupLabel = !groupLabel;
-    network.groupLabelToggle(groupLabel);
-    // const emptyGroup = network.createGroup(emptyObj);
-    // emptyGroup.defaultStyle.fillColor = 0X00ff00;
-    // emptyGroup.defaultStyle.fillOpacity = 0.5;
-    // emptyGroup.draw();
-    // network.addElement(emptyGroup);
-    // emptyGroup.setLabel('text', 'Center');
-    // network.syncView();
-    // emptyGroup.on('rightclick', (event: any) => {
-    //   network.menu.setMenuItems([
-    //     { label: 'add child node', id: '0' },
-    //     { label: 'change style', id: '1' },
-    //   ]);
-    //   network.menu.menuOnAction = (id) => {
-    //     if (id === '0') {
-    //       const node1 = _.get(network.getNodeObj(), '192.168.30.0/24');
-    //       const node2 = _.get(network.getNodeObj(), '192.168.40.0/24');
-    //       emptyGroup.addChildNodes(node1);
-    //       emptyGroup.addChildNodes(node2);
-    //     } else if (id === '1') {
-    //       emptyGroup.defaultStyle.fillColor = 0Xff0000;
-    //       emptyGroup.draw();
-    //     }
-    //   };
-    //   network.menu.setClass('popMenu');
-    //   network.menu.showMenu(event);
-    // });
+    // groupLabel = !groupLabel;
+    // network.groupLabelToggle(groupLabel);
+    const emptyGroup = network.createGroup(emptyObj);
+    emptyGroup.initStyle({
+      fillColor: 0X00ff00,
+      fillOpacity: 0.5,
+    });
+    emptyGroup.draw();
+    network.addElement(emptyGroup);
+    emptyGroup.setLabel('text', 'Center');
+    network.syncView();
+    emptyGroup.on('rightclick', (event: any) => {
+      network.menu.setMenuItems([
+        { label: 'add child node', id: '0' },
+        { label: 'change style', id: '1' },
+        { label: 'Debug', id: '2' },
+      ]);
+      network.menu.menuOnAction = (id) => {
+        if (id === '0') {
+          const node1 = _.get(network.getNodeObj(), '192.168.30.0/24');
+          const node2 = _.get(network.getNodeObj(), '192.168.40.0/24');
+          emptyGroup.addChildNodes(node1);
+          emptyGroup.addChildNodes(node2);
+        } else if (id === '1') {
+          emptyGroup.defaultStyle.fillColor = 0Xff0000;
+          emptyGroup.draw();
+        } else if (id === '2') {
+          // tslint:disable-next-line: no-console
+          console.log(emptyGroup);
+        }
+      };
+      network.menu.setClass('popMenu');
+      network.menu.showMenu(event);
+    });
     // grouptitleToggle = !grouptitleToggle;
     // const node = network.getNodeObj();
     // _.each(node, (n: any) => {

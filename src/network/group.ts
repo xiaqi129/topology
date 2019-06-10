@@ -83,6 +83,10 @@ export class Group extends CommonElement {
     this.edgeResource = this.getEdgeResource();
     this.interactive = true;
     this.buttonMode = true;
+    if (this.emptyObj) {
+      this.centerPoint.x = this.emptyObj.location.x;
+      this.centerPoint.y = this.emptyObj.location.y;
+    }
     this.draw();
     document.addEventListener('mouseup', this.onDragEnd.bind(this));
   }
@@ -731,8 +735,8 @@ export class Group extends CommonElement {
       } else {
         this.position.x += newPosition.x - this.last.parents.x;
         this.position.y += newPosition.y - this.last.parents.y;
-        this.centerPoint.x = this.position.x;
-        this.centerPoint.y = this.position.y;
+        this.centerPoint.x = newPosition.x;
+        this.centerPoint.y = newPosition.y;
       }
       this.last = { parents: newPosition };
       this.draw();

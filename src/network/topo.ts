@@ -79,15 +79,6 @@ export class Topo implements ITopo {
     this.addElements([element]);
   }
 
-  // find brother edge not in edge bundle
-  public findBrotherEdge(edge: Edge) {
-    const edgesFound: Edge[] = _.get(this.edgesGroupByNodes, edge.edgeNodesSortUIDStr(), []);
-    _.remove(edgesFound, (edgeFound: Edge) => {
-      return edgeFound === edge;
-    });
-    return edgesFound;
-  }
-
   public findEdgeBundleByID(bundleID: string) {
     return _.find(this.elements, (element) => {
       if (element instanceof EdgeBundle) {
@@ -117,8 +108,7 @@ export class Topo implements ITopo {
       if (element instanceof Edge) {
         element.defaultColor = element.defaultStyle.lineColor;
         let edgeBundle: EdgeBundle;
-        const edges = this.findBrotherEdge(element);
-        element.brotherEdges = edges;
+        const edges = element.brotherEdges;
         if (edges.length > 0) {
           edgeBundle = new EdgeBundle(element);
           edgeBundle.defaultStyle = element.defaultStyle;
@@ -142,7 +132,6 @@ export class Topo implements ITopo {
       } else {
         this.elements.push(element);
       }
-      this.refreshEdgesMaps();
     });
   }
 
@@ -155,29 +144,6 @@ export class Topo implements ITopo {
     const keys = _.keys(obj);
     _.each(keys, (key: string) => {
       delete obj[key];
-    });
-  }
-
-  public refreshEdgesMaps() {
-    this.clearObject(this.edgesGroupByNodes);
-    let edges: Edge[] = [];
-    _.each(this.elements, (element) => {
-      if (element instanceof Edge) {
-        edges.push(element);
-      }
-      if (element instanceof EdgeBundle) {
-        const childEges = element.children as Edge[];
-        edges = edges.concat(childEges);
-      }
-    });
-    const edgesGroups = _.groupBy(_.uniq(edges), (edge) => {
-      return this.getSortNodesUID(edge);
-    });
-    _.each(edgesGroups, (edgesList: Edge[]) => {
-      const uid: string = this.getSortNodesUID(edgesList[0]);
-      _.extend(this.edgesGroupByNodes, {
-        [uid]: edgesList,
-      });
     });
   }
 
