@@ -107,7 +107,7 @@ export class EdgeBundle extends CommonElement {
       if (edge) {
         const bundleLabel = edge.getChildByName('bundle_label');
         const bundleBackground = edge.getChildByName('label_background');
-        if (size <= 1.2 && size >= 0) {
+        if (size <= 1.2 && size >= 0.2) {
           edge.setStyle({
             lineWidth: this.defaultWidth * size,
           });
@@ -118,7 +118,7 @@ export class EdgeBundle extends CommonElement {
           bundleLabel.setStyle({
             fontSize: 10 * size,
           });
-        } else {
+        } else if (size > 1.2) {
           edge.setStyle({
             lineWidth: this.defaultWidth * 1.2,
           });
@@ -128,6 +128,17 @@ export class EdgeBundle extends CommonElement {
           bundleBackground.endFill();
           bundleLabel.setStyle({
             fontSize: 10 * 1.2,
+          });
+        } else if (size < 0.2) {
+          edge.setStyle({
+            lineWidth: this.defaultWidth * 0.2,
+          });
+          bundleBackground.clear();
+          bundleBackground.beginFill(this.defaultStyle.fillColor, 1);
+          bundleBackground.drawCircle(0, 0, 7 * 0.2);
+          bundleBackground.endFill();
+          bundleLabel.setStyle({
+            fontSize: 10 * 0.2,
           });
         }
       }

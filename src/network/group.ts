@@ -54,7 +54,7 @@ export class Group extends CommonElement {
   public isLock: boolean = false;
   private childNodesList: Node[][] = [];
   private edgeResource: IedgeResource[] = [];
-  private labelStyle: any;
+  private labelStyle: any = {};
   private toggleExpanded: boolean = false;
   private positionList: IPosition[] = [];
   private elements: any[];
@@ -78,7 +78,6 @@ export class Group extends CommonElement {
   constructor(element: any, emptyObj: IEmptyGroup | undefined) {
     super();
     this.elements = element;
-    this.labelStyle = {};
     this.emptyObj = emptyObj;
     this.edgeResource = this.getEdgeResource();
     this.interactive = true;
@@ -362,15 +361,17 @@ export class Group extends CommonElement {
     const nodeWidth = this.defaultStyle.width;
     if (label && graph) {
       if (this.width !== 0 && this.isExpanded) {
-        label.style.fontSize = _.floor(graph.width / 10) + 1;
-        label.style.breakWords = true;
-        label.style.wordWrap = true;
-        label.style.wordWrapWidth = graph.width - 10;
-        if (this.expandedVisibleNodes.length === 1) {
-          label.style.breakWords = false;
-          label.style.wordWrap = false;
+        const fontSize = _.floor(graph.width / 10) + 1;
+        if (fontSize > 12 && fontSize < 20) {
+          label.style.fontSize = _.floor(graph.width / 10) + 1;
+        } else if (fontSize <= 12) {
           label.style.fontSize = 10;
+        } else if (fontSize >= 20) {
+          label.style.fontSize = 20;
         }
+        // label.style.breakWords = true;
+        // label.style.wordWrap = true;
+        // label.style.wordWrapWidth = graph.width - 10;
       } else {
         const textLength = _.ceil(label.text.length / 2);
         label.style.fontSize = nodeWidth / textLength;

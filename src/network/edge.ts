@@ -161,6 +161,7 @@ export class Edge extends CommonElement {
     return this.endNode;
   }
 
+  // Setup brother edges used to create Edge Bundle
   private analysisBrotherEdge() {
     const edgeList = this.startNode.linksArray;
     this.brotherEdges = _.filter(edgeList, (edge: Edge) => {

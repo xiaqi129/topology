@@ -26,6 +26,7 @@ export class Network {
   public callback: any;
   public zoom: number;
   public isSelect: boolean;
+  public pointNum: number = 300;
   private topo: Topo;
   private drawer: Drawer;
   private app: Application;
@@ -649,19 +650,19 @@ export class Network {
     if (node.icon) {
       const defaultWidth = node.getDefaultSize().width;
       const defaultHeight = node.getDefaultSize().height;
-      if (this.zoom < 0.4 && inWrapperNodesList.length > 300) {
+      if (this.zoom < 0.4 && inWrapperNodesList.length > this.pointNum) {
         _.extend(node.defaultStyle, ({
           width: 4,
           fillColor: 0X0386d2,
         }));
         node.drawGraph();
       } else {
-        if (this.zoom <= 1.5 && this.zoom >= 0.3) {
+        if (this.zoom <= 1.5 && this.zoom >= 0.4) {
           node.iconWidth = NP.times(defaultWidth, this.zoom);
           node.iconHeight = NP.times(defaultHeight, this.zoom);
-        } else if (this.zoom < 0.3) {
-          node.iconWidth = NP.times(defaultWidth, 0.3);
-          node.iconHeight = NP.times(defaultHeight, 0.3);
+        } else if (this.zoom < 0.4) {
+          node.iconWidth = NP.times(defaultWidth, 0.4);
+          node.iconHeight = NP.times(defaultHeight, 0.4);
         } else if (this.zoom > 1.5) {
           node.iconWidth = NP.times(defaultWidth, 1.5);
           node.iconHeight = NP.times(defaultHeight, 1.5);
@@ -682,13 +683,17 @@ export class Network {
     } else {
       width = 1;
     }
-    if (this.zoom <= 1.2) {
+    if (this.zoom <= 1.2 && this.zoom >= 0.2) {
       _.extend(edge.defaultStyle, ({
         lineWidth: width * this.zoom,
       }));
-    } else {
+    } else if (this.zoom > 1.2) {
       _.extend(edge.defaultStyle, ({
         lineWidth: width * 1.2,
+      }));
+    } else if (this.zoom < 0.2) {
+      _.extend(edge.defaultStyle, ({
+        lineWidth: width * 0.2,
       }));
     }
     edge.draw();
