@@ -40,6 +40,8 @@ export class DataFlow extends CommonElement {
     this.end = end;
     this.background = new PIXI.Graphics();
     this.neon = new PIXI.Graphics();
+    start.dataFlowArray.push(this);
+    end.dataFlowArray.push(this);
     this.gameLoop();
   }
 

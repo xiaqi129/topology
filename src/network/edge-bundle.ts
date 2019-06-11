@@ -24,6 +24,7 @@ export class EdgeBundle extends CommonElement {
   private style: any;
   private defaultColor: number;
   private defaultWidth: number;
+  private afterBundle: Edge;
 
   constructor(edge: Edge) {
     super();
@@ -31,64 +32,27 @@ export class EdgeBundle extends CommonElement {
     this.startNode = edge.startNode;
     this.endNode = edge.endNode;
     this.style = edge.defaultStyle;
-    this.addChild(edge);
     this.defaultColor = _.cloneDeep(edge.defaultColor);
     this.defaultWidth = edge.invariableStyles.lineWidth;
     this.bundleEdge = this.children;
+    this.afterBundle = new Edge(this.startNode, this.endNode);
+    this.addChild(edge);
     this.setBundle(edge);
+    this.removeBundleEdge();
   }
 
   public draw() {
+    _.each(this.children, (edge: any) => {
+      edge.draw();
+    });
+  }
+
+  public multiEdgeBundle() {
     if (this.toggleBundle) {
       if (!this.isExpanded) {
-        // collapse
-        if (this.children.length > 1) {
-          this.bundleData = [];
-          _.each(this.children, (child) => {
-            this.bundleData.push(child);
-          });
-        }
-        this.removeChildren(0, this.children.length);
-        const afterBundle = new Edge(this.startNode, this.endNode);
-        afterBundle.setStyle(this.style);
-        afterBundle.name = 'bundle_line';
-        if (this.bundleData.length > 0) {
-          const graph = new PIXI.Graphics();
-          const style = this.defaultStyle;
-          graph.name = 'label_background';
-          graph.beginFill(style.fillColor, 1);
-          graph.drawCircle(0, 0, 7);
-          graph.endFill();
-          afterBundle.addChild(graph);
-          const label = new Label(`${this.bundleData.length}`, {
-            fill: 0Xffffff,
-            fontFamily: 'Times New Roman',
-            fontWeight: 'bold',
-          });
-          label.name = 'bundle_label';
-          label.setPosition(4);
-          afterBundle.addChild(label);
-          afterBundle.setChildIndex(label, afterBundle.children.length - 1);
-          afterBundle.setChildIndex(graph, afterBundle.children.length - 2);
-          // add to elements
-          afterBundle.initStyle({
-            lineType: 0,
-            lineColor: this.defaultColor,
-            lineWidth: this.defaultWidth,
-          });
-          this.addChild(afterBundle);
-        } else {
-          this.removeChild(this.getChildByName('bundle_label'));
-        }
-        this.setBundle(afterBundle);
+        this.closeBundle();
       } else {
-        // expand
-        this.removeChild(this.getChildByName('bundle_line'));
-        const edges = this.bundleData;
-        _.each(edges, (bundleEdge) => {
-          this.addChild(bundleEdge);
-          bundleEdge.draw();
-        });
+        this.openBundle();
       }
       const tooltip = document.getElementById('tooltip');
       if (tooltip) {
@@ -147,7 +111,7 @@ export class EdgeBundle extends CommonElement {
 
   public setExpaned(expanded: boolean) {
     this.isExpanded = expanded;
-    this.draw();
+    this.multiEdgeBundle();
   }
 
   public addEdges(edges: Edge[]) {
@@ -217,7 +181,7 @@ export class EdgeBundle extends CommonElement {
         if (currentTime - this.lastClickTime < 500) {
           if (edge.parent instanceof EdgeBundle) {
             this.isExpanded = !this.isExpanded;
-            this.draw();
+            this.multiEdgeBundle();
           }
         } else {
           this.lastClickTime = currentTime;
@@ -225,4 +189,75 @@ export class EdgeBundle extends CommonElement {
       });
     }
   }
+
+  private closeBundle() {
+    // collapse
+    this.bundleData = [];
+    _.each(this.children, (child) => {
+      this.bundleData.push(child);
+      _.remove(this.startNode.linksArray, (edge) => {
+        return edge === child;
+      });
+      _.remove(this.endNode.linksArray, (edge) => {
+        return edge === child;
+      });
+    });
+    this.startNode.linksArray.push(this.afterBundle);
+    this.endNode.linksArray.push(this.afterBundle);
+    this.removeChildren(0, this.children.length);
+    this.afterBundle.setStyle(this.style);
+    this.afterBundle.name = 'bundle_line';
+    if (this.bundleData.length > 0) {
+      const graph = new PIXI.Graphics();
+      const style = this.defaultStyle;
+      graph.name = 'label_background';
+      graph.beginFill(style.fillColor, 1);
+      graph.drawCircle(0, 0, 7);
+      graph.endFill();
+      this.afterBundle.addChild(graph);
+      const label = new Label(`${this.bundleData.length}`, {
+        fill: 0Xffffff,
+        fontFamily: 'Times New Roman',
+        fontWeight: 'bold',
+      });
+      label.name = 'bundle_label';
+      label.setPosition(4);
+      this.afterBundle.addChild(label);
+      this.afterBundle.setChildIndex(label, this.afterBundle.children.length - 1);
+      this.afterBundle.setChildIndex(graph, this.afterBundle.children.length - 2);
+      // add to elements
+      this.afterBundle.initStyle({
+        lineType: 0,
+        lineColor: this.defaultColor,
+        lineWidth: this.defaultWidth,
+      });
+      this.addChild(this.afterBundle);
+    } else {
+      this.removeChild(this.getChildByName('bundle_label'));
+    }
+    this.setBundle(this.afterBundle);
+  }
+
+  private openBundle() {
+    // expand
+    this.removeChild(this.getChildByName('bundle_line'));
+    const edges = this.bundleData;
+    _.each(edges, (bundleEdge) => {
+      this.addChild(bundleEdge);
+      bundleEdge.draw();
+      this.startNode.linksArray.push(bundleEdge);
+      this.endNode.linksArray.push(bundleEdge);
+    });
+    this.removeBundleEdge();
+  }
+
+  private removeBundleEdge() {
+    _.remove(this.startNode.linksArray, (edge) => {
+      return edge.id === this.afterBundle.id;
+    });
+    _.remove(this.endNode.linksArray, (edge) => {
+      return edge.id === this.afterBundle.id;
+    });
+  }
+
 }

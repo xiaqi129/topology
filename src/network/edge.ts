@@ -801,6 +801,9 @@ export class Edge extends CommonElement {
     if (srcLabel || endLabel) {
       this.setLabelPosition(srcLabel, endLabel);
     }
+    _.each(this.includeGroup, (edgeGroup) => {
+      edgeGroup.draw();
+    });
   }
 
   // Set label position

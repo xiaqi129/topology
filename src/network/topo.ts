@@ -110,23 +110,22 @@ export class Topo implements ITopo {
         let edgeBundle: EdgeBundle;
         const edges = element.brotherEdges;
         if (edges.length > 0) {
-          edgeBundle = new EdgeBundle(element);
-          edgeBundle.defaultStyle = element.defaultStyle;
-          edgeBundle.setStyle({
-            fillColor: 0X0081cf,
-          });
-          edgeBundle.addEdges(edges);
-          _.remove(this.elements, (elem: CommonElement) => {
-            return _.indexOf(edges, elem) > -1;
-          });
-          this.elements.push(edgeBundle);
-        } else {
           edgeBundle = this.findEdgeBundleByID(element.edgeNodesSortUIDStr());
           if (edgeBundle) {
             edgeBundle.addEdge(element);
+          } else {
+            edgeBundle = new EdgeBundle(element);
+            edgeBundle.defaultStyle = element.defaultStyle;
+            edgeBundle.setStyle({
+              fillColor: 0X0081cf,
+            });
+            edgeBundle.addEdges(edges);
+            _.remove(this.elements, (elem: CommonElement) => {
+              return _.indexOf(edges, elem) > -1;
+            });
+            this.elements.push(edgeBundle);
           }
-        }
-        if (!edgeBundle) {
+        } else {
           this.elements.push(element);
         }
       } else {

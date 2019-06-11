@@ -43,15 +43,15 @@ const network = new Network('network');
 network.initIconResource(iconResource);
 // tslint:disable-next-line:only-arrow-functions
 const noData = function () {
-  const num = 10000;
+  const num = 2;
   for (let i: number = 0, len: number = num; i < len;) {
     i += 1;
     const node = network.createNode('cisco-ASR9');
     node.name = `node${i}`;
     // node.setNodeSize(25,25);
     network.addElement(node);
-    node.x = Math.random() * 1800;
-    node.y = Math.random() * 1500;
+    node.x = Math.random() * 800;
+    node.y = Math.random() * 500;
   }
   const nodes = network.getNodes();
   for (let i: number = 0, len: number = num; i < len;) {
@@ -1072,8 +1072,8 @@ const simpleData = function () {
   network.toggleLabel(1, 2);
 };
 network.callback = () => {
-  // simpleData();
-  noData();
+  simpleData();
+  // noData();
   // edgeGroupDemo();
   // dataFlowDemo();
 };

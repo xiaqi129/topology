@@ -7,6 +7,7 @@
 
 import * as _ from 'lodash';
 import { CommonElement } from './common-element';
+import { DataFlow } from './data-flow';
 import { Edge } from './edge';
 import { EdgeBundle } from './edge-bundle';
 import { Group } from './group';
@@ -31,6 +32,7 @@ export class Node extends CommonElement {
   public tooltip: Tooltip;
   public isLock: boolean = false;
   public clients: {} = {};
+  public dataFlowArray: DataFlow[] = [];
   private defaultWidth: number = 20;
   private defaultHeight: number = 20;
   private labelContent: string = '';
@@ -404,7 +406,7 @@ export class Node extends CommonElement {
       const isInSelect = _.find(this.selectedNodes, (node) => {
         return node === this;
       });
-      if (this.selectedNodes.length > 0 && isInSelect
+      if (this.selectedNodes.length > 1 && isInSelect
         && this.last) {
         const distX = event.data.global.x;
         const distY = event.data.global.y;
@@ -413,11 +415,20 @@ export class Node extends CommonElement {
           node.position.y += (newPosition.y - this.last.parents.y);
         });
         this.last = { parents: newPosition, x: distX, y: distY };
+        this.redrawEdge();
       } else {
         this.position.x = newPosition.x;
         this.position.y = newPosition.y;
+        _.each(this.linksArray, (edge) => {
+          edge.draw();
+        });
+        _.each(this.includedGroups, (group) => {
+          group.draw();
+        });
+        _.each(this.dataFlowArray, (dataFlow) => {
+          dataFlow.draw();
+        });
       }
-      this.redrawEdge();
     }
   }
 
