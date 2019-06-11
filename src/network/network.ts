@@ -683,7 +683,7 @@ export class Network {
     } else {
       width = 1;
     }
-    if (this.zoom <= 1.2 && this.zoom >= 0.2) {
+    if (this.zoom <= 1.2 && this.zoom >= 0.1) {
       _.extend(edge.defaultStyle, ({
         lineWidth: width * this.zoom,
       }));
@@ -691,9 +691,9 @@ export class Network {
       _.extend(edge.defaultStyle, ({
         lineWidth: width * 1.2,
       }));
-    } else if (this.zoom < 0.2) {
+    } else if (this.zoom < 0.1) {
       _.extend(edge.defaultStyle, ({
-        lineWidth: width * 0.2,
+        lineWidth: width * 0.1,
       }));
     }
     edge.draw();

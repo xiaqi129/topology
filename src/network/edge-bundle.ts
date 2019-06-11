@@ -129,16 +129,16 @@ export class EdgeBundle extends CommonElement {
           bundleLabel.setStyle({
             fontSize: 10 * 1.2,
           });
-        } else if (size < 0.2) {
+        } else if (size < 0.1) {
           edge.setStyle({
-            lineWidth: this.defaultWidth * 0.2,
+            lineWidth: this.defaultWidth * 0.1,
           });
           bundleBackground.clear();
           bundleBackground.beginFill(this.defaultStyle.fillColor, 1);
-          bundleBackground.drawCircle(0, 0, 7 * 0.2);
+          bundleBackground.drawCircle(0, 0, 7 * 0.1);
           bundleBackground.endFill();
           bundleLabel.setStyle({
-            fontSize: 10 * 0.2,
+            fontSize: 10 * 0.1,
           });
         }
       }
