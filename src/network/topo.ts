@@ -17,11 +17,11 @@ import { Node } from './node';
 
 export interface ITopo {
 
-  getElements(): PIXI.Container[];
+  getElements(): CommonElement[];
 
-  addElement(node: Node | Group | Edge): void;
+  addElement(element: CommonElement): void;
 
-  addElements(node: Node[] | Group[] | Edge[]): void;
+  addElements(elements: CommonElement[]): void;
 
   createNode(domRegex: string, texture: string): Node;
 

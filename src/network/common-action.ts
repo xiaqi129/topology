@@ -162,14 +162,6 @@ export class CommonAction {
 
   public onDragEnd() {
     this.container.cursor = 'default';
-    const edges = this.getChildEdges();
-    const groups = this.getOtherElements();
-    _.each(groups, (group) => {
-      group.draw();
-    });
-    _.each(edges, (edge: Edge) => {
-      edge.draw();
-    });
   }
 
   public getChildEdges() {

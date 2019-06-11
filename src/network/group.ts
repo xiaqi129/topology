@@ -95,7 +95,6 @@ export class Group extends CommonElement {
     if (graph) {
       graph.destroy();
     }
-    this.clearDisplayObjects();
     if (!this.isExpanded) {
       this.drawGroupNode();
     } else {
@@ -941,7 +940,9 @@ export class Group extends CommonElement {
       if (!this.isLock) {
         graphic.on('mousemove', this.onDragMove, this);
       }
-      this.analyzeChildNodesList();
+      if (this.isLayer) {
+        this.analyzeChildNodesList();
+      }
     }
   }
 
@@ -982,8 +983,7 @@ export class Group extends CommonElement {
     _.each(this.elements, (element: CommonElement) => {
       if (element instanceof Edge) {
         edges.push(element);
-      }
-      if (element instanceof EdgeBundle) {
+      } else if (element instanceof EdgeBundle) {
         const childrenEdges = element.children as Edge[];
         edges = edges.concat(childrenEdges);
       }
