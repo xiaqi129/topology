@@ -33,20 +33,6 @@ export class Drawer {
     return this.topo;
   }
 
-  public sortElements(elements: PIXI.DisplayObject[]) {
-    _.sortBy(elements, (element) => {
-      if (element instanceof Node) {
-        return 1;
-      }
-      if (element instanceof Group) {
-        return 0;
-      }
-      if (element instanceof Edge) {
-        return 2;
-      }
-    });
-  }
-
   public syncView() {
     this.whiteBoard.clearContainer();
     const elements = this.topo.getElements();

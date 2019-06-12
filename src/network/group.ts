@@ -50,7 +50,7 @@ export class Group extends CommonElement {
   public labelContent: string = '';
   public linksArray: Edge[] = [];
   public isSelected: boolean = false;
-  public isLayer: boolean = true;
+  public isLayer: boolean = false;
   public isLock: boolean = false;
   private childNodesList: Node[][] = [];
   private edgeResource: IedgeResource[] = [];
