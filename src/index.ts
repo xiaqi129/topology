@@ -1072,8 +1072,8 @@ const simpleData = function () {
   network.toggleLabel(1, 2);
 };
 network.callback = () => {
-  // simpleData();
-  noData();
+  simpleData();
+  // noData();
   // edgeGroupDemo();
   // dataFlowDemo();
 };

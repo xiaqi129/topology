@@ -85,11 +85,9 @@ export class Edge extends CommonElement {
 
   // Selected an edge
   public selectOn() {
-    const highLight = {
+    this.setStyle({
       lineColor: 0X024997,
-    };
-    _.extend(this.defaultStyle, highLight);
-    this.draw();
+    });
   }
 
   // Cancle selected on the edge

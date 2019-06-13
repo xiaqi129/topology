@@ -224,7 +224,6 @@ export class CommonAction {
           }
         });
       } else if (element instanceof Edge) {
-        this.defaultLineColor = element.defaultStyle.lineColor;
         element.addEventListener('mousedown', (event: PIXI.interaction.InteractionEvent) => {
           event.stopPropagation();
           this.removeHighLight();
@@ -232,8 +231,8 @@ export class CommonAction {
           element.selectOn();
         });
       } else if (element instanceof EdgeBundle) {
-        _.each(element.children, (edges: any) => {
-          this.defaultLineColor = edges.defaultStyle.lineColor;
+        const childEdge = element.isExpanded ? element.children : element.bundleData;
+        _.each(childEdge, (edges: any) => {
           edges.addEventListener('mousedown', (event: PIXI.interaction.InteractionEvent) => {
             event.stopPropagation();
             this.removeHighLight();

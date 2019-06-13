@@ -68,14 +68,14 @@ export class EdgeBundle extends CommonElement {
   public changeLabelSize(size: number) {
     if (!this.isExpanded) {
       const edge: any = this.children[0];
-      if (edge) {
-        const bundleLabel = edge.getChildByName('bundle_label');
-        const bundleBackground = edge.getChildByName('label_background');
+      const bundleLabel: any = this.afterBundle.getChildByName('bundle_label');
+      const bundleBackground: any = this.afterBundle.getChildByName('label_background');
+      if (bundleLabel && bundleBackground) {
+        bundleBackground.clear();
         if (size <= 1.2 && size >= 0.2) {
           edge.setStyle({
             lineWidth: this.defaultWidth * size,
           });
-          bundleBackground.clear();
           bundleBackground.beginFill(this.defaultStyle.fillColor, 1);
           bundleBackground.drawCircle(0, 0, 7 * size);
           bundleBackground.endFill();
@@ -86,7 +86,6 @@ export class EdgeBundle extends CommonElement {
           edge.setStyle({
             lineWidth: this.defaultWidth * 1.2,
           });
-          bundleBackground.clear();
           bundleBackground.beginFill(this.defaultStyle.fillColor, 1);
           bundleBackground.drawCircle(0, 0, 7 * 1.2);
           bundleBackground.endFill();
@@ -97,7 +96,6 @@ export class EdgeBundle extends CommonElement {
           edge.setStyle({
             lineWidth: this.defaultWidth * 0.1,
           });
-          bundleBackground.clear();
           bundleBackground.beginFill(this.defaultStyle.fillColor, 1);
           bundleBackground.drawCircle(0, 0, 7 * 0.1);
           bundleBackground.endFill();
@@ -105,6 +103,7 @@ export class EdgeBundle extends CommonElement {
             fontSize: 10 * 0.1,
           });
         }
+
       }
     }
   }
@@ -207,6 +206,9 @@ export class EdgeBundle extends CommonElement {
     this.removeChildren(0, this.children.length);
     this.afterBundle.setStyle(this.style);
     this.afterBundle.name = 'bundle_line';
+    this.afterBundle.removeChild(this.afterBundle.getChildByName('label_background'));
+    this.afterBundle.removeChild(this.afterBundle.getChildByName('bundle_label'));
+    this.afterBundle.removeAllListeners();
     if (this.bundleData.length > 0) {
       const graph = new PIXI.Graphics();
       const style = this.defaultStyle;
@@ -232,15 +234,15 @@ export class EdgeBundle extends CommonElement {
         lineWidth: this.defaultWidth,
       });
       this.addChild(this.afterBundle);
+      this.setBundle(this.afterBundle);
     } else {
       this.removeChild(this.getChildByName('bundle_label'));
     }
-    this.setBundle(this.afterBundle);
   }
 
   private openBundle() {
     // expand
-    this.removeChild(this.getChildByName('bundle_line'));
+    this.removeChildren(0, this.children.length);
     const edges = this.bundleData;
     _.each(edges, (bundleEdge) => {
       this.addChild(bundleEdge);
