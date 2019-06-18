@@ -246,6 +246,29 @@ export class Network {
     return edgeObj;
   }
 
+  // Get all edges
+  public getAllEdges(): { [key: string]: Edge } {
+    const edgeObj = {};
+    const elements = this.topo.getElements();
+    _.each(elements, (element) => {
+      if (element instanceof EdgeBundle) {
+        _.each(element.bundleData, (edge, index) => {
+          const name: string = `${(edge as Edge).startNode.name}=>${(edge as Edge).endNode.name}-${index + 1}ofBundle`;
+          _.extend(edgeObj, {
+            [name]: edge,
+          });
+        });
+      }
+      if (element instanceof Edge) {
+        const name: string = `${element.startNode.name}=>${element.endNode.name}`;
+        _.extend(edgeObj, {
+          [name]: element,
+        });
+      }
+    });
+    return edgeObj;
+  }
+
   // Get all groups object
   public getGroupObj(): { [key: string]: Group } {
     const groupObj = {};

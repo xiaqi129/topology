@@ -45,7 +45,6 @@ export class Edge extends CommonElement {
     this.interactive = true;
     this.buttonMode = true;
     this.analysisBrotherEdge();
-    this.draw();
     this.tooltip = new Tooltip(domRegex);
   }
 
