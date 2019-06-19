@@ -65,49 +65,6 @@ export class EdgeBundle extends CommonElement {
     this.addEdges([edge]);
   }
 
-  public changeLabelSize(size: number) {
-    if (!this.isExpanded) {
-      const edge: any = this.children[0];
-      const bundleLabel: any = this.afterBundle.getChildByName('bundle_label');
-      const bundleBackground: any = this.afterBundle.getChildByName('label_background');
-      if (bundleLabel && bundleBackground) {
-        bundleBackground.clear();
-        if (size <= 1.2 && size >= 0.2) {
-          edge.setStyle({
-            lineWidth: this.defaultWidth * size,
-          });
-          bundleBackground.beginFill(this.defaultStyle.fillColor, 1);
-          bundleBackground.drawCircle(0, 0, 7 * size);
-          bundleBackground.endFill();
-          bundleLabel.setStyle({
-            fontSize: 10 * size,
-          });
-        } else if (size > 1.2) {
-          edge.setStyle({
-            lineWidth: this.defaultWidth * 1.2,
-          });
-          bundleBackground.beginFill(this.defaultStyle.fillColor, 1);
-          bundleBackground.drawCircle(0, 0, 7 * 1.2);
-          bundleBackground.endFill();
-          bundleLabel.setStyle({
-            fontSize: 10 * 1.2,
-          });
-        } else if (size < 0.1) {
-          edge.setStyle({
-            lineWidth: this.defaultWidth * 0.1,
-          });
-          bundleBackground.beginFill(this.defaultStyle.fillColor, 1);
-          bundleBackground.drawCircle(0, 0, 7 * 0.1);
-          bundleBackground.endFill();
-          bundleLabel.setStyle({
-            fontSize: 10 * 0.1,
-          });
-        }
-
-      }
-    }
-  }
-
   public setExpaned(expanded: boolean) {
     this.isExpanded = expanded;
     this.multiEdgeBundle();
@@ -170,6 +127,15 @@ export class EdgeBundle extends CommonElement {
     return this.bundleID;
   }
 
+  public removeBundleEdge() {
+    _.remove(this.startNode.linksArray, (edge) => {
+      return edge.id === this.afterBundle.id;
+    });
+    _.remove(this.endNode.linksArray, (edge) => {
+      return edge.id === this.afterBundle.id;
+    });
+  }
+
   public setBundle(edge: Edge) {
     edge.bundleParent = this;
     if (this.toggleBundle) {
@@ -185,6 +151,17 @@ export class EdgeBundle extends CommonElement {
         } else {
           this.lastClickTime = currentTime;
         }
+      });
+    }
+  }
+
+  public updateNum() {
+    const label: any = this.afterBundle.getChildByName('bundle_label');
+    if (label) {
+      label.setText(`${this.bundleData.length}`, {
+        fill: 0Xffffff,
+        fontFamily: 'Times New Roman',
+        fontWeight: 'bold',
       });
     }
   }
@@ -251,15 +228,6 @@ export class EdgeBundle extends CommonElement {
       this.endNode.linksArray.push(bundleEdge);
     });
     this.removeBundleEdge();
-  }
-
-  private removeBundleEdge() {
-    _.remove(this.startNode.linksArray, (edge) => {
-      return edge.id === this.afterBundle.id;
-    });
-    _.remove(this.endNode.linksArray, (edge) => {
-      return edge.id === this.afterBundle.id;
-    });
   }
 
 }

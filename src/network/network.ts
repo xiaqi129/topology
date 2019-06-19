@@ -131,7 +131,7 @@ export class Network {
   }
 
   // Setup topology can zoom in and zoom out with mouse wheel
-  public setZoom() {
+  public setZoom(isDraw?: boolean) {
     const wrapper = document.getElementById(this.domRegex);
     if (wrapper) {
       wrapper.addEventListener('wheel', (e) => {
@@ -159,9 +159,12 @@ export class Network {
           }
         }
         const scale = NP.divide(this.zoom, zoom);
-        this.moveTopology(scale, e.offsetX, e.offsetY);
+        if (isDraw) {
+          this.moveTopology(scale, e.offsetX, e.offsetY, isDraw);
+        } else {
+          this.moveTopology(scale, e.offsetX, e.offsetY, true);
+        }
       });
-
     }
   }
 
@@ -181,7 +184,7 @@ export class Network {
     });
     this.zoom = zoomNum;
     if (networkSize) {
-      this.moveTopology(this.zoom / originZoom, networkSize[0] / 2, networkSize[1] / 2);
+      this.moveTopology(this.zoom / originZoom, networkSize[0] / 2, networkSize[1] / 2, true);
       this.toggleLabel(this.nodeLabel, this.edgeLabel);
     }
   }
@@ -252,7 +255,8 @@ export class Network {
     const elements = this.topo.getElements();
     _.each(elements, (element) => {
       if (element instanceof EdgeBundle) {
-        _.each(element.bundleData, (edge, index) => {
+        const data = !element.isExpanded ? element.bundleData : element.children;
+        _.each(data, (edge, index) => {
           const name: string = `${(edge as Edge).startNode.name}=>${(edge as Edge).endNode.name}-${index + 1}ofBundle`;
           _.extend(edgeObj, {
             [name]: edge,
@@ -305,24 +309,27 @@ export class Network {
   // Delete specified elements in topology
   public removeElements(element: CommonElement) {
     const elements = this.getElements();
-    _.remove(elements, (elem: CommonElement) => {
-      return element === elem;
-    });
     if (element instanceof Edge) {
-      this.topo.clearObject(this.topo.getEdgesGroup());
-      if (element.parent instanceof EdgeBundle) {
-        _.remove(element.parent.bundleEdge, (edge) => {
+      if (element.bundleParent instanceof EdgeBundle) {
+        const data = !element.bundleParent.isExpanded ? element.bundleParent.bundleData : element.bundleParent.children;
+        _.remove(data, (edge) => {
           return edge === element;
         });
-        if (element.parent.bundleEdge.length === 1 && element.parent.bundleEdge[0]) {
-          const edge = element.parent.bundleEdge[0];
+        if (data.length === 1 && data[0]) {
+          const edge = data[0];
           _.remove(elements, (elem: CommonElement) => {
-            return element.parent === elem;
+            return element.bundleParent === elem;
           });
+          element.bundleParent.removeBundleEdge();
+          edge.brotherEdges = [];
           this.addElement(edge);
+          edge.startNode.linksArray.push(edge);
+          edge.endNode.linksArray.push(edge);
           edge.setStyle({
             lineType: 0,
           });
+        } else if (data.length > 1) {
+          element.bundleParent.updateNum();
         }
       }
       element.setStyle({
@@ -334,6 +341,9 @@ export class Network {
         });
       }
     }
+    _.remove(elements, (elem: CommonElement) => {
+      return element === elem;
+    });
     this.syncView();
   }
 
@@ -403,10 +413,13 @@ export class Network {
   }
 
   // move topology to the center of screen
-  public moveCenter() {
+  public moveCenter(isDraw?: boolean) {
     const vertexPointsList = this.vertexPoints();
     const analyzeCenter = (new polygon(vertexPointsList)).center();
     this.moveToCenter(analyzeCenter);
+    if (isDraw === true || isDraw === undefined) {
+      this.reDraw();
+    }
   }
 
   // Set up tooltip show or hide
@@ -557,45 +570,37 @@ export class Network {
     }
   }
 
+  public getEdgeBundles() {
+    const elements = this.getElements();
+    const bundleEdge: any = [];
+    _.each(elements, (element) => {
+      if (element instanceof EdgeBundle) {
+        bundleEdge.push(element);
+      }
+    });
+    return bundleEdge;
+  }
+
   // basic reDraw elements on canvas
   public reDraw() {
     const nodes = this.getNodeObj();
     const edgeObj: any = this.getEdgeObj();
     const groupObj = this.getGroupObj();
-    const edgeBundles = this.getEdgeBundles();
     const edgeGroups = this.getEdgeGroup();
     const dataFlowList = this.getDataFlow();
-    const inWrapperNodesList = this.analyzeInWrapperNodes();
     _.each(nodes, (node: Node) => {
-      this.drawNode(node, inWrapperNodesList);
-    });
-    _.each(edgeBundles, (bundle: EdgeBundle) => {
-      bundle.changeLabelSize(this.zoom);
+      this.drawNode(node);
     });
     _.each(edgeObj, (edge: Edge) => {
-      this.drawEdge(edge);
+      edge.draw();
     });
     _.each(groupObj, (group: Group) => {
-      this.drawGroup(group);
-      if (this.isLayer) {
-        group.layerHideNodes(this.zoom);
-      }
+      group.draw();
     });
     _.each(edgeGroups, (edgeGroup: EdgeGroup) => {
-      this.drawEdgeGroup(edgeGroup);
+      edgeGroup.draw();
     });
     _.each(dataFlowList, (dataFlow: DataFlow) => {
-      let defaultWidth;
-      if (dataFlow.invariableStyles && dataFlow.invariableStyles.lineWidth) {
-        defaultWidth = dataFlow.invariableStyles.lineWidth;
-      } else {
-        defaultWidth = dataFlow.defaultStyle.lineWidth;
-      }
-      if (this.zoom <= 1) {
-        dataFlow.setStyle({
-          lineWidth: defaultWidth * this.zoom,
-        });
-      }
       dataFlow.draw();
     });
   }
@@ -621,33 +626,19 @@ export class Network {
     }
   }
 
-  private getNetworkSize() {
-    const wrapper = document.getElementById(this.domRegex);
-    if (wrapper) {
-      return [wrapper.offsetWidth, wrapper.offsetHeight];
-    }
-  }
-
-  private moveTopology(zoom: number, originx: number, originy: number) {
+  public moveTopology(zoom: number, originx: number, originy: number, isDraw: boolean) {
     const moveOriginX = NP.times(originx, NP.minus(1, zoom));
     const moveOriginY = NP.times(originy, NP.minus(1, zoom));
     const nodesObj = this.getNodeObj();
     _.each(nodesObj, (node: any) => {
       node.position.set(node.x + moveOriginX, node.y + moveOriginY);
     });
-    this.reDraw();
+    if (isDraw) {
+      this.reDraw();
+    }
   }
 
-  private zoomElements(zoomNum: number) {
-    const nodesObj = this.getNodeObj();
-    const zoomScale = NP.divide(zoomNum, this.zoom);
-    _.each(nodesObj, (node: any) => {
-      node.position.set(NP.times(node.x, zoomScale), NP.times(node.y, zoomScale));
-    });
-    this.zoom = zoomNum;
-  }
-
-  private analyzeInWrapperNodes() {
+  public analyzeInWrapperNodes() {
     const wrapper = document.getElementById(this.domRegex);
     const nodes = this.getNodeObj();
     const inWrapperNodesList: Node[] = [];
@@ -669,101 +660,53 @@ export class Network {
     return inWrapperNodesList;
   }
 
-  private drawNode(node: Node, inWrapperNodesList: Node[]) {
+  public moveToCenter(center: IPosition) {
+    const wrapperCenter = this.getCenter();
+    const nodes = this.getNodeObj();
+    const moveX = wrapperCenter.x - center.x;
+    const moveY = wrapperCenter.y - center.y;
+    _.each(nodes, (node: Node) => {
+      node.x = node.x + moveX;
+      node.y = node.y + moveY;
+    });
+  }
+
+  private getNetworkSize() {
+    const wrapper = document.getElementById(this.domRegex);
+    if (wrapper) {
+      return [wrapper.offsetWidth, wrapper.offsetHeight];
+    }
+  }
+
+  private zoomElements(zoomNum: number) {
+    const nodesObj = this.getNodeObj();
+    const zoomScale = NP.divide(zoomNum, this.zoom);
+    _.each(nodesObj, (node: any) => {
+      node.position.set(NP.times(node.x, zoomScale), NP.times(node.y, zoomScale));
+    });
+    this.zoom = zoomNum;
+  }
+
+  private drawNode(node: Node) {
     if (node.icon) {
       const defaultWidth = node.getDefaultSize().width;
       const defaultHeight = node.getDefaultSize().height;
-      if (this.zoom < 0.4 && inWrapperNodesList.length > this.pointNum) {
-        _.extend(node.defaultStyle, ({
-          width: 4,
-          fillColor: 0X0386d2,
-        }));
-        node.drawGraph();
-      } else {
-        if (this.zoom <= 1.5 && this.zoom >= 0.4) {
-          node.iconWidth = NP.times(defaultWidth, this.zoom);
-          node.iconHeight = NP.times(defaultHeight, this.zoom);
-        } else if (this.zoom < 0.4) {
-          node.iconWidth = NP.times(defaultWidth, 0.4);
-          node.iconHeight = NP.times(defaultHeight, 0.4);
-        } else if (this.zoom > 1.5) {
-          node.iconWidth = NP.times(defaultWidth, 1.5);
-          node.iconHeight = NP.times(defaultHeight, 1.5);
-        }
-        node.drawSprite(node.icon);
+      if (this.zoom <= 1.5 && this.zoom >= 0.4) {
+        node.iconWidth = NP.times(defaultWidth, this.zoom);
+        node.iconHeight = NP.times(defaultHeight, this.zoom);
+      } else if (this.zoom < 0.4) {
+        node.iconWidth = NP.times(defaultWidth, 0.4);
+        node.iconHeight = NP.times(defaultHeight, 0.4);
+      } else if (this.zoom > 1.5) {
+        node.iconWidth = NP.times(defaultWidth, 1.5);
+        node.iconHeight = NP.times(defaultHeight, 1.5);
       }
+      node.drawSprite(node.icon);
     }
     const border = node.getChildByName('node_border');
     if (border) {
       node.selectOn();
     }
-  }
-
-  private drawEdge(edge: Edge) {
-    let width;
-    if (edge.invariableStyles && edge.invariableStyles.lineWidth) {
-      width = edge.invariableStyles.lineWidth;
-    } else {
-      width = 1;
-    }
-    if (this.zoom <= 1.2 && this.zoom >= 0.1) {
-      _.extend(edge.defaultStyle, ({
-        lineWidth: width * this.zoom,
-      }));
-    } else if (this.zoom > 1.2) {
-      _.extend(edge.defaultStyle, ({
-        lineWidth: width * 1.2,
-      }));
-    } else if (this.zoom < 0.1) {
-      _.extend(edge.defaultStyle, ({
-        lineWidth: width * 0.1,
-      }));
-    }
-    edge.draw();
-  }
-
-  private drawGroup(group: Group) {
-    let defaultLineWidth;
-    if (group.invariableStyles && group.invariableStyles.lineWidth) {
-      defaultLineWidth = group.invariableStyles.lineWidth;
-    } else {
-      defaultLineWidth = 1;
-    }
-    if (this.zoom > 1) {
-      group.setStyle({
-        lineWidth: defaultLineWidth,
-      });
-    } else if (this.zoom <= 1 && this.zoom > 0.5) {
-      group.setStyle({
-        lineWidth: defaultLineWidth / this.zoom,
-      });
-    } else {
-      group.setStyle({
-        lineWidth: defaultLineWidth / 0.5,
-      });
-    }
-    if (group.isSelected) {
-      group.selectOn();
-    }
-    group.draw();
-  }
-
-  private drawEdgeGroup(edgeGroup: EdgeGroup) {
-    let defaultMargin;
-    if (edgeGroup.invariableStyles && edgeGroup.invariableStyles.lineWidth) {
-      defaultMargin = edgeGroup.invariableStyles.margin;
-    } else {
-      defaultMargin = 8;
-    }
-    if (this.zoom <= 1) {
-      edgeGroup.setStyle({
-        margin: defaultMargin * this.zoom,
-      });
-    }
-    if (edgeGroup.isSelected) {
-      edgeGroup.selectOn();
-    }
-    edgeGroup.draw();
   }
 
   private analyzeZoom() {
@@ -829,29 +772,6 @@ export class Network {
         e.preventDefault();
       });
     }
-  }
-
-  private moveToCenter(center: IPosition) {
-    const wrapperCenter = this.getCenter();
-    const nodes = this.getNodeObj();
-    const moveX = wrapperCenter.x - center.x;
-    const moveY = wrapperCenter.y - center.y;
-    _.each(nodes, (node: Node) => {
-      node.x = node.x + moveX;
-      node.y = node.y + moveY;
-    });
-    this.reDraw();
-  }
-
-  private getEdgeBundles() {
-    const elements = this.getElements();
-    const bundleEdge: any = [];
-    _.each(elements, (element) => {
-      if (element instanceof EdgeBundle) {
-        bundleEdge.push(element);
-      }
-    });
-    return bundleEdge;
   }
 
   private vertexPoints() {

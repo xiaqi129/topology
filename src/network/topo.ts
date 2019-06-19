@@ -35,8 +35,6 @@ export interface ITopo {
 
   clear(): void;
 
-  getEdgesGroup(): { [key: string]: Edge[] };
-
   setSelectedNodes(element: CommonElement): void;
 
   getSelectedNodes(): any[];
@@ -57,8 +55,6 @@ export interface ITopo {
 
   removeEdgeBundleByName(name: string): void;
 
-  clearObject(obj: { [key: string]: any }): void;
-
 }
 
 export class Topo implements ITopo {
@@ -72,8 +68,6 @@ export class Topo implements ITopo {
   private selectedGroup: any[] = [];
 
   private elements: any[] = [];
-
-  private edgesGroupByNodes: { [key: string]: Edge[] } = {};
 
   public addElement(element: CommonElement) {
     this.addElements([element]);
@@ -137,17 +131,6 @@ export class Topo implements ITopo {
   public getSortNodesUID(edge: Edge) {
     const nodes = [edge.startNode, edge.endNode];
     return [nodes[0].getUID(), nodes[1].getUID()].sort().join();
-  }
-
-  public clearObject(obj: { [key: string]: any }) {
-    const keys = _.keys(obj);
-    _.each(keys, (key: string) => {
-      delete obj[key];
-    });
-  }
-
-  public getEdgesGroup() {
-    return this.edgesGroupByNodes;
   }
 
   public getElements() {
