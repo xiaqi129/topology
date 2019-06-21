@@ -140,12 +140,10 @@ export class Network {
         if (e.deltaY < 0) {
           if (zoom < 1 && zoom >= 0.1) {
             this.zoomElements(NP.plus(zoom, 0.1));
-          } else if (zoom <= 4.8 && zoom >= 1) {
+          } else if (zoom <= 5 && zoom >= 1) {
             this.zoomElements(NP.plus(zoom, 0.2));
           } else if (zoom < 0.1 && zoom >= 0) {
             this.zoomElements(NP.plus(zoom, 0.01));
-          } else if (zoom > 4.8 && zoom <= 5) {
-            this.zoomElements(NP.plus(zoom, 0.2));
           }
         } else {
           if (zoom <= 1 && zoom > 0.11) {
@@ -312,17 +310,18 @@ export class Network {
     if (element instanceof Edge) {
       if (element.bundleParent instanceof EdgeBundle) {
         const data = !element.bundleParent.isExpanded ? element.bundleParent.bundleData : element.bundleParent.children;
+        // remove bundle data or bundle children
         _.remove(data, (edge) => {
           return edge === element;
         });
         if (data.length === 1 && data[0]) {
           const edge = data[0];
+          // remove edge bundle on elements
           _.remove(elements, (elem: CommonElement) => {
             return element.bundleParent === elem;
           });
           element.bundleParent.removeBundleEdge();
-          edge.brotherEdges = [];
-          this.addElement(edge);
+          elements.push(edge);
           edge.startNode.linksArray.push(edge);
           edge.endNode.linksArray.push(edge);
           edge.setStyle({
@@ -338,6 +337,12 @@ export class Network {
       if (element.includeGroup) {
         _.each(element.includeGroup, (edgeGroup: EdgeGroup) => {
           edgeGroup.removeChildEdge(element);
+        });
+      }
+    } else if (element instanceof Node) {
+      if (element.includedGroups) {
+        _.each(element.includedGroups, (group: Group) => {
+          group.removeChildNode(element);
         });
       }
     }

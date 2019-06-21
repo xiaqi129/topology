@@ -1141,6 +1141,7 @@ if (btnAaddEdge) {
   btnAaddEdge.addEventListener('click', () => {
     // console.log(sourcesEdge);
     network.addElements(sourcesEdge);
+    network.setBundleExpanded(false);
     network.setClick();
     network.syncView();
   });

@@ -9012,6 +9012,14 @@ export const data = {
     'remote_host': 'mykul-cmp-west-f-wlc2'
         },
         {
+    'local_host': 'mykul-cmp-west-r-cr01',
+    'link_protocol': 'cdp',
+    'remote_int': 'Gi0/0/2',
+    'local_int': 'Portchannel4(Eth3/5)',
+    'link_state': 'normal',
+    'remote_host': 'mykul-cmp-west-f-wlc2'
+        },
+        {
     'local_host': 'mykul-cmp-east-r-wan02',
     'link_protocol': 'OSPF',
     'remote_int': '',
