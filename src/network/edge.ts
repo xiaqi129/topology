@@ -337,16 +337,19 @@ export class Edge extends CommonElement {
   // Draw imaginary line with imaginary line points
   private drawImaginaryLink(graph: any, points: any) {
     const style = this.defaultStyle;
+    const isHit = this.hitTestRectangle(this.startNode, this.endNode);
     graph.interactive = true;
-    _.each(points, (point) => {
-      graph.lineStyle(style.lineWidth, style.lineColor);
-      graph.beginFill(style.lineColor, style.fillOpacity);
-      graph.moveTo(point.sLeft.x, point.sLeft.y);
-      graph.lineTo(point.sRight.x, point.sRight.y);
-      graph.lineTo(point.eRight.x, point.eRight.y);
-      graph.lineTo(point.eLeft.x, point.eLeft.y);
-      graph.endFill();
-    });
+    if (!isHit) {
+      _.each(points, (point) => {
+        graph.lineStyle(style.lineWidth, style.lineColor);
+        graph.beginFill(style.lineColor, style.fillOpacity);
+        graph.moveTo(point.sLeft.x, point.sLeft.y);
+        graph.lineTo(point.sRight.x, point.sRight.y);
+        graph.lineTo(point.eRight.x, point.eRight.y);
+        graph.lineTo(point.eLeft.x, point.eLeft.y);
+        graph.endFill();
+      });
+    }
   }
 
   // The length of the Pythagorean theorem to get the line
@@ -801,6 +804,38 @@ export class Edge extends CommonElement {
     _.each(this.includeGroup, (edgeGroup) => {
       edgeGroup.draw();
     });
+  }
+
+  // Collision detection function
+  private hitTestRectangle(r1: any, r2: any) {
+    let hit;
+    let combinedHalfWidths;
+    let combinedHalfHeights;
+    let vx;
+    let vy;
+    hit = false;
+    r1.centerX = r1.x + r1.iconWidth / 2;
+    r1.centerY = r1.y + r1.iconHeight / 2;
+    r2.centerX = r2.x + r2.iconWidth / 2;
+    r2.centerY = r2.y + r2.iconHeight / 2;
+    r1.halfWidth = r1.iconWidth / 2;
+    r1.halfHeight = r1.iconHeight / 2;
+    r2.halfWidth = r2.iconWidth / 2;
+    r2.halfHeight = r2.iconHeight / 2;
+    vx = r1.centerX - r2.centerX;
+    vy = r1.centerY - r2.centerY;
+    combinedHalfWidths = r1.halfWidth + r2.halfWidth;
+    combinedHalfHeights = r1.halfHeight + r2.halfHeight;
+    if (Math.abs(vx) < combinedHalfWidths) {
+      if (Math.abs(vy) < combinedHalfHeights) {
+        hit = true;
+      } else {
+        hit = false;
+      }
+    } else {
+      hit = false;
+    }
+    return hit;
   }
 
   // Set label position

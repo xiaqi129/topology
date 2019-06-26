@@ -154,6 +154,8 @@ export class Network {
             this.zoomElements(NP.minus(zoom, 0.01));
           } else if (zoom > 5) {
             this.zoomElements(NP.minus(zoom, 0.2));
+          } else if (zoom < 0.02 && zoom > 0.01) {
+            this.zoomElements(0.01);
           }
         }
         const scale = NP.divide(this.zoom, zoom);

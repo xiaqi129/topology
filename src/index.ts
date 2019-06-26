@@ -540,58 +540,58 @@ const edgeGroupDemo = function () {
         },
         children: ['2'],
       },
-      // {
-      //   name: 'group3',
-      //   style: {
-      //     fillColor: 0Xfcc242,
-      //     margin: 8,
-      //   },
-      //   children: ['5'],
-      // },
-      // {
-      //   name: 'group4',
-      //   style: {
-      //     fillColor: 0xf55d54,
-      //     margin: 8,
-      //     fillOpacity: 0,
-      //     lineColor: 0xf55d54,
-      //   },
-      //   children: ['9'],
-      // },
-      // {
-      //   name: 'group5',
-      //   style: {
-      //     fillColor: 0xf55d54,
-      //     margin: 8,
-      //     fillOpacity: 0,
-      //     lineColor: 0Xa378b4,
-      //     lineWidth: 2,
-      //   },
-      //   children: ['4'],
-      // },
-      // {
-      //   name: 'group6',
-      //   style: {
-      //     fillColor: 0xf55d54,
-      //     margin: 8,
-      //     fillOpacity: 0,
-      //     lineColor: 0Xfcc242,
-      //     lineWidth: 2,
-      //   },
-      //   // children: ['1', '4', '10', '11', '12', '13', '14'],
-      //   children: ['12', '13'],
-      // },
-      // {
-      // name: 'group7',
-      // style: {
-      //   fillColor: 0X0984e3,
-      //   margin: 8,
-      //   fillOpacity: 0,
-      //   lineColor: 0X0984e3,
-      //   lineWidth: 2,
-      // },
-      // children: ['6'],
-      // },
+      {
+        name: 'group3',
+        style: {
+          fillColor: 0Xfcc242,
+          margin: 8,
+        },
+        children: ['5'],
+      },
+      {
+        name: 'group4',
+        style: {
+          fillColor: 0xf55d54,
+          margin: 8,
+          fillOpacity: 0,
+          lineColor: 0xf55d54,
+        },
+        children: ['9'],
+      },
+      {
+        name: 'group5',
+        style: {
+          fillColor: 0xf55d54,
+          margin: 8,
+          fillOpacity: 0,
+          lineColor: 0Xa378b4,
+          lineWidth: 2,
+        },
+        children: ['4'],
+      },
+      {
+        name: 'group6',
+        style: {
+          fillColor: 0xf55d54,
+          margin: 8,
+          fillOpacity: 0,
+          lineColor: 0Xfcc242,
+          lineWidth: 2,
+        },
+        children: ['1', '4', '10', '11', '12', '13', '14'],
+        // children: ['12', '13'],
+      },
+      {
+        name: 'group7',
+        style: {
+          fillColor: 0X0984e3,
+          margin: 8,
+          fillOpacity: 0,
+          lineColor: 0X0984e3,
+          lineWidth: 2,
+        },
+        children: ['6'],
+      },
     ],
     groups: [
       {
@@ -1073,9 +1073,9 @@ const simpleData = function () {
   network.toggleLabel(1, 2);
 };
 network.callback = () => {
-  simpleData();
+  // simpleData();
   // noData();
-  // edgeGroupDemo();
+  edgeGroupDemo();
   // dataFlowDemo();
 };
 const body = document.getElementById('network');

@@ -10,6 +10,7 @@ import Offset from 'polygon-offset/dist/offset';
 import { CommonElement, IPosition } from './common-element';
 import { Edge } from './edge';
 import { EdgeBundle } from './edge-bundle';
+import { Group } from './group';
 import { Label } from './label';
 import ConvexHullGrahamScan from './lib/convex-hull';
 import { Node } from './node';
@@ -28,6 +29,7 @@ export class EdgeGroup extends CommonElement {
   private dragging: boolean = false;
   private last: any;
   private elements: CommonElement;
+  private childNodes: Node[] = [];
   constructor(elements: any) {
     super();
     this.elements = elements;
@@ -232,15 +234,34 @@ export class EdgeGroup extends CommonElement {
   private getPolygonPoints(): number[][] {
     let pointsList: number[] = [];
     if (this.childrenEdge) {
-      _.each(this.childrenEdge, (edge: any) => {
-        if (edge instanceof Edge && edge.visible) {
-          pointsList = _.concat(pointsList, edge.polygonData);
-        } else if (edge instanceof EdgeBundle) {
-          _.each(edge.children, (e: any) => {
-            pointsList = _.concat(pointsList, e.polygonData);
-          });
-        }
-      });
+      if (this.childrenEdge.length === 1) {
+        _.each(this.childrenEdge, (edge: any) => {
+          if (_.indexOf(this.childNodes, edge.startNode) === -1) {
+            this.childNodes.push(edge.startNode);
+          }
+          if (_.indexOf(this.childNodes, edge.endNode) === -1) {
+            this.childNodes.push(edge.endNode);
+          }
+          if (edge instanceof Edge && edge.visible) {
+            pointsList = _.concat(pointsList, edge.polygonData);
+          } else if (edge instanceof EdgeBundle) {
+            _.each(edge.children, (e: any) => {
+              pointsList = _.concat(pointsList, e.polygonData);
+            });
+          }
+        });
+      } else {
+        _.each(this.childrenEdge, (edge: Edge) => {
+          if (_.indexOf(this.childNodes, edge.startNode) === -1) {
+            this.childNodes.push(edge.startNode);
+          }
+          if (_.indexOf(this.childNodes, edge.endNode) === -1) {
+            this.childNodes.push(edge.endNode);
+          }
+          pointsList.push(edge.startNode.x, edge.startNode.y);
+          pointsList.push(edge.endNode.x, edge.endNode.y);
+        });
+      }
     }
     const vertexPoints: number[][] = _.chunk(pointsList, 2);
     return vertexPoints;
@@ -303,28 +324,17 @@ export class EdgeGroup extends CommonElement {
   private onDragMove(event: any) {
     if (this.dragging) {
       const newPosition = this.parent.toLocal(event.data.global);
-      const edges = this.childrenEdge;
+      const edges = this.getChildEdges();
       const allEdgeGroups = this.getEdgeGroup();
-      let nodesLinkEdges: any[] = [];
-      let nodesList: Node[] = [];
-      if (edges.length > 0) {
-        let nodesGroup: any[] = [];
-        _.each(edges, (edge: Edge) => {
-          const startNode: Node = edge.startNode;
-          const endNode: Node = edge.endNode;
-          nodesGroup.push(startNode.includedGroups, endNode.includedGroups);
-          nodesLinkEdges = _.concat(nodesLinkEdges, startNode.linksArray, endNode.linksArray);
-          nodesList.push(startNode, endNode);
-        });
-        nodesGroup = _.uniq(_.flattenDeep(nodesGroup));
-        nodesList = _.uniq(nodesList);
-        _.each(nodesList, (node: Node) => {
+      const nodesGroup = this.getGroups();
+      if (this.childrenEdge.length > 0) {
+        _.each(this.childNodes, (node: Node) => {
           if (!node.isLock) {
             node.position.x += newPosition.x - this.last.parents.x;
             node.position.y += newPosition.y - this.last.parents.y;
           }
         });
-        _.each(nodesLinkEdges, (edge: Edge) => {
+        _.each(edges, (edge: Edge) => {
           edge.draw();
         });
         _.each(allEdgeGroups, (group) => {
@@ -347,13 +357,32 @@ export class EdgeGroup extends CommonElement {
   }
 
   private getEdgeGroup() {
-    const edgeGroups: EdgeGroup[] = [];
-    _.each(this.elements, (element) => {
-      if (element instanceof EdgeGroup) {
-        edgeGroups.push(element);
+    const elements = this.elements;
+    const edgeGroup = _.filter(elements, (ele) => {
+      return ele instanceof EdgeGroup;
+    });
+    return edgeGroup;
+  }
+
+  private getGroups() {
+    const elements = this.elements;
+    const edgeGroup = _.filter(elements, (ele) => {
+      return ele instanceof Group;
+    });
+    return edgeGroup;
+  }
+
+  private getChildEdges(): Edge[] {
+    let edges: Edge[] = [];
+    _.each(this.elements, (element: CommonElement) => {
+      if (element instanceof Edge) {
+        edges.push(element);
+      } else if (element instanceof EdgeBundle) {
+        const childrenEdges = element.children as Edge[];
+        edges = edges.concat(childrenEdges);
       }
     });
-    return edgeGroups;
+    return edges;
   }
 
 }
