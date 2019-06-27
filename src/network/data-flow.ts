@@ -249,10 +249,10 @@ export class DataFlow extends CommonElement {
     let vx;
     let vy;
     hit = false;
-    r1.centerX = r1.x + r1.iconWidth / 2;
-    r1.centerY = r1.y + r1.iconHeight / 2;
-    r2.centerX = r2.x + r2.iconWidth / 2;
-    r2.centerY = r2.y + r2.iconHeight / 2;
+    r1.centerX = r1.x;
+    r1.centerY = r1.y;
+    r2.centerX = r2.x;
+    r2.centerY = r2.y;
     r1.halfWidth = r1.iconWidth / 2;
     r1.halfHeight = r1.iconHeight / 2;
     r2.halfWidth = r2.iconWidth / 2;
