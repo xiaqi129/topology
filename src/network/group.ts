@@ -50,7 +50,6 @@ export class Group extends CommonElement {
   public labelContent: string = '';
   public linksArray: Edge[] = [];
   public isSelected: boolean = false;
-  public isLayer: boolean = false;
   public isLock: boolean = false;
   private childNodesList: Node[][] = [];
   private edgeResource: IedgeResource[] = [];
@@ -206,56 +205,6 @@ export class Group extends CommonElement {
     return this.childrenNode;
   }
 
-  public layerHideNodes(zoom: number) {
-    if (zoom <= 0.6) {
-      if (this.substratumInfo.length === 0 && this.childNodesList.length > 1) {
-        const showNodesList = _.drop(this.childNodesList);
-        let showEdgeList: Edge[] = [];
-        let groups: Group[] = [];
-        if (showNodesList) {
-          const showNodes: any = _.flattenDeep(showNodesList);
-          _.each(showNodes, (node: Node) => {
-            node.visible = true;
-            showEdgeList = _.concat(showEdgeList, node.linksArray);
-            groups = _.concat(groups, node.includedGroups);
-          });
-          _.each(showEdgeList, (edge: Edge) => {
-            edge.visible = true;
-          });
-          groups = _.uniq(groups);
-          const index = showNodesList.length;
-          let hideNodeList: any[] = [];
-          let hideEdge: Edge[] = [];
-          if (this.isLayer) {
-            if (zoom <= 0.5 && index > 0 && zoom > 0.3) {
-              hideNodeList = _.flattenDeep(_.takeRight(showNodesList));
-            } else if (zoom <= 0.3 && index - 1 > 0 && zoom > 0.2) {
-              hideNodeList = _.flattenDeep(_.takeRight(showNodesList, 2));
-            } else if (zoom <= 0.2 && index - 2 > 0 && zoom > 0.1) {
-              hideNodeList = _.flattenDeep(_.takeRight(showNodesList, 3));
-            } else if (zoom <= 0.1) {
-              hideNodeList = _.flattenDeep(showNodesList);
-            }
-            if (hideNodeList.length === 0 && zoom < 0.5) {
-              hideNodeList = _.flattenDeep(showNodesList);
-            }
-            _.each(hideNodeList, (node: Node) => {
-              node.visible = false;
-              hideEdge = _.concat(hideEdge, node.linksArray);
-
-            });
-            _.each(hideEdge, (edge: Edge) => {
-              edge.visible = false;
-            });
-          }
-        }
-        _.each(groups, (g: Group) => {
-          g.draw();
-        });
-      }
-    }
-  }
-
   public intersection() {
     const intersectionGroup: any[] = [];
     let intersectionNode: Node[] = [];
@@ -376,54 +325,6 @@ export class Group extends CommonElement {
         label.style.fontSize = nodeWidth / textLength;
       }
     }
-  }
-
-  private analyzeChildNodesList() {
-    const childNodesList: Node[][] = [];
-    const outsideEdges: Edge[] = this.edgeArray;
-    const nodes = this.getAllVisibleNodes();
-    let insideEdge: Edge[] = this.filterInsideEdge();
-    let fatherNode: Node[] = [];
-    _.each(outsideEdges, (edge: Edge) => {
-      const srcNode = edge.startNode;
-      const targetNode = edge.endNode;
-      if (_.includes(nodes, srcNode) && !(_.includes(nodes, targetNode))) {
-        if (!(_.includes(fatherNode, srcNode))) {
-          fatherNode.push(srcNode);
-        }
-      } else if (!(_.includes(nodes, srcNode)) && _.includes(nodes, targetNode)) {
-        if (!(_.includes(fatherNode, targetNode))) {
-          fatherNode.push(targetNode);
-        }
-      }
-    });
-    childNodesList.push(fatherNode);
-    while (insideEdge.length > 0) {
-      const childNode: Node[] = [];
-      const removeEdge: Edge[] = [];
-      _.each(insideEdge, (edge: Edge) => {
-        const srcNode = edge.startNode;
-        const targetNode = edge.endNode;
-        if (_.includes(fatherNode, srcNode) && !(_.includes(childNode, targetNode))) {
-          childNode.push(targetNode);
-          removeEdge.push(edge);
-        } else if (_.includes(fatherNode, targetNode) && !(_.includes(childNode, srcNode))) {
-          childNode.push(srcNode);
-          removeEdge.push(edge);
-        }
-      });
-      if (childNode.length === 0 && removeEdge.length === 0) {
-        break;
-      }
-      const delChildNode = _.difference(childNode, fatherNode);
-      const concatArray = _.flattenDeep(childNodesList);
-      if (delChildNode.length > 0 && concatArray.length < this.childrenNode.length) {
-        childNodesList.push(delChildNode);
-      }
-      fatherNode = delChildNode;
-      insideEdge = _.difference(insideEdge, removeEdge);
-    }
-    this.childNodesList = childNodesList;
   }
 
   private setExpanded() {
@@ -939,9 +840,6 @@ export class Group extends CommonElement {
       graphic.on('mousedown', this.onDragStart, this);
       if (!this.isLock) {
         graphic.on('mousemove', this.onDragMove, this);
-      }
-      if (this.isLayer) {
-        this.analyzeChildNodesList();
       }
     }
   }

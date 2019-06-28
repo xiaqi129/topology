@@ -15,6 +15,22 @@ import { Tooltip } from './tooltip';
 
 const Point = PIXI.Point;
 
+export interface IPoint {
+  x: number;
+  y: number;
+}
+export interface IResultsPoints {
+  sLeft: IPoint;
+  sRight: IPoint;
+  eRight: IPoint;
+  eLeft: IPoint;
+}
+
+export interface IDottedPoints {
+  start: IPoint;
+  end: IPoint;
+}
+
 export class Edge extends CommonElement {
   public type: string = 'Edge';
   public startNode: any;
@@ -194,43 +210,34 @@ export class Edge extends CommonElement {
   // Get line points
   private calcEdgePoints(start: any, end: any) {
     const lineWidth = this.defaultStyle.lineWidth;
-    const lineDistance = this.defaultStyle.bezierLineDistance;
     const angle = this.getAngle();
-    const half = lineWidth * 0.5;
-    let sLeft = {};
-    let sRight = {};
-    let eRight: any = {};
-    let eLeft: any = {};
-    const sX = start.x + Math.cos(angle) * lineDistance;
-    const sY = start.y - Math.sin(angle) * lineDistance;
-    const eX = end.x + Math.cos(angle) * lineDistance;
-    const eY = end.y - Math.sin(angle) * lineDistance;
-    const results: any = {};
-    if ((sX < eX && sY < eY) ||
-      (sX > eX && sY > eY)) {
-      sLeft = new Point(sX - half, sY + half);
-      sRight = new Point(sX + half, sY - half);
-      eRight = new Point(eX + half, eY - half);
-      eLeft = new Point(eX - half, eY + half);
-    } else if ((sX > eX && sY < eY) ||
-      (sX < eX && sY > eY)) {
-      sLeft = new Point(sX - half, sY - half);
-      sRight = new Point(sX + half, sY + half);
-      eRight = new Point(eX + half, eY + half);
-      eLeft = new Point(eX - half, eY - half);
-    } else if (sX === eX &&
-      (sY > eY || sY < eY)) {
-      sLeft = new Point(sX - half, sY);
-      sRight = new Point(sX + half, sY);
-      eRight = new Point(eX + half, eY);
-      eLeft = new Point(eX - half, eY);
-    } else if (sY === eY &&
-      (sX < eX || sX > eX)) {
-      sLeft = new Point(sX, sY + half);
-      sRight = new Point(sX, sY - half);
-      eRight = new Point(eX, eY - half);
-      eLeft = new Point(eX, eY + half);
-    }
+    const half = lineWidth * 3;
+    const sX = start.x;
+    const sY = start.y;
+    const eX = end.x;
+    const eY = end.y;
+    this.polygonData = [];
+    this.polygonData.push(
+      sX - Math.cos(angle) * half,
+      sY + Math.sin(angle) * half,
+      sX + Math.cos(angle) * half,
+      sY - Math.sin(angle) * half,
+      eX + Math.cos(angle) * half,
+      eY - Math.sin(angle) * half,
+      eX - Math.cos(angle) * half,
+      eY + Math.sin(angle) * half,
+    );
+    // after delete
+    const results: IResultsPoints = {
+      sLeft: { x: 0, y: 0 },
+      sRight: { x: 0, y: 0 },
+      eRight: { x: 0, y: 0 },
+      eLeft: { x: 0, y: 0 },
+    };
+    const sLeft = new Point(sX - Math.cos(angle) * half, sY + Math.sin(angle) * half);
+    const sRight = new Point(sX + Math.cos(angle) * half, sY - Math.sin(angle) * half);
+    const eRight = new Point(eX + Math.cos(angle) * half, eY - Math.sin(angle) * half);
+    const eLeft = new Point(eX - Math.cos(angle) * half, eY + Math.sin(angle) * half);
     results.sLeft = sLeft;
     results.sRight = sRight;
     results.eRight = eRight;
@@ -240,114 +247,53 @@ export class Edge extends CommonElement {
 
   // Get imaginary line points
   private calcDottedEdgePoints(start: any, end: any, lineWidth: number) {
-    const half = lineWidth * 0.5;
-    const breakNum = 15;
-    const breakLength = 5;
-    const pointsList = [];
     const angle = this.getAngle();
-    const breakX = breakLength * Math.sin(angle);
-    const breakY = breakLength * Math.cos(angle);
-    const distanceX = Math.abs(start.x - end.x) / breakNum - Math.abs(breakX);
-    const distanceY = Math.abs(start.y - end.y) / breakNum - Math.abs(breakY);
-    let sLeft = {};
-    let sRight = {};
-    let eRight: any = {};
-    let eLeft: any = {};
+    const flowLength = 10;
+    const xLength = start.x - end.x;
+    const yLength = start.y - end.y;
+    const distance = Math.sqrt(xLength * xLength + yLength * yLength);
+    const segmentNum = (distance / flowLength / 2);
+    const moveX = flowLength * Math.sin(angle);
+    const moveY = flowLength * Math.cos(angle);
+    const pointsList = [];
     let sX = start.x;
     let sY = start.y;
-    const eX = end.x;
-    const eY = end.y;
-    for (let index = 0; index < breakNum; index = index + 1) {
-      const result: any = {};
-      if (sX > eX && sY > eY && (sX - distanceX > eX) && (sY - distanceY > eY)) {
-        sLeft = new Point(sX - half, sY + half);
-        sRight = new Point(sX + half, sY - half);
-        eRight = new Point(sX + half - distanceX, sY - half - distanceY);
-        eLeft = new Point(sX - half - distanceX, sY + half - distanceY);
-        sX = sX - distanceX - breakX;
-        sY = sY - distanceY - breakY;
-      } else if (sX < eX && sY < eY && (sX + distanceX < eX) && (sY + distanceY < eY)) {
-        sLeft = new Point(sX - half, sY + half);
-        sRight = new Point(sX + half, sY - half);
-        eRight = new Point(sX + half + distanceX, sY - half + distanceY);
-        eLeft = new Point(sX - half + distanceX, sY + half + distanceY);
-        sX = sX + distanceX - breakX;
-        sY = sY + distanceY - breakY;
-      } else if (sX > eX && sY < eY && (sX - distanceX > eX) && (sY + distanceY < eY)) {
-        sLeft = new Point(sX - half, sY - half);
-        sRight = new Point(sX + half, sY + half);
-        eRight = new Point(sX + half - distanceX, sY + half + distanceY);
-        eLeft = new Point(sX - half - distanceX, sY - half + distanceY);
-        sX = sX - distanceX - breakX;
-        sY = sY + distanceY - breakY;
-      } else if (sX < eX && sY > eY && (sX + distanceX < eX) && (sY - distanceY > eY)) {
-        sLeft = new Point(sX - half, sY - half);
-        sRight = new Point(sX + half, sY + half);
-        eRight = new Point(sX + half + distanceX, sY + half - distanceY);
-        eLeft = new Point(sX - half + distanceX, sY - half - distanceY);
-        sX = sX + distanceX - breakX;
-        sY = sY - distanceY - breakY;
-      } else if (sX === eX && sY > eY && (sY - distanceY > eY)) {
-        sLeft = new Point(sX - half, sY);
-        sRight = new Point(sX + half, sY);
-        eRight = new Point(eX + half, sY - distanceY);
-        eLeft = new Point(eX - half, sY - distanceY);
-        sY = sY - distanceY - breakY;
-      } else if (sX === eX && sY < eY && (sY + distanceY < eY)) {
-        sLeft = new Point(sX - half, sY);
-        sRight = new Point(sX + half, sY);
-        eRight = new Point(eX + half, sY + distanceY);
-        eLeft = new Point(eX - half, sY + distanceY);
-        sY = sY + distanceY - breakY;
-      } else if (sY === eY && sX < eX && (sX + distanceX < eX)) {
-        sLeft = new Point(sX, sY + half);
-        sRight = new Point(sX, sY - half);
-        eRight = new Point(sX + distanceX, eY - half);
-        eLeft = new Point(sX + distanceX, eY + half);
-        sX = sX + distanceX - breakX;
-      } else if (sY === eY && sX > eX && (sX - distanceX > eX)) {
-        sLeft = new Point(sX, sY + half);
-        sRight = new Point(sX, sY - half);
-        eRight = new Point(sX - distanceX, eY - half);
-        eLeft = new Point(sX - distanceX, eY + half);
-        sX = sX - distanceX - breakX;
-      }
-      result.sLeft = sLeft;
-      result.sRight = sRight;
-      result.eRight = eRight;
-      result.eLeft = eLeft;
+    this.calcEdgePoints(start, end);
+    for (let index = 0; index < segmentNum; index = index + 1) {
+      const result: IDottedPoints = {
+        start: { x: 0, y: 0 },
+        end: { x: 0, y: 0 },
+      };
+      const dottedStart = new Point(sX, sY);
+      const dottedEnd = new Point(sX - moveX, sY - moveY);
+      sX = sX - moveX * 2;
+      sY = sY - moveY * 2;
+      result.start = dottedStart;
+      result.end = dottedEnd;
       pointsList.push(result);
     }
     return pointsList;
   }
 
   // Draw edge with line points
-  private drawEdge(graph: any, points: any) {
+  private drawEdge(graph: any) {
     const style = this.defaultStyle;
-    graph.interactive = true;
+    this.hitArea = new PIXI.Polygon(this.polygonData);
     graph.lineStyle(style.lineWidth, style.lineColor);
-    graph.beginFill(style.lineColor, style.fillOpacity);
-    graph.moveTo(points.sLeft.x, points.sLeft.y);
-    graph.lineTo(points.sRight.x, points.sRight.y);
-    graph.lineTo(points.eRight.x, points.eRight.y);
-    graph.lineTo(points.eLeft.x, points.eLeft.y);
-    graph.endFill();
+    graph.moveTo(this.startNode.x, this.startNode.y);
+    graph.lineTo(this.endNode.x, this.endNode.y);
   }
 
   // Draw imaginary line with imaginary line points
-  private drawImaginaryLink(graph: any, points: any) {
+  private drawImaginaryLink(graph: any, points: IDottedPoints[]) {
     const style = this.defaultStyle;
     const isHit = this.hitTestRectangle(this.startNode, this.endNode);
-    graph.interactive = true;
+    this.hitArea = new PIXI.Polygon(this.polygonData);
     if (!isHit) {
       _.each(points, (point) => {
         graph.lineStyle(style.lineWidth, style.lineColor);
-        graph.beginFill(style.lineColor, style.fillOpacity);
-        graph.moveTo(point.sLeft.x, point.sLeft.y);
-        graph.lineTo(point.sRight.x, point.sRight.y);
-        graph.lineTo(point.eRight.x, point.eRight.y);
-        graph.lineTo(point.eLeft.x, point.eLeft.y);
-        graph.endFill();
+        graph.moveTo(point.start.x, point.start.y);
+        graph.lineTo(point.end.x, point.end.y);
       });
     }
   }
@@ -557,14 +503,8 @@ export class Edge extends CommonElement {
 
   // Complete generated edge
   private createLinkEdge(srcNodePos: any, endNodePos: any, style: any) {
-    const points = this.calcEdgePoints(
-      srcNodePos, endNodePos);
-    this.drawEdge(this.edge, points);
-    const polygonData: number[] = [];
-    _.each(points, (point) => {
-      polygonData.push(point.x, point.y);
-    });
-    this.polygonData = polygonData;
+    this.calcEdgePoints(srcNodePos, endNodePos);
+    this.drawEdge(this.edge);
     return this.edge;
   }
 
@@ -572,22 +512,16 @@ export class Edge extends CommonElement {
   private createImaginaryEdge(srcNodePos: any, endNodePos: any, style: any) {
     const pointsList = this.calcDottedEdgePoints(
       srcNodePos, endNodePos, style.lineWidth);
-    const polygonData: number[] = [];
-    const points = this.calcEdgePoints(
-      srcNodePos, endNodePos);
-    _.each(points, (point) => {
-      polygonData.push(point.x, point.y);
-    });
-    this.polygonData = polygonData;
     this.drawImaginaryLink(this.edge, pointsList);
     return this.edge;
   }
 
   // Complete genneated arrow
   private createLinkArrows(
-    srcNodePos: any, endNodePos: any, angle: any, style: any) {
+    srcNodePos: any, endNodePos: any, style: any) {
     const arrowsDirections = [[true], [false], [true, false], [undefined]];
     const directions = arrowsDirections[style.arrowType];
+    const angle = this.getAngle();
     _.each(directions, (direction) => {
       if (direction !== undefined) {
         const position = direction ? endNodePos : srcNodePos;
@@ -706,7 +640,7 @@ export class Edge extends CommonElement {
     angle: number,
     style: IStyles) {
     const edge = this.createLinkEdge(srcNodePos, endNodePos, style);
-    const arrow = this.createLinkArrows(srcNodePos, endNodePos, angle, style);
+    const arrow = this.createLinkArrows(srcNodePos, endNodePos, style);
     return [edge, arrow];
   }
 
@@ -748,7 +682,8 @@ export class Edge extends CommonElement {
     const endNodePosAdjusted =
       this.getParallelPoint(endNodePos, this.defaultStyle.lineDistance, this.getAngle());
     const edge = this.createImaginaryEdge(srcNodePosAdjusted, endNodePosAdjusted, style);
-    return [edge];
+    const arrow = this.createLinkArrows(srcNodePos, endNodePos, style);
+    return [edge, arrow];
   }
 
   // Draw imaginary curve

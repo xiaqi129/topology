@@ -34,7 +34,6 @@ export class Network {
   private domRegex: string;
   private nodeLabel: number = 0;
   private edgeLabel: number = 0;
-  private isLayer: boolean = false;
 
   constructor(domRegex: string) {
     PIXI.utils.skipHello();
@@ -610,11 +609,6 @@ export class Network {
     _.each(dataFlowList, (dataFlow: DataFlow) => {
       dataFlow.draw();
     });
-  }
-
-  set layerHide(flag: boolean) {
-    this.isLayer = flag;
-    this.reDraw();
   }
 
   // Based on the zoom number to show or hide node's and edge's label

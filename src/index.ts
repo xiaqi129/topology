@@ -43,7 +43,7 @@ const network = new Network('network');
 network.initIconResource(iconResource);
 // tslint:disable-next-line:only-arrow-functions
 const noData = function () {
-  const num = 4;
+  const num = 2;
   for (let i: number = 0, len: number = num; i < len;) {
     i += 1;
     const node = network.createNode('cisco-ASR9');
@@ -57,7 +57,7 @@ const noData = function () {
   for (let i: number = 0, len: number = num; i < len;) {
     const srcNode = nodes[i];
     const destNode = nodes[i + 1];
-    for (let j = 0; j < 2;) {
+    for (let j = 0; j < 1;) {
       const edge = network.createEdge(srcNode, destNode);
       edge.initStyle({
         arrowColor: 0X006aad,
@@ -67,7 +67,7 @@ const noData = function () {
         arrowType: 3,
         fillArrow: true,
         lineColor: 0X0386d2,
-        lineType: 0,
+        lineType: 1,
         lineFull: 0,
         lineWidth: 1,
         bundleStyle: 1,
@@ -84,7 +84,7 @@ const noData = function () {
   // _.each(groupNodes, (node) => {
   //   group.addChildNodes(node);
   // });
-  network.setBundleExpanded(false);
+  // network.setBundleExpanded(false);
   network.syncView();
   network.setDrag();
   network.setZoom();
@@ -625,7 +625,7 @@ const edgeGroupDemo = function () {
     if (srcNode && destNode) {
       const edge = network.createEdge(srcNode, destNode);
       edge.name = link.name;
-      edge.edge.on('rightclick', (event: any) => {
+      edge.on('rightclick', (event: any) => {
         network.menu.setMenuItems([
           { label: 'Hide Edge', id: '0' },
           { label: 'Remove Link', id: '1' },
@@ -1037,7 +1037,6 @@ const simpleData = function () {
         { label: 'Disaggregate selected group', id: '0' },
         { label: 'Extened a group', id: '1' },
         { label: 'Remove Group', id: '3' },
-        { label: 'Not Layer Hide Nodes', id: '4' },
         { label: 'Debug', id: '5' },
       ]);
       network.menu.menuOnAction = (id) => {
@@ -1050,9 +1049,6 @@ const simpleData = function () {
           newGroup.draw();
         } else if (id === '3') {
           network.removeElements(newGroup);
-        } else if (id === '4') {
-          newGroup.isLayer = false;
-          newGroup.layerHideNodes(network.zoom);
         } else if (id === '5') {
           // tslint:disable-next-line:no-console
           console.log(newGroup);
@@ -1063,7 +1059,6 @@ const simpleData = function () {
     });
     network.addElement(newGroup);
   });
-  network.layerHide = true;
   network.setBundleExpanded(false);
   network.syncView();
   network.setDrag();
@@ -1074,8 +1069,8 @@ const simpleData = function () {
 };
 network.callback = () => {
   // simpleData();
-  // noData();
-  edgeGroupDemo();
+  noData();
+  // edgeGroupDemo();
   // dataFlowDemo();
 };
 const body = document.getElementById('network');
