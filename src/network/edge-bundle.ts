@@ -109,14 +109,12 @@ export class EdgeBundle extends CommonElement {
             bezierLineDistance: values[i][0],
             bezierLineDegree: values[i][1],
             lineType: 1,
-            arrowType: 3,
           });
         } else {
           edge.setStyle({
             bezierLineDistance: values[i][0],
             bezierLineDegree: values[i][1],
             lineType: 0,
-            arrowType: 3,
           });
         }
       }

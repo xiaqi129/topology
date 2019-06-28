@@ -182,7 +182,12 @@ export class PopMenu {
   }
 
   private highlightElement(event: any) {
-    const selectElement = event.target.parent;
+    let selectElement;
+    if (event.target instanceof Edge) {
+      selectElement = event.target;
+    } else {
+      selectElement = event.target.parent;
+    }
     const selectedNodes = this.action.getSelectNodes();
     const selectGroups = this.action.getSelectGroups();
     if (selectElement instanceof Node) {

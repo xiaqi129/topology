@@ -84,7 +84,7 @@ export class Edge extends CommonElement {
       angle,
       this.getDistance(this.endNode, lineDistance),
     );
-    let elements: any[] = [];
+    let elements: PIXI.Graphics[] = [];
     if (style.lineType === 0 && style.lineFull === 0) {
       elements = this.drawLineEdge(srcNodePos, endNodePos, angle, this.defaultStyle);
     } else if (style.lineType === 1 && style.lineFull === 0) {
@@ -210,39 +210,68 @@ export class Edge extends CommonElement {
   // Get line points
   private calcEdgePoints(start: any, end: any) {
     const lineWidth = this.defaultStyle.lineWidth;
+    const lineDistance = this.defaultStyle.bezierLineDistance;
     const angle = this.getAngle();
     const half = lineWidth * 3;
-    const sX = start.x;
-    const sY = start.y;
-    const eX = end.x;
-    const eY = end.y;
-    this.polygonData = [];
-    this.polygonData.push(
-      sX - Math.cos(angle) * half,
-      sY + Math.sin(angle) * half,
-      sX + Math.cos(angle) * half,
-      sY - Math.sin(angle) * half,
-      eX + Math.cos(angle) * half,
-      eY - Math.sin(angle) * half,
-      eX - Math.cos(angle) * half,
-      eY + Math.sin(angle) * half,
-    );
-    // after delete
-    const results: IResultsPoints = {
-      sLeft: { x: 0, y: 0 },
-      sRight: { x: 0, y: 0 },
-      eRight: { x: 0, y: 0 },
-      eLeft: { x: 0, y: 0 },
+    const sX = start.x + Math.cos(angle) * lineDistance;
+    const sY = start.y - Math.sin(angle) * lineDistance;
+    const eX = end.x + Math.cos(angle) * lineDistance;
+    const eY = end.y - Math.sin(angle) * lineDistance;
+    const result: IDottedPoints = {
+      start: { x: sX, y: sY },
+      end: { x: eX, y: eY },
     };
-    const sLeft = new Point(sX - Math.cos(angle) * half, sY + Math.sin(angle) * half);
-    const sRight = new Point(sX + Math.cos(angle) * half, sY - Math.sin(angle) * half);
-    const eRight = new Point(eX + Math.cos(angle) * half, eY - Math.sin(angle) * half);
-    const eLeft = new Point(eX - Math.cos(angle) * half, eY + Math.sin(angle) * half);
-    results.sLeft = sLeft;
-    results.sRight = sRight;
-    results.eRight = eRight;
-    results.eLeft = eLeft;
-    return results;
+    this.polygonData = [];
+    if ((sX < eX && sY < eY) ||
+      (sX > eX && sY > eY)) {
+      this.polygonData.push(
+        sX - half,
+        sY + half,
+        sX + half,
+        sY - half,
+        eX + half,
+        eY - half,
+        eX - half,
+        eY + half,
+      );
+    } else if ((sX > eX && sY < eY) ||
+      (sX < eX && sY > eY)) {
+      this.polygonData.push(
+        sX - half,
+        sY - half,
+        sX + half,
+        sY + half,
+        eX + half,
+        eY + half,
+        eX - half,
+        eY - half,
+      );
+    } else if (sX === eX &&
+      (sY > eY || sY < eY)) {
+      this.polygonData.push(
+        sX - half,
+        sY,
+        sX + half,
+        sY,
+        eX + half,
+        eY,
+        eX - half,
+        eY,
+      );
+    } else if (sY === eY &&
+      (sX < eX || sX > eX)) {
+      this.polygonData.push(
+        sX,
+        sY + half,
+        sX,
+        sY - half,
+        eX,
+        eY - half,
+        eX,
+        eY + half,
+      );
+    }
+    return result;
   }
 
   // Get imaginary line points
@@ -276,12 +305,12 @@ export class Edge extends CommonElement {
   }
 
   // Draw edge with line points
-  private drawEdge(graph: any) {
+  private drawEdge(graph: any, points: IDottedPoints) {
     const style = this.defaultStyle;
     this.hitArea = new PIXI.Polygon(this.polygonData);
     graph.lineStyle(style.lineWidth, style.lineColor);
-    graph.moveTo(this.startNode.x, this.startNode.y);
-    graph.lineTo(this.endNode.x, this.endNode.y);
+    graph.moveTo(points.start.x, points.start.y);
+    graph.lineTo(points.end.x, points.end.y);
   }
 
   // Draw imaginary line with imaginary line points
@@ -342,16 +371,12 @@ export class Edge extends CommonElement {
   // Draw curve
   private drawBezierCurve(
     graph: any, points: any, angle: number, curveDistance: number, curveDegree: number) {
-    const style = this.defaultStyle;
-    graph.lineStyle(0, style.lineColor);
-    // const srcPointX = points.shift() + curveDistance * Math.cos(angle);
-    // const srcPointY = points.shift() - curveDistance * Math.sin(angle);
+    this.polygonData = [];
     const parallelPoint = this.getParallelPoint(
       { x: points.shift(), y: points.shift() }, curveDistance, angle);
     const srcLabel = this.getChildByName('edge_srclabel');
     const endLabel = this.getChildByName('edge_endlabel');
-    graph.interactive = true;
-    graph.beginFill(style.lineColor, style.bezierOacity);
+    this.polygonData.push(parallelPoint.x, parallelPoint.y);
     graph.moveTo(parallelPoint.x, parallelPoint.y);
     points.reverse();
     points[1] = points[1] + curveDistance * Math.cos(angle);
@@ -367,41 +392,28 @@ export class Edge extends CommonElement {
       endLabel.x = points[2];
       endLabel.y = points[3];
     }
+    this.polygonData = this.polygonData.concat(points);
     graph.bezierCurveTo.apply(graph, points);
-    this.polygonData = _.take(graph.currentPath.shape.points, 42);
-    const echoDistance = style.lineWidth * 1.5; // curve width
-    const echoPoints = [];
-    const echoSrc = this.getParallelPoint(
-      { x: parallelPoint.x, y: parallelPoint.y },
-      echoDistance,
-      angle,
-    );
-    echoPoints.push(echoSrc.y, echoSrc.x);
-    for (let i: number = 0, len: number = points.length; i < len; i += 2) {
-      const tmp = this.getParallelPoint(
-        { x: points[i], y: points[i + 1] },
-        echoDistance,
-        angle,
-      );
-      echoPoints.push(tmp.y, tmp.x);
-    }
-    echoPoints.reverse();
-    graph.lineTo(echoPoints.shift(), echoPoints.shift());
-    graph.bezierCurveTo.apply(graph, echoPoints);
-    graph.endFill();
+    this.hitArea = new PIXI.Polygon(this.polygonData);
     return [parallelPoint.x, parallelPoint.y].concat(points);
   }
 
   // Draw imaginary curve
-  private drawDottedBezierCurve(
-    graph: any, points: any, angle: number, curveDistance: number = 10, curveDegree: number = 50) {
-    const style = this.defaultStyle;
-    const bezier = new PIXI.Graphics();
-    bezier.lineStyle(0, style.lineColor);
+  private drawDottedBezierCurve(graph: any, points: any, angle: number, curveDistance: number, curveDegree: number) {
     const parallelPoint = this.getParallelPoint(
       { x: points.shift(), y: points.shift() }, curveDistance, angle);
+    const style = this.defaultStyle;
+    const oldBezier = this.getChildByName('bezier');
+    if (oldBezier) {
+      oldBezier.destroy();
+    }
+    const bezier = new PIXI.Graphics();
+    bezier.name = 'bezier';
+    bezier.lineStyle(0, style.lineColor);
+    this.polygonData = [];
     const srcLabel = this.getChildByName('edge_srclabel');
     const endLabel = this.getChildByName('edge_endlabel');
+    this.polygonData.push(parallelPoint.x, parallelPoint.y);
     bezier.moveTo(parallelPoint.x, parallelPoint.y);
     points.reverse();
     points[1] = points[1] + curveDistance * Math.cos(angle);
@@ -418,22 +430,19 @@ export class Edge extends CommonElement {
       endLabel.y = points[3];
     }
     bezier.bezierCurveTo.apply(bezier, points);
-    this.polygonData = bezier.currentPath.shape.points;
+    this.addChild(bezier);
+    this.polygonData = this.polygonData.concat(points);
+    this.hitArea = new PIXI.Polygon(this.polygonData);
     const calcPoints = _.chunk(bezier.currentPath.shape.points, 4);
     _.each(calcPoints, (point) => {
       const srcX = Number(point[0]);
       const srcY = Number(point[1]);
       const endX = Number(point[2]);
       const endY = Number(point[3]);
-      const linePoints = this.calcEdgePoints({ x: srcX, y: srcY }, { x: endX, y: endY });
-      graph.lineStyle(1, style.lineColor);
-      graph.beginFill(style.lineColor, style.bezierOacity);
-      graph.moveTo(linePoints.sLeft.x, linePoints.sLeft.y);
-      graph.lineTo(linePoints.sRight.x, linePoints.sRight.y);
-      graph.lineTo(linePoints.eRight.x, linePoints.eRight.y);
-      graph.lineTo(linePoints.eLeft.x, linePoints.eLeft.y);
-      graph.endFill();
+      graph.moveTo(srcX, srcY);
+      graph.lineTo(endX, endY);
     });
+    return [parallelPoint.x, parallelPoint.y].concat(points);
   }
 
   // Get adjusted position with start node and end node
@@ -503,8 +512,8 @@ export class Edge extends CommonElement {
 
   // Complete generated edge
   private createLinkEdge(srcNodePos: any, endNodePos: any, style: any) {
-    this.calcEdgePoints(srcNodePos, endNodePos);
-    this.drawEdge(this.edge);
+    const points = this.calcEdgePoints(srcNodePos, endNodePos);
+    this.drawEdge(this.edge, points);
     return this.edge;
   }
 
@@ -518,13 +527,26 @@ export class Edge extends CommonElement {
 
   // Complete genneated arrow
   private createLinkArrows(
-    srcNodePos: any, endNodePos: any, style: any) {
+    start: any, end: any, style: any) {
     const arrowsDirections = [[true], [false], [true, false], [undefined]];
     const directions = arrowsDirections[style.arrowType];
+    const lineDistance = this.defaultStyle.bezierLineDistance;
     const angle = this.getAngle();
+    const sX = start.x + Math.cos(angle) * lineDistance;
+    const sY = start.y - Math.sin(angle) * lineDistance;
+    const eX = end.x + Math.cos(angle) * lineDistance;
+    const eY = end.y - Math.sin(angle) * lineDistance;
+    const srcPoint: IPoint = {
+      x: sX,
+      y: sY,
+    };
+    const endPoint: IPoint = {
+      x: eX,
+      y: eY,
+    };
     _.each(directions, (direction) => {
       if (direction !== undefined) {
-        const position = direction ? endNodePos : srcNodePos;
+        const position = direction ? endPoint : srcPoint;
         this.createArrow(position, angle, direction);
       }
     });
@@ -561,7 +583,7 @@ export class Edge extends CommonElement {
       curveDistance,
       curveDegree,
     );
-    return [this.edge, curveEnds];
+    return curveEnds;
   }
 
   // Calculate bezier tangent
@@ -658,17 +680,16 @@ export class Edge extends CommonElement {
         controlPoints,
         style,
       );
-    const curveEnds = edgeRelated[1];
     if (style.arrowType === 3) {
-      return [edgeRelated[0]];
+      return [this.edge];
     }
     const arrow = this.createBezierArrows(
-      { x: curveEnds[0], y: curveEnds[1] },
-      { x: curveEnds[curveEnds.length - 2], y: curveEnds[curveEnds.length - 1] },
-      [curveEnds[2], curveEnds[3], curveEnds[4], curveEnds[5]],
+      { x: edgeRelated[0], y: edgeRelated[1] },
+      { x: edgeRelated[edgeRelated.length - 2], y: edgeRelated[edgeRelated.length - 1] },
+      [edgeRelated[2], edgeRelated[3], edgeRelated[4], edgeRelated[5]],
       style,
     );
-    return [edgeRelated[0], arrow];
+    return [this.edge, arrow];
   }
 
   // Draw imaginary edge
@@ -697,7 +718,7 @@ export class Edge extends CommonElement {
     const curveDegree = style.bezierLineDegree;
     const angle = this.getAngle();
     this.edge.lineStyle(style.lineWidth, style.lineColor);
-    this.drawDottedBezierCurve(
+    const edgeRelated = this.drawDottedBezierCurve(
       this.edge,
       _.flatten(
         [
@@ -716,7 +737,16 @@ export class Edge extends CommonElement {
       curveDistance,
       curveDegree,
     );
-    return [this.edge];
+    if (style.arrowType === 3) {
+      return [this.edge];
+    }
+    const arrow = this.createBezierArrows(
+      { x: edgeRelated[0], y: edgeRelated[1] },
+      { x: edgeRelated[edgeRelated.length - 2], y: edgeRelated[edgeRelated.length - 1] },
+      [edgeRelated[2], edgeRelated[3], edgeRelated[4], edgeRelated[5]],
+      style,
+    );
+    return [this.edge, arrow];
   }
 
   // Add label and so on after draw

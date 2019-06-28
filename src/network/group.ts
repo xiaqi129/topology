@@ -85,7 +85,6 @@ export class Group extends CommonElement {
       this.centerPoint.x = this.emptyObj.location.x;
       this.centerPoint.y = this.emptyObj.location.y;
     }
-    // this.draw();
     document.addEventListener('mouseup', this.onDragEnd.bind(this));
   }
 

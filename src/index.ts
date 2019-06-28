@@ -68,9 +68,9 @@ const noData = function () {
         fillArrow: true,
         lineColor: 0X0386d2,
         lineType: 1,
-        lineFull: 0,
+        lineFull: 1,
         lineWidth: 1,
-        bundleStyle: 1,
+        bundleStyle: 0,
       });
       network.addElement(edge);
       j += 1;
@@ -1059,7 +1059,7 @@ const simpleData = function () {
     });
     network.addElement(newGroup);
   });
-  network.setBundleExpanded(false);
+  // network.setBundleExpanded(false);
   network.syncView();
   network.setDrag();
   network.setClick();
@@ -1068,8 +1068,8 @@ const simpleData = function () {
   network.toggleLabel(1, 2);
 };
 network.callback = () => {
-  // simpleData();
-  noData();
+  simpleData();
+  // noData();
   // edgeGroupDemo();
   // dataFlowDemo();
 };
