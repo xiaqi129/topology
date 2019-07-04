@@ -391,7 +391,7 @@ const edgeGroupDemo = function () {
         local_host: 'name-1',
         remote_host: 'name-2',
         style: {
-          lineType: 0,
+          lineType: 1,
           lineFull: 1,
         },
       },
@@ -400,7 +400,7 @@ const edgeGroupDemo = function () {
         local_host: 'name-2',
         remote_host: 'name-1',
         style: {
-          lineType: 0,
+          lineType: 1,
           lineFull: 1,
         },
       },
@@ -1068,9 +1068,9 @@ const simpleData = function () {
   network.toggleLabel(1, 2);
 };
 network.callback = () => {
-  simpleData();
+  // simpleData();
   // noData();
-  // edgeGroupDemo();
+  edgeGroupDemo();
   // dataFlowDemo();
 };
 const body = document.getElementById('network');

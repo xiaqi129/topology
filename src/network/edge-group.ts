@@ -41,11 +41,7 @@ export class EdgeGroup extends CommonElement {
   }
 
   public addChildEdges(edge: Edge) {
-    if (edge.bundleParent) {
-      this.childrenEdge.push(edge.bundleParent);
-    } else {
-      this.childrenEdge.push(edge);
-    }
+    this.childrenEdge.push(edge);
     this.childrenEdge = _.uniq(this.childrenEdge);
     edge.setIncluedGroup(this);
     if (this.childrenEdge) {
@@ -124,6 +120,9 @@ export class EdgeGroup extends CommonElement {
   public removeChildEdge(edge: Edge): void {
     _.remove(this.childrenEdge, (e) => {
       return e === edge;
+    });
+    _.remove(this.childNodes, (n) => {
+      return n === edge.startNode || n === edge.endNode;
     });
     this.draw();
   }
@@ -234,7 +233,7 @@ export class EdgeGroup extends CommonElement {
   private getPolygonPoints(): number[][] {
     let pointsList: number[] = [];
     if (this.childrenEdge) {
-      if (this.childrenEdge.length === 1) {
+      if (this.childrenEdge.length <= 1) {
         _.each(this.childrenEdge, (edge: any) => {
           if (_.indexOf(this.childNodes, edge.startNode) === -1) {
             this.childNodes.push(edge.startNode);
