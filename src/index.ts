@@ -1085,8 +1085,8 @@ const groupEdgeNode = function () {
         local_host: 'name-1',
         remote_host: 'name-2',
         style: {
-          lineType: 0,
-          lineFull: 0,
+          // lineType: 0,
+          lineFull: 1,
         },
       },
       {
@@ -1094,8 +1094,8 @@ const groupEdgeNode = function () {
         local_host: 'name-1',
         remote_host: 'name-2',
         style: {
-          lineType: 0,
-          lineFull: 0,
+          // lineType: 0,
+          lineFull: 1,
         },
       },
       // {

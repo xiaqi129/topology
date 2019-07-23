@@ -300,9 +300,10 @@ export class Edge extends CommonElement {
     const segmentNum = (distance / flowLength / 2);
     const moveX = flowLength * Math.sin(angle);
     const moveY = flowLength * Math.cos(angle);
+    const lineDistance = this.defaultStyle.bezierLineDistance;
     const pointsList = [];
-    let sX = start.x;
-    let sY = start.y;
+    let sX = start.x + Math.cos(angle) * lineDistance;
+    let sY = start.y - Math.sin(angle) * lineDistance;
     this.calcEdgePoints(start, end);
     for (let index = 0; index < segmentNum; index = index + 1) {
       const result: IDottedPoints = {
