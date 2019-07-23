@@ -959,6 +959,7 @@ const simpleData = function () {
         lineType: 0,
         lineFull: 0,
         lineWidth: 1,
+        bundleStyle: 0,
       });
       edge.setTooltip(linkTooltipContent, commonStyles);
       edge.on('rightclick', (event: any) => {
@@ -1097,6 +1098,24 @@ const groupEdgeNode = function () {
           lineFull: 0,
         },
       },
+      // {
+      //   name: '3',
+      //   local_host: 'name-1',
+      //   remote_host: 'name-2',
+      //   style: {
+      //     lineType: 0,
+      //     lineFull: 0,
+      //   },
+      // },
+      // {
+      //   name: '4',
+      //   local_host: 'name-1',
+      //   remote_host: 'name-2',
+      //   style: {
+      //     lineType: 0,
+      //     lineFull: 0,
+      //   },
+      // },
       {
         name: '3',
         local_host: 'name-2',

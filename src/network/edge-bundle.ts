@@ -85,8 +85,8 @@ export class EdgeBundle extends CommonElement {
     const degree = 15;
     const degreeStep = 8;
     const values: number[][] = [];
-    const distance = 4;
-    let distanceStep = 4;
+    const distance = 3;
+    let distanceStep = 6;
     if (bundleStyle === 1) {
       distanceStep = 1;
     }
@@ -102,6 +102,7 @@ export class EdgeBundle extends CommonElement {
         values.push([(distance + i * distanceStep), (degree + i * degreeStep)]);
       }
     });
+    let old = 0;
     _.each(this.children, (edge, i) => {
       if (edge instanceof Edge) {
         if (bundleStyle === 1) {
@@ -111,6 +112,14 @@ export class EdgeBundle extends CommonElement {
             lineType: 1,
           });
         } else {
+          const direction = i % 2 === 1 ? 1.1 : -1.1;
+          const srcLabel: any = edge.getChildByName('edge_srclabel');
+          const endLabel: any = edge.getChildByName('edge_endlabel');
+          if (srcLabel || endLabel) {
+            srcLabel.anchor.set(0.5, old + i * direction);
+            endLabel.anchor.set(0.5, old + i * direction);
+            old = old + i * direction;
+          }
           edge.setStyle({
             bezierLineDistance: values[i][0],
             bezierLineDegree: values[i][1],
