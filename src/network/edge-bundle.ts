@@ -85,7 +85,7 @@ export class EdgeBundle extends CommonElement {
     const degree = 15;
     const degreeStep = 8;
     const values: number[][] = [];
-    const distance = 2;
+    const distance = 4;
     let distanceStep = 4;
     if (bundleStyle === 1) {
       distanceStep = 1;

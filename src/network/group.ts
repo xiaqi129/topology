@@ -219,11 +219,13 @@ export class Group extends CommonElement {
   }
 
   public getWidth() {
-    return this.defaultStyle.width * 1.8 + this.defaultStyle.padding;
+    const graph: any = this.getChildByName(this.polygonHullOutlineName);
+    return graph.width / 2;
   }
 
   public getHeight() {
-    return this.defaultStyle.height * 1.8 + this.defaultStyle.padding;
+    const graph: any = this.getChildByName(this.polygonHullOutlineName);
+    return graph.height / 2;
   }
 
   public selectOn() {

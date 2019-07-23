@@ -54,12 +54,11 @@ export class Edge extends CommonElement {
     this.arrow.name = 'edge_arrow';
     this.startNode = startNode;
     this.endNode = endNode;
-    startNode.linksArray.push(this);
-    endNode.linksArray.push(this);
     this.labelStyle = {};
     this.labelContent = [];
     this.interactive = true;
     this.buttonMode = true;
+    this.readyLinkArray();
     this.analysisBrotherEdge();
     this.tooltip = new Tooltip(domRegex);
   }
@@ -172,6 +171,23 @@ export class Edge extends CommonElement {
 
   public getTargetNode() {
     return this.endNode;
+  }
+
+  private readyLinkArray() {
+    if (this.startNode instanceof Node) {
+      this.startNode.linksArray.push(this);
+    } else {
+      _.each(this.startNode.childrenNode, (node: Node) => {
+        node.linksArray.push(this);
+      });
+    }
+    if (this.endNode instanceof Node) {
+      this.endNode.linksArray.push(this);
+    } else {
+      _.each(this.endNode.childrenNode, (node: Node) => {
+        node.linksArray.push(this);
+      });
+    }
   }
 
   // Setup brother edges used to create Edge Bundle

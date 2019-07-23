@@ -53,6 +53,8 @@ export class Node extends CommonElement {
     this.selectedNodes = selectedNodes;
     this.icon = icon;
     this.tooltip = new Tooltip(domRegex);
+    this.interactive = true;
+    this.buttonMode = true;
     this.setDrag();
     this.draw();
   }
@@ -93,8 +95,6 @@ export class Node extends CommonElement {
     graph.beginFill(style.fillColor, style.fillOpacity);
     graph.drawCircle(0, 0, style.width);
     graph.endFill();
-    graph.interactive = true;
-    graph.buttonMode = true;
     this.addChild(graph);
     _.each(this.markList, (mark) => {
       const addSprite: any = this.getChildByName(`node_${mark.name}`);
@@ -123,8 +123,6 @@ export class Node extends CommonElement {
     node.width = texture.width * scale;
     node.height = texture.height * scale;
     node.anchor.set(0.5, 0.5);
-    node.interactive = true;
-    node.buttonMode = true;
     node.name = 'node_sprite';
     this.addChild(node);
     if (oldLabel) {
@@ -371,8 +369,6 @@ export class Node extends CommonElement {
   }
   // set node can be draged
   private setDrag() {
-    this.interactive = true;
-    this.buttonMode = true;
     this
       .on('mousedown', this.onDragStart)
       .on('mouseup', this.onDragEnd)
