@@ -220,12 +220,12 @@ export class Group extends CommonElement {
 
   public getWidth() {
     const graph: any = this.getChildByName(this.polygonHullOutlineName);
-    return graph.width / 2;
+    return graph.width;
   }
 
   public getHeight() {
     const graph: any = this.getChildByName(this.polygonHullOutlineName);
-    return graph.height / 2;
+    return graph.height;
   }
 
   public selectOn() {

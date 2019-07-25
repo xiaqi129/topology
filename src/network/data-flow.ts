@@ -95,6 +95,7 @@ export class DataFlow extends CommonElement {
    * @param {IPoint} node nodes position
    * @param {number} n direction '1' means from end node and '-1' means from start node
    * @param {number} distanceRound need to adjust the distance
+   * @returns adjusted location
    */
   private getAdjustedLocation(node: IPoint, n: number, distanceRound: number): IPoint {
     const angle = this.getAngle();

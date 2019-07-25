@@ -1014,7 +1014,11 @@ const simpleData = function () {
       }
     });
     const nameArr = _.split(newGroup.name as string, '#@');
-    newGroup.setLabel(`${nameArr[nameArr.length - 1]}`, 'Center');
+    newGroup.setLabel(`${nameArr[nameArr.length - 1]}`, 'Center', {
+      fontFamily: 'Arial',
+      fontSize: 12,
+      fill: '0x0386d2',
+    });
     newGroup.setToggleExpanded(true);
     newGroup.on('rightclick', (event: any) => {
       network.menu.setMenuItems([
@@ -1043,7 +1047,7 @@ const simpleData = function () {
     });
     network.addElement(newGroup);
   });
-  // network.setBundleExpanded(false);
+  network.setBundleExpanded(false);
   network.syncView();
   network.setDrag();
   network.setClick();
@@ -1080,24 +1084,24 @@ const groupEdgeNode = function () {
 
     ],
     links: [
-      {
-        name: '1',
-        local_host: 'name-1',
-        remote_host: 'name-2',
-        style: {
-          // lineType: 0,
-          lineFull: 1,
-        },
-      },
-      {
-        name: '2',
-        local_host: 'name-1',
-        remote_host: 'name-2',
-        style: {
-          // lineType: 0,
-          lineFull: 1,
-        },
-      },
+      // {
+      //   name: '1',
+      //   local_host: 'name-1',
+      //   remote_host: 'name-2',
+      //   style: {
+      //     // lineType: 0,
+      //     lineFull: 1,
+      //   },
+      // },
+      // {
+      //   name: '2',
+      //   local_host: 'name-1',
+      //   remote_host: 'name-2',
+      //   style: {
+      //     // lineType: 0,
+      //     lineFull: 1,
+      //   },
+      // },
       // {
       //   name: '3',
       //   local_host: 'name-1',
@@ -1118,7 +1122,7 @@ const groupEdgeNode = function () {
       // },
       {
         name: '3',
-        local_host: 'name-2',
+        local_host: 'nodeGroup',
         remote_host: 'name-3',
         style: {
           lineType: 0,
@@ -1126,21 +1130,21 @@ const groupEdgeNode = function () {
         },
       },
     ],
-    // groups: [
-    //   {
-    //     name: 'nodeGroup',
-    //     children: ['name-1', 'name-2'],
-    //     style: {
-    //       // fillColor: 0X0984e3,
-    //       // lineColor: 0X0984e3,
-    //       lineWidth: 1,
-    //     },
-    //   },
-    // ],
+    groups: [
+      {
+        name: 'nodeGroup',
+        children: ['name-1', 'name-2'],
+        style: {
+          // fillColor: 0X0984e3,
+          // lineColor: 0X0984e3,
+          lineWidth: 1,
+        },
+      },
+    ],
   };
   const devices = data.devices;
   const links = data.links;
-  // const groups = data.groups;
+  const groups = data.groups;
   _.each(devices, (device: any) => {
     const node = network.createNode('cisco-ASR9');
     node.name = device.name;
@@ -1149,35 +1153,36 @@ const groupEdgeNode = function () {
     network.addElement(node);
   });
   const nodes = network.getNodeObj();
-  // _.each(groups, (g) => {
-  //   const group = network.createGroup();
-  //   network.addElement(group);
-  //   _.each(g.children, (child) => {
-  //     const node: any = _.find(nodes, (e: any) => {
-  //       return e.name === child;
-  //     });
-  //     group.addChildNodes(node);
-  //   });
-  //   group.name = g.name;
-  //   group.initStyle(g.style);
-  //   group.setLabel(`${g.name}`);
-  //   group.on('rightclick', (event: any) => {
-  //     network.menu.setMenuItems([
-  //       { label: 'Remove Group', id: '0' },
-  //       { label: 'Debug', id: '1' },
-  //     ]);
-  //     network.menu.menuOnAction = (id) => {
-  //       if (id === '0') {
-  //         network.removeElements(group);
-  //       } else if (id === '1') {
-  //         // tslint:disable-next-line:no-console
-  //         console.log(group);
-  //       }
-  //     };
-  //     network.menu.setClass('popMenu');
-  //     network.menu.showMenu(event);
-  //   });
-  // });
+  _.each(groups, (g) => {
+    const group = network.createGroup();
+    network.addElement(group);
+    _.each(g.children, (child) => {
+      const node: any = _.find(nodes, (e: any) => {
+        return e.name === child;
+      });
+      group.addChildNodes(node);
+    });
+    group.name = g.name;
+    group.initStyle(g.style);
+    group.setLabel(`${g.name}`);
+    group.setOutlineStyle(3);
+    group.on('rightclick', (event: any) => {
+      network.menu.setMenuItems([
+        { label: 'Remove Group', id: '0' },
+        { label: 'Debug', id: '1' },
+      ]);
+      network.menu.menuOnAction = (id) => {
+        if (id === '0') {
+          network.removeElements(group);
+        } else if (id === '1') {
+          // tslint:disable-next-line:no-console
+          console.log(group);
+        }
+      };
+      network.menu.setClass('popMenu');
+      network.menu.showMenu(event);
+    });
+  });
   const allNodeGroups = getNodeGroups();
   _.each(links, (link: any) => {
     const srcNodeName = link.local_host;
@@ -1222,7 +1227,7 @@ const groupEdgeNode = function () {
         lineWidth: 1,
         bundleStyle: 0,
       });
-      edge.setLabel(link.local_host, link.remote_host);
+      // edge.setLabel(link.local_host, link.remote_host);
       network.addElement(edge);
     }
   });
@@ -1235,10 +1240,10 @@ const groupEdgeNode = function () {
 };
 
 network.callback = () => {
-  // simpleData();
+  simpleData();
   // noData();
   // edgeGroupDemo();
-  groupEdgeNode();
+  // groupEdgeNode();
   // dataFlowDemo();
 };
 const body = document.getElementById('network');

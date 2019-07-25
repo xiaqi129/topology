@@ -523,8 +523,31 @@ export class Edge extends CommonElement {
 
   // Get distance to adjusted node position
   private getDistance(node: Node | Group, lineDistance: number) {
-    const result = node.getWidth() < node.getHeight() ? node.getWidth() : node.getHeight();
-    return result * 0.5 + lineDistance;
+    let result;
+    if (node instanceof Node) {
+      result = node.getWidth() < node.getHeight() ? node.getWidth() / 2 : node.getHeight() / 2;
+    } else {
+      const pi = Math.atan2(node.getWidth() * 0.5, node.getHeight() * 0.5);
+      const angle = this.getAngle();
+      let oneSide = 0;
+      if (angle <= pi && angle >= -pi) {
+        oneSide = node.getHeight() * 0.5 / Math.cos(angle);
+      }
+      if (angle <= Math.PI && angle >= Math.PI - pi) {
+        oneSide = node.getHeight() * 0.5 / Math.cos(angle);
+      }
+      if (angle <= -(Math.PI - pi) && angle >= -Math.PI) {
+        oneSide = node.getHeight() * 0.5 / Math.cos(angle);
+      }
+      if (angle < Math.PI - pi && angle > pi) {
+        oneSide = node.getWidth() * 0.5 / Math.sin(angle);
+      }
+      if (angle < -pi && angle > -(Math.PI - pi)) {
+        oneSide = node.getWidth() * 0.5 / Math.sin(angle);
+      }
+      result = Math.abs(oneSide);
+    }
+    return result + lineDistance;
   }
 
   // Complete generated edge
