@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import { CommonAction } from './common-action';
 import { Edge } from './edge';
+import { EdgeGroup } from './edge-group';
 import { Group } from './group';
 import { Node } from './node';
 
@@ -183,10 +184,11 @@ export class PopMenu {
 
   private highlightElement(event: any) {
     let selectElement;
-    if (event.target instanceof Edge) {
-      selectElement = event.target;
-    } else {
-      selectElement = event.target.parent;
+    selectElement = event.target;
+    if (event.target.parent) {
+      if (event.target.parent instanceof Group || event.target.parent instanceof EdgeGroup) {
+        selectElement = event.target.parent;
+      }
     }
     const selectedNodes = this.action.getSelectNodes();
     const selectGroups = this.action.getSelectGroups();
@@ -201,7 +203,7 @@ export class PopMenu {
       this.action.removeHighLight();
       this.action.setSelectEdge(selectElement);
       selectElement.selectOn();
-    } else if (selectElement instanceof Group) {
+    } else if (selectElement instanceof Group || selectElement instanceof EdgeGroup) {
       if (selectGroups.length < 2) {
         this.action.removeHighLight();
         this.action.setSelectGroups(selectElement);

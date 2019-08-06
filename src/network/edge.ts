@@ -19,6 +19,11 @@ export interface IPoint {
   x: number;
   y: number;
 }
+
+export interface MarkInfo {
+  content: string;
+  color: number;
+}
 export interface IResultsPoints {
   sLeft: IPoint;
   sRight: IPoint;
@@ -85,7 +90,7 @@ export class Edge extends CommonElement {
     );
     let elements: PIXI.Graphics[] = [];
     if (style.lineType === 0 && style.lineFull === 0) {
-      elements = this.drawLineEdge(srcNodePos, endNodePos, angle, this.defaultStyle);
+      elements = this.drawLineEdge(srcNodePos, endNodePos, this.defaultStyle);
     } else if (style.lineType === 1 && style.lineFull === 0) {
       elements = this.drawBezierEdge(srcNodePos, endNodePos, this.defaultStyle);
     } else if (style.lineType === 0 && style.lineFull === 1) {
@@ -152,6 +157,76 @@ export class Edge extends CommonElement {
       };
       return result;
     }
+  }
+
+  // Set up mark on edge
+  public setMark(srcMark?: MarkInfo, endMark?: MarkInfo) {
+    if (srcMark) {
+      /* src mark */
+      this.removeChild(this.getChildByName('src_mark_background'));
+      this.removeChild(this.getChildByName('src_mark_label'));
+      const srcGraph = new PIXI.Graphics();
+      srcGraph.name = 'src_mark_background';
+      srcGraph.beginFill(srcMark.color, 1);
+      srcGraph.drawCircle(0, 0, 7);
+      srcGraph.endFill();
+      this.addChild(srcGraph);
+      const srcLabel = new Label(srcMark.content, {
+        fill: 0Xffffff,
+        fontFamily: 'Times New Roman',
+        fontWeight: 'bold',
+      });
+      srcLabel.name = 'src_mark_label';
+      srcLabel.setPosition(4);
+      this.addChild(srcLabel);
+      this.setChildIndex(srcLabel, this.children.length - 1);
+      this.setChildIndex(srcLabel, this.children.length - 2);
+
+    }
+    if (endMark) {
+      /* end mark */
+      this.removeChild(this.getChildByName('end_mark_background'));
+      this.removeChild(this.getChildByName('end_mark_label'));
+      const endGraph = new PIXI.Graphics();
+      endGraph.name = 'end_mark_background';
+      endGraph.beginFill(endMark.color, 1);
+      endGraph.drawCircle(0, 0, 7);
+      endGraph.endFill();
+      this.addChild(endGraph);
+      const endLabel = new Label(endMark.content, {
+        fill: 0Xffffff,
+        fontFamily: 'Times New Roman',
+        fontWeight: 'bold',
+      });
+      endLabel.name = 'end_mark_label';
+      endLabel.setPosition(4);
+      this.addChild(endLabel);
+      this.setChildIndex(endLabel, this.children.length - 1);
+      this.setChildIndex(endLabel, this.children.length - 2);
+    }
+  }
+
+  // Get part of line position
+  public getPartPosition(part: number) {
+    const len = this.edgeLength(this.startNode.x, this.startNode.y, this.endNode.x, this.endNode.y) * part;
+    const angle = Math.atan2(this.startNode.y - this.endNode.y, this.startNode.x - this.endNode.x);
+    const result = {
+      src: {
+        x: 0,
+        y: 0,
+      },
+      end: {
+        x: 0,
+        y: 0,
+      },
+    };
+    if (this.defaultStyle.lineType !== 1) {
+      result.src.x = this.startNode.x - len * Math.cos(angle);
+      result.src.y = this.startNode.y - len * Math.sin(angle);
+      result.end.x = this.endNode.x + len * Math.cos(angle);
+      result.end.y = this.endNode.y + len * Math.sin(angle);
+    }
+    return result;
   }
 
   // Get edge group included this edge
@@ -699,7 +774,6 @@ export class Edge extends CommonElement {
   private drawLineEdge(
     srcNodePos: { [key: string]: number },
     endNodePos: { [key: string]: number },
-    angle: number,
     style: IStyles) {
     const edge = this.createLinkEdge(srcNodePos, endNodePos, style);
     const arrow = this.createLinkArrows(srcNodePos, endNodePos, style);
@@ -791,20 +865,42 @@ export class Edge extends CommonElement {
 
   // Add label and so on after draw
   private addOthers() {
+    const markLocation = this.getPartPosition(0.3);
+    const centerLocation = this.getPartPosition(0.5);
     const bundleLabel = this.getChildByName('bundle_label');
     const bundleBackground = this.getChildByName('label_background');
+    const srcMarkBackground = this.getChildByName('src_mark_background');
+    const srcMarkLabel = this.getChildByName('src_mark_label');
+    const endMarkBackground = this.getChildByName('end_mark_background');
+    const endMarkLabel = this.getChildByName('end_mark_label');
     const srcLabel = this.getChildByName('edge_srclabel');
     const endLabel = this.getChildByName('edge_endlabel');
     if (bundleLabel && bundleBackground) {
-      bundleLabel.x = (this.startNode.x + this.endNode.x) / 2;
-      bundleLabel.y = (this.startNode.y + this.endNode.y) / 2;
-      bundleBackground.x = (this.startNode.x + this.endNode.x) / 2;
-      bundleBackground.y = (this.startNode.y + this.endNode.y) / 2;
+      bundleLabel.x = centerLocation.src.x;
+      bundleLabel.y = centerLocation.src.y;
+      bundleBackground.x = centerLocation.src.x;
+      bundleBackground.y = centerLocation.src.y;
       this.setChildIndex(bundleLabel, this.children.length - 1);
       this.setChildIndex(bundleBackground, this.children.length - 2);
     }
     if (srcLabel || endLabel) {
       this.setLabelPosition(srcLabel, endLabel);
+    }
+    if (srcMarkBackground && srcMarkLabel) {
+      srcMarkBackground.x = markLocation.src.x;
+      srcMarkBackground.y = markLocation.src.y;
+      srcMarkLabel.x = markLocation.src.x;
+      srcMarkLabel.y = markLocation.src.y;
+      this.setChildIndex(srcMarkLabel, this.children.length - 1);
+      this.setChildIndex(srcMarkBackground, this.children.length - 2);
+    }
+    if (endMarkBackground && endMarkLabel) {
+      endMarkBackground.x = markLocation.end.x;
+      endMarkBackground.y = markLocation.end.y;
+      endMarkLabel.x = markLocation.end.x;
+      endMarkLabel.y = markLocation.end.y;
+      this.setChildIndex(endMarkLabel, this.children.length - 1);
+      this.setChildIndex(endMarkBackground, this.children.length - 2);
     }
     _.each(this.includeGroup, (edgeGroup) => {
       edgeGroup.draw();

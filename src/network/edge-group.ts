@@ -66,9 +66,7 @@ export class EdgeGroup extends CommonElement {
     }
     const graph: any = this.getChildByName('edge_group');
     if (this.width !== 0 && content && graph) {
-      const size = _.floor(graph.width / 20) + 1;
       this.labelStyle = {
-        fontSize: size,
         fill: [
           '#0776da',
           '#5146d9',
@@ -109,11 +107,18 @@ export class EdgeGroup extends CommonElement {
     const graph: any = this.getChildByName('edge_group');
     if (label && graph) {
       label.setText(content);
-      label.style.fontSize = _.floor(graph.width / 20) + 1;
-      label.style.breakWords = true;
-      label.style.wordWrap = true;
-      label.style.wordWrapWidth = graph.width / 2;
       this.labelContent = content;
+      if (this.childNodes.length !== 1) {
+        label.style.fontSize = _.floor(graph.width / 20) + 1;
+        label.style.breakWords = true;
+        label.style.wordWrap = true;
+        label.style.wordWrapWidth = graph.width - 10;
+      } else {
+        label.style.wordWrap = false;
+        label.style.breakWords = false;
+        label.style.fontSize = 10;
+      }
+      return label;
     }
   }
 
@@ -211,8 +216,14 @@ export class EdgeGroup extends CommonElement {
     const nodeWidth = this.defaultStyle.width;
     if (label && graph) {
       if (this.width !== 0) {
-        label.style.fontSize = _.floor(graph.width / 20) + 1;
-        label.style.wordWrapWidth = graph.width / 2;
+        const fontSize = _.floor(graph.width / 10) + 1;
+        if (fontSize > 12 && fontSize < 20) {
+          label.style.fontSize = _.floor(graph.width / 10) + 1;
+        } else if (fontSize <= 12) {
+          label.style.fontSize = 10;
+        } else if (fontSize >= 20) {
+          label.style.fontSize = 20;
+        }
       } else {
         const textLength = _.ceil(label.text.length / 2);
         label.style.fontSize = nodeWidth / textLength;

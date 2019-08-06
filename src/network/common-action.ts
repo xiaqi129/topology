@@ -81,7 +81,7 @@ export class CommonAction {
     this.topo.setSelectedNodes(node);
   }
 
-  public setSelectGroups(group: Group) {
+  public setSelectGroups(group: Group | EdgeGroup) {
     this.topo.setSelectedGroups(group);
   }
 
@@ -214,38 +214,20 @@ export class CommonAction {
     const elements = this.topo.getElements();
     const groups = this.getOtherElements();
     _.each(elements, (element) => {
-      if (element instanceof Node) {
-        element.addEventListener('mousedown', (event: PIXI.interaction.InteractionEvent) => {
-          event.stopPropagation();
-          if (this.getSelectNodes().length < 1) {
-            this.removeHighLight();
-            element.selectOne();
-            this.setSelectNodes(element);
-          }
-        });
-      } else if (element instanceof Edge) {
-        element.addEventListener('mousedown', (event: PIXI.interaction.InteractionEvent) => {
-          event.stopPropagation();
-          this.removeHighLight();
-          this.topo.setSelectedEdge(element);
-          element.selectOn();
-        });
-      } else if (element instanceof EdgeBundle) {
-        const childEdge = element.isExpanded ? element.children : element.bundleData;
-        _.each(childEdge, (edges: any) => {
-          edges.addEventListener('mousedown', (event: PIXI.interaction.InteractionEvent) => {
-            event.stopPropagation();
-            this.removeHighLight();
-            this.topo.setSelectedEdge(edges);
-            edges.selectOn();
-          });
-        });
-      } else if (element instanceof Group || element instanceof EdgeGroup) {
+      if (element instanceof Group || element instanceof EdgeGroup) {
         element.addEventListener('click', (event: PIXI.interaction.InteractionEvent) => {
           event.stopPropagation();
           this.removeHighLight();
           this.topo.setSelectedGroups(element);
           element.selectOn();
+        });
+      } else {
+        element.off('mousedown', () => {
+          this.clickEvent(element);
+        });
+        element.on('mousedown', (event: PIXI.interaction.InteractionEvent) => {
+          event.stopPropagation();
+          this.clickEvent(element);
         });
       }
     });
@@ -282,6 +264,29 @@ export class CommonAction {
 
   public toggleLabel() {
     this.nodeLabelFlag = !this.nodeLabelFlag;
+  }
+
+  private clickEvent(element: CommonElement) {
+    if (element instanceof Node) {
+      if (this.getSelectNodes().length < 1) {
+        this.removeHighLight();
+        element.selectOne();
+        this.setSelectNodes(element);
+      }
+    } else if (element instanceof Edge) {
+      if (this.getSelectNodes().length < 1) {
+        this.removeHighLight();
+        this.topo.setSelectedEdge(element);
+        element.selectOn();
+      }
+    } else if (element instanceof EdgeBundle) {
+      const childEdge = element.isExpanded ? element.children : element.bundleData;
+      _.each(childEdge, (edges: any) => {
+        this.removeHighLight();
+        this.topo.setSelectedEdge(edges);
+        edges.selectOn();
+      });
+    }
   }
 
   private onSelectStart(event: PIXI.interaction.InteractionEvent) {

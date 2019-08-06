@@ -21,6 +21,11 @@ export interface IMark {
   position: string;
 }
 
+export interface ILabelMarkStyle {
+  fillColor: number;
+  alpha: number;
+}
+
 export class Node extends CommonElement {
   public type: string = 'Node';
   public icon: string = '';
@@ -42,6 +47,7 @@ export class Node extends CommonElement {
   private dragging: boolean = false;
   private last: any;
   private labelStyle: {} = {};
+  private labelMarkStyle: ILabelMarkStyle | undefined = undefined;
 
   constructor(
     elements: CommonElement[],
@@ -137,6 +143,12 @@ export class Node extends CommonElement {
         this.setChildIndex(markSprite, this.children.length - 1);
       }
     });
+    const labelMark: any = this.getChildByName('labelMark');
+    if (labelMark) {
+      const labelMarkBackground = labelMark.getChildByName('labelMark_background');
+      const labelMarkLabel = labelMark.getChildByName('labelMark_label');
+      this.drawLabelMark(labelMark, labelMarkBackground, labelMarkLabel);
+    }
     return node;
   }
 
@@ -325,6 +337,67 @@ export class Node extends CommonElement {
         return mark.name === icon;
       });
     }
+  }
+
+  /* add and remove label mark  */
+  public addLabelMark(content: string, style?: ILabelMarkStyle) {
+    if (content.length > 2) {
+      throw Error('The content length is not greater than 2');
+    }
+    this.removeLabelMark();
+    const markContainer = new PIXI.Container();
+    const markBackground = new PIXI.Graphics();
+    const markLabel = new Label(content, {
+      fill: 0Xffffff,
+    });
+    markContainer.name = 'labelMark';
+    markBackground.name = 'labelMark_background';
+    markLabel.name = 'labelMark_label';
+    if (style) {
+      this.labelMarkStyle = style;
+    }
+    this.drawLabelMark(markContainer, markBackground, markLabel);
+  }
+
+  public removeLabelMark() {
+    const oldMarkContainer = this.getChildByName('labelMark');
+    if (oldMarkContainer) {
+      this.removeChild(oldMarkContainer);
+    }
+  }
+
+  private drawLabelMark(markContainer: PIXI.Container, markBackground: PIXI.Graphics, markLabel: Label) {
+    let fillColor;
+    let alpha;
+    const style = this.labelMarkStyle;
+    if (style) {
+      this.labelMarkStyle = style;
+      fillColor = style.fillColor;
+      alpha = style.alpha;
+    } else {
+      fillColor = 0XFFC125;
+      alpha = 1;
+    }
+    markBackground.clear();
+    markBackground.beginFill(fillColor, alpha);
+    let radius = this.iconWidth / 2.3;
+    markBackground.drawCircle(0, 0, radius);
+    markBackground.endFill();
+    if (radius <= 10) {
+      radius = 10;
+    } else if (radius >= 12) {
+      radius = 12;
+    }
+    markContainer.addChild(markBackground);
+    markContainer.addChild(markLabel);
+    markLabel.setPosition(4);
+    markLabel.setStyle({
+      fontSize: radius,
+    });
+    this.addChild(markContainer);
+    this.setChildIndex(markContainer, this.children.length - 1);
+    markContainer.x = this.iconWidth;
+    markContainer.y = -this.iconHeight / 2;
   }
 
   private switchPos(addSprite: any, pos: string) {

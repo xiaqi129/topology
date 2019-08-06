@@ -55,7 +55,7 @@ const getNodeGroups = () => {
 };
 // tslint:disable-next-line:only-arrow-functions
 const noData = function () {
-  const num = 4000;
+  const num = 2;
   for (let i: number = 0, len: number = num; i < len;) {
     i += 1;
     const node = network.createNode('cisco-ASR9');
@@ -64,12 +64,16 @@ const noData = function () {
     network.addElement(node);
     node.x = Math.random() * 800;
     node.y = Math.random() * 500;
+    node.addLabelMark('R', {
+      fillColor: 0Xf00f00,
+      alpha: 0.3,
+    });
   }
   const nodes = network.getNodes();
   for (let i: number = 0, len: number = num; i < len;) {
     const srcNode = nodes[i];
     const destNode = nodes[i + 1];
-    for (let j = 0; j < 4;) {
+    for (let j = 0; j < 1;) {
       const edge = network.createEdge(srcNode, destNode);
       edge.initStyle({
         arrowColor: 0X006aad,
@@ -79,7 +83,7 @@ const noData = function () {
         arrowType: 3,
         fillArrow: true,
         lineColor: 0X0386d2,
-        lineType: 1,
+        lineType: 0,
         lineFull: 0,
         lineWidth: 1,
         bundleStyle: 0,
@@ -811,6 +815,7 @@ const simpleData = function () {
           { label: 'Mark Node', id: '5' },
           { label: 'unMark Node', id: '6' },
           { label: 'Remove Node', id: '7' },
+          { label: 'Click Event', id: '8' },
         ]);
         network.menu.menuOnAction = (id) => {
           if (id === '0') {
@@ -854,6 +859,8 @@ const simpleData = function () {
             node.removeNodeMark('mapSVG');
           } else if (id === '7') {
             network.removeElements(node);
+          } else if (id === '8') {
+            network.setClick();
           }
         };
         network.menu.setClass('popMenu');
@@ -1067,13 +1074,13 @@ const groupEdgeNode = function () {
           y: 200,
         },
       },
-      {
-        name: 'name-2',
-        location: {
-          x: 350,
-          y: 250,
-        },
-      },
+      // {
+      //   name: 'name-2',
+      //   location: {
+      //     x: 350,
+      //     y: 250,
+      //   },
+      // },
       {
         name: 'name-3',
         location: {
@@ -1084,24 +1091,24 @@ const groupEdgeNode = function () {
 
     ],
     links: [
-      // {
-      //   name: '1',
-      //   local_host: 'name-1',
-      //   remote_host: 'name-2',
-      //   style: {
-      //     // lineType: 0,
-      //     lineFull: 1,
-      //   },
-      // },
-      // {
-      //   name: '2',
-      //   local_host: 'name-1',
-      //   remote_host: 'name-2',
-      //   style: {
-      //     // lineType: 0,
-      //     lineFull: 1,
-      //   },
-      // },
+      {
+        name: '1',
+        local_host: 'name-1',
+        remote_host: 'name-3',
+        style: {
+          lineType: 0,
+          lineFull: 1,
+        },
+      },
+      {
+        name: '2',
+        local_host: 'name-1',
+        remote_host: 'name-3',
+        style: {
+          lineType: 0,
+          lineFull: 1,
+        },
+      },
       // {
       //   name: '3',
       //   local_host: 'name-1',
@@ -1122,7 +1129,7 @@ const groupEdgeNode = function () {
       // },
       {
         name: '3',
-        local_host: 'nodeGroup',
+        local_host: 'name-1',
         remote_host: 'name-3',
         style: {
           lineType: 0,
@@ -1144,7 +1151,7 @@ const groupEdgeNode = function () {
   };
   const devices = data.devices;
   const links = data.links;
-  const groups = data.groups;
+  // const groups = data.groups;
   _.each(devices, (device: any) => {
     const node = network.createNode('cisco-ASR9');
     node.name = device.name;
@@ -1153,36 +1160,36 @@ const groupEdgeNode = function () {
     network.addElement(node);
   });
   const nodes = network.getNodeObj();
-  _.each(groups, (g) => {
-    const group = network.createGroup();
-    network.addElement(group);
-    _.each(g.children, (child) => {
-      const node: any = _.find(nodes, (e: any) => {
-        return e.name === child;
-      });
-      group.addChildNodes(node);
-    });
-    group.name = g.name;
-    group.initStyle(g.style);
-    group.setLabel(`${g.name}`);
-    group.setOutlineStyle(3);
-    group.on('rightclick', (event: any) => {
-      network.menu.setMenuItems([
-        { label: 'Remove Group', id: '0' },
-        { label: 'Debug', id: '1' },
-      ]);
-      network.menu.menuOnAction = (id) => {
-        if (id === '0') {
-          network.removeElements(group);
-        } else if (id === '1') {
-          // tslint:disable-next-line:no-console
-          console.log(group);
-        }
-      };
-      network.menu.setClass('popMenu');
-      network.menu.showMenu(event);
-    });
-  });
+  // _.each(groups, (g) => {
+  //   const group = network.createGroup();
+  //   network.addElement(group);
+  //   _.each(g.children, (child) => {
+  //     const node: any = _.find(nodes, (e: any) => {
+  //       return e.name === child;
+  //     });
+  //     group.addChildNodes(node);
+  //   });
+  //   group.name = g.name;
+  //   group.initStyle(g.style);
+  //   group.setLabel(`${g.name}`);
+  //   group.setOutlineStyle(3);
+  //   group.on('rightclick', (event: any) => {
+  //     network.menu.setMenuItems([
+  //       { label: 'Remove Group', id: '0' },
+  //       { label: 'Debug', id: '1' },
+  //     ]);
+  //     network.menu.menuOnAction = (id) => {
+  //       if (id === '0') {
+  //         network.removeElements(group);
+  //       } else if (id === '1') {
+  //         // tslint:disable-next-line:no-console
+  //         console.log(group);
+  //       }
+  //     };
+  //     network.menu.setClass('popMenu');
+  //     network.menu.showMenu(event);
+  //   });
+  // });
   const allNodeGroups = getNodeGroups();
   _.each(links, (link: any) => {
     const srcNodeName = link.local_host;
@@ -1223,11 +1230,20 @@ const groupEdgeNode = function () {
         fillArrow: true,
         lineColor: 0X0386d2,
         lineType: link.style.lineType,
-        lineFull: link.style.lineFull,
+        lineFull: 0,
         lineWidth: 1,
         bundleStyle: 0,
       });
-      // edge.setLabel(link.local_host, link.remote_host);
+      edge.setLabel(link.local_host, link.remote_host);
+      const srcMark = {
+        content: 'B',
+        color: 0X0386d2,
+      };
+      const endMark = {
+        content: 'F',
+        color: 0Xdd0d3d,
+      };
+      edge.setMark(srcMark, endMark);
       network.addElement(edge);
     }
   });
@@ -1240,8 +1256,8 @@ const groupEdgeNode = function () {
 };
 
 network.callback = () => {
-  simpleData();
-  // noData();
+  // simpleData();
+  noData();
   // edgeGroupDemo();
   // groupEdgeNode();
   // dataFlowDemo();

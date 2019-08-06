@@ -29,7 +29,7 @@ export class Label extends PIXI.Text {
     this.text = label;
   }
 
-  public setStyle(style: PIXI.TextStyle) {
+  public setStyle(style: PIXI.TextStyleOptions) {
     _.extend(this.style, style);
   }
 
