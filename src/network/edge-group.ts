@@ -14,7 +14,12 @@ import { Group } from './group';
 import { Label } from './label';
 import ConvexHullGrahamScan from './lib/convex-hull';
 import { Node } from './node';
+import { Topo } from './topo';
 
+export interface ICondition {
+  isLock: boolean;
+  isSelectGroup: boolean;
+}
 export class EdgeGroup extends CommonElement {
   public type: string = 'EdgeGroup';
   public childrenEdge: Edge[] = [];
@@ -23,6 +28,9 @@ export class EdgeGroup extends CommonElement {
   public labelContent: string = '';
   public centerPoint: IPosition = { x: 0, y: 0 };
   public isSelected: boolean = false;
+  public polygonHullOutlineName: string = _.uniqueId('hull_outline_');
+  /* add to differentiate select or drag*/
+  public isSelecting: boolean = false;
   private labelStyle: any;
   private labelPosition: string = 'Center';
   // drag
@@ -30,13 +38,21 @@ export class EdgeGroup extends CommonElement {
   private last: any;
   private elements: CommonElement;
   private childNodes: Node[] = [];
-  constructor(elements: any) {
+  // select
+  private topo: Topo;
+  private rectangle = new PIXI.Graphics();
+  private selecting: boolean = false;
+  private selectLockNodes: boolean = false;
+  private isSelectGroup: boolean = false;
+  constructor(elements: any, topo: Topo) {
     super();
     this.elements = elements;
     this.polygon = new PIXI.Graphics();
-    this.polygon.name = 'edge_group';
+    this.polygon.name = this.polygonHullOutlineName;
     this.interactive = true;
-    this.buttonMode = true;
+    this.topo = topo;
+    // this.buttonMode = true;
+    document.addEventListener('mouseup', this.onMouseup.bind(this));
     this.setDrag();
   }
 
@@ -160,6 +176,33 @@ export class EdgeGroup extends CommonElement {
     return _.uniq(nodes);
   }
 
+  public setDrag() {
+    this.isSelecting = false;
+    this.off('mousedown');
+    this.off('mousemove');
+    this.off('mouseup');
+    this.on('mousedown', this.onDragStart, this);
+    this.highLightGroup();
+    this.cursor = 'pointer';
+    this.on('mousemove', this.onDragMove, this);
+  }
+
+  public setSelect(condition?: ICondition) {
+    this.isSelecting = true;
+    this.off('mousedown');
+    this.off('mousemove');
+    this.off('mouseup');
+    this.cursor = 'crosshair';
+    this.highLightGroup();
+    if (condition) {
+      this.selectLockNodes = condition.isLock;
+      this.isSelectGroup = condition.isSelectGroup;
+    }
+    this.on('mousedown', this.onSelectStart, this);
+    this.on('mousemove', this.onSelectMove, this);
+    this.on('mouseup', this.onSelectEnd, this);
+  }
+
   private getLabelPos() {
     let height = 0;
     const graph: any = this.getChildByName('edge_group');
@@ -234,7 +277,7 @@ export class EdgeGroup extends CommonElement {
   private initPolygonOutline(): void {
     const graph = this.polygon;
     graph.interactive = true;
-    graph.buttonMode = true;
+    // graph.buttonMode = true;
     this.addChild(graph);
     const style = this.defaultStyle;
     graph.lineStyle(style.lineWidth, style.lineColor);
@@ -315,18 +358,14 @@ export class EdgeGroup extends CommonElement {
   }
 
   // set edge group can drag
-  private setDrag() {
-    const graphic = this.polygon;
-    graphic.on('mousedown', this.onDragStart, this);
-    graphic.on('mousemove', this.onDragMove, this);
-    document.addEventListener('mouseup', this.onDragEnd.bind(this));
-  }
 
   private onDragStart(event: any) {
     event.stopPropagation();
+    this.removeHighLight();
     if (event.data.originalEvent.button === 0) {
       const parent = this.parent.toLocal(event.data.global);
       this.dragging = true;
+      this.selecting = false;
       this.last = { parents: parent };
     }
   }
@@ -361,9 +400,128 @@ export class EdgeGroup extends CommonElement {
     }
   }
 
-  private onDragEnd() {
-    this.dragging = false;
+  /* set select on edge group */
+  private onMouseup() {
     this.last = null;
+    if (this.selecting) {
+      this.onSelectEnd();
+    }
+    this.dragging = false;
+    this.selecting = false;
+    this.rectangle.clear();
+    this.parent.addChild(this.rectangle);
+  }
+
+  /* set move select more nodes on group*/
+  private onSelectStart(event: any) {
+    this.removeHighLight();
+    const parent = this.parent.toLocal(event.data.global);
+    this.dragging = false;
+    this.selecting = true;
+    this.last = { parents: parent };
+  }
+
+  private onSelectMove(event: any) {
+    if (this.selecting) {
+      this.rectangle.clear();
+      const newPosition = this.parent.toLocal(event.data.global);
+      const network = document.getElementById(this.topo.domRegex);
+      let adjustedX = newPosition.x;
+      let adjustedY = newPosition.y;
+      if (network) {
+        const borderTop = 1;
+        const borderRight = network.clientWidth - 1;
+        const borderBottom = network.clientHeight - 1;
+        const borderLeft = 1;
+        if (newPosition.x <= borderLeft) {
+          adjustedX = borderLeft;
+        } else if (newPosition.x >= borderRight) {
+          adjustedX = borderRight;
+        }
+        if (newPosition.y <= borderTop) {
+          adjustedY = borderTop;
+        } else if (newPosition.y >= borderBottom) {
+          adjustedY = borderBottom;
+        }
+      }
+      const oldLeft = this.last.parents.x;
+      const oldTop = this.last.parents.y;
+      const width = adjustedX - oldLeft;
+      const height = adjustedY - oldTop;
+      this.rectangle.lineStyle(1, 0X024997, 1);
+      this.rectangle.alpha = 0.8;
+      this.rectangle.drawRect(oldLeft, oldTop, width, height);
+    }
+  }
+
+  private onSelectEnd() {
+    const bounds = this.rectangle.getLocalBounds();
+    const elements = this.topo.getElements();
+    const groups = this.topo.getGroups();
+    const selectNodes: Node[] = [];
+    _.each(elements, (element) => {
+      if (element instanceof Node) {
+        const sprite: any = element.getSprite();
+        if (sprite) {
+          const nodeTop = element.y - (sprite.height / 2);
+          const nodeLeft = element.x - (sprite.width / 2);
+          const nodeRight = element.x + (sprite.width / 2);
+          const nodeBottom = element.y + (sprite.height / 2);
+          if ((nodeTop >= bounds.top) && (nodeRight <= bounds.right) &&
+            (nodeBottom <= bounds.bottom) && (nodeLeft >= bounds.left)) {
+            selectNodes.push(element);
+          }
+        }
+      }
+    });
+    _.each(selectNodes, (node: Node) => {
+      if (this.selectLockNodes === node.isLock) {
+        this.topo.setSelectedNodes(node);
+      }
+    });
+    if (this.isSelectGroup) {
+      const filterGroup = _.filter(groups, (group: any) => {
+        const childNodes = group.getVisibleNodes();
+        return _.every(childNodes, (node: any) => {
+          const isInclude = _.includes(selectNodes, node);
+          return isInclude;
+        });
+      });
+      this.removeHighLight();
+      _.each(filterGroup, (group: Group) => {
+        this.topo.setSelectedGroups(group);
+      });
+    }
+  }
+
+  private highLightGroup() {
+    this.on('mousedown', (event: PIXI.interaction.InteractionEvent) => {
+      event.stopPropagation();
+      this.removeHighLight();
+      this.topo.setSelectedGroups(this);
+      this.selectOn();
+    });
+  }
+
+  private removeHighLight() {
+    // clear highlight nodes
+    const selectNodes = this.topo.getSelectedNodes();
+    _.each(selectNodes, (node: Node) => {
+      node.selectOff();
+    });
+    this.topo.removeSelectedNodes();
+    // clear highlight edge
+    const selectEdge: Edge | undefined = this.topo.getSelectedEdge();
+    if (selectEdge) {
+      selectEdge.selectOff();
+    }
+    this.topo.removeSelectedEdge();
+    // clear highlight groups
+    const selectGroups = this.topo.getSelectedGroups();
+    _.each(selectGroups, (group: any) => {
+      group.selectOff();
+    });
+    this.topo.removeSelectedGroups();
   }
 
   private getEdgeGroup() {

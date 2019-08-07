@@ -189,15 +189,6 @@ export class CommonAction {
     return filterElements;
   }
 
-  public getGroups() {
-    const elements: any = this.topo.getElements();
-    const groups = _.filter(elements, (element) => {
-      return ((element instanceof Group && element.getChildNodes().length > 0) ||
-        element instanceof EdgeGroup && element.childrenEdge.length > 0);
-    });
-    return groups;
-  }
-
   public moveSelect(condition?: ICondition) {
     if (condition) {
       this.isLock = condition.isLock;
@@ -215,7 +206,7 @@ export class CommonAction {
     const groups = this.getOtherElements();
     _.each(elements, (element) => {
       if (element instanceof Group || element instanceof EdgeGroup) {
-        element.addEventListener('click', (event: PIXI.interaction.InteractionEvent) => {
+        element.on('mousedown', (event: PIXI.interaction.InteractionEvent) => {
           event.stopPropagation();
           this.removeHighLight();
           this.topo.setSelectedGroups(element);
@@ -331,7 +322,6 @@ export class CommonAction {
       this.rectangle.lineStyle(1, 0X024997, 1);
       this.rectangle.alpha = 0.8;
       this.rectangle.drawRect(oldLeft, oldTop, width, height);
-      this.app.addElement(this.rectangle);
     } else {
       this.dragging = false;
     }
@@ -347,13 +337,14 @@ export class CommonAction {
         this.onSelectEnd();
       }
       this.rectangle.clear();
+      this.container.addChild(this.rectangle);
     }
   }
 
   private onSelectEnd() {
     const bounds = this.rectangle.getLocalBounds();
     const elements = this.topo.getElements();
-    const groups = this.getGroups();
+    const groups = this.topo.getGroups();
     const selectNodes: Node[] = [];
     this.containerUp = true;
     _.each(elements, (element) => {

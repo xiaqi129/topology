@@ -548,66 +548,66 @@ const edgeGroupDemo = function () {
         },
         children: ['1', '1_1'],
       },
-      // {
-      //   name: 'group2',
-      //   style: {
-      //     fillColor: 0Xa3d89f,
-      //     margin: 8,
-      //   },
-      //   children: ['2'],
-      // },
-      // {
-      //   name: 'group3',
-      //   style: {
-      //     fillColor: 0Xfcc242,
-      //     margin: 8,
-      //   },
-      //   children: ['5'],
-      // },
-      // {
-      //   name: 'group4',
-      //   style: {
-      //     fillColor: 0xf55d54,
-      //     margin: 8,
-      //     fillOpacity: 0,
-      //     lineColor: 0xf55d54,
-      //   },
-      //   children: ['9'],
-      // },
-      // {
-      //   name: 'group5',
-      //   style: {
-      //     fillColor: 0xf55d54,
-      //     margin: 8,
-      //     fillOpacity: 0,
-      //     lineColor: 0Xa378b4,
-      //     lineWidth: 2,
-      //   },
-      //   children: ['4'],
-      // },
-      // {
-      //   name: 'group6',
-      //   style: {
-      //     fillColor: 0xf55d54,
-      //     margin: 8,
-      //     fillOpacity: 0,
-      //     lineColor: 0Xfcc242,
-      //     lineWidth: 2,
-      //   },
-      //   children: ['1', '4', '10', '11', '12', '13', '14'],
-      //   // children: ['12', '13'],
-      // },
-      // {
-      //   name: 'group7',
-      //   style: {
-      //     fillColor: 0X0984e3,
-      //     margin: 8,
-      //     fillOpacity: 0,
-      //     lineColor: 0X0984e3,
-      //     lineWidth: 2,
-      //   },
-      //   children: ['6'],
-      // },
+      {
+        name: 'group2',
+        style: {
+          fillColor: 0Xa3d89f,
+          margin: 8,
+        },
+        children: ['2'],
+      },
+      {
+        name: 'group3',
+        style: {
+          fillColor: 0Xfcc242,
+          margin: 8,
+        },
+        children: ['5'],
+      },
+      {
+        name: 'group4',
+        style: {
+          fillColor: 0xf55d54,
+          margin: 8,
+          fillOpacity: 0,
+          lineColor: 0xf55d54,
+        },
+        children: ['9'],
+      },
+      {
+        name: 'group5',
+        style: {
+          fillColor: 0xf55d54,
+          margin: 8,
+          fillOpacity: 0,
+          lineColor: 0Xa378b4,
+          lineWidth: 2,
+        },
+        children: ['4'],
+      },
+      {
+        name: 'group6',
+        style: {
+          fillColor: 0xf55d54,
+          margin: 8,
+          fillOpacity: 0,
+          lineColor: 0Xfcc242,
+          lineWidth: 2,
+        },
+        children: ['1', '4', '10', '11', '12', '13', '14'],
+        // children: ['12', '13'],
+      },
+      {
+        name: 'group7',
+        style: {
+          fillColor: 0X0984e3,
+          margin: 8,
+          fillOpacity: 0,
+          lineColor: 0X0984e3,
+          lineWidth: 2,
+        },
+        children: ['6'],
+      },
     ],
     groups: [
       {
@@ -1257,178 +1257,201 @@ const groupEdgeNode = function () {
 
 network.callback = () => {
   // simpleData();
-  noData();
-  // edgeGroupDemo();
+  // noData();
+  edgeGroupDemo();
   // groupEdgeNode();
   // dataFlowDemo();
+  afterDrawTopo();
 };
-const body = document.getElementById('network');
-const zoomIn = document.querySelector('button.btn_zoomIn');
-const zoomOut = document.querySelector('button.btn_zoomOut');
-const zoomOver = document.querySelector('button.btn_zoomOver');
-const tooltipToggle = document.querySelector('button.btn_tooltipToggle');
-const bundleToggle = document.querySelector('button.btn_bundleLabelToggle');
-const nodeLabelToggle = document.querySelector('button.btn_nodeLabelToggle');
-const groupLabelToggle = document.querySelector('button.btn_groupLabelToggle');
-const linkLabelToggle = document.querySelector('button.btn_linkLabelToggle');
-const btnAaddEdge = document.querySelector('button.btn_addEdge');
-const searchNode = document.querySelector('button.btn_search_node');
-if (zoomIn) {
-  zoomIn.addEventListener('click', () => {
-    if (network.zoom < 4) {
-      network.zoomNetworkElements(NP.plus(network.zoom, 0.1));
-    }
-  });
-}
-if (zoomOut) {
-  zoomOut.addEventListener('click', () => {
-    if (network.zoom > 0.4) {
-      network.zoomNetworkElements(NP.minus(network.zoom, 0.1));
-    }
-  });
-}
-if (zoomOver) {
-  // let isZoom = true;
-  zoomOver.addEventListener('click', () => {
-    network.zoomOver();
-  });
-}
-if (tooltipToggle) {
-  let isDisplay = true;
-  tooltipToggle.addEventListener('click', () => {
-    isDisplay = !isDisplay;
-    network.setTooltipDisplay(isDisplay);
-  });
-}
-let labelToggle = true;
-if (nodeLabelToggle) {
-  nodeLabelToggle.addEventListener('click', () => {
-    labelToggle = !labelToggle;
-    network.bundleLabelToggle(labelToggle);
-  });
-}
-let bundleLabelToggle = true;
-if (bundleToggle) {
-  bundleToggle.addEventListener('click', () => {
-    bundleLabelToggle = !bundleLabelToggle;
-    network.setBundleExpanded(bundleLabelToggle);
-  });
-}
-let edgeLabelToggle = true;
-if (linkLabelToggle) {
-  linkLabelToggle.addEventListener('click', () => {
-    edgeLabelToggle = !edgeLabelToggle;
-    network.edgeLabelToggle(edgeLabelToggle);
-  });
-}
-if (btnAaddEdge) {
-  btnAaddEdge.addEventListener('click', () => {
-    // console.log(sourcesEdge);
-    network.addElements(sourcesEdge);
-    network.setBundleExpanded(false);
-    network.setClick();
-    network.syncView();
-  });
-}
-if (searchNode) {
-  searchNode.addEventListener('click', () => {
-    const searchInput = document.querySelector('input.input_search_node') as HTMLInputElement;
-    _.each(network.getNodes(), (node) => {
-      if (node.getUID() === `element_${searchInput.value}`) {
-        node.selectOn();
+// tslint:disable-next-line: only-arrow-functions
+const afterDrawTopo = function () {
+  const body = document.getElementById('network');
+  const zoomIn = document.querySelector('button.btn_zoomIn');
+  const zoomOut = document.querySelector('button.btn_zoomOut');
+  const zoomOver = document.querySelector('button.btn_zoomOver');
+  const tooltipToggle = document.querySelector('button.btn_tooltipToggle');
+  const bundleToggle = document.querySelector('button.btn_bundleLabelToggle');
+  const nodeLabelToggle = document.querySelector('button.btn_nodeLabelToggle');
+  const groupLabelToggle = document.querySelector('button.btn_groupLabelToggle');
+  const linkLabelToggle = document.querySelector('button.btn_linkLabelToggle');
+  const btnAaddEdge = document.querySelector('button.btn_addEdge');
+  const searchNode = document.querySelector('button.btn_search_node');
+  if (zoomIn) {
+    zoomIn.addEventListener('click', () => {
+      if (network.zoom < 4) {
+        network.zoomNetworkElements(NP.plus(network.zoom, 0.1));
       }
     });
-  });
-}
-
-// let grouptitleToggle = true;
-const emptyObj = {
-  type: 'square',
-  location: { x: 100, y: 100 },
-  size: 100,
-};
-// let groupLabel = true;
-if (groupLabelToggle) {
-  groupLabelToggle.addEventListener('click', () => {
-    // groupLabel = !groupLabel;
-    // network.groupLabelToggle(groupLabel);
-    const emptyGroup = network.createGroup(emptyObj);
-    emptyGroup.initStyle({
-      fillColor: 0X00ff00,
-      fillOpacity: 0.5,
+  }
+  if (zoomOut) {
+    zoomOut.addEventListener('click', () => {
+      if (network.zoom > 0.4) {
+        network.zoomNetworkElements(NP.minus(network.zoom, 0.1));
+      }
     });
-    emptyGroup.draw();
-    network.addElement(emptyGroup);
-    emptyGroup.setLabel('text', 'Center');
-    network.syncView();
-    emptyGroup.on('rightclick', (event: any) => {
-      network.menu.setMenuItems([
-        { label: 'add child node', id: '0' },
-        { label: 'change style', id: '1' },
-        { label: 'Debug', id: '2' },
-      ]);
-      network.menu.menuOnAction = (id) => {
-        if (id === '0') {
-          const node1 = _.get(network.getNodeObj(), '192.168.30.0/24');
-          const node2 = _.get(network.getNodeObj(), '192.168.40.0/24');
-          emptyGroup.addChildNodes(node1);
-          emptyGroup.addChildNodes(node2);
-        } else if (id === '1') {
-          emptyGroup.defaultStyle.fillColor = 0Xff0000;
-          emptyGroup.draw();
-        } else if (id === '2') {
-          // tslint:disable-next-line: no-console
-          console.log(emptyGroup);
+  }
+  if (zoomOver) {
+    // let isZoom = true;
+    zoomOver.addEventListener('click', () => {
+      network.zoomOver();
+    });
+  }
+  if (tooltipToggle) {
+    let isDisplay = true;
+    tooltipToggle.addEventListener('click', () => {
+      isDisplay = !isDisplay;
+      network.setTooltipDisplay(isDisplay);
+    });
+  }
+  let labelToggle = true;
+  if (nodeLabelToggle) {
+    nodeLabelToggle.addEventListener('click', () => {
+      labelToggle = !labelToggle;
+      network.bundleLabelToggle(labelToggle);
+    });
+  }
+  let bundleLabelToggle = true;
+  if (bundleToggle) {
+    bundleToggle.addEventListener('click', () => {
+      bundleLabelToggle = !bundleLabelToggle;
+      network.setBundleExpanded(bundleLabelToggle);
+    });
+  }
+  let edgeLabelToggle = true;
+  if (linkLabelToggle) {
+    linkLabelToggle.addEventListener('click', () => {
+      edgeLabelToggle = !edgeLabelToggle;
+      network.edgeLabelToggle(edgeLabelToggle);
+    });
+  }
+  if (btnAaddEdge) {
+    btnAaddEdge.addEventListener('click', () => {
+      // console.log(sourcesEdge);
+      network.addElements(sourcesEdge);
+      network.setBundleExpanded(false);
+      network.setClick();
+      network.syncView();
+    });
+  }
+  if (searchNode) {
+    searchNode.addEventListener('click', () => {
+      const searchInput = document.querySelector('input.input_search_node') as HTMLInputElement;
+      _.each(network.getNodes(), (node) => {
+        if (node.getUID() === `element_${searchInput.value}`) {
+          node.selectOn();
         }
-      };
-      network.menu.setClass('popMenu');
-      network.menu.showMenu(event);
+      });
     });
-    // grouptitleToggle = !grouptitleToggle;
-    // const node = network.getNodeObj();
-    // _.each(node, (n: any) => {
-    //   if (grouptitleToggle) {
-    //     n.setLabelText(n.name);
-    //   } else {
-    //     n.setLabelText(n.clients.User_Role);
-    //   }
-    // });
-  });
-}
-if (body) {
-  let pressSpace = true;
-  let pressAlt = true;
-  const condition = {
-    isLock: false,
-    isSelectGroup: false,
+  }
+
+  // let grouptitleToggle = true;
+  const emptyObj = {
+    type: 'square',
+    location: { x: 100, y: 100 },
+    size: 100,
   };
-  body.addEventListener('wheel', () => {
-    network.toggleLabel(1, 2);
-  });
-  window.addEventListener('keydown', (e) => {
-    if (e.keyCode === 17 && !network.isSelect) {
-      condition.isLock = false;
-      condition.isSelectGroup = false;
-      network.setSelect(condition);
-    }
-    if (e.keyCode === 32 && e.ctrlKey && pressSpace) {
-      condition.isLock = true;
-      condition.isSelectGroup = false;
-      pressSpace = false;
-      network.setSelect(condition);
-    }
-    if (e.altKey && e.ctrlKey && pressAlt) {
-      pressAlt = false;
-      condition.isLock = false;
-      condition.isSelectGroup = true;
-      network.setSelect(condition);
-    }
-  });
-  window.addEventListener('keyup', (e) => {
-    if (e.keyCode === 17) {
-      network.setDrag();
-      pressSpace = true;
-      pressAlt = true;
-    }
-  });
-}
+  // let groupLabel = true;
+  if (groupLabelToggle) {
+    groupLabelToggle.addEventListener('click', () => {
+      // groupLabel = !groupLabel;
+      // network.groupLabelToggle(groupLabel);
+      const emptyGroup = network.createGroup(emptyObj);
+      emptyGroup.initStyle({
+        fillColor: 0X00ff00,
+        fillOpacity: 0.5,
+      });
+      emptyGroup.draw();
+      network.addElement(emptyGroup);
+      emptyGroup.setLabel('text', 'Center');
+      network.syncView();
+      emptyGroup.on('rightclick', (event: any) => {
+        network.menu.setMenuItems([
+          { label: 'add child node', id: '0' },
+          { label: 'change style', id: '1' },
+          { label: 'Debug', id: '2' },
+        ]);
+        network.menu.menuOnAction = (id) => {
+          if (id === '0') {
+            const node1 = _.get(network.getNodeObj(), '192.168.30.0/24');
+            const node2 = _.get(network.getNodeObj(), '192.168.40.0/24');
+            emptyGroup.addChildNodes(node1);
+            emptyGroup.addChildNodes(node2);
+          } else if (id === '1') {
+            emptyGroup.defaultStyle.fillColor = 0Xff0000;
+            emptyGroup.draw();
+          } else if (id === '2') {
+            // tslint:disable-next-line: no-console
+            console.log(emptyGroup);
+          }
+        };
+        network.menu.setClass('popMenu');
+        network.menu.showMenu(event);
+      });
+      // grouptitleToggle = !grouptitleToggle;
+      // const node = network.getNodeObj();
+      // _.each(node, (n: any) => {
+      //   if (grouptitleToggle) {
+      //     n.setLabelText(n.name);
+      //   } else {
+      //     n.setLabelText(n.clients.User_Role);
+      //   }
+      // });
+    });
+  }
+  if (body) {
+    let pressSpace = true;
+    let pressAlt = true;
+    const condition = {
+      isLock: false,
+      isSelectGroup: false,
+    };
+    body.addEventListener('wheel', () => {
+      network.toggleLabel(1, 2);
+    });
+    const groups = network.getAllGroups();
+    window.addEventListener('keydown', (e) => {
+      if (e.keyCode === 17 && !network.isSelect) {
+        condition.isLock = false;
+        condition.isSelectGroup = false;
+        network.setSelect(condition);
+        _.each(groups, (group) => {
+          if (!group.isSelecting) {
+            group.setSelect(condition);
+          }
+        });
+      }
+      if (e.keyCode === 32 && e.ctrlKey && pressSpace) {
+        condition.isLock = true;
+        condition.isSelectGroup = false;
+        pressSpace = false;
+        network.setSelect(condition);
+        _.each(groups, (group) => {
+          if (!group.isSelecting) {
+            group.setSelect(condition);
+          }
+        });
+      }
+      if (e.altKey && e.ctrlKey && pressAlt) {
+        pressAlt = false;
+        condition.isLock = false;
+        condition.isSelectGroup = true;
+        network.setSelect(condition);
+        _.each(groups, (group) => {
+          if (!group.isSelecting) {
+            group.setSelect(condition);
+          }
+        });
+      }
+    });
+    window.addEventListener('keyup', (e) => {
+      if (e.keyCode === 17) {
+        network.setDrag();
+        pressSpace = true;
+        pressAlt = true;
+        _.each(groups, (group) => {
+          group.setDrag();
+        });
+      }
+    });
+  }
+};

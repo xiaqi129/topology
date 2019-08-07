@@ -39,7 +39,7 @@ export class Network {
     PIXI.utils.skipHello();
     NP.enableBoundaryChecking(false);
     this.domRegex = domRegex;
-    this.topo = new Topo();
+    this.topo = new Topo(domRegex);
     this.drawer = new Drawer(domRegex, this.topo);
     this.app = this.drawer.getWhiteBoard();
     this.action = new CommonAction(this.app, this.topo, domRegex);
@@ -272,7 +272,7 @@ export class Network {
     return edgeObj;
   }
 
-  // Get all groups object
+  // Get all node groups object
   public getGroupObj(): { [key: string]: Group } {
     const groupObj = {};
     const elements = this.topo.getElements();
@@ -285,6 +285,17 @@ export class Network {
       }
     });
     return groupObj;
+  }
+
+  public getAllGroups() {
+    const groups: any[] = [];
+    const elements = this.topo.getElements();
+    _.each(elements, (element) => {
+      if (element instanceof Group || element instanceof EdgeGroup) {
+        groups.push(element);
+      }
+    });
+    return groups;
   }
 
   // Get all edge groups array
