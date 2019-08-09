@@ -269,7 +269,8 @@ export class Edge extends CommonElement {
   private analysisBrotherEdge() {
     const edgeList = this.startNode.linksArray;
     this.brotherEdges = _.filter(edgeList, (edge: Edge) => {
-      return edge.startNode === this.startNode && edge.endNode === this.endNode;
+      return ((edge.startNode === this.startNode && edge.endNode === this.endNode)
+        || (edge.startNode === this.endNode && edge.endNode === this.startNode));
     });
     _.remove(this.brotherEdges, (edge: Edge) => {
       return edge === this;

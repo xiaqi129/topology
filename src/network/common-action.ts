@@ -205,12 +205,16 @@ export class CommonAction {
     const elements = this.topo.getElements();
     const groups = this.getOtherElements();
     _.each(elements, (element) => {
-      if (element instanceof Group || element instanceof EdgeGroup) {
-        element.on('mousedown', (event: PIXI.interaction.InteractionEvent) => {
-          event.stopPropagation();
-          this.removeHighLight();
-          this.topo.setSelectedGroups(element);
-          element.selectOn();
+      if (element instanceof EdgeBundle) {
+        const childEdge = element.isExpanded ? element.children : element.bundleData;
+        _.each(childEdge, (edges: any) => {
+          edges.off('mousedown');
+          edges.on('mousedown', (event: PIXI.interaction.InteractionEvent) => {
+            event.stopPropagation();
+            this.removeHighLight();
+            this.topo.setSelectedEdge(edges);
+            edges.selectOn();
+          });
         });
       } else {
         element.off('mousedown', () => {
@@ -270,13 +274,10 @@ export class CommonAction {
         this.topo.setSelectedEdge(element);
         element.selectOn();
       }
-    } else if (element instanceof EdgeBundle) {
-      const childEdge = element.isExpanded ? element.children : element.bundleData;
-      _.each(childEdge, (edges: any) => {
-        this.removeHighLight();
-        this.topo.setSelectedEdge(edges);
-        edges.selectOn();
-      });
+    } else if (element instanceof Group || element instanceof EdgeGroup) {
+      this.removeHighLight();
+      this.topo.setSelectedGroups(element);
+      element.selectOn();
     }
   }
 

@@ -85,23 +85,32 @@ export class EdgeBundle extends CommonElement {
     const degree = 15;
     const degreeStep = 8;
     const values: number[][] = [];
-    const distance = 3;
-    let distanceStep = 6;
-    if (bundleStyle === 1) {
-      distanceStep = 1;
-    }
+    const distance = 2;
+    let distanceStep = 4;
     const isSameDirection = _.every(edges, (edg: Edge) => {
       return edg.startNode === this.startNode;
     });
-    _.each(edges, (edge: any, i: number) => {
-      if (isSameDirection) {
-        _.each([1, -1], (j) => {
-          values.push([(distance + i * distanceStep) * j, (degree + i * degreeStep) * j]);
-        });
-      } else {
-        values.push([(distance + i * distanceStep), (degree + i * degreeStep)]);
-      }
-    });
+    if (bundleStyle === 1) {
+      distanceStep = 1;
+      _.each(edges, (edge: any, i: number) => {
+        if (isSameDirection) {
+          _.each([1, -1], (j) => {
+            values.push([(distance + i * distanceStep) * j, (degree + i * degreeStep) * j]);
+          });
+        } else {
+          values.push([(distance + i * distanceStep), (degree + i * degreeStep)]);
+        }
+      });
+    } else {
+      _.each(edges, (edge: any, i: number) => {
+        const direction = i % 2 === 1 ? 1 : -1;
+        if (edge.startNode === this.startNode) {
+          values.push([(distance + i * distanceStep) * direction, (degree + i * degreeStep) * direction]);
+        } else {
+          values.push([-(distance + i * distanceStep) * direction, (degree + i * degreeStep) * direction]);
+        }
+      });
+    }
     let old = 0;
     _.each(this.children, (edge, i) => {
       if (edge instanceof Edge) {
@@ -146,7 +155,7 @@ export class EdgeBundle extends CommonElement {
   public setBundle(edge: Edge) {
     edge.bundleParent = this;
     if (this.toggleBundle) {
-      edge.addEventListener('mousedown', (event: PIXI.interaction.InteractionEvent) => {
+      edge.addEventListener('click', (event: PIXI.interaction.InteractionEvent) => {
         // event.stopPropagation();
         const currentTime = new Date().getTime();
         // double click

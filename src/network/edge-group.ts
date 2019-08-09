@@ -80,8 +80,7 @@ export class EdgeGroup extends CommonElement {
     if (groupLabel) {
       groupLabel.destroy();
     }
-    const graph: any = this.getChildByName('edge_group');
-    if (this.width !== 0 && content && graph) {
+    if (this.width !== 0 && content) {
       this.labelStyle = {
         fill: [
           '#0776da',
@@ -409,7 +408,9 @@ export class EdgeGroup extends CommonElement {
     this.dragging = false;
     this.selecting = false;
     this.rectangle.clear();
-    this.parent.addChild(this.rectangle);
+    if (this.parent) {
+      this.parent.addChild(this.rectangle);
+    }
   }
 
   /* set move select more nodes on group*/

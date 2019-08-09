@@ -73,7 +73,7 @@ const noData = function () {
   for (let i: number = 0, len: number = num; i < len;) {
     const srcNode = nodes[i];
     const destNode = nodes[i + 1];
-    for (let j = 0; j < 1;) {
+    for (let j = 0; j < 9;) {
       const edge = network.createEdge(srcNode, destNode);
       edge.initStyle({
         arrowColor: 0X006aad,
@@ -100,7 +100,7 @@ const noData = function () {
   // _.each(groupNodes, (node) => {
   //   group.addChildNodes(node);
   // });
-  network.setBundleExpanded(false);
+  // network.setBundleExpanded(false);
   network.syncView();
   network.setDrag();
   network.setZoom();
@@ -1054,7 +1054,7 @@ const simpleData = function () {
     });
     network.addElement(newGroup);
   });
-  network.setBundleExpanded(false);
+  // network.setBundleExpanded(false);
   network.syncView();
   network.setDrag();
   network.setClick();
@@ -1101,6 +1101,15 @@ const groupEdgeNode = function () {
         },
       },
       {
+        name: '3',
+        local_host: 'name-1',
+        remote_host: 'name-3',
+        style: {
+          lineType: 0,
+          lineFull: 0,
+        },
+      },
+      {
         name: '2',
         local_host: 'name-1',
         remote_host: 'name-3',
@@ -1110,44 +1119,35 @@ const groupEdgeNode = function () {
         },
       },
       // {
-      //   name: '3',
-      //   local_host: 'name-1',
-      //   remote_host: 'name-2',
+      //   name: '4',
+      //   local_host: 'name-3',
+      //   remote_host: 'name-1',
       //   style: {
       //     lineType: 0,
       //     lineFull: 0,
       //   },
       // },
       // {
-      //   name: '4',
+      //   name: '5',
       //   local_host: 'name-1',
-      //   remote_host: 'name-2',
+      //   remote_host: 'name-3',
       //   style: {
       //     lineType: 0,
-      //     lineFull: 0,
+      //     lineFull: 1,
       //   },
       // },
-      {
-        name: '3',
-        local_host: 'name-1',
-        remote_host: 'name-3',
-        style: {
-          lineType: 0,
-          lineFull: 1,
-        },
-      },
     ],
-    groups: [
-      {
-        name: 'nodeGroup',
-        children: ['name-1', 'name-2'],
-        style: {
-          // fillColor: 0X0984e3,
-          // lineColor: 0X0984e3,
-          lineWidth: 1,
-        },
-      },
-    ],
+    // groups: [
+    //   {
+    //     name: 'nodeGroup',
+    //     children: ['name-1', 'name-2'],
+    //     style: {
+    //       // fillColor: 0X0984e3,
+    //       // lineColor: 0X0984e3,
+    //       lineWidth: 1,
+    //     },
+    //   },
+    // ],
   };
   const devices = data.devices;
   const links = data.links;
@@ -1226,7 +1226,7 @@ const groupEdgeNode = function () {
         arrowAngle: 20,
         arrowMiddleLength: 5,
         arrowLength: 8,
-        arrowType: 0,
+        arrowType: 3,
         fillArrow: true,
         lineColor: 0X0386d2,
         lineType: link.style.lineType,
@@ -1234,16 +1234,16 @@ const groupEdgeNode = function () {
         lineWidth: 1,
         bundleStyle: 0,
       });
-      edge.setLabel(link.local_host, link.remote_host);
-      const srcMark = {
-        content: 'B',
-        color: 0X0386d2,
-      };
-      const endMark = {
-        content: 'F',
-        color: 0Xdd0d3d,
-      };
-      edge.setMark(srcMark, endMark);
+      // edge.setLabel(link.local_host, link.remote_host);
+      // const srcMark = {
+      //   content: 'B',
+      //   color: 0X0386d2,
+      // };
+      // const endMark = {
+      //   content: 'F',
+      //   color: 0Xdd0d3d,
+      // };
+      // edge.setMark(srcMark, endMark);
       network.addElement(edge);
     }
   });
@@ -1256,9 +1256,9 @@ const groupEdgeNode = function () {
 };
 
 network.callback = () => {
-  // simpleData();
+  simpleData();
   // noData();
-  edgeGroupDemo();
+  // edgeGroupDemo();
   // groupEdgeNode();
   // dataFlowDemo();
   afterDrawTopo();
@@ -1410,36 +1410,29 @@ const afterDrawTopo = function () {
     });
     const groups = network.getAllGroups();
     window.addEventListener('keydown', (e) => {
-      if (e.keyCode === 17 && !network.isSelect) {
-        condition.isLock = false;
-        condition.isSelectGroup = false;
-        network.setSelect(condition);
-        _.each(groups, (group) => {
-          if (!group.isSelecting) {
-            group.setSelect(condition);
-          }
-        });
-      }
-      if (e.keyCode === 32 && e.ctrlKey && pressSpace) {
+      const keyCode = e.keyCode || e.which || e.charCode;
+      if (e.ctrlKey && keyCode === 90 && pressSpace) {
         condition.isLock = true;
         condition.isSelectGroup = false;
         pressSpace = false;
         network.setSelect(condition);
         _.each(groups, (group) => {
-          if (!group.isSelecting) {
-            group.setSelect(condition);
-          }
+          group.setSelect(condition);
         });
-      }
-      if (e.altKey && e.ctrlKey && pressAlt) {
+      } else if (e.altKey && e.ctrlKey && pressAlt) {
         pressAlt = false;
         condition.isLock = false;
         condition.isSelectGroup = true;
         network.setSelect(condition);
         _.each(groups, (group) => {
-          if (!group.isSelecting) {
-            group.setSelect(condition);
-          }
+          group.setSelect(condition);
+        });
+      } else if (e.ctrlKey && !network.isSelect) {
+        condition.isLock = false;
+        condition.isSelectGroup = false;
+        network.setSelect(condition);
+        _.each(groups, (group) => {
+          group.setSelect(condition);
         });
       }
     });

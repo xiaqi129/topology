@@ -705,7 +705,9 @@ export class Group extends CommonElement {
     this.dragging = false;
     this.selecting = false;
     this.rectangle.clear();
-    this.parent.addChild(this.rectangle);
+    if (this.parent) {
+      this.parent.addChild(this.rectangle);
+    }
   }
 
   /* set move select more nodes on group*/

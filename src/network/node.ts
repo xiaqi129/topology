@@ -202,7 +202,7 @@ export class Node extends CommonElement {
       this.addChild(border);
     }
     this.hitArea = new PIXI.Circle(0, 0, radius / 2 + 5);
-    this.scale.set(1.5);
+    // this.scale.set(1.5);
   }
 
   public selectOff() {
@@ -217,7 +217,7 @@ export class Node extends CommonElement {
     }
     // this.removeChild(this.getChildByName('node_map-greenSVG'));
 
-    this.scale.set(1);
+    // this.scale.set(1);
   }
 
   public setTooltip(content: string, style?: any) {
