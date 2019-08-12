@@ -31,13 +31,15 @@ export class EdgeGroup extends CommonElement {
   public polygonHullOutlineName: string = _.uniqueId('hull_outline_');
   /* add to differentiate select or drag*/
   public isSelecting: boolean = false;
+  public childNodes: Node[] = [];
+  public isLock = false;
+  public substratumInfo: EdgeGroup[] = [];
   private labelStyle: any;
   private labelPosition: string = 'Center';
   // drag
   private dragging: boolean = false;
   private last: any;
   private elements: CommonElement;
-  private childNodes: Node[] = [];
   // select
   private topo: Topo;
   private rectangle = new PIXI.Graphics();
@@ -70,6 +72,7 @@ export class EdgeGroup extends CommonElement {
     this.initPolygonOutline();
     const pointsList = this.getPolygonPoints();
     this.drawPolygon(pointsList);
+    this.analyzeSubstratum();
     this.updateLabelPos();
     this.updateLabelSize();
   }
@@ -183,7 +186,9 @@ export class EdgeGroup extends CommonElement {
     this.on('mousedown', this.onDragStart, this);
     this.highLightGroup();
     this.cursor = 'pointer';
-    this.on('mousemove', this.onDragMove, this);
+    if (!this.isLock) {
+      this.on('mousemove', this.onDragMove, this);
+    }
   }
 
   public setSelect(condition?: ICondition) {
@@ -200,6 +205,17 @@ export class EdgeGroup extends CommonElement {
     this.on('mousedown', this.onSelectStart, this);
     this.on('mousemove', this.onSelectMove, this);
     this.on('mouseup', this.onSelectEnd, this);
+  }
+
+  private analyzeSubstratum() {
+    let subStratum: any = [];
+    this.substratumInfo = [];
+    _.each(this.childrenEdge, (edge: Edge) => {
+      const index = _.indexOf(edge.includeGroup, this) + 1;
+      const sliceList = _.slice(edge.includeGroup, index);
+      subStratum = _.concat(subStratum, sliceList);
+    });
+    this.substratumInfo = _.union(subStratum);
   }
 
   private getLabelPos() {

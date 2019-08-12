@@ -541,6 +541,18 @@ const edgeGroupDemo = function () {
     ],
     edgeGroups: [
       {
+        name: 'group6',
+        style: {
+          fillColor: 0xf55d54,
+          margin: 8,
+          fillOpacity: 0,
+          lineColor: 0Xfcc242,
+          lineWidth: 2,
+        },
+        children: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14'],
+        // children: ['12', '13'],
+      },
+      {
         name: 'group1',
         style: {
           fillColor: 0xf55d54,
@@ -584,18 +596,6 @@ const edgeGroupDemo = function () {
           lineWidth: 2,
         },
         children: ['4'],
-      },
-      {
-        name: 'group6',
-        style: {
-          fillColor: 0xf55d54,
-          margin: 8,
-          fillOpacity: 0,
-          lineColor: 0Xfcc242,
-          lineWidth: 2,
-        },
-        children: ['1', '4', '10', '11', '12', '13', '14'],
-        // children: ['12', '13'],
       },
       {
         name: 'group7',
@@ -1256,9 +1256,9 @@ const groupEdgeNode = function () {
 };
 
 network.callback = () => {
-  simpleData();
+  // simpleData();
   // noData();
-  // edgeGroupDemo();
+  edgeGroupDemo();
   // groupEdgeNode();
   // dataFlowDemo();
   afterDrawTopo();
