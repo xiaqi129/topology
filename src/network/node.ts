@@ -341,8 +341,8 @@ export class Node extends CommonElement {
 
   /* add and remove label mark  */
   public addLabelMark(content: string, style?: ILabelMarkStyle) {
-    if (content.length > 2) {
-      throw Error('The content length is not greater than 2');
+    if (content.length > 3) {
+      throw Error('The content length is not greater than 3');
     }
     this.removeLabelMark();
     const markContainer = new PIXI.Container();
@@ -380,7 +380,7 @@ export class Node extends CommonElement {
     }
     markBackground.clear();
     markBackground.beginFill(fillColor, alpha);
-    let radius = this.iconWidth / 2.3;
+    let radius = this.iconWidth / 3;
     markBackground.drawCircle(0, 0, radius);
     markBackground.endFill();
     if (radius <= 10) {

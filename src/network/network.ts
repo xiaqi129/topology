@@ -320,6 +320,12 @@ export class Network {
   public removeElements(element: CommonElement) {
     const elements = this.getElements();
     if (element instanceof Edge) {
+      _.remove(element.startNode.linksArray, (e: any) => {
+        return e.id === element.id;
+      });
+      _.remove(element.endNode.linksArray, (e: any) => {
+        return e.id === element.id;
+      });
       if (element.bundleParent instanceof EdgeBundle) {
         const data = !element.bundleParent.isExpanded ? element.bundleParent.bundleData : element.bundleParent.children;
         // remove bundle data or bundle children
@@ -359,7 +365,7 @@ export class Network {
       }
     }
     _.remove(elements, (elem: CommonElement) => {
-      return element === elem;
+      return element.id === elem.id;
     });
     this.syncView();
   }
@@ -660,12 +666,10 @@ export class Network {
       const bottom = wrapper.offsetTop + wrapper.offsetHeight;
       const right = wrapper.offsetLeft + wrapper.offsetWidth;
       _.each(nodes, (node: Node) => {
-        if (node.visible) {
-          const x = node.x + left;
-          const y = node.y + top;
-          if ((x < right && x > left) && (y < bottom && y > top)) {
-            inWrapperNodesList.push(node);
-          }
+        const x = node.x + left;
+        const y = node.y + top;
+        if ((x < right && x > left) && (y < bottom && y > top)) {
+          inWrapperNodesList.push(node);
         }
       });
     }
@@ -700,21 +704,6 @@ export class Network {
   }
 
   private drawNode(node: Node) {
-    if (node.icon) {
-      const defaultWidth = node.getDefaultSize().width;
-      const defaultHeight = node.getDefaultSize().height;
-      if (this.zoom <= 1.5 && this.zoom >= 0.4) {
-        node.iconWidth = NP.times(defaultWidth, this.zoom);
-        node.iconHeight = NP.times(defaultHeight, this.zoom);
-      } else if (this.zoom < 0.4) {
-        node.iconWidth = NP.times(defaultWidth, 0.4);
-        node.iconHeight = NP.times(defaultHeight, 0.4);
-      } else if (this.zoom > 1.5) {
-        node.iconWidth = NP.times(defaultWidth, 1.5);
-        node.iconHeight = NP.times(defaultHeight, 1.5);
-      }
-      node.drawSprite(node.icon);
-    }
     const border = node.getChildByName('node_border');
     if (border) {
       node.selectOn();
