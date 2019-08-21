@@ -137,24 +137,32 @@ export class Network {
         const zoom = this.zoom;
         // this.clearHighlight();
         if (e.deltaY < 0) {
-          if (zoom < 1 && zoom >= 0.1) {
+          if (zoom <= 1 && zoom > 0.1) {
             this.zoomElements(NP.plus(zoom, 0.1));
-          } else if (zoom <= 5 && zoom >= 1) {
+          } else if (zoom <= 10 && zoom > 1) {
             this.zoomElements(NP.plus(zoom, 0.2));
-          } else if (zoom < 0.1 && zoom >= 0) {
+          } else if (zoom <= 0.1 && zoom > 0.01) {
             this.zoomElements(NP.plus(zoom, 0.01));
+          } else if (zoom <= 0.01 && zoom > 0.001) {
+            this.zoomElements(NP.plus(zoom, 0.001));
+          } else if (zoom <= 0.001 && zoom >= 0.0001) {
+            this.zoomElements(NP.plus(zoom, 0.0001));
           }
         } else {
-          if (zoom <= 1 && zoom > 0.11) {
+          if (zoom <= 10 && zoom > 1) {
+            this.zoomElements(NP.minus(zoom, 0.2));
+          } else if (zoom > 10) {
+            this.zoomElements(NP.minus(zoom, 0.2));
+          } else if (zoom <= 1 && zoom > 0.11) {
             this.zoomElements(NP.minus(zoom, 0.1));
-          } else if (zoom <= 5 && zoom >= 1) {
-            this.zoomElements(NP.minus(zoom, 0.2));
-          } else if (zoom <= 0.11 && zoom >= 0.02) {
+          } else if (zoom <= 0.11 && zoom > 0.011) {
             this.zoomElements(NP.minus(zoom, 0.01));
-          } else if (zoom > 5) {
-            this.zoomElements(NP.minus(zoom, 0.2));
-          } else if (zoom < 0.02 && zoom > 0.01) {
-            this.zoomElements(0.01);
+          } else if (zoom <= 0.011 && zoom > 0.0011) {
+            this.zoomElements(NP.minus(zoom, 0.001));
+          } else if (zoom <= 0.0011 && zoom > 0.0002) {
+            this.zoomElements(NP.minus(zoom, 0.0001));
+          } else if (zoom <= 0.0002 && zoom > 0) {
+            this.zoomElements(0.0001);
           }
         }
         const scale = NP.divide(this.zoom, zoom);
