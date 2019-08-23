@@ -233,8 +233,7 @@ export class Node extends CommonElement {
       _.extend(this.labelStyle, style);
     }
     const oldLabel = this.getChildByName('node_label');
-    const sprite: any = this.getChildByName('node_sprite') ?
-      this.getChildByName('node_sprite') : this.getChildByName('node_graph');
+    const sprite: any = this.getChildByName('node_sprite');
     if (oldLabel) {
       (oldLabel as any).setText(content);
       this.labelContent = (oldLabel as any).text;
@@ -242,6 +241,8 @@ export class Node extends CommonElement {
       const label = new Label(content, this.labelStyle);
       label.name = 'node_label';
       if (sprite) {
+        label.anchor.set(0.5, -0.5);
+      } else {
         label.anchor.set(0.5, 0.5);
       }
       this.addChild(label);

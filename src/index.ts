@@ -64,10 +64,6 @@ const noData = function () {
     network.addElement(node);
     node.x = Math.random() * 800;
     node.y = Math.random() * 500;
-    node.addLabelMark('R', {
-      fillColor: 0Xf00f00,
-      alpha: 0.3,
-    });
   }
   const nodes = network.getNodes();
   for (let i: number = 0, len: number = num; i < len;) {
@@ -110,18 +106,20 @@ const noData = function () {
     i += 2;
   }
   // const group = network.createGroup();
-  // network.addElement(group);
-
-  // const groupNodes = _.slice(_.shuffle(_.dropRight(nodes, (num / 2) + 1)), 0, 300);
-  // _.each(groupNodes, (node) => {
+  // _.each(nodes, (node) => {
   //   group.addChildNodes(node);
   // });
-  // network.setBundleExpanded(false);
+  // network.addElement(group);
+  // group.name = '1';
+  // group.initStyle({
+  //   fillOpacity: 0.5,
+  //   lineColor: 0Xb0bdbf,
+  // });
   network.syncView();
   network.setDrag();
-  network.setZoom();
   network.setClick();
-  network.moveCenter();
+  network.setZoom();
+  network.moveCenter(true);
 };
 // tslint:disable-next-line:only-arrow-functions
 const dataFlowDemo = function () {
@@ -624,6 +622,39 @@ const edgeGroupDemo = function () {
         },
         children: ['6'],
       },
+      {
+        name: 'group8',
+        style: {
+          fillColor: 0xf55d54,
+          margin: 8,
+          fillOpacity: 0,
+          lineColor: 0Xfcc242,
+          lineWidth: 2,
+        },
+        children: ['1', '2', '3'],
+      },
+      {
+        name: 'group9',
+        style: {
+          fillColor: 0xf55d54,
+          margin: 8,
+          fillOpacity: 0,
+          lineColor: 0Xfcc242,
+          lineWidth: 2,
+        },
+        children: ['1', '2', '3'],
+      },
+      {
+        name: 'group10',
+        style: {
+          fillColor: 0xf55d54,
+          margin: 8,
+          fillOpacity: 0,
+          lineColor: 0Xfcc242,
+          lineWidth: 2,
+        },
+        children: ['8', '9', '10'],
+      },
     ],
     groups: [
       {
@@ -737,8 +768,6 @@ const simpleData = function () {
   const links = topoData.links;
   const groups = topoData.groups;
   const groupsList = keySort(groups);
-  const labelArray: any = [];
-  const anchorArray: any = [];
   // create Node
   _.each(devices, (device: any) => {
     const client = device.clients.User_Mark;
@@ -805,22 +834,6 @@ const simpleData = function () {
       node.x = device.location.x;
       node.y = device.location.y;
       const label = node.setLabel(`${device.name}`, nodeLabelStyle);
-      // const sprite: any = node.getChildByName('node_sprite');
-      // const radius = sprite.width > sprite.height ? sprite.width : sprite.height;
-      // if (label && sprite) {
-      //   labelArray.push({
-      //     x: node.x + label.x,
-      //     y: node.y + label.y,
-      //     name: label.text,
-      //     width: label.width,
-      //     height: label.height,
-      //   });
-      //   anchorArray.push({
-      //     x: node.x,
-      //     y: node.y,
-      //     r: radius,
-      //   });
-      // }
       node.setTooltip(tooltipContent, commonStyles);
       node.on('rightclick', (event: any) => {
         network.menu.setMenuItems([
@@ -844,7 +857,6 @@ const simpleData = function () {
             });
             group.on('rightclick', (groupevent: any) => {
               network.menu.setMenuItems([
-                // { label: 'Aggregated as a group', id: '0' },
                 { label: 'Disaggregate selected group', id: '0' },
               ]);
               network.menu.menuOnAction = (groupid) => {
@@ -882,65 +894,10 @@ const simpleData = function () {
         network.menu.setClass('popMenu');
         network.menu.showMenu(event);
       });
-      // let dragging: boolean = false;
-      // let data: any = null;
-      // let parent: any = null;
-      // let last: any = null;
-      // let mark: PIXI.Sprite | undefined;
-      // node.on('mousedown', (event: any) => {
-      //   if (network.getSelectedNodes().length === 0) {
-      //     mark = node.addNodeMark('map-greenSVG', 'bottom-left');
-      //     mark.on('mousedown', (e: any) => {
-      //       parent = node.parent.toLocal(e.data.global);
-      //       node.off('mousemove');
-      //       dragging = true;
-      //       data = e.data;
-      //       last = { parents: parent, x: e.data.global.x, y: e.data.global.y };
-      //     });
-      //     mark.on('mousemove', (e: any) => {
-      //       if (dragging) {
-      //         const newPosition = data.getLocalPosition(node.parent);
-      //         const distX = e.data.global.x;
-      //         const distY = e.data.global.y;
-      //         network.createArrowLine(parent, newPosition);
-      //         last = { parents: newPosition, x: distX, y: distY };
-      //       }
-      //     });
-      //     document.addEventListener('mouseup', () => {
-      //       dragging = false;
-      //       data = null;
-      //       last = null;
-      //       node.on('mousemove', node.onDragMove);
-      //     });
-      //   }
-      // });
     }
   });
-  // const wrapper = document.getElementById('network');
-  // console.log(labelArray);
-  // labeler.label(labelArray);
-  // labeler.anchor(anchorArray);
-  // if (wrapper) {
-  //   labeler.width(wrapper.clientWidth);
-  //   labeler.height(wrapper.clientHeight);
-  // }
-  // labeler.start(1000);
-  // console.log(labeler.start(1000));
   // create Links
   const nodes = network.getNodeObj();
-  // const edgeLabel = {
-  //   fill: [
-  //     'red',
-  //     '#be1432',
-  //   ],
-  //   fontFamily: 'Times New Roman',
-  //   fontSize: 12,
-  //   fontWeight: 'bold',
-  //   letterSpacing: 1,
-  //   lineJoin: 'bevel',
-  //   stroke: '#800040',
-  //   strokeThickness: 1,
-  // };
   _.each(links, (link) => {
     const srcNodeName = link.local_host;
     const destNodeName = link.remote_host;
@@ -982,7 +939,7 @@ const simpleData = function () {
         lineType: 0,
         lineFull: 0,
         lineWidth: 1,
-        bundleStyle: 0,
+        // bundleStyle: 0,
       });
       edge.setTooltip(linkTooltipContent, commonStyles);
       edge.on('rightclick', (event: any) => {
@@ -1030,6 +987,7 @@ const simpleData = function () {
       fillColor: rgb2hex(bgColor),
       lineColor: 0Xb0bdbf,
     });
+    newGroup.setToggleExpanded(true);
     _.each(children, (child) => {
       const node = _.get(nodes, child);
       if (node) {
@@ -1042,7 +1000,6 @@ const simpleData = function () {
       fontSize: 12,
       fill: '0x0386d2',
     });
-    newGroup.setToggleExpanded(true);
     newGroup.on('rightclick', (event: any) => {
       network.menu.setMenuItems([
         { label: 'Disaggregate selected group', id: '0' },

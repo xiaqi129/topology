@@ -139,8 +139,10 @@ export class Network {
         if (e.deltaY < 0) {
           if (zoom <= 1 && zoom > 0.1) {
             this.zoomElements(NP.plus(zoom, 0.1));
-          } else if (zoom <= 10 && zoom > 1) {
+          } else if (zoom <= 2 && zoom > 1) {
             this.zoomElements(NP.plus(zoom, 0.2));
+          } else if (zoom > 2) {
+            this.zoomElements(NP.plus(zoom, 1));
           } else if (zoom <= 0.1 && zoom > 0.01) {
             this.zoomElements(NP.plus(zoom, 0.01));
           } else if (zoom <= 0.01 && zoom > 0.001) {
@@ -149,9 +151,9 @@ export class Network {
             this.zoomElements(NP.plus(zoom, 0.0001));
           }
         } else {
-          if (zoom <= 10 && zoom > 1) {
-            this.zoomElements(NP.minus(zoom, 0.2));
-          } else if (zoom > 10) {
+          if (zoom > 2) {
+            this.zoomElements(NP.minus(zoom, 1));
+          } else if (zoom <= 2 && zoom > 1) {
             this.zoomElements(NP.minus(zoom, 0.2));
           } else if (zoom <= 1 && zoom > 0.11) {
             this.zoomElements(NP.minus(zoom, 0.1));
@@ -360,20 +362,26 @@ export class Network {
       element.setStyle({
         lineColor: element.defaultColor,
       });
-      if (element.includeGroup) {
+      if (element.includeGroup.length > 0) {
         _.each(element.includeGroup, (edgeGroup: EdgeGroup) => {
           edgeGroup.removeChildEdge(element);
         });
       }
     } else if (element instanceof Node) {
-      if (element.includedGroups) {
+      if (element.includedGroups.length > 0) {
         _.each(element.includedGroups, (group: Group) => {
           group.removeChildNode(element);
         });
       }
+      const nodeLinks = this.getNodeLinks(element);
+      _.each(nodeLinks, (edge: Edge) => {
+        this.removeElements(edge);
+      });
     }
     _.remove(elements, (elem: CommonElement) => {
-      return element.id === elem.id;
+      if (element) {
+        return element.id === elem.id;
+      }
     });
     this.syncView();
   }
@@ -693,6 +701,14 @@ export class Network {
       node.x = node.x + moveX;
       node.y = node.y + moveY;
     });
+  }
+
+  private getNodeLinks(node: Node) {
+    const edgesArray = this.getAllEdges();
+    const nodeLinks = _.filter(edgesArray, (edge: Edge) => {
+      return edge.startNode.id === node.id || edge.endNode.id === node.id;
+    });
+    return nodeLinks;
   }
 
   private getNetworkSize() {

@@ -119,9 +119,6 @@ export class Group extends CommonElement {
       }
     }
     this.analyzeSubstratum();
-    if (this.toggleExpanded) {
-      this.toggleGroupExpand();
-    }
     this.sortGraphicsIndex();
     this.updateLabelPos();
     this.updateLabelSize();
@@ -132,9 +129,8 @@ export class Group extends CommonElement {
     this.position.set(0, 0);
     this.childrenNode.push(element);
     this.emptyObj = undefined;
-    this.edgeArray = _.difference(this.filterEdge(), this.filterInsideEdge());
-    if (this.childrenNode) {
-      this.draw();
+    if (this.toggleExpanded) {
+      this.edgeArray = _.difference(this.filterEdge(), this.filterInsideEdge());
     }
   }
 
@@ -149,6 +145,9 @@ export class Group extends CommonElement {
 
   public setToggleExpanded(expanded: boolean) {
     this.toggleExpanded = expanded;
+    if (this.toggleExpanded) {
+      this.toggleGroupExpand();
+    }
   }
 
   // Set Group Label
@@ -300,7 +299,6 @@ export class Group extends CommonElement {
     this.off('mousemove');
     this.off('mouseup');
     this.on('mousedown', this.onDragStart, this);
-    this.highLightGroup();
     this.cursor = 'pointer';
     if (!this.isLock) {
       this.on('mousemove', this.onDragMove, this);
@@ -313,7 +311,6 @@ export class Group extends CommonElement {
     this.off('mousemove');
     this.off('mouseup');
     this.cursor = 'crosshair';
-    this.highLightGroup();
     if (condition) {
       this.selectLockNodes = condition.isLock;
       this.isSelectGroup = condition.isSelectGroup;
@@ -324,8 +321,7 @@ export class Group extends CommonElement {
   }
 
   private toggleGroupExpand() {
-    const graph = this.getChildByName(this.polygonHullOutlineName);
-    graph.on('click', () => {
+    this.on('click', (event: any) => {
       const currentTime = new Date().getTime();
       if (this.childrenNode[0]) {
         const includeGroups = this.childrenNode[0].getIncluedGroup();
@@ -384,17 +380,23 @@ export class Group extends CommonElement {
     if (this.intersection()[0].length === 0) {
       if (isBundle) {
         this.isExpanded = !this.isExpanded;
-        this.changeEdgeResource();
-        this.toggleChildNodesVisible(this.isExpanded);
         if (!this.isExpanded) {
           this.removeEdgeLabel();
         } else {
           this.addEdgeLabel();
         }
+        this.changeEdgeResource();
+        this.toggleChildNodesVisible(this.isExpanded);
         this.toggleShowEdges(this.isExpanded);
         this.redrawGroup(this.isExpanded);
       }
     }
+    _.each(this.getAllGroup(), (group) => {
+      group.draw();
+    });
+    _.each(this.edgeArray, (edge) => {
+      edge.draw();
+    });
   }
 
   private getExpandedVisibleNodes() {
@@ -656,6 +658,8 @@ export class Group extends CommonElement {
       this.dragging = true;
       this.selecting = false;
       this.last = { parents: parent };
+      this.topo.setSelectedGroups(this);
+      this.selectOn();
     }
   }
 
@@ -712,7 +716,7 @@ export class Group extends CommonElement {
 
   /* set move select more nodes on group*/
   private onSelectStart(event: any) {
-    // event.stopPropagation();
+    event.stopPropagation();
     this.removeHighLight();
     const parent = this.parent.toLocal(event.data.global);
     this.dragging = false;
@@ -791,15 +795,6 @@ export class Group extends CommonElement {
         this.topo.setSelectedGroups(group);
       });
     }
-  }
-
-  private highLightGroup() {
-    this.on('mousedown', (event: PIXI.interaction.InteractionEvent) => {
-      event.stopPropagation();
-      this.removeHighLight();
-      this.topo.setSelectedGroups(this);
-      this.selectOn();
-    });
   }
 
   private removeHighLight() {
@@ -990,7 +985,6 @@ export class Group extends CommonElement {
       default:
         this.drawPolygonOutline(graph, vertexPointsNumber);
     }
-    // console.log(graph);
   }
 
   private toggleShowEdges(visible: boolean) {

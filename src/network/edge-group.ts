@@ -62,9 +62,6 @@ export class EdgeGroup extends CommonElement {
     this.childrenEdge.push(edge);
     this.childrenEdge = _.uniq(this.childrenEdge);
     edge.setIncluedGroup(this);
-    if (this.childrenEdge) {
-      this.draw();
-    }
   }
 
   public draw(): void {
@@ -184,7 +181,6 @@ export class EdgeGroup extends CommonElement {
     this.off('mousemove');
     this.off('mouseup');
     this.on('mousedown', this.onDragStart, this);
-    this.highLightGroup();
     this.cursor = 'pointer';
     if (!this.isLock) {
       this.on('mousemove', this.onDragMove, this);
@@ -197,7 +193,6 @@ export class EdgeGroup extends CommonElement {
     this.off('mousemove');
     this.off('mouseup');
     this.cursor = 'crosshair';
-    this.highLightGroup();
     if (condition) {
       this.selectLockNodes = condition.isLock;
       this.isSelectGroup = condition.isSelectGroup;
@@ -382,6 +377,8 @@ export class EdgeGroup extends CommonElement {
       this.dragging = true;
       this.selecting = false;
       this.last = { parents: parent };
+      this.topo.setSelectedGroups(this);
+      this.selectOn();
     }
   }
 

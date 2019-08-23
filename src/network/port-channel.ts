@@ -8,7 +8,7 @@
 import * as _ from 'lodash';
 import { CommonElement } from './common-element';
 
-export class Tag extends CommonElement {
+export class PortChannel extends CommonElement {
   public backgroundShape: PIXI.Graphics;
   constructor() {
     super();

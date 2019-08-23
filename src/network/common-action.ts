@@ -109,11 +109,6 @@ export class CommonAction {
     this.cleanGroup();
   }
 
-  public clearNodeAndLineHighlight() {
-    this.cleanEdge();
-    this.cleanNode();
-  }
-
   public drag() {
     this.container.on('mousedown', (event: any) => {
       this.onDragStart(event);
@@ -127,7 +122,6 @@ export class CommonAction {
   public onDragStart(event: PIXI.interaction.InteractionEvent) {
     const parent = this.container.parent.toLocal(event.data.global);
     this.removeHighLight();
-    this.cleanGroup();
     this.container.cursor = 'move';
     this.dragging = true;
     this.data = event.data;
@@ -203,7 +197,6 @@ export class CommonAction {
 
   public setClick() {
     const elements = this.topo.getElements();
-    const groups = this.getOtherElements();
     _.each(elements, (element) => {
       if (element instanceof EdgeBundle) {
         const childEdge = element.isExpanded ? element.children : element.bundleData;
@@ -225,11 +218,6 @@ export class CommonAction {
           this.clickEvent(element);
         });
       }
-    });
-    _.each(groups, (group) => {
-      group.on('click', (event: PIXI.interaction.InteractionEvent) => {
-        this.clearNodeAndLineHighlight();
-      });
     });
   }
 
@@ -269,15 +257,15 @@ export class CommonAction {
         this.setSelectNodes(element);
       }
     } else if (element instanceof Edge) {
-      if (this.getSelectNodes().length < 1) {
-        this.removeHighLight();
-        this.topo.setSelectedEdge(element);
-        element.selectOn();
-      }
+      this.removeHighLight();
+      this.topo.setSelectedEdge(element);
+      element.selectOn();
     } else if (element instanceof Group || element instanceof EdgeGroup) {
       this.removeHighLight();
       this.topo.setSelectedGroups(element);
       element.selectOn();
+    } else if (element instanceof DataFlow) {
+      this.removeHighLight();
     }
   }
 
