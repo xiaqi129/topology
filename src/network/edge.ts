@@ -141,8 +141,6 @@ export class Edge extends CommonElement {
       this.labelContent.push(srcContent);
       this.labelContent.push(endContent);
       this.labelContent = _.uniq(this.labelContent);
-      srcLabel.setPosition(0);
-      endLabel.setPosition(0);
       srcLabel.name = 'edge_srclabel';
       endLabel.name = 'edge_endlabel';
       this.setLabelPosition(srcLabel, endLabel);

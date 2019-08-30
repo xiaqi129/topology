@@ -38,10 +38,10 @@ export class Node extends CommonElement {
   public tooltip: Tooltip;
   public isLock: boolean = false;
   public clients: {} = {};
+  public labelContent: string = '';
   public dataFlowArray: DataFlow[] = [];
   private defaultWidth: number = 20;
   private defaultHeight: number = 20;
-  private labelContent: string = '';
   private data: any = null;
   private elements: Edge | CommonElement[];
   private selectedNodes: any[] = [];

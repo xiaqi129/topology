@@ -1104,22 +1104,22 @@ const groupEdgeNode = function () {
       },
       {
         name: '3',
-        local_host: 'name-1',
-        remote_host: 'name-3',
+        local_host: 'name-3',
+        remote_host: 'name-1',
         style: {
           lineType: 0,
           lineFull: 0,
         },
       },
-      {
-        name: '2',
-        local_host: 'name-1',
-        remote_host: 'name-3',
-        style: {
-          lineType: 0,
-          lineFull: 1,
-        },
-      },
+      // {
+      //   name: '2',
+      //   local_host: 'name-1',
+      //   remote_host: 'name-3',
+      //   style: {
+      //     lineType: 0,
+      //     lineFull: 1,
+      //   },
+      // },
       // {
       //   name: '4',
       //   local_host: 'name-3',
@@ -1160,6 +1160,9 @@ const groupEdgeNode = function () {
     node.x = device.location.x;
     node.y = device.location.y;
     network.addElement(node);
+    if (node.name) {
+      node.setLabel(node.name);
+    }
   });
   const nodes = network.getNodeObj();
   // _.each(groups, (g) => {
@@ -1227,16 +1230,17 @@ const groupEdgeNode = function () {
         arrowColor: 0X006aad,
         arrowAngle: 20,
         arrowMiddleLength: 5,
-        arrowLength: 8,
-        arrowType: 3,
+        arrowLength: 10,
+        arrowType: 0,
         fillArrow: true,
         lineColor: 0X0386d2,
         lineType: link.style.lineType,
         lineFull: 0,
         lineWidth: 1,
         bundleStyle: 0,
+        lineDistance: 0,
       });
-      // edge.setLabel(link.local_host, link.remote_host);
+      edge.setLabel(link.local_host, link.remote_host);
       // const srcMark = {
       //   content: 'B',
       //   color: 0X0386d2,
@@ -1260,8 +1264,8 @@ const groupEdgeNode = function () {
 network.callback = () => {
   // simpleData();
   // noData();
-  edgeGroupDemo();
-  // groupEdgeNode();
+  // edgeGroupDemo();
+  groupEdgeNode();
   // dataFlowDemo();
   afterDrawTopo();
 };
@@ -1435,9 +1439,9 @@ const afterDrawTopo = function () {
       isLock: false,
       isSelectGroup: false,
     };
-    body.addEventListener('wheel', () => {
-      network.toggleLabel(1, 2);
-    });
+    // body.addEventListener('wheel', () => {
+    //   network.toggleLabel(1, 2);
+    // });
     const groups = network.getAllGroups();
     window.addEventListener('keydown', (e) => {
       const keyCode = e.keyCode || e.which || e.charCode;
