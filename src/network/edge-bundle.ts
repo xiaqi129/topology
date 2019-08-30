@@ -17,6 +17,7 @@ export class EdgeBundle extends CommonElement {
   public toggleBundle: boolean = true;
   public type: string = 'EdgeBundle';
   public bundleData: any[] = [];
+  public afterBundle: Edge;
   private bundleID: string = '';
   private lastClickTime: number = 0;
   private startNode: Node;
@@ -24,7 +25,6 @@ export class EdgeBundle extends CommonElement {
   private style: any;
   private defaultColor: number;
   private defaultWidth: number;
-  private afterBundle: Edge;
 
   constructor(edge: Edge) {
     super();

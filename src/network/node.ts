@@ -10,6 +10,7 @@ import { CommonElement } from './common-element';
 import { DataFlow } from './data-flow';
 import { Edge } from './edge';
 import { EdgeBundle } from './edge-bundle';
+import { EdgeGroup } from './edge-group';
 import { Group } from './group';
 import { Label } from './label';
 import { Tooltip } from './tooltip';
@@ -476,21 +477,44 @@ export class Node extends CommonElement {
       const isInSelect = _.find(this.selectedNodes, (node) => {
         return node === this;
       });
+      let edgeGroupList: EdgeGroup[] = [];
       if (this.selectedNodes.length > 1 && isInSelect
         && this.last) {
         const distX = event.data.global.x;
         const distY = event.data.global.y;
-        _.each(this.selectedNodes, (node) => {
+        let groups: Group[] = [];
+        let edges: Edge[] = [];
+        let dataFlows: DataFlow[] = [];
+        _.each(this.selectedNodes, (node: Node) => {
           node.position.x += (newPosition.x - this.last.parents.x);
           node.position.y += (newPosition.y - this.last.parents.y);
+          edges = edges.concat(node.linksArray);
+          groups = groups.concat(node.includedGroups);
+          dataFlows = dataFlows.concat(node.dataFlowArray);
         });
         this.last = { parents: newPosition, x: distX, y: distY };
-        this.redrawEdge();
+        _.each(_.uniq(edges), (edge) => {
+          edge.draw();
+          edgeGroupList = edgeGroupList.concat(edge.includeGroup);
+        });
+        _.each(_.uniq(groups), (group) => {
+          group.draw();
+        });
+        _.each(_.uniq(edgeGroupList), (edgeGroup) => {
+          edgeGroup.draw();
+        });
+        _.each(_.uniq(dataFlows), (dataFlow) => {
+          dataFlow.draw();
+        });
       } else {
         this.position.x = newPosition.x;
         this.position.y = newPosition.y;
         _.each(this.linksArray, (edge) => {
+          edgeGroupList = edgeGroupList.concat(edge.includeGroup);
           edge.draw();
+        });
+        _.each(_.uniq(edgeGroupList), (edgeGroup: EdgeGroup) => {
+          edgeGroup.draw();
         });
         _.each(this.includedGroups, (group) => {
           group.draw();
@@ -500,19 +524,6 @@ export class Node extends CommonElement {
         });
       }
     }
-  }
-
-  private redrawEdge() {
-    _.each(this.elements, (element: any) => {
-      // redraw elements
-      if (element instanceof EdgeBundle) {
-        _.each(element.children, (edge: any) => {
-          edge.draw();
-        });
-      } else if (!(element instanceof Node)) {
-        element.draw();
-      }
-    });
   }
 
 }

@@ -622,25 +622,16 @@ export class Network {
 
   // basic reDraw elements on canvas
   public reDraw() {
-    const nodes = this.getNodeObj();
-    const edgeObj: any = this.getEdgeObj();
-    const groupObj = this.getGroupObj();
-    const edgeGroups = this.getEdgeGroup();
-    const dataFlowList = this.getDataFlow();
-    _.each(nodes, (node: Node) => {
-      this.drawNode(node);
+    let elements = this.getElements();
+    elements = _.filter(elements, (element: CommonElement) => {
+      return !(element instanceof Node);
     });
-    _.each(edgeObj, (edge: Edge) => {
-      edge.draw();
+    const objOrder = [Node, Edge, EdgeBundle, Group, EdgeGroup, DataFlow];
+    elements.sort((a: any, b: any) => {
+      return _.indexOf(objOrder, a.constructor) - _.indexOf(objOrder, b.constructor);
     });
-    _.each(groupObj, (group: Group) => {
-      group.draw();
-    });
-    _.each(edgeGroups, (edgeGroup: EdgeGroup) => {
-      edgeGroup.draw();
-    });
-    _.each(dataFlowList, (dataFlow: DataFlow) => {
-      dataFlow.draw();
+    _.each(elements, (element: CommonElement) => {
+      element.draw();
     });
   }
 

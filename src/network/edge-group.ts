@@ -33,7 +33,6 @@ export class EdgeGroup extends CommonElement {
   public isSelecting: boolean = false;
   public childNodes: Node[] = [];
   public isLock = false;
-  public substratumInfo: EdgeGroup[] = [];
   private labelStyle: any;
   private labelPosition: string = 'Center';
   // drag
@@ -59,9 +58,15 @@ export class EdgeGroup extends CommonElement {
   }
 
   public addChildEdges(edge: Edge) {
-    this.childrenEdge.push(edge);
-    this.childrenEdge = _.uniq(this.childrenEdge);
-    edge.setIncluedGroup(this);
+    if (_.indexOf(this.childrenEdge, edge) < 0) {
+      this.childrenEdge.push(edge);
+      if (edge.parent instanceof EdgeBundle) {
+        if (_.indexOf(edge.parent.afterBundle.includeGroup, this) < 0) {
+          edge.parent.afterBundle.setIncluedGroup(this);
+        }
+      }
+      edge.setIncluedGroup(this);
+    }
   }
 
   public draw(): void {
@@ -69,7 +74,6 @@ export class EdgeGroup extends CommonElement {
     this.initPolygonOutline();
     const pointsList = this.getPolygonPoints();
     this.drawPolygon(pointsList);
-    this.analyzeSubstratum();
     this.updateLabelPos();
     this.updateLabelSize();
   }
@@ -119,7 +123,7 @@ export class EdgeGroup extends CommonElement {
 
   public setLabelText(content: string) {
     const label: any = this.getChildByName('group_label');
-    const graph: any = this.getChildByName('edge_group');
+    const graph = this.polygon;
     if (label && graph) {
       label.setText(content);
       this.labelContent = content;
@@ -202,20 +206,9 @@ export class EdgeGroup extends CommonElement {
     this.on('mouseup', this.onSelectEnd, this);
   }
 
-  private analyzeSubstratum() {
-    let subStratum: any = [];
-    this.substratumInfo = [];
-    _.each(this.childrenEdge, (edge: Edge) => {
-      const index = _.indexOf(edge.includeGroup, this) + 1;
-      const sliceList = _.slice(edge.includeGroup, index);
-      subStratum = _.concat(subStratum, sliceList);
-    });
-    this.substratumInfo = _.union(subStratum);
-  }
-
   private getLabelPos() {
     let height = 0;
-    const graph: any = this.getChildByName('edge_group');
+    const graph = this.polygon;
     if (graph) {
       height = graph.height;
     }
@@ -265,7 +258,7 @@ export class EdgeGroup extends CommonElement {
 
   private updateLabelSize() {
     const label: any = this.getChildByName('group_label');
-    const graph: any = this.getChildByName('edge_group');
+    const graph = this.polygon;
     const nodeWidth = this.defaultStyle.width;
     if (label && graph) {
       if (this.width !== 0) {
@@ -385,28 +378,32 @@ export class EdgeGroup extends CommonElement {
   private onDragMove(event: any) {
     if (this.dragging) {
       const newPosition = this.parent.toLocal(event.data.global);
-      const edges = this.getChildEdges();
-      const allEdgeGroups = this.getEdgeGroup();
-      const nodesGroup = this.getGroups();
+      let edges: Edge[] = [];
+      let nodesGroup: Group[] = [];
+      let edgeGroups: EdgeGroup[] = [];
       if (this.childrenEdge.length > 0) {
         _.each(this.childNodes, (node: Node) => {
           if (!node.isLock) {
             node.position.x += newPosition.x - this.last.parents.x;
             node.position.y += newPosition.y - this.last.parents.y;
+            edges = edges.concat(node.linksArray);
+            nodesGroup = nodesGroup.concat(node.includedGroups);
           }
         });
-        _.each(edges, (edge: Edge) => {
+        _.each(_.uniq(edges), (edge) => {
+          edgeGroups = edgeGroups.concat(edge.includeGroup);
+        });
+        _.each(_.uniq(edges), (edge: Edge) => {
           edge.draw();
         });
-        _.each(allEdgeGroups, (group) => {
+        _.each(_.uniq(nodesGroup), (group) => {
           group.draw();
         });
-        _.each(nodesGroup, (group) => {
-          group.draw();
+        _.each(_.uniq(edgeGroups), (edgeGroup) => {
+          edgeGroup.draw();
         });
       }
       this.last = { parents: newPosition };
-      this.draw();
     } else {
       this.dragging = false;
     }
@@ -508,15 +505,6 @@ export class EdgeGroup extends CommonElement {
     }
   }
 
-  private highLightGroup() {
-    this.on('mousedown', (event: PIXI.interaction.InteractionEvent) => {
-      event.stopPropagation();
-      this.removeHighLight();
-      this.topo.setSelectedGroups(this);
-      this.selectOn();
-    });
-  }
-
   private removeHighLight() {
     // clear highlight nodes
     const selectNodes = this.topo.getSelectedNodes();
@@ -538,33 +526,12 @@ export class EdgeGroup extends CommonElement {
     this.topo.removeSelectedGroups();
   }
 
-  private getEdgeGroup() {
-    const elements = this.elements;
-    const edgeGroup = _.filter(elements, (ele) => {
-      return ele instanceof EdgeGroup;
-    });
-    return edgeGroup;
-  }
-
   private getGroups() {
     const elements = this.elements;
     const edgeGroup = _.filter(elements, (ele) => {
       return ele instanceof Group;
     });
     return edgeGroup;
-  }
-
-  private getChildEdges(): Edge[] {
-    let edges: Edge[] = [];
-    _.each(this.elements, (element: CommonElement) => {
-      if (element instanceof Edge) {
-        edges.push(element);
-      } else if (element instanceof EdgeBundle) {
-        const childrenEdges = element.children as Edge[];
-        edges = edges.concat(childrenEdges);
-      }
-    });
-    return edges;
   }
 
 }

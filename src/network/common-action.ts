@@ -133,20 +133,18 @@ export class CommonAction {
       const newPosition = this.data.getLocalPosition(this.container.parent);
       const distX = event.data.global.x;
       const distY = event.data.global.y;
-      const edges = this.getChildEdges();
-      const groups = this.getOtherElements();
       const elements: any = this.topo.getElements();
+      const objOrder = [Node, Edge, EdgeBundle, Group, EdgeGroup, DataFlow];
+      elements.sort((a: any, b: any) => {
+        return _.indexOf(objOrder, a.constructor) - _.indexOf(objOrder, b.constructor);
+      });
       _.each(elements, (element: CommonElement) => {
         if (element instanceof Node) {
           element.position.x += (newPosition.x - this.last.parents.x);
           element.position.y += (newPosition.y - this.last.parents.y);
+        } else {
+          element.draw();
         }
-      });
-      _.each(groups, (group) => {
-        group.draw();
-      });
-      _.each(edges, (edge: Edge) => {
-        edge.draw();
       });
       this.last = { parents: newPosition, x: distX, y: distY };
     } else {
@@ -156,31 +154,6 @@ export class CommonAction {
 
   public onDragEnd() {
     this.container.cursor = 'default';
-  }
-
-  public getChildEdges() {
-    let edges: Edge[] = [];
-    const elements: any = this.topo.getElements();
-
-    _.each(elements, (element: CommonElement) => {
-      if (element instanceof Edge) {
-        edges.push(element);
-      }
-      if (element instanceof EdgeBundle) {
-        const childrenEdges = element.children as Edge[];
-        edges = edges.concat(childrenEdges);
-      }
-    });
-    return edges;
-  }
-
-  public getOtherElements() {
-    const elements: any = this.topo.getElements();
-    const instanceList = [Group, EdgeGroup, DataFlow];
-    const filterElements = _.filter(elements, (element: CommonElement) => {
-      return _.indexOf(instanceList, element.constructor) > -1;
-    });
-    return filterElements;
   }
 
   public moveSelect(condition?: ICondition) {

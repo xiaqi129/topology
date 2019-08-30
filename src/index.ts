@@ -55,7 +55,7 @@ const getNodeGroups = () => {
 };
 // tslint:disable-next-line:only-arrow-functions
 const noData = function () {
-  const num = 2;
+  const num = 2500;
   for (let i: number = 0, len: number = num; i < len;) {
     i += 1;
     const node = network.createNode('cisco-ASR9');
@@ -736,7 +736,7 @@ const edgeGroupDemo = function () {
       edgeGroup.addChildEdges(edge);
     });
     edgeGroup.initStyle(group.style);
-    edgeGroup.setLabel(`${group.name}`);
+    edgeGroup.setLabel(`${group.name}`, 'Below');
     edgeGroup.on('rightclick', (event: any) => {
       network.menu.setMenuItems([
         { label: 'Remove Group', id: '0' },
@@ -748,6 +748,35 @@ const edgeGroupDemo = function () {
         } else if (id === '1') {
           // tslint:disable-next-line:no-console
           console.log(edgeGroup);
+        }
+      };
+      network.menu.setClass('popMenu');
+      network.menu.showMenu(event);
+    });
+  });
+  _.each(groups, (g) => {
+    const nodeGroup = network.createGroup();
+    nodeGroup.name = g.name;
+    network.addElement(nodeGroup);
+    _.each(g.children, (child) => {
+      const node: any = _.find(nodes, (n: any) => {
+        return n.name === child;
+      });
+      nodeGroup.addChildNodes(node);
+    });
+    nodeGroup.initStyle(g.style);
+    nodeGroup.setLabel(`${g.name}`);
+    nodeGroup.on('rightclick', (event: any) => {
+      network.menu.setMenuItems([
+        { label: 'Remove Group', id: '0' },
+        { label: 'Debug', id: '1' },
+      ]);
+      network.menu.menuOnAction = (id) => {
+        if (id === '0') {
+          network.removeElements(nodeGroup);
+        } else if (id === '1') {
+          // tslint:disable-next-line:no-console
+          console.log(nodeGroup);
         }
       };
       network.menu.setClass('popMenu');
@@ -1230,8 +1259,8 @@ const groupEdgeNode = function () {
 
 network.callback = () => {
   // simpleData();
-  noData();
-  // edgeGroupDemo();
+  // noData();
+  edgeGroupDemo();
   // groupEdgeNode();
   // dataFlowDemo();
   afterDrawTopo();

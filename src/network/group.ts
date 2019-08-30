@@ -666,18 +666,19 @@ export class Group extends CommonElement {
   private onDragMove(event: any) {
     if (this.dragging) {
       const newPosition = this.parent.toLocal(event.data.global);
-      const edges = this.getChildEdges();
+      let edges: Edge[] = [];
       const edgeGroups = this.getEdgeGroups();
       const intersectionNodes = this.intersection()[0];
       const intersectionGroup = this.intersection()[1];
       if (this.childrenNode.length > 0) {
-        _.each(this.childrenNode, (element) => {
-          if (element instanceof Node) {
-            element.position.x += newPosition.x - this.last.parents.x;
-            element.position.y += newPosition.y - this.last.parents.y;
+        _.each(this.childrenNode, (node) => {
+          if (node instanceof Node) {
+            node.position.x += newPosition.x - this.last.parents.x;
+            node.position.y += newPosition.y - this.last.parents.y;
+            edges = edges.concat(node.linksArray);
           }
         });
-        _.each(edges, (edge: Edge) => {
+        _.each(_.uniq(edges), (edge: Edge) => {
           edge.draw();
         });
         _.each(edgeGroups, (edgeGroup: EdgeGroup) => {

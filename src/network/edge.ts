@@ -248,19 +248,27 @@ export class Edge extends CommonElement {
     return this.endNode;
   }
 
-  private readyLinkArray() {
+  public readyLinkArray() {
     if (this.startNode instanceof Node) {
-      this.startNode.linksArray.push(this);
+      if (_.indexOf(this.startNode.linksArray, this) < 0) {
+        this.startNode.linksArray.push(this);
+      }
     } else {
       _.each(this.startNode.childrenNode, (node: Node) => {
-        node.linksArray.push(this);
+        if (_.indexOf(node.linksArray, this) < 0) {
+          node.linksArray.push(this);
+        }
       });
     }
     if (this.endNode instanceof Node) {
-      this.endNode.linksArray.push(this);
+      if (_.indexOf(this.endNode.linksArray, this) < 0) {
+        this.endNode.linksArray.push(this);
+      }
     } else {
       _.each(this.endNode.childrenNode, (node: Node) => {
-        node.linksArray.push(this);
+        if (_.indexOf(node.linksArray, this) < 0) {
+          node.linksArray.push(this);
+        }
       });
     }
   }
@@ -903,9 +911,6 @@ export class Edge extends CommonElement {
       this.setChildIndex(endMarkLabel, this.children.length - 1);
       this.setChildIndex(endMarkBackground, this.children.length - 2);
     }
-    _.each(this.includeGroup, (edgeGroup) => {
-      edgeGroup.draw();
-    });
   }
 
   // Collision detection function
