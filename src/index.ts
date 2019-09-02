@@ -1076,18 +1076,25 @@ const groupEdgeNode = function () {
           y: 200,
         },
       },
-      // {
-      //   name: 'name-2',
-      //   location: {
-      //     x: 350,
-      //     y: 250,
-      //   },
-      // },
+      {
+        name: 'name-2',
+        location: {
+          x: 500,
+          y: 200,
+        },
+      },
       {
         name: 'name-3',
         location: {
           x: 500,
-          y: 320,
+          y: 500,
+        },
+      },
+      {
+        name: 'name-4',
+        location: {
+          x: 200,
+          y: 500,
         },
       },
 
@@ -1096,7 +1103,7 @@ const groupEdgeNode = function () {
       {
         name: '1',
         local_host: 'name-1',
-        remote_host: 'name-3',
+        remote_host: 'name-2',
         style: {
           lineType: 0,
           lineFull: 1,
@@ -1104,31 +1111,31 @@ const groupEdgeNode = function () {
       },
       {
         name: '3',
+        local_host: 'name-2',
+        remote_host: 'name-3',
+        style: {
+          lineType: 0,
+          lineFull: 0,
+        },
+      },
+      {
+        name: '2',
         local_host: 'name-3',
+        remote_host: 'name-4',
+        style: {
+          lineType: 0,
+          lineFull: 1,
+        },
+      },
+      {
+        name: '4',
+        local_host: 'name-4',
         remote_host: 'name-1',
         style: {
           lineType: 0,
           lineFull: 0,
         },
       },
-      // {
-      //   name: '2',
-      //   local_host: 'name-1',
-      //   remote_host: 'name-3',
-      //   style: {
-      //     lineType: 0,
-      //     lineFull: 1,
-      //   },
-      // },
-      // {
-      //   name: '4',
-      //   local_host: 'name-3',
-      //   remote_host: 'name-1',
-      //   style: {
-      //     lineType: 0,
-      //     lineFull: 0,
-      //   },
-      // },
       // {
       //   name: '5',
       //   local_host: 'name-1',
@@ -1202,45 +1209,48 @@ const groupEdgeNode = function () {
     const srcNode = _.get(allNodeGroups, srcNodeName);
     const destNode = _.get(allNodeGroups, destNodeName);
     if (srcNode && destNode) {
-      const edge = network.createEdge(srcNode, destNode);
-      edge.name = link.name;
-      edge.on('rightclick', (event: any) => {
-        network.menu.setMenuItems([
-          { label: 'Hide Edge', id: '0' },
-          { label: 'Remove Link', id: '1' },
-          { label: 'Print line Info', id: '2' },
-        ]);
-        network.menu.menuOnAction = (id) => {
-          if (id === '0') {
-            edge.visible = false;
-            _.each(edge.includeGroup, (edgeGroup: any) => {
-              edgeGroup.draw();
-            });
-          } else if (id === '1') {
-            network.removeElements(edge);
-          } else if (id === '2') {
-            // tslint:disable-next-line: no-console
-            console.log(edge);
-          }
-        };
-        network.menu.setClass('popMenu');
-        network.menu.showMenu(event);
-      });
-      edge.initStyle({
-        arrowColor: 0X006aad,
-        arrowAngle: 20,
-        arrowMiddleLength: 5,
-        arrowLength: 10,
-        arrowType: 0,
-        fillArrow: true,
-        lineColor: 0X0386d2,
-        lineType: link.style.lineType,
-        lineFull: 0,
-        lineWidth: 1,
-        bundleStyle: 0,
-        lineDistance: 0,
-      });
-      edge.setLabel(link.local_host, link.remote_host);
+      // const edge = network.createEdge(srcNode, destNode);
+      const edge = network.createMultipleLine(srcNode, destNode);
+      // edge.name = link.name;
+      // edge.on('rightclick', (event: any) => {
+      //   network.menu.setMenuItems([
+      //     { label: 'Hide Edge', id: '0' },
+      //     { label: 'Remove Link', id: '1' },
+      //     { label: 'Print line Info', id: '2' },
+      //   ]);
+      //   network.menu.menuOnAction = (id) => {
+      //     if (id === '0') {
+      //       edge.visible = false;
+      //       _.each(edge.includeGroup, (edgeGroup: any) => {
+      //         edgeGroup.draw();
+      //       });
+      //     } else if (id === '1') {
+      //       network.removeElements(edge);
+      //     } else if (id === '2') {
+      //       // tslint:disable-next-line: no-console
+      //       console.log(edge);
+      //     }
+      //   };
+      //   network.menu.setClass('popMenu');
+      //   network.menu.showMenu(event);
+      // });
+      // edge.initStyle({
+      //   arrowColor: 0X006aad,
+      //   arrowAngle: 20,
+      //   arrowMiddleLength: 5,
+      //   arrowLength: 10,
+      //   arrowType: 0,
+      //   fillArrow: true,
+      //   lineColor: 0X0386d2,
+      //   lineType: link.style.lineType,
+      //   lineFull: 0,
+      //   lineWidth: 1,
+      //   bundleStyle: 0,
+      //   lineDistance: 0,
+      // });
+      edge.createLeftLine(1);
+      edge.createRightLine(0.5);
+      // edge.setLabel(link.local_host, link.remote_host);
       // const srcMark = {
       //   content: 'B',
       //   color: 0X0386d2,

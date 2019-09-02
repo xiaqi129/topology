@@ -6,24 +6,8 @@
  */
 import * as _ from 'lodash';
 import { CommonElement } from './common-element';
+import { IPoint, IResultsPoints, LineCommonFunction } from './lib/line';
 import { Node } from './node';
-
-export interface IPoint {
-  x: number;
-  y: number;
-}
-
-export interface IResultsPoints {
-  sLeft: IPoint;
-  sRight: IPoint;
-  eRight: IPoint;
-  eLeft: IPoint;
-}
-
-export interface IAdjustedNodePosition {
-  srcNode: IPoint;
-  endNode: IPoint;
-}
 
 const Point = PIXI.Point;
 export class DataFlow extends CommonElement {
@@ -34,86 +18,32 @@ export class DataFlow extends CommonElement {
   private moveDistance: number = 0;
   private start: Node;
   private end: Node;
+  private lineFunction: LineCommonFunction;
   constructor(start: Node, end: Node) {
     super();
     this.start = start;
     this.end = end;
     this.background = new PIXI.Graphics();
     this.neon = new PIXI.Graphics();
-    start.dataFlowArray.push(this);
-    end.dataFlowArray.push(this);
+    this.lineFunction = new LineCommonFunction(start, end);
+    start.exceptEdgesArray.push(this);
+    end.exceptEdgesArray.push(this);
     this.gameLoop();
   }
 
   // basic draw
   public draw(): void {
     this.clearRelatedGraph();
-    const nodePos = this.adustNodePos();
+    const nodePos = this.lineFunction.adustNodePos(this.defaultStyle);
     const points = this.calcDottedEdgePoints(nodePos.srcNode, nodePos.endNode);
     this.createBackground(nodePos.srcNode, nodePos.endNode);
     this.drawImaginaryLink(points);
-  }
-
-  // adjust draw line's rectangle position
-  private adustNodePos(): IAdjustedNodePosition {
-    const style = this.defaultStyle;
-    const nodePos: IAdjustedNodePosition = {
-      srcNode: { x: 0, y: 0 },
-      endNode: { x: 0, y: 0 },
-    };
-    const startDistance = this.getDistance(this.start, style.lineDistance);
-    const endDistance = this.getDistance(this.end, style.lineDistance);
-    const srcNodePos = this.getNodePosition(this.start);
-    const endNodePos = this.getNodePosition(this.end);
-    nodePos.srcNode = this.getAdjustedLocation(srcNodePos, -1, startDistance);
-    nodePos.endNode = this.getAdjustedLocation(endNodePos, 1, endDistance);
-    return nodePos;
   }
 
   // clear data flow graph
   private clearRelatedGraph(): void {
     this.background.clear();
     this.neon.clear();
-  }
-
-  // get nodes init position
-  private getNodePosition(node: Node): IPoint {
-    const x: number = node.x;
-    const y: number = node.y;
-    return { x, y };
-  }
-
-  // get the angle which between the start and end node
-  private getAngle(): number {
-    const srcNodePos = this.getNodePosition(this.start);
-    const endNodePos = this.getNodePosition(this.end);
-    return Math.atan2(srcNodePos.x - endNodePos.x, srcNodePos.y - endNodePos.y);
-  }
-
-  /**
-   * get after adjusted the location of the node
-   * @param {IPoint} node nodes position
-   * @param {number} n direction '1' means from end node and '-1' means from start node
-   * @param {number} distanceRound need to adjust the distance
-   * @returns adjusted location
-   */
-  private getAdjustedLocation(node: IPoint, n: number, distanceRound: number): IPoint {
-    const angle = this.getAngle();
-    const location = {
-      x: node.x + n * distanceRound * Math.sin(angle),
-      y: node.y + n * distanceRound * Math.cos(angle),
-    };
-    return location;
-  }
-
-  /**
-   * get how many distances need to adjusted
-   * @param {IPoint} node nodes position
-   * @param {number} lineDistance need to adjust the distance
-   */
-  private getDistance(node: Node, lineDistance: number): number {
-    const result = node.getWidth() < node.getHeight() ? node.getWidth() : node.getHeight();
-    return result * 0.5 + lineDistance;
   }
 
   /**
@@ -178,7 +108,7 @@ export class DataFlow extends CommonElement {
    */
   private calcEdgePoints(start: IPoint, end: IPoint): IResultsPoints {
     const lineWidth = this.defaultStyle.lineWidth;
-    const angle = this.getAngle();
+    const angle = this.lineFunction.getAngle();
     const half = lineWidth * 4;
     const sX = start.x;
     const sY = start.y;
@@ -209,7 +139,7 @@ export class DataFlow extends CommonElement {
   private calcDottedEdgePoints(start: IPoint, end: IPoint): IResultsPoints[] {
     const lineWidth = this.defaultStyle.lineWidth;
     const half = lineWidth * 4;
-    const angle = this.getAngle();
+    const angle = this.lineFunction.getAngle();
     const flowLength = this.flowLength;
     const xLength = start.x - end.x;
     const yLength = start.y - end.y;
@@ -278,7 +208,7 @@ export class DataFlow extends CommonElement {
   private gameLoop(): void {
     requestAnimationFrame(this.gameLoop.bind(this));
     this.moveDistance += 1;
-    const nodePos = this.adustNodePos();
+    const nodePos = this.lineFunction.adustNodePos(this.defaultStyle);
     const points = this.calcDottedEdgePoints(nodePos.srcNode, nodePos.endNode);
     if (this.moveDistance === this.flowLength + 1) {
       this.moveDistance = -(this.flowLength + 1);
@@ -288,7 +218,7 @@ export class DataFlow extends CommonElement {
 
   // animate the data flow with move points
   private movePoints(points: IResultsPoints[]): void {
-    const angle = this.getAngle();
+    const angle = this.lineFunction.getAngle();
     const moveX = this.moveDistance * Math.sin(angle);
     const moveY = this.moveDistance * Math.cos(angle);
     const adustedPoints = _.each(points, (point: IResultsPoints) => {
@@ -309,10 +239,10 @@ export class DataFlow extends CommonElement {
    */
   private adjustedPoints(point: IResultsPoints): IResultsPoints {
     const result = point;
-    const nodePos = this.adustNodePos();
+    const nodePos = this.lineFunction.adustNodePos(this.defaultStyle);
     const lineWidth = this.defaultStyle.lineWidth;
     const half = lineWidth * 4;
-    const angle = this.getAngle();
+    const angle = this.lineFunction.getAngle();
     const sX = nodePos.srcNode.x;
     const sY = nodePos.srcNode.y;
     const eX = nodePos.endNode.x;

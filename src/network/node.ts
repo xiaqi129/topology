@@ -39,7 +39,7 @@ export class Node extends CommonElement {
   public isLock: boolean = false;
   public clients: {} = {};
   public labelContent: string = '';
-  public dataFlowArray: DataFlow[] = [];
+  public exceptEdgesArray: CommonElement[] = [];
   private defaultWidth: number = 20;
   private defaultHeight: number = 20;
   private data: any = null;
@@ -484,13 +484,13 @@ export class Node extends CommonElement {
         const distY = event.data.global.y;
         let groups: Group[] = [];
         let edges: Edge[] = [];
-        let dataFlows: DataFlow[] = [];
+        let dataFlows: CommonElement[] = [];
         _.each(this.selectedNodes, (node: Node) => {
           node.position.x += (newPosition.x - this.last.parents.x);
           node.position.y += (newPosition.y - this.last.parents.y);
           edges = edges.concat(node.linksArray);
           groups = groups.concat(node.includedGroups);
-          dataFlows = dataFlows.concat(node.dataFlowArray);
+          dataFlows = dataFlows.concat(node.exceptEdgesArray);
         });
         this.last = { parents: newPosition, x: distX, y: distY };
         _.each(_.uniq(edges), (edge) => {
@@ -519,7 +519,7 @@ export class Node extends CommonElement {
         _.each(this.includedGroups, (group) => {
           group.draw();
         });
-        _.each(this.dataFlowArray, (dataFlow) => {
+        _.each(this.exceptEdgesArray, (dataFlow) => {
           dataFlow.draw();
         });
       }

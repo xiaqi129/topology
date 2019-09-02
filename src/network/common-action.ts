@@ -13,6 +13,7 @@ import { Edge } from './edge';
 import { EdgeBundle } from './edge-bundle';
 import { EdgeGroup } from './edge-group';
 import { Group } from './group';
+import { MultipleColorLine } from './multiple-color-line';
 import { Node } from './node';
 import { ITopo } from './topo';
 
@@ -134,7 +135,7 @@ export class CommonAction {
       const distX = event.data.global.x;
       const distY = event.data.global.y;
       const elements: any = this.topo.getElements();
-      const objOrder = [Node, Edge, EdgeBundle, Group, EdgeGroup, DataFlow];
+      const objOrder = [Node, Edge, EdgeBundle, Group, EdgeGroup, DataFlow, MultipleColorLine];
       elements.sort((a: any, b: any) => {
         return _.indexOf(objOrder, a.constructor) - _.indexOf(objOrder, b.constructor);
       });
