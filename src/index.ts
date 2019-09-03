@@ -1248,8 +1248,21 @@ const groupEdgeNode = function () {
       //   bundleStyle: 0,
       //   lineDistance: 0,
       // });
-      edge.createLeftLine(1);
+      edge.createLeftLine(0.2);
       edge.createRightLine(0.5);
+      edge.setLabel('   test break word    ', 0.2, {
+        fill: 0Xef5050,
+      });
+      edge.setLabel('test', 0.5, {
+        fill: 0X20c1a1,
+      });
+      edge.setLabel('test', 0.7, {
+        fill: 0Xef5050,
+      });
+      edge.setLabel('test', 1, {
+        fill: 0X20c1a1,
+      });
+      edge.setLabel('test', 1.5);
       // edge.setLabel(link.local_host, link.remote_host);
       // const srcMark = {
       //   content: 'B',
@@ -1341,40 +1354,47 @@ const afterDrawTopo = function () {
     });
   }
   if (btnAaddEdge) {
+    let midLine = false;
     btnAaddEdge.addEventListener('click', () => {
-      const nodes = network.getNodes();
-      const newEdge = network.createEdge(nodes[0], nodes[1]);
-      newEdge.initStyle({
-        arrowColor: 0X006aad,
-        arrowAngle: 20,
-        arrowMiddleLength: 5,
-        arrowLength: 8,
-        arrowType: 3,
-        fillArrow: true,
-        lineColor: 0X0386d2,
-        lineType: 0,
-        lineFull: 0,
-        lineWidth: 1,
-        bundleStyle: 0,
+      const edges = network.getMultipleLines();
+      midLine = !midLine;
+      _.each(edges, (edge) => {
+        edge.setMidline(midLine);
+        edge.setLeftRatio(0.1);
       });
-      network.addElement(newEdge);
-      newEdge.on('rightclick', (event: any) => {
-        network.menu.setMenuItems([
-          { label: 'Print line Info', id: '2' },
-          { label: 'Remove Link', id: '3' },
-        ]);
-        network.menu.menuOnAction = (id) => {
-          if (id === '2') {
-            // tslint:disable-next-line:no-console
-            console.log(newEdge);
-          } else if (id === '3') {
-            network.removeElements(newEdge);
-          }
-        };
-        network.menu.setClass('popMenu');
-        network.menu.showMenu(event);
-      });
-      network.syncView();
+      // const nodes = network.getNodes();
+      // const newEdge = network.createEdge(nodes[0], nodes[1]);
+      // newEdge.initStyle({
+      //   arrowColor: 0X006aad,
+      //   arrowAngle: 20,
+      //   arrowMiddleLength: 5,
+      //   arrowLength: 8,
+      //   arrowType: 3,
+      //   fillArrow: true,
+      //   lineColor: 0X0386d2,
+      //   lineType: 0,
+      //   lineFull: 0,
+      //   lineWidth: 1,
+      //   bundleStyle: 0,
+      // });
+      // network.addElement(newEdge);
+      // newEdge.on('rightclick', (event: any) => {
+      //   network.menu.setMenuItems([
+      //     { label: 'Print line Info', id: '2' },
+      //     { label: 'Remove Link', id: '3' },
+      //   ]);
+      //   network.menu.menuOnAction = (id) => {
+      //     if (id === '2') {
+      //       // tslint:disable-next-line:no-console
+      //       console.log(newEdge);
+      //     } else if (id === '3') {
+      //       network.removeElements(newEdge);
+      //     }
+      //   };
+      //   network.menu.setClass('popMenu');
+      //   network.menu.showMenu(event);
+      // });
+      // network.syncView();
     });
   }
   if (searchNode) {

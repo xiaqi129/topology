@@ -4,7 +4,9 @@
  *
  * Author: gsp-dalian-ued@cisco.com
  */
+import * as _ from 'lodash';
 import { CommonElement } from './common-element';
+import { Label } from './label';
 import { IPoint, IResultsPoints, LineCommonFunction } from './lib/line';
 import { Node } from './node';
 
@@ -18,10 +20,23 @@ export interface ISimpleSideStyle {
   right: IlineStyle;
 }
 
+export interface ILabel {
+  content: string;
+  ratio: number;
+  style?: PIXI.TextStyleOptions;
+}
+
+export interface ILabelData {
+  style: object;
+  ratio: number;
+  label: Label;
+}
+
 const Point = PIXI.Point;
 export class MultipleColorLine extends CommonElement {
   public background: PIXI.Graphics;
   public type: string = 'MultipleColorLine';
+  public midLine: boolean = false;
   private leftRatio: number = 1;
   private rightRatio: number = 1;
   private start: Node;
@@ -30,6 +45,10 @@ export class MultipleColorLine extends CommonElement {
   private rightLine: PIXI.Graphics;
   private lineFunction: LineCommonFunction;
   private eachSideStyle: ISimpleSideStyle;
+  /* LABEL */
+  private labelObj: any = {};
+  private labelIdList: string[] = [];
+  private labelId: number = 0;
   constructor(start: Node, end: Node) {
     super();
     this.start = start;
@@ -40,11 +59,11 @@ export class MultipleColorLine extends CommonElement {
     this.lineFunction = new LineCommonFunction(start, end);
     this.eachSideStyle = {
       left: {
-        color: 0Xffff00,
+        color: 0Xef5050,
         opacity: 1,
       },
       right: {
-        color: 0X00ff00,
+        color: 0X20c1a1,
         opacity: 1,
       },
     };
@@ -61,6 +80,12 @@ export class MultipleColorLine extends CommonElement {
     this.createBackground(nodePos.srcNode, nodePos.endNode);
     this.drawLeftLine();
     this.drawRightLine();
+    if (this.midLine) {
+      this.drawMidline();
+    } else {
+      this.removeMidline();
+    }
+    this.addLabel();
   }
 
   /**
@@ -99,12 +124,44 @@ export class MultipleColorLine extends CommonElement {
     return this.rightLine;
   }
 
+  // Set up the ratio of the left side of the multiple color line
   public setLeftRatio(ratio: number) {
     this.leftRatio = ratio;
+    this.draw();
   }
 
+  // Set up the ratio of the right side of the multiple color line
   public setRightRatio(ratio: number) {
     this.rightRatio = ratio;
+    this.draw();
+  }
+
+  // Set up the multiple color line with or without midLine.(default is without midLine)
+  public setMidline(flag: boolean) {
+    this.midLine = flag;
+    this.draw();
+  }
+
+  public setLabel(content: string, ratio: number, style?: PIXI.TextStyleOptions) {
+    this.labelId += 1;
+    const labelId = `label_${this.labelId}`;
+    this.labelIdList.push(labelId);
+    this.labelObj[labelId] = {};
+    this.labelObj[labelId].style = {};
+    _.extend(this.labelObj[labelId].style, {
+      fontSize: 14,
+      wordWrap: true,
+      wordWrapWidth: 10,
+    });
+    if (style) {
+      _.extend(this.labelObj[labelId].style, style);
+    }
+    const label = new Label(content, this.labelObj[labelId].style);
+    label.name = labelId;
+    this.labelObj[labelId].label = label;
+    this.labelObj[labelId].ratio = ratio;
+    this.addChild(label);
+    this.draw();
   }
 
   // Clear old graphics
@@ -122,6 +179,29 @@ export class MultipleColorLine extends CommonElement {
     result.x = point.x + (centerPoint.x - point.x) * rotio;
     result.y = point.y + (centerPoint.y - point.y) * rotio;
     return result;
+  }
+
+  // Set up the multiple color line of the midline
+  private drawMidline() {
+    const nodePos = this.lineFunction.adustNodePos(this.defaultStyle);
+    const centerPoint: IPoint = this.lineFunction.getCenterPoint(nodePos.srcNode, nodePos.endNode);
+    this.removeMidline();
+    const lineWidth = this.defaultStyle.lineWidth;
+    const midLine = new PIXI.Graphics();
+    midLine.name = 'midLine';
+    midLine.lineStyle(0);
+    midLine.beginFill(0X74b9ff, 1);
+    midLine.drawCircle(centerPoint.x, centerPoint.y, lineWidth * 4);
+    midLine.endFill();
+    this.background.addChild(midLine);
+  }
+
+  // Remove the multiple color line of the midline
+  private removeMidline() {
+    const oldMidline = this.background.getChildByName('midLine');
+    if (oldMidline) {
+      this.background.removeChild(oldMidline);
+    }
   }
 
   /**
@@ -214,6 +294,38 @@ export class MultipleColorLine extends CommonElement {
     graph.lineTo(points.eLeft.x, points.eLeft.y);
     graph.endFill();
     this.background.addChild(graph);
+  }
+
+  private addLabel() {
+    _.each(this.labelObj, (data: ILabelData) => {
+      this.setLabelPosition(data.label, data.ratio);
+    });
+  }
+
+  // Set label position
+  private setLabelPosition(label: Label, ratio: number) {
+    const startDistance = this.lineFunction.getDistance(this.start, this.defaultStyle.lineDistance);
+    const srcNodePos = this.lineFunction.getNodePosition(this.start);
+    const srcNode = this.lineFunction.getAdjustedLocation(srcNodePos, -1, startDistance);
+    const point = this.getOneSideLinkPoints(srcNode, ratio);
+    const nodePos = this.lineFunction.adustNodePos(this.defaultStyle);
+    label.anchor.set(0.5, 0.5);
+    const length = this.deleteSpace(label.getText()).split(/\s+/).length;
+    const angle = this.lineFunction.getAngle();
+    const height = Number(label.style.fontSize) + 8 * (length - 1);
+    label.x = point.x - Math.cos(angle) * height;
+    label.y = point.y + Math.sin(angle) * height;
+    if (this.start.x > this.end.x) {
+      label.rotation = Math.atan2(nodePos.srcNode.y - nodePos.endNode.y, nodePos.srcNode.x - nodePos.endNode.x);
+    } else {
+      label.rotation = Math.atan2(nodePos.endNode.y - nodePos.srcNode.y, nodePos.endNode.x - nodePos.srcNode.x);
+    }
+  }
+
+  private deleteSpace(str: string) {
+    const str1 = str.replace(/\s+$/, '');
+    const str2 = str1.replace(/^\s+/, '');
+    return str2;
   }
 
 }

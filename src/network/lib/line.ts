@@ -126,4 +126,9 @@ export class LineCommonFunction {
     return center;
   }
 
+  // The length of the Pythagorean theorem to get the line
+  public edgeLength(sx: number, sy: number, ex: number, ey: number) {
+    return Math.pow(Math.pow(sx - ex, 2) + Math.pow(sy - ey, 2), 0.5);
+  }
+
 }
