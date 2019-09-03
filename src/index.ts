@@ -1253,16 +1253,13 @@ const groupEdgeNode = function () {
       edge.setLabel('   test break word    ', 0.2, {
         fill: 0Xef5050,
       });
-      edge.setLabel('test', 0.5, {
-        fill: 0X20c1a1,
-      });
-      edge.setLabel('test', 0.7, {
-        fill: 0Xef5050,
-      });
       edge.setLabel('test', 1, {
         fill: 0X20c1a1,
       });
-      edge.setLabel('test', 1.5);
+      edge.setLabel('test', 1.3, {
+        fill: 0Xef5050,
+      });
+      edge.setLabel('test', 1.7);
       // edge.setLabel(link.local_host, link.remote_host);
       // const srcMark = {
       //   content: 'B',
@@ -1360,7 +1357,15 @@ const afterDrawTopo = function () {
       midLine = !midLine;
       _.each(edges, (edge) => {
         edge.setMidline(midLine);
-        edge.setLeftRatio(0.1);
+        edge.setLeftLine(0.7, {
+          color: 0Xfcc242,
+          opacity: 1,
+        });
+        edge.setRightLine(0.3);
+        const label2 = _.get(edge.labelObj, 'label_2').label;
+        label2.style.fill = 0Xfcc242;
+        label2.setText('test change text');
+        edge.draw();
       });
       // const nodes = network.getNodes();
       // const newEdge = network.createEdge(nodes[0], nodes[1]);

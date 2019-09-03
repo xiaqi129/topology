@@ -36,6 +36,7 @@ const Point = PIXI.Point;
 export class MultipleColorLine extends CommonElement {
   public background: PIXI.Graphics;
   public type: string = 'MultipleColorLine';
+  public labelObj: any = {};
   public midLine: boolean = false;
   private leftRatio: number = 1;
   private rightRatio: number = 1;
@@ -46,7 +47,6 @@ export class MultipleColorLine extends CommonElement {
   private lineFunction: LineCommonFunction;
   private eachSideStyle: ISimpleSideStyle;
   /* LABEL */
-  private labelObj: any = {};
   private labelIdList: string[] = [];
   private labelId: number = 0;
   constructor(start: Node, end: Node) {
@@ -124,14 +124,20 @@ export class MultipleColorLine extends CommonElement {
     return this.rightLine;
   }
 
-  // Set up the ratio of the left side of the multiple color line
-  public setLeftRatio(ratio: number) {
+  // Set up the ratio and style of the left side of the multiple color line
+  public setLeftLine(ratio: number, style?: IlineStyle) {
     this.leftRatio = ratio;
+    if (style) {
+      this.eachSideStyle.right = style;
+    }
     this.draw();
   }
 
-  // Set up the ratio of the right side of the multiple color line
-  public setRightRatio(ratio: number) {
+  // Set up the ratio and style of the right side of the multiple color line
+  public setRightLine(ratio: number, style?: IlineStyle) {
+    if (style) {
+      this.eachSideStyle.right = style;
+    }
     this.rightRatio = ratio;
     this.draw();
   }
