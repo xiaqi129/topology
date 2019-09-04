@@ -105,7 +105,7 @@ export class Network {
    * @param end the node of destination
    */
   public createMultipleLine(start: Node, end: Node) {
-    return this.topo.createMultipleColor(start, end);
+    return this.topo.createMultipleColor(start, end, this.domRegex);
   }
 
   // Get outside container

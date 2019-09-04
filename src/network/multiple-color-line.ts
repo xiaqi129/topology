@@ -9,15 +9,23 @@ import { CommonElement } from './common-element';
 import { Label } from './label';
 import { IPoint, IResultsPoints, LineCommonFunction } from './lib/line';
 import { Node } from './node';
+import { Tooltip } from './tooltip';
 
 export interface IlineStyle {
   color: number;
   opacity: number;
 }
 
+export interface IArrowStyle {
+  color: number;
+  opacity: number;
+  lineWidth?: number;
+}
 export interface ISimpleSideStyle {
   left: IlineStyle;
+  startArrow: IArrowStyle;
   right: IlineStyle;
+  endArrow: IArrowStyle;
 }
 
 export interface ILabel {
@@ -38,6 +46,7 @@ export class MultipleColorLine extends CommonElement {
   public type: string = 'MultipleColorLine';
   public labelObj: any = {};
   public midLine: boolean = false;
+  public tooltip: Tooltip;
   private leftRatio: number = 1;
   private rightRatio: number = 1;
   private start: Node;
@@ -46,19 +55,30 @@ export class MultipleColorLine extends CommonElement {
   private rightLine: PIXI.Graphics;
   private lineFunction: LineCommonFunction;
   private eachSideStyle: ISimpleSideStyle;
+  /* ARROW */
+  private startArrow: PIXI.Graphics;
+  private endArrow: PIXI.Graphics;
+  private isStartArrow: boolean = false;
+  private isEndArrow: boolean = false;
   /* LABEL */
   private labelIdList: string[] = [];
   private labelId: number = 0;
-  constructor(start: Node, end: Node) {
+  constructor(start: Node, end: Node, domRegex: string) {
     super();
     this.start = start;
     this.end = end;
     this.background = new PIXI.Graphics();
     this.leftLine = new PIXI.Graphics();
     this.rightLine = new PIXI.Graphics();
+    this.startArrow = new PIXI.Graphics();
+    this.endArrow = new PIXI.Graphics();
     this.lineFunction = new LineCommonFunction(start, end);
     this.eachSideStyle = {
       left: {
+        color: 0Xef5050,
+        opacity: 1,
+      },
+      startArrow: {
         color: 0Xef5050,
         opacity: 1,
       },
@@ -66,9 +86,14 @@ export class MultipleColorLine extends CommonElement {
         color: 0X20c1a1,
         opacity: 1,
       },
+      endArrow: {
+        color: 0X20c1a1,
+        opacity: 1,
+      },
     };
     this.interactive = true;
     this.buttonMode = true;
+    this.tooltip = new Tooltip(domRegex);
     start.exceptEdgesArray.push(this);
     end.exceptEdgesArray.push(this);
   }
@@ -76,10 +101,11 @@ export class MultipleColorLine extends CommonElement {
   // basic draw
   public draw(): void {
     this.clearOldGraphics();
-    const nodePos = this.lineFunction.adustNodePos(this.defaultStyle);
-    this.createBackground(nodePos.srcNode, nodePos.endNode);
+    this.createBackground();
     this.drawLeftLine();
     this.drawRightLine();
+    this.drawStartToEndArrow();
+    this.drawEndToStartArrow();
     if (this.midLine) {
       this.drawMidline();
     } else {
@@ -99,6 +125,7 @@ export class MultipleColorLine extends CommonElement {
       this.eachSideStyle.left = style;
     }
     this.drawLeftLine();
+    this.background.addChild(this.leftLine);
   }
 
   /**
@@ -112,6 +139,7 @@ export class MultipleColorLine extends CommonElement {
       this.eachSideStyle.right = style;
     }
     this.drawRightLine();
+    this.background.addChild(this.rightLine);
   }
 
   // Get left line
@@ -128,7 +156,7 @@ export class MultipleColorLine extends CommonElement {
   public setLeftLine(ratio: number, style?: IlineStyle) {
     this.leftRatio = ratio;
     if (style) {
-      this.eachSideStyle.right = style;
+      this.eachSideStyle.left = style;
     }
     this.draw();
   }
@@ -170,11 +198,93 @@ export class MultipleColorLine extends CommonElement {
     this.draw();
   }
 
+  // Set up tooltip on the edge
+  public setTooltip(content: string, style?: any) {
+    this.removeListener('mouseover');
+    this.removeListener('mouseout');
+    this.tooltip.addTooltip(this, content, style);
+    return this.tooltip;
+  }
+
+  // Create arrow
+  public createStartToEndArrow(style?: IArrowStyle) {
+    if (style) {
+      this.eachSideStyle.startArrow = style;
+    }
+    this.isStartArrow = true;
+    this.drawStartToEndArrow();
+    this.background.addChild(this.startArrow);
+  }
+
+  public createEndToStartArrow(style?: IArrowStyle) {
+    if (style) {
+      this.eachSideStyle.endArrow = style;
+    }
+    this.isEndArrow = true;
+    this.drawEndToStartArrow();
+    this.background.addChild(this.endArrow);
+  }
+
+  public setStartToEndArrow(style: IArrowStyle) {
+    if (style) {
+      this.eachSideStyle.startArrow = style;
+    }
+    const oldStartArrow = this.background.getChildByName('start_end_arrow');
+    if (oldStartArrow) {
+      this.isStartArrow = true;
+      this.draw();
+    }
+  }
+
+  public setEndToStartArrow(style: IArrowStyle) {
+    if (style) {
+      this.eachSideStyle.endArrow = style;
+    }
+    const oldEndArrow = this.background.getChildByName('end_start_arrow');
+    if (oldEndArrow) {
+      this.isEndArrow = true;
+      this.draw();
+    }
+  }
+
+  private drawStartToEndArrow() {
+    const style = this.eachSideStyle.startArrow;
+    const nodePos = this.lineFunction.adustNodePos(this.defaultStyle);
+    const angle = this.lineFunction.getAngle();
+    this.startArrow.name = 'start_end_arrow';
+    this.startArrow.lineStyle(1 || style.lineWidth, style.color, style.opacity);
+    if (this.defaultStyle.fillArrow) {
+      this.startArrow.beginFill(style.color);
+    }
+    const arrowPoints = this.getArrowPints(nodePos.srcNode, angle, true);
+    this.startArrow.drawPolygon(_.flatMap(_.map(
+      _.values(arrowPoints), o => ([o.x, o.y]))));
+    this.startArrow.endFill();
+    return this.startArrow;
+  }
+
+  private drawEndToStartArrow() {
+    const style = this.eachSideStyle.endArrow;
+    const nodePos = this.lineFunction.adustNodePos(this.defaultStyle);
+    const angle = this.lineFunction.getAngle();
+    this.endArrow.name = 'end_start_arrow';
+    this.endArrow.lineStyle(1 || style.lineWidth, style.color, style.opacity);
+    if (this.defaultStyle.fillArrow) {
+      this.endArrow.beginFill(style.color);
+    }
+    const arrowPoints = this.getArrowPints(nodePos.endNode, angle, false);
+    this.endArrow.drawPolygon(_.flatMap(_.map(
+      _.values(arrowPoints), o => ([o.x, o.y]))));
+    this.endArrow.endFill();
+    return this.endArrow;
+  }
   // Clear old graphics
   private clearOldGraphics() {
     this.background.clear();
     this.leftLine.clear();
     this.rightLine.clear();
+    this.startArrow.clear();
+    this.endArrow.clear();
   }
 
   // Get one side of link points
@@ -212,13 +322,27 @@ export class MultipleColorLine extends CommonElement {
 
   /**
    * draw background of the data flow
-   * @param {IPoint} srcNodePos src node postion
-   * @param {IPoint} endNodePos end node postion
    */
-  private createBackground(srcNodePos: IPoint, endNodePos: IPoint): void {
+  private createBackground(): void {
     const style = this.defaultStyle;
     const graph = this.background;
-    const points = this.calcEdgePoints(srcNodePos, endNodePos);
+    let startDistance;
+    let endDistance;
+    if (!this.isStartArrow) {
+      startDistance = this.lineFunction.getDistance(this.start, style.lineDistance);
+    } else {
+      startDistance = this.lineFunction.getDistance(this.start, style.lineDistance + style.lineWidth * 10);
+    }
+    if (!this.isEndArrow) {
+      endDistance = this.lineFunction.getDistance(this.end, style.lineDistance);
+    } else {
+      endDistance = this.lineFunction.getDistance(this.end, style.lineDistance + style.lineWidth * 10);
+    }
+    const endNodePos = this.lineFunction.getNodePosition(this.end);
+    const endNode = this.lineFunction.getAdjustedLocation(endNodePos, 1, endDistance);
+    const srcNodePos = this.lineFunction.getNodePosition(this.start);
+    const srcNode = this.lineFunction.getAdjustedLocation(srcNodePos, -1, startDistance);
+    const points = this.calcEdgePoints(srcNode, endNode);
     let lineColor;
     if (this.invariableStyles && this.invariableStyles.lineColor && this.invariableStyles.lineColor !== 0xEEEEEE) {
       lineColor = this.invariableStyles.lineColor;
@@ -271,7 +395,13 @@ export class MultipleColorLine extends CommonElement {
   private drawLeftLine() {
     const linkStyle = this.eachSideStyle.left;
     const graph = this.leftLine;
-    const startDistance = this.lineFunction.getDistance(this.start, this.defaultStyle.lineDistance);
+    const style = this.defaultStyle;
+    let startDistance;
+    if (!this.isStartArrow) {
+      startDistance = this.lineFunction.getDistance(this.start, style.lineDistance);
+    } else {
+      startDistance = this.lineFunction.getDistance(this.start, style.lineDistance + style.lineWidth * 10);
+    }
     const srcNodePos = this.lineFunction.getNodePosition(this.start);
     const srcNode = this.lineFunction.getAdjustedLocation(srcNodePos, -1, startDistance);
     const endNode = this.getOneSideLinkPoints(srcNode, this.leftRatio);
@@ -282,13 +412,18 @@ export class MultipleColorLine extends CommonElement {
     graph.lineTo(points.eRight.x, points.eRight.y);
     graph.lineTo(points.eLeft.x, points.eLeft.y);
     graph.endFill();
-    this.background.addChild(graph);
   }
 
   private drawRightLine() {
     const linkStyle = this.eachSideStyle.right;
     const graph = this.rightLine;
-    const endDistance = this.lineFunction.getDistance(this.end, this.defaultStyle.lineDistance);
+    const style = this.defaultStyle;
+    let endDistance;
+    if (!this.isEndArrow) {
+      endDistance = this.lineFunction.getDistance(this.end, style.lineDistance);
+    } else {
+      endDistance = this.lineFunction.getDistance(this.end, style.lineDistance + style.lineWidth * 10);
+    }
     const endNodePos = this.lineFunction.getNodePosition(this.end);
     const endNode = this.lineFunction.getAdjustedLocation(endNodePos, 1, endDistance);
     const srcNode = this.getOneSideLinkPoints(endNode, this.rightRatio);
@@ -299,7 +434,6 @@ export class MultipleColorLine extends CommonElement {
     graph.lineTo(points.eRight.x, points.eRight.y);
     graph.lineTo(points.eLeft.x, points.eLeft.y);
     graph.endFill();
-    this.background.addChild(graph);
   }
 
   private addLabel() {
@@ -332,6 +466,29 @@ export class MultipleColorLine extends CommonElement {
     const str1 = str.replace(/\s+$/, '');
     const str2 = str1.replace(/^\s+/, '');
     return str2;
+  }
+
+  // Get the path of the arrow
+  private getArrowPints(pos: any, angle: number, direction: boolean) {
+    const style = this.defaultStyle;
+    const arrowAngel = style.arrowAngle;
+    const angelT = angle + _.divide(arrowAngel * Math.PI, 180);
+    const angelB = angle - _.divide(arrowAngel * Math.PI, 180);
+    const x = pos.x;
+    const y = pos.y;
+    const t = direction ? -1 : 1;
+    return {
+      p1: { x: x + 0, y: y + 0 },
+      p2: {
+        x: x + style.lineWidth * 15 * Math.sin(angelT) * t,
+        y: y + style.lineWidth * 15 * Math.cos(angelT) * t,
+      },
+      p3: {
+        x: x + style.lineWidth * 15 * Math.sin(angelB) * t,
+        y: y + style.lineWidth * 15 * Math.cos(angelB) * t,
+      },
+      p4: { x: x + 0, y: y + 0 },
+    };
   }
 
 }

@@ -1160,6 +1160,25 @@ const groupEdgeNode = function () {
   };
   const devices = data.devices;
   const links = data.links;
+  const linkTooltipContent = `
+  <table border = "1">
+    <tr class="dog">
+    <th>HostName</th>
+    <th>Interface</th>
+    <th>Interface</th>
+    <th>Hostname</th>
+    <th>Link Protocol</th>
+    <th>Link State</th>
+    </tr>
+    <tr>
+    <td>local_hos}</td>
+    <td>link.remote_host</td>
+    <td>link.local_int</td>
+    <td>link.remote_int</td>
+    <td>link.link_state</td>
+    <td>link.link_protocol</td>
+    </tr>
+    </table>`;
   // const groups = data.groups;
   _.each(devices, (device: any) => {
     const node = network.createNode('cisco-ASR9');
@@ -1234,22 +1253,12 @@ const groupEdgeNode = function () {
       //   network.menu.setClass('popMenu');
       //   network.menu.showMenu(event);
       // });
-      // edge.initStyle({
-      //   arrowColor: 0X006aad,
-      //   arrowAngle: 20,
-      //   arrowMiddleLength: 5,
-      //   arrowLength: 10,
-      //   arrowType: 0,
-      //   fillArrow: true,
-      //   lineColor: 0X0386d2,
-      //   lineType: link.style.lineType,
-      //   lineFull: 0,
-      //   lineWidth: 1,
-      //   bundleStyle: 0,
-      //   lineDistance: 0,
-      // });
-      edge.createLeftLine(0.2);
-      edge.createRightLine(0.5);
+      edge.initStyle({
+        arrowAngle: 30,
+        // lineColor: 0X0386d2,
+      });
+      edge.createLeftLine(0.9);
+      edge.createRightLine(0.3);
       edge.setLabel('   test break word    ', 0.2, {
         fill: 0Xef5050,
       });
@@ -1260,6 +1269,9 @@ const groupEdgeNode = function () {
         fill: 0Xef5050,
       });
       edge.setLabel('test', 1.7);
+      // edge.createStartToEndArrow();
+      edge.createEndToStartArrow();
+      // edge.setTooltip(linkTooltipContent, commonStyles);
       // edge.setLabel(link.local_host, link.remote_host);
       // const srcMark = {
       //   content: 'B',
@@ -1357,13 +1369,26 @@ const afterDrawTopo = function () {
       midLine = !midLine;
       _.each(edges, (edge) => {
         edge.setMidline(midLine);
-        edge.setLeftLine(0.7, {
+        edge.setLeftLine(0.3, {
+          color: 0X20c1a1,
+          opacity: 1,
+        });
+        edge.setRightLine(0.7, {
           color: 0Xfcc242,
           opacity: 1,
         });
-        edge.setRightLine(0.3);
+        edge.setStartToEndArrow({
+          color: 0X20c1a1,
+          opacity: 1,
+        });
+        edge.setEndToStartArrow({
+          color: 0Xfcc242,
+          opacity: 1,
+        });
         const label2 = _.get(edge.labelObj, 'label_2').label;
-        label2.style.fill = 0Xfcc242;
+        label2.setStyle({
+          fill: 0Xfcc242,
+        });
         label2.setText('test change text');
         edge.draw();
       });

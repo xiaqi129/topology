@@ -28,7 +28,7 @@ export interface ITopo {
 
   createDataFlow(start: Node, end: Node): DataFlow;
 
-  createMultipleColor(start: Node, end: Node): MultipleColorLine;
+  createMultipleColor(start: Node, end: Node, domRegex: string): MultipleColorLine;
 
   createGroup(): Group;
 
@@ -169,8 +169,8 @@ export class Topo implements ITopo {
     return new DataFlow(start, end);
   }
 
-  public createMultipleColor(start: Node, end: Node) {
-    return new MultipleColorLine(start, end);
+  public createMultipleColor(start: Node, end: Node, domRegex: string) {
+    return new MultipleColorLine(start, end, domRegex);
   }
 
   public createLabel(text?: string, style?: PIXI.TextStyleOptions, canvas?: HTMLCanvasElement) {

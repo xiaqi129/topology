@@ -19,17 +19,10 @@ export class Tooltip {
   }
 
   public addTooltip(ele: CommonElement, content: string, style?: any) {
-    if (ele instanceof Node) {
-      ele.on('mouseover', (event: any) => {
-        this.nodeTooltipOn(content, style);
-        this.tooltipMove(event);
-      });
-    } else if (ele instanceof Edge) {
-      ele.on('mouseover', (event: any) => {
-        this.edgeTooltipOn(content, style);
-        this.tooltipMove(event);
-      });
-    }
+    ele.on('mouseover', (event: any) => {
+      this.tooltipOn(content, style);
+      this.tooltipMove(event);
+    });
     ele.on('mouseout', (event: any) => {
       this.clearTooltip();
     });
@@ -53,14 +46,7 @@ export class Tooltip {
     }
   }
 
-  private nodeTooltipOn(content: string, customStyle?: any) {
-    this.clearTooltip();
-    const tooltipContent = content;
-    _.extend(Tooltip.commonStyles, customStyle);
-    this.createTooltip(tooltipContent, Tooltip.commonStyles);
-  }
-
-  private edgeTooltipOn(content: string, customStyle?: any) {
+  private tooltipOn(content: string, customStyle?: any) {
     this.clearTooltip();
     const tooltipContent = content;
     _.extend(Tooltip.commonStyles, customStyle);
