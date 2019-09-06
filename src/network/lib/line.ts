@@ -131,4 +131,21 @@ export class LineCommonFunction {
     return Math.pow(Math.pow(sx - ex, 2) + Math.pow(sy - ey, 2), 0.5);
   }
 
+  public getControlPoint(
+    srcNodePos: IPoint,
+    endNodePos: IPoint,
+  ) {
+    const sx: number = srcNodePos.x;
+    const sy: number = srcNodePos.y;
+    const ex: number = endNodePos.x;
+    const ey: number = endNodePos.y;
+    const linkAngle = Math.atan2(sx - ex, sy - ey);
+    const len = this.edgeLength(sx, sy, ex, ey) * 0.3;
+    const sxc = sx - len * Math.sin(linkAngle);
+    const syc = sy - len * Math.cos(linkAngle);
+    const exc = ex + len * Math.sin(linkAngle);
+    const eyc = ey + len * Math.cos(linkAngle);
+    return [sxc, syc, exc, eyc];
+  }
+
 }

@@ -55,7 +55,7 @@ const getNodeGroups = () => {
 };
 // tslint:disable-next-line:only-arrow-functions
 const noData = function () {
-  const num = 2500;
+  const num = 2;
   for (let i: number = 0, len: number = num; i < len;) {
     i += 1;
     const node = network.createNode('cisco-ASR9');
@@ -69,7 +69,7 @@ const noData = function () {
   for (let i: number = 0, len: number = num; i < len;) {
     const srcNode = nodes[i];
     const destNode = nodes[i + 1];
-    for (let j = 0; j < 4;) {
+    for (let j = 0; j < 2;) {
       const edge = network.createEdge(srcNode, destNode);
       edge.on('rightclick', (event: any) => {
         network.menu.setMenuItems([
@@ -92,13 +92,13 @@ const noData = function () {
         arrowAngle: 20,
         arrowMiddleLength: 5,
         arrowLength: 8,
-        arrowType: 3,
+        arrowType: 0,
         fillArrow: true,
         lineColor: 0X0386d2,
         lineType: 0,
         lineFull: 0,
         lineWidth: 1,
-        bundleStyle: 0,
+        bundleStyle: 1,
       });
       network.addElement(edge);
       j += 1;
@@ -1110,6 +1110,15 @@ const groupEdgeNode = function () {
         },
       },
       {
+        name: '2',
+        local_host: 'name-1',
+        remote_host: 'name-2',
+        style: {
+          lineType: 0,
+          lineFull: 1,
+        },
+      },
+      {
         name: '3',
         local_host: 'name-2',
         remote_host: 'name-3',
@@ -1119,7 +1128,7 @@ const groupEdgeNode = function () {
         },
       },
       {
-        name: '2',
+        name: '4',
         local_host: 'name-3',
         remote_host: 'name-4',
         style: {
@@ -1128,7 +1137,7 @@ const groupEdgeNode = function () {
         },
       },
       {
-        name: '4',
+        name: '5',
         local_host: 'name-4',
         remote_host: 'name-1',
         style: {
@@ -1137,7 +1146,7 @@ const groupEdgeNode = function () {
         },
       },
       // {
-      //   name: '5',
+      //   name: '6',
       //   local_host: 'name-1',
       //   remote_host: 'name-3',
       //   style: {
@@ -1255,10 +1264,12 @@ const groupEdgeNode = function () {
       // });
       edge.initStyle({
         arrowAngle: 30,
+        // lineWidth: 0.4,
+        // lineType: 1,
         // lineColor: 0X0386d2,
       });
-      edge.createLeftLine(0.9);
-      edge.createRightLine(0.3);
+      edge.createStartLine(0.7);
+      edge.createEndLine(0.3);
       edge.setLabel('   test break word    ', 0.2, {
         fill: 0Xef5050,
       });
@@ -1269,8 +1280,8 @@ const groupEdgeNode = function () {
         fill: 0Xef5050,
       });
       edge.setLabel('test', 1.7);
-      // edge.createStartToEndArrow();
-      edge.createEndToStartArrow();
+      edge.createEndArrow();
+      edge.createStartArrow();
       // edge.setTooltip(linkTooltipContent, commonStyles);
       // edge.setLabel(link.local_host, link.remote_host);
       // const srcMark = {
@@ -1369,20 +1380,20 @@ const afterDrawTopo = function () {
       midLine = !midLine;
       _.each(edges, (edge) => {
         edge.setMidline(midLine);
-        edge.setLeftLine(0.3, {
+        edge.setStartLine(0.3, {
           color: 0X20c1a1,
           opacity: 1,
         });
-        edge.setRightLine(0.7, {
+        edge.setEndLine(0.7, {
           color: 0Xfcc242,
           opacity: 1,
         });
-        edge.setStartToEndArrow({
+        edge.setEndArrow({
+          color: 0Xfcc242,
+          opacity: 1,
+        });
+        edge.setStartArrow({
           color: 0X20c1a1,
-          opacity: 1,
-        });
-        edge.setEndToStartArrow({
-          color: 0Xfcc242,
           opacity: 1,
         });
         const label2 = _.get(edge.labelObj, 'label_2').label;
@@ -1391,6 +1402,8 @@ const afterDrawTopo = function () {
         });
         label2.setText('test change text');
         edge.draw();
+        // const leftArrow = edge.getStartToEndArrow();
+        // edge.visibleElement(leftArrow, false);
       });
       // const nodes = network.getNodes();
       // const newEdge = network.createEdge(nodes[0], nodes[1]);
