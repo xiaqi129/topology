@@ -1118,6 +1118,24 @@ const groupEdgeNode = function () {
           lineFull: 1,
         },
       },
+      // {
+      //   name: '6',
+      //   local_host: 'name-1',
+      //   remote_host: 'name-2',
+      //   style: {
+      //     lineType: 0,
+      //     lineFull: 1,
+      //   },
+      // },
+      // {
+      //   name: '7',
+      //   local_host: 'name-1',
+      //   remote_host: 'name-2',
+      //   style: {
+      //     lineType: 0,
+      //     lineFull: 1,
+      //   },
+      // },
       {
         name: '3',
         local_host: 'name-2',

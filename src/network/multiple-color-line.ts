@@ -66,6 +66,7 @@ export class MultipleColorLine extends CommonElement {
   private labelId: number = 0;
   /* BESIZER CURVE */
   private bezierPoints: IPoint[] = [];
+  private bezierData: any;
   constructor(start: Node, end: Node, domRegex: string) {
     super();
     this.start = start;
@@ -329,13 +330,15 @@ export class MultipleColorLine extends CommonElement {
   private drawBezierStartToEndArrow() {
     const style = this.eachSideStyle.startArrow;
     const points = this.bezierPoints;
+    const curve: Bezier = this.bezierData;
+    const ratio = this.getArrowRatio(curve.length());
     this.startArrow.lineStyle(1 || style.lineWidth, style.color, style.opacity);
     if (this.defaultStyle.fillArrow) {
       this.startArrow.beginFill(style.color);
     }
     const angle = this.getTangentAngle(points[3], points[2], points[1], points[0], 1);
-    const arrowPoints = this.getBezierArrowPints(
-      points[0],
+    const arrowPoints = this.getArrowPints(
+      curve.get(ratio),
       angle,
       false,
     );
@@ -344,6 +347,26 @@ export class MultipleColorLine extends CommonElement {
     this.startArrow.endFill();
     this.startArrow.name = 'start_end_arrow';
     return this.startArrow;
+  }
+
+  private getArrowRatio(length: number) {
+    let result: number = 0;
+    if (length > 0 && length <= 200) {
+      result = -0.06;
+    } else if (length > 200 && length <= 300) {
+      result = -0.05;
+    } else if (length > 300 && length <= 400) {
+      result = -0.04;
+    } else if (length > 400 && length <= 500) {
+      result = -0.03;
+    } else if (length > 500 && length <= 600) {
+      result = -0.02;
+    } else if (length > 600 && length <= 700) {
+      result = -0.01;
+    } else if (length > 700) {
+      result = -0.007;
+    }
+    return result;
   }
 
   private drawEndToStartArrow() {
@@ -365,12 +388,14 @@ export class MultipleColorLine extends CommonElement {
   private drawBezierEndToStartArrow() {
     const style = this.eachSideStyle.endArrow;
     const points = this.bezierPoints;
+    const curve: Bezier = this.bezierData;
+    const ratio = this.getArrowRatio(curve.length());
     if (this.defaultStyle.fillArrow) {
       this.endArrow.beginFill(style.color);
     }
     const angle = this.getTangentAngle(points[0], points[1], points[2], points[3], 1);
     const arrowPoints = this.getArrowPints(
-      points[3],
+      curve.get(1 - ratio),
       angle,
       false,
     );
@@ -483,19 +508,36 @@ export class MultipleColorLine extends CommonElement {
     const nodePos = this.lineFunction.adustNodePos(style);
     const originPoints = [];
     let lineColor;
-    const originControlPoints = this.lineFunction.getControlPoint(nodePos.srcNode, nodePos.endNode);
+    let startDistance;
+    let endDistance;
+    if (!this.isStartArrow) {
+      startDistance = this.lineFunction.getDistance(this.start, style.lineDistance);
+    } else {
+      startDistance = this.lineFunction.getDistance(this.start, style.lineDistance + style.lineWidth * 10);
+    }
+    if (!this.isEndArrow) {
+      endDistance = this.lineFunction.getDistance(this.end, style.lineDistance);
+    } else {
+      endDistance = this.lineFunction.getDistance(this.end, style.lineDistance + style.lineWidth * 10);
+    }
+    const endNodePos = this.lineFunction.getNodePosition(this.end);
+    const endNode = this.lineFunction.getAdjustedLocation(endNodePos, 1, endDistance);
+    const srcNodePos = this.lineFunction.getNodePosition(this.start);
+    const srcNode = this.lineFunction.getAdjustedLocation(srcNodePos, -1, startDistance);
+    const originControlPoints = this.lineFunction.getControlPoint(srcNode, endNode);
     if (this.invariableStyles && this.invariableStyles.lineColor && this.invariableStyles.lineColor !== 0xEEEEEE) {
       lineColor = this.invariableStyles.lineColor;
     } else {
       lineColor = 0xCCCCCC;
     }
     graph.lineStyle(style.lineWidth * 8, lineColor);
-    originPoints.push(nodePos.srcNode);
+    originPoints.push(srcNode);
     originPoints.push({ x: originControlPoints[0], y: originControlPoints[1] });
     originPoints.push({ x: originControlPoints[2], y: originControlPoints[3] });
-    originPoints.push(nodePos.endNode);
+    originPoints.push(endNode);
     const points = this.calcBezierCurvePoints(originPoints, curveDistance, curveDegree);
     this.bezierPoints = points;
+    this.bezierData = this.calcBezierArrowPoints(points);
     const hitAreaData = [points[0].x, points[0].y, points[1].x, points[1].y, points[2].x, points[2].y, points[3].x, points[3].y];
     graph.moveTo(points[0].x, points[0].y);
     graph.bezierCurveTo(points[1].x, points[1].y, points[2].x, points[2].y, points[3].x, points[3].y);
@@ -514,6 +556,11 @@ export class MultipleColorLine extends CommonElement {
     points[2].x = points[2].x + curveDegree * Math.cos(angle);
     points[2].y = points[2].y - curveDegree * Math.sin(angle);
     return points;
+  }
+
+  private calcBezierArrowPoints(points: IPoint[]) {
+    const curve = new Bezier(points[0].x, points[0].y, points[1].x, points[1].y, points[2].x, points[2].y, points[3].x, points[3].y);
+    return curve;
   }
 
   private getCurvePointsWithRatio(points: IPoint[], ratio: number, isLeft: boolean): IPoint[] {
@@ -724,29 +771,6 @@ export class MultipleColorLine extends CommonElement {
     };
   }
 
-  // Get the path of the arrow
-  private getBezierArrowPints(pos: IPoint, angle: number, direction: boolean) {
-    const style = this.defaultStyle;
-    const arrowAngel = style.arrowAngle;
-    const angelT = angle + _.divide(arrowAngel * Math.PI, 180);
-    const angelB = angle - _.divide(arrowAngel * Math.PI, 180);
-    const x = pos.x;
-    const y = pos.y;
-    const t = direction ? -1 : 1;
-    return {
-      p1: { x: x + 0, y: y + 0 },
-      p2: {
-        x: x + style.lineWidth * 15 * Math.sin(angelT) * t,
-        y: y + style.lineWidth * 15 * Math.cos(angelT) * t,
-      },
-      p3: {
-        x: x + style.lineWidth * 15 * Math.sin(angelB) * t,
-        y: y + style.lineWidth * 15 * Math.cos(angelB) * t,
-      },
-      p4: { x: x + 0, y: y + 0 },
-    };
-  }
-
   // Setup brother edges used to create Edge Bundle
   private analysisBrotherEdge() {
     const multipleColorLines = this.start.exceptEdgesArray;
@@ -761,7 +785,7 @@ export class MultipleColorLine extends CommonElement {
 
   private setBundleEdgesPosition(multipleLines: any[]) {
     const degree = 30;
-    const degreeStep = 8;
+    const degreeStep = 80;
     const values: number[][] = [];
     const distance = 10;
     const distanceStep = 4;
