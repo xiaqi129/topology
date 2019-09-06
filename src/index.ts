@@ -58,12 +58,17 @@ const noData = function () {
   const num = 2;
   for (let i: number = 0, len: number = num; i < len;) {
     i += 1;
-    const node = network.createNode('cisco-ASR9');
+    // const node = network.createNode('cisco-ASR9');
+    const node = network.createNode();
     node.name = `node${i}`;
     // node.setNodeSize(25,25);
     network.addElement(node);
     node.x = Math.random() * 800;
     node.y = Math.random() * 500;
+    node.initStyle({
+      width: 20,
+    });
+    node.addLabelMark('R');
   }
   const nodes = network.getNodes();
   for (let i: number = 0, len: number = num; i < len;) {
@@ -1324,9 +1329,9 @@ const groupEdgeNode = function () {
 
 network.callback = () => {
   // simpleData();
-  // noData();
+  noData();
   // edgeGroupDemo();
-  groupEdgeNode();
+  // groupEdgeNode();
   // dataFlowDemo();
   afterDrawTopo();
 };
@@ -1407,6 +1412,7 @@ const afterDrawTopo = function () {
           opacity: 1,
         });
         edge.setEndArrow({
+          // yellow
           color: 0Xfcc242,
           opacity: 1,
         });

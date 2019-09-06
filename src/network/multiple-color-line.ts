@@ -43,11 +43,11 @@ export interface ILabelData {
 
 const Point = PIXI.Point;
 export class MultipleColorLine extends CommonElement {
-  public background: PIXI.Graphics;
   public type: string = 'MultipleColorLine';
   public labelObj: any = {};
-  public midLine: boolean = false;
-  public tooltip: Tooltip;
+  private midLine: boolean = false;
+  private tooltip: Tooltip;
+  private background: PIXI.Graphics;
   private leftRatio: number = 1;
   private rightRatio: number = 1;
   private start: Node;
