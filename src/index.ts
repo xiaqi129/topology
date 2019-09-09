@@ -1240,7 +1240,10 @@ const groupEdgeNode = function () {
         bundleStyle: 0,
         lineDistance: 0,
       });
-      edge.setLabel(link.local_host, link.remote_host);
+      const resultLabel = edge.setLabel(link.local_host, link.remote_host);
+      // if (resultLabel) {
+      //   resultLabel.src.anchor.set(0.5, 10);
+      // }
       // const srcMark = {
       //   content: 'B',
       //   color: 0X0386d2,
