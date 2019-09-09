@@ -1102,15 +1102,15 @@ const groupEdgeNode = function () {
           lineFull: 1,
         },
       },
-      {
-        name: '3',
-        local_host: 'name-3',
-        remote_host: 'name-1',
-        style: {
-          lineType: 0,
-          lineFull: 0,
-        },
-      },
+      // {
+      //   name: '3',
+      //   local_host: 'name-3',
+      //   remote_host: 'name-1',
+      //   style: {
+      //     lineType: 0,
+      //     lineFull: 0,
+      //   },
+      // },
       // {
       //   name: '2',
       //   local_host: 'name-1',
