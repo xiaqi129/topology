@@ -1238,9 +1238,8 @@ const groupEdgeNode = function () {
         lineFull: 0,
         lineWidth: 1,
         bundleStyle: 0,
-        lineDistance: 0,
       });
-      const resultLabel = edge.setLabel(link.local_host, link.remote_host);
+      edge.setLabel(link.local_host, link.remote_host);
       // if (resultLabel) {
       //   resultLabel.src.anchor.set(0.5, 10);
       // }
