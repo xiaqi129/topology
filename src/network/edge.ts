@@ -138,8 +138,8 @@ export class Edge extends CommonElement {
     if (srcContent || endContent) {
       const srcLabel = new Label(srcContent, this.labelStyle);
       const endLabel = new Label(endContent, this.labelStyle);
-      srcLabel.anchor.set(0.5, 1.5);
-      endLabel.anchor.set(0.5, 1.5);
+      srcLabel.anchor.set(0.5, 1.2);
+      endLabel.anchor.set(0.5, 1.2);
       this.labelContent.push(srcContent);
       this.labelContent.push(endContent);
       this.labelContent = _.uniq(this.labelContent);
@@ -949,8 +949,6 @@ export class Edge extends CommonElement {
   private setLabelPosition(srcLabel: PIXI.DisplayObject, endLabel: PIXI.DisplayObject) {
     const len = this.edgeLength(this.startNode.x, this.startNode.y, this.endNode.x, this.endNode.y) * 0.25;
     const angle = Math.atan2(this.startNode.y - this.endNode.y, this.startNode.x - this.endNode.x);
-    // console.log('bezierLineDistance', this.defaultStyle.bezierLineDistance);
-    // console.log(this.defaultStyle.bezierLineDegree);
     if (this.defaultStyle.lineType !== 1) {
       srcLabel.x = this.startNode.x - len * Math.cos(angle);
       srcLabel.y = this.startNode.y - len * Math.sin(angle);

@@ -1239,7 +1239,10 @@ const groupEdgeNode = function () {
         lineWidth: 1,
         bundleStyle: 0,
       });
-      edge.setLabel(link.local_host, link.remote_host);
+      edge.setLabel(`${link.local_host}  aaaaaa`, link.remote_host, {
+        wordWrap: true,
+        wordWrapWidth: 10,
+      });
       // if (resultLabel) {
       //   resultLabel.src.anchor.set(0.5, 10);
       // }
