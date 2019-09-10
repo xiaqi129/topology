@@ -55,21 +55,26 @@ const getNodeGroups = () => {
 };
 // tslint:disable-next-line:only-arrow-functions
 const noData = function () {
-  const num = 2500;
+  const num = 2;
   for (let i: number = 0, len: number = num; i < len;) {
     i += 1;
-    const node = network.createNode('cisco-ASR9');
+    // const node = network.createNode('cisco-ASR9');
+    const node = network.createNode();
     node.name = `node${i}`;
     // node.setNodeSize(25,25);
     network.addElement(node);
     node.x = Math.random() * 800;
     node.y = Math.random() * 500;
+    node.initStyle({
+      width: 20,
+    });
+    node.addLabelMark('R');
   }
   const nodes = network.getNodes();
   for (let i: number = 0, len: number = num; i < len;) {
     const srcNode = nodes[i];
     const destNode = nodes[i + 1];
-    for (let j = 0; j < 4;) {
+    for (let j = 0; j < 2;) {
       const edge = network.createEdge(srcNode, destNode);
       edge.on('rightclick', (event: any) => {
         network.menu.setMenuItems([
@@ -92,13 +97,13 @@ const noData = function () {
         arrowAngle: 20,
         arrowMiddleLength: 5,
         arrowLength: 8,
-        arrowType: 3,
+        arrowType: 0,
         fillArrow: true,
         lineColor: 0X0386d2,
         lineType: 0,
         lineFull: 0,
         lineWidth: 1,
-        bundleStyle: 0,
+        bundleStyle: 1,
       });
       network.addElement(edge);
       j += 1;
@@ -1076,18 +1081,25 @@ const groupEdgeNode = function () {
           y: 200,
         },
       },
-      // {
-      //   name: 'name-2',
-      //   location: {
-      //     x: 350,
-      //     y: 250,
-      //   },
-      // },
+      {
+        name: 'name-2',
+        location: {
+          x: 500,
+          y: 200,
+        },
+      },
       {
         name: 'name-3',
         location: {
           x: 500,
-          y: 320,
+          y: 500,
+        },
+      },
+      {
+        name: 'name-4',
+        location: {
+          x: 200,
+          y: 500,
         },
       },
 
@@ -1096,41 +1108,68 @@ const groupEdgeNode = function () {
       {
         name: '1',
         local_host: 'name-1',
-        remote_host: 'name-3',
+        remote_host: 'name-2',
+        style: {
+          lineType: 0,
+          lineFull: 1,
+        },
+      },
+      {
+        name: '2',
+        local_host: 'name-1',
+        remote_host: 'name-2',
         style: {
           lineType: 0,
           lineFull: 1,
         },
       },
       // {
-      //   name: '3',
-      //   local_host: 'name-3',
-      //   remote_host: 'name-1',
-      //   style: {
-      //     lineType: 0,
-      //     lineFull: 0,
-      //   },
-      // },
-      // {
-      //   name: '2',
+      //   name: '6',
       //   local_host: 'name-1',
-      //   remote_host: 'name-3',
+      //   remote_host: 'name-2',
       //   style: {
       //     lineType: 0,
       //     lineFull: 1,
       //   },
       // },
       // {
-      //   name: '4',
-      //   local_host: 'name-3',
-      //   remote_host: 'name-1',
+      //   name: '7',
+      //   local_host: 'name-1',
+      //   remote_host: 'name-2',
       //   style: {
       //     lineType: 0,
-      //     lineFull: 0,
+      //     lineFull: 1,
       //   },
       // },
+      {
+        name: '3',
+        local_host: 'name-2',
+        remote_host: 'name-3',
+        style: {
+          lineType: 0,
+          lineFull: 0,
+        },
+      },
+      {
+        name: '4',
+        local_host: 'name-3',
+        remote_host: 'name-4',
+        style: {
+          lineType: 0,
+          lineFull: 1,
+        },
+      },
+      {
+        name: '5',
+        local_host: 'name-4',
+        remote_host: 'name-1',
+        style: {
+          lineType: 0,
+          lineFull: 0,
+        },
+      },
       // {
-      //   name: '5',
+      //   name: '6',
       //   local_host: 'name-1',
       //   remote_host: 'name-3',
       //   style: {
@@ -1153,6 +1192,25 @@ const groupEdgeNode = function () {
   };
   const devices = data.devices;
   const links = data.links;
+  const linkTooltipContent = `
+  <table border = "1">
+    <tr class="dog">
+    <th>HostName</th>
+    <th>Interface</th>
+    <th>Interface</th>
+    <th>Hostname</th>
+    <th>Link Protocol</th>
+    <th>Link State</th>
+    </tr>
+    <tr>
+    <td>local_hos}</td>
+    <td>link.remote_host</td>
+    <td>link.local_int</td>
+    <td>link.remote_int</td>
+    <td>link.link_state</td>
+    <td>link.link_protocol</td>
+    </tr>
+    </table>`;
   // const groups = data.groups;
   _.each(devices, (device: any) => {
     const node = network.createNode('cisco-ASR9');
@@ -1202,50 +1260,53 @@ const groupEdgeNode = function () {
     const srcNode = _.get(allNodeGroups, srcNodeName);
     const destNode = _.get(allNodeGroups, destNodeName);
     if (srcNode && destNode) {
-      const edge = network.createEdge(srcNode, destNode);
-      edge.name = link.name;
-      edge.on('rightclick', (event: any) => {
-        network.menu.setMenuItems([
-          { label: 'Hide Edge', id: '0' },
-          { label: 'Remove Link', id: '1' },
-          { label: 'Print line Info', id: '2' },
-        ]);
-        network.menu.menuOnAction = (id) => {
-          if (id === '0') {
-            edge.visible = false;
-            _.each(edge.includeGroup, (edgeGroup: any) => {
-              edgeGroup.draw();
-            });
-          } else if (id === '1') {
-            network.removeElements(edge);
-          } else if (id === '2') {
-            // tslint:disable-next-line: no-console
-            console.log(edge);
-          }
-        };
-        network.menu.setClass('popMenu');
-        network.menu.showMenu(event);
-      });
+      // const edge = network.createEdge(srcNode, destNode);
+      const edge = network.createMultipleLine(srcNode, destNode);
+      // edge.name = link.name;
+      // edge.on('rightclick', (event: any) => {
+      //   network.menu.setMenuItems([
+      //     { label: 'Hide Edge', id: '0' },
+      //     { label: 'Remove Link', id: '1' },
+      //     { label: 'Print line Info', id: '2' },
+      //   ]);
+      //   network.menu.menuOnAction = (id) => {
+      //     if (id === '0') {
+      //       edge.visible = false;
+      //       _.each(edge.includeGroup, (edgeGroup: any) => {
+      //         edgeGroup.draw();
+      //       });
+      //     } else if (id === '1') {
+      //       network.removeElements(edge);
+      //     } else if (id === '2') {
+      //       // tslint:disable-next-line: no-console
+      //       console.log(edge);
+      //     }
+      //   };
+      //   network.menu.setClass('popMenu');
+      //   network.menu.showMenu(event);
+      // });
       edge.initStyle({
-        arrowColor: 0X006aad,
-        arrowAngle: 20,
-        arrowMiddleLength: 5,
-        arrowLength: 10,
-        arrowType: 0,
-        fillArrow: true,
-        lineColor: 0X0386d2,
-        lineType: link.style.lineType,
-        lineFull: 0,
-        lineWidth: 1,
-        bundleStyle: 0,
+        arrowAngle: 30,
+        // lineWidth: 0.4,
+        // lineType: 1,
+        // lineColor: 0X0386d2,
       });
-      edge.setLabel(`${link.local_host}  aaaaaa`, link.remote_host, {
-        wordWrap: true,
-        wordWrapWidth: 10,
+      edge.createStartLine(0.7);
+      edge.createEndLine(0.3);
+      edge.setLabel('   test break word    ', 0.2, {
+        fill: 0Xef5050,
       });
-      // if (resultLabel) {
-      //   resultLabel.src.anchor.set(0.5, 10);
-      // }
+      edge.setLabel('test', 1, {
+        fill: 0X20c1a1,
+      });
+      edge.setLabel('test', 1.3, {
+        fill: 0Xef5050,
+      });
+      edge.setLabel('test', 1.7);
+      edge.createEndArrow();
+      edge.createStartArrow();
+      // edge.setTooltip(linkTooltipContent, commonStyles);
+      // edge.setLabel(link.local_host, link.remote_host);
       // const srcMark = {
       //   content: 'B',
       //   color: 0X0386d2,
@@ -1336,40 +1397,71 @@ const afterDrawTopo = function () {
     });
   }
   if (btnAaddEdge) {
+    let midLine = false;
     btnAaddEdge.addEventListener('click', () => {
-      const nodes = network.getNodes();
-      const newEdge = network.createEdge(nodes[0], nodes[1]);
-      newEdge.initStyle({
-        arrowColor: 0X006aad,
-        arrowAngle: 20,
-        arrowMiddleLength: 5,
-        arrowLength: 8,
-        arrowType: 3,
-        fillArrow: true,
-        lineColor: 0X0386d2,
-        lineType: 0,
-        lineFull: 0,
-        lineWidth: 1,
-        bundleStyle: 0,
+      const edges = network.getMultipleLines();
+      midLine = !midLine;
+      _.each(edges, (edge) => {
+        edge.setMidline(midLine);
+        edge.setStartLine(0.3, {
+          color: 0X20c1a1,
+          opacity: 1,
+        });
+        edge.setEndLine(0.7, {
+          color: 0Xfcc242,
+          opacity: 1,
+        });
+        edge.setEndArrow({
+          // yellow
+          color: 0Xfcc242,
+          opacity: 1,
+        });
+        edge.setStartArrow({
+          color: 0X20c1a1,
+          opacity: 1,
+        });
+        const label2 = _.get(edge.labelObj, 'label_2').label;
+        label2.setStyle({
+          fill: 0Xfcc242,
+        });
+        label2.setText('test change text');
+        edge.draw();
+        // const leftArrow = edge.getStartToEndArrow();
+        // edge.visibleElement(leftArrow, false);
       });
-      network.addElement(newEdge);
-      newEdge.on('rightclick', (event: any) => {
-        network.menu.setMenuItems([
-          { label: 'Print line Info', id: '2' },
-          { label: 'Remove Link', id: '3' },
-        ]);
-        network.menu.menuOnAction = (id) => {
-          if (id === '2') {
-            // tslint:disable-next-line:no-console
-            console.log(newEdge);
-          } else if (id === '3') {
-            network.removeElements(newEdge);
-          }
-        };
-        network.menu.setClass('popMenu');
-        network.menu.showMenu(event);
-      });
-      network.syncView();
+      // const nodes = network.getNodes();
+      // const newEdge = network.createEdge(nodes[0], nodes[1]);
+      // newEdge.initStyle({
+      //   arrowColor: 0X006aad,
+      //   arrowAngle: 20,
+      //   arrowMiddleLength: 5,
+      //   arrowLength: 8,
+      //   arrowType: 3,
+      //   fillArrow: true,
+      //   lineColor: 0X0386d2,
+      //   lineType: 0,
+      //   lineFull: 0,
+      //   lineWidth: 1,
+      //   bundleStyle: 0,
+      // });
+      // network.addElement(newEdge);
+      // newEdge.on('rightclick', (event: any) => {
+      //   network.menu.setMenuItems([
+      //     { label: 'Print line Info', id: '2' },
+      //     { label: 'Remove Link', id: '3' },
+      //   ]);
+      //   network.menu.menuOnAction = (id) => {
+      //     if (id === '2') {
+      //       // tslint:disable-next-line:no-console
+      //       console.log(newEdge);
+      //     } else if (id === '3') {
+      //       network.removeElements(newEdge);
+      //     }
+      //   };
+      //   network.menu.setClass('popMenu');
+      //   network.menu.showMenu(event);
+      // });
+      // network.syncView();
     });
   }
   if (searchNode) {

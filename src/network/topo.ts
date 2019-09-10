@@ -13,6 +13,7 @@ import { EdgeBundle } from './edge-bundle';
 import { EdgeGroup } from './edge-group';
 import { Group } from './group';
 import { Label } from './label';
+import { MultipleColorLine } from './multiple-color-line';
 import { Node } from './node';
 
 export interface ITopo {
@@ -26,6 +27,8 @@ export interface ITopo {
   createNode(domRegex: string, texture: string): Node;
 
   createDataFlow(start: Node, end: Node): DataFlow;
+
+  createMultipleColor(start: Node, end: Node, domRegex: string): MultipleColorLine;
 
   createGroup(): Group;
 
@@ -164,6 +167,10 @@ export class Topo implements ITopo {
 
   public createDataFlow(start: Node, end: Node) {
     return new DataFlow(start, end);
+  }
+
+  public createMultipleColor(start: Node, end: Node, domRegex: string) {
+    return new MultipleColorLine(start, end, domRegex);
   }
 
   public createLabel(text?: string, style?: PIXI.TextStyleOptions, canvas?: HTMLCanvasElement) {

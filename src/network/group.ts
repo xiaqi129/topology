@@ -628,8 +628,8 @@ export class Group extends CommonElement {
   }
 
   private drawGroupNode() {
-    const position = this.getGroupPosition();
     const style = this.defaultStyle;
+    const position = this.getGroupPosition();
     const graph = new PIXI.Graphics();
     graph.name = this.polygonHullOutlineName;
     graph.lineStyle(style.lineWidth, style.lineWidth);

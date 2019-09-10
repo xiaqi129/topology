@@ -39,7 +39,7 @@ export class Node extends CommonElement {
   public isLock: boolean = false;
   public clients: {} = {};
   public labelContent: string = '';
-  public dataFlowArray: DataFlow[] = [];
+  public exceptEdgesArray: CommonElement[] = [];
   private defaultWidth: number = 20;
   private defaultHeight: number = 20;
   private data: any = null;
@@ -203,7 +203,7 @@ export class Node extends CommonElement {
       this.addChild(border);
     }
     this.hitArea = new PIXI.Circle(0, 0, radius / 2 + 5);
-    // this.scale.set(1.5);
+    this.scale.set(1.5);
   }
 
   public selectOff() {
@@ -218,7 +218,7 @@ export class Node extends CommonElement {
     }
     // this.removeChild(this.getChildByName('node_map-greenSVG'));
 
-    // this.scale.set(1);
+    this.scale.set(1);
   }
 
   public setTooltip(content: string, style?: any) {
@@ -382,7 +382,12 @@ export class Node extends CommonElement {
     }
     markBackground.clear();
     markBackground.beginFill(fillColor, alpha);
-    let radius = this.iconWidth / 3;
+    let radius;
+    if (this.icon) {
+      radius = this.iconWidth / 3;
+    } else {
+      radius = this.defaultStyle.width / 2;
+    }
     markBackground.drawCircle(0, 0, radius);
     markBackground.endFill();
     if (radius <= 10) {
@@ -399,7 +404,11 @@ export class Node extends CommonElement {
     this.addChild(markContainer);
     this.setChildIndex(markContainer, this.children.length - 1);
     markContainer.x = this.iconWidth;
-    markContainer.y = -this.iconHeight / 2;
+    if (this.icon) {
+      markContainer.y = -this.iconHeight / 2;
+    } else {
+      markContainer.y = -this.iconHeight;
+    }
   }
 
   private switchPos(addSprite: any, pos: string) {
@@ -484,13 +493,13 @@ export class Node extends CommonElement {
         const distY = event.data.global.y;
         let groups: Group[] = [];
         let edges: Edge[] = [];
-        let dataFlows: DataFlow[] = [];
+        let dataFlows: CommonElement[] = [];
         _.each(this.selectedNodes, (node: Node) => {
           node.position.x += (newPosition.x - this.last.parents.x);
           node.position.y += (newPosition.y - this.last.parents.y);
           edges = edges.concat(node.linksArray);
           groups = groups.concat(node.includedGroups);
-          dataFlows = dataFlows.concat(node.dataFlowArray);
+          dataFlows = dataFlows.concat(node.exceptEdgesArray);
         });
         this.last = { parents: newPosition, x: distX, y: distY };
         _.each(_.uniq(edges), (edge) => {
@@ -519,7 +528,7 @@ export class Node extends CommonElement {
         _.each(this.includedGroups, (group) => {
           group.draw();
         });
-        _.each(this.dataFlowArray, (dataFlow) => {
+        _.each(this.exceptEdgesArray, (dataFlow) => {
           dataFlow.draw();
         });
       }
