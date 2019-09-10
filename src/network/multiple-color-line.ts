@@ -366,7 +366,7 @@ export class MultipleColorLine extends CommonElement {
     } else if (length > 700) {
       result = -0.007;
     }
-    return result;
+    return result * this.defaultStyle.lineWidth;
   }
 
   private drawEndToStartArrow() {
@@ -505,7 +505,6 @@ export class MultipleColorLine extends CommonElement {
     const graph = this.background;
     const curveDistance = style.bezierLineDistance;
     const curveDegree = style.bezierLineDegree;
-    const nodePos = this.lineFunction.adustNodePos(style);
     const originPoints = [];
     let lineColor;
     let startDistance;
