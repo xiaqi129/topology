@@ -1329,9 +1329,9 @@ const groupEdgeNode = function () {
 
 network.callback = () => {
   // simpleData();
-  noData();
+  // noData();
   // edgeGroupDemo();
-  // groupEdgeNode();
+  groupEdgeNode();
   // dataFlowDemo();
   afterDrawTopo();
 };
