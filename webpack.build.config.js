@@ -8,6 +8,7 @@ module.exports = {
     mode: 'development',
     entry: './src/network/network.ts',
     // devtool: 'eval-source-map',
+    // devtool: 'source-map',
     devtool: false,
     resolve: {
         extensions: ['.ts', '.js', '.json']

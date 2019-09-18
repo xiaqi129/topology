@@ -15,6 +15,7 @@ export interface IStyles {
   lineFull: number;
   bezierLineDistance: number;
   bezierLineDegree: number;
+  multipleLineDegree: number;
   bezierOacity: number;
   fillColor: any;
   fillOpacity: number;
@@ -51,12 +52,13 @@ export abstract class CommonElement extends PIXI.Container {
     fillOpacity: 1,
     arrowColor: 0Xc71bd3,
     arrowLength: 15,
-    arrowType: 3, // 0: src  to target, 1: target to src, 2: bidirection
+    arrowType: 3, // 0: src  to target, 1: target to src, 2: bidirection 3:none
     arrowWidth: 1,
     arrowAngle: 20,
     arrowMiddleLength: 10,
     bezierLineDistance: 0,
     bezierLineDegree: 20,
+    multipleLineDegree: 40,
     fillArrow: true,
     lineDistance: 0,
     padding: 5,

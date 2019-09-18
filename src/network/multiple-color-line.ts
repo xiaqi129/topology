@@ -141,7 +141,7 @@ export class MultipleColorLine extends CommonElement {
   public createStartLine(ratio: number, style?: IlineStyle) {
     const defaultStyle = this.defaultStyle;
     if (ratio > 1 || ratio <= 0) {
-      throw Error('Ratio must be greater than zero and less than 1');
+      throw Error('Ratio must be greater than 0 and less than 1');
     }
     this.leftRatio = ratio;
     if (style) {
@@ -163,7 +163,7 @@ export class MultipleColorLine extends CommonElement {
   public createEndLine(ratio: number, style?: IlineStyle) {
     const defaultStyle = this.defaultStyle;
     if (ratio > 1 || ratio <= 0) {
-      throw Error('Ratio must be greater than zero and less than 1');
+      throw Error('Ratio must be greater than 0 and less than 1');
     }
     this.rightRatio = ratio;
     if (style) {
@@ -197,6 +197,9 @@ export class MultipleColorLine extends CommonElement {
 
   // Set up the ratio and style of the left side of the multiple color line
   public setStartLine(ratio: number, style?: IlineStyle) {
+    if (ratio > 1 || ratio <= 0) {
+      throw Error('Ratio must be greater than 0 and less than 1');
+    }
     this.leftRatio = ratio;
     if (style) {
       this.eachSideStyle.left = style;
@@ -206,6 +209,9 @@ export class MultipleColorLine extends CommonElement {
 
   // Set up the ratio and style of the right side of the multiple color line
   public setEndLine(ratio: number, style?: IlineStyle) {
+    if (ratio > 1 || ratio <= 0) {
+      throw Error('Ratio must be greater than 0 and less than 1');
+    }
     if (style) {
       this.eachSideStyle.right = style;
     }
@@ -220,6 +226,9 @@ export class MultipleColorLine extends CommonElement {
   }
 
   public setLabel(content: string, ratio: number, style?: PIXI.TextStyleOptions) {
+    if (ratio > 2 || ratio <= 0) {
+      throw Error('Ratio must be greater than 0 and less than 2');
+    }
     this.labelId += 1;
     const labelId = `label_${this.labelId}`;
     this.labelIdList.push(labelId);
@@ -784,7 +793,7 @@ export class MultipleColorLine extends CommonElement {
 
   private setBundleEdgesPosition(multipleLines: any[]) {
     const degree = 30;
-    const degreeStep = 80;
+    const degreeStep = 60;
     const values: number[][] = [];
     const distance = 10;
     const distanceStep = 4;

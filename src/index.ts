@@ -1287,6 +1287,7 @@ const groupEdgeNode = function () {
       // });
       edge.initStyle({
         arrowAngle: 30,
+        multipleLineDegree: 80,
         // lineWidth: 0.4,
         // lineType: 1,
         // lineColor: 0X0386d2,
