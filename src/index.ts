@@ -1327,12 +1327,159 @@ const groupEdgeNode = function () {
   network.moveCenter();
 };
 
+// tslint:disable-next-line: only-arrow-functions
+const portChannel = function () {
+  const data = {
+    devices: [
+      {
+        name: 'name-1',
+        location: {
+          x: 200,
+          y: 200,
+        },
+      },
+      {
+        name: 'name-2',
+        location: {
+          x: 400,
+          y: 50,
+        },
+      },
+      {
+        name: 'name-3',
+        location: {
+          x: 400,
+          y: 350,
+        },
+      },
+    ],
+    links: [
+      {
+        name: '1',
+        local_host: 'name-1',
+        remote_host: 'name-2',
+        style: {
+          lineType: 0,
+          lineFull: 0,
+        },
+      },
+      // {
+      //   name: '1_1',
+      //   local_host: 'name-1',
+      //   remote_host: 'name-2',
+      //   style: {
+      //     lineType: 0,
+      //     lineFull: 0,
+      //   },
+      // },
+      // {
+      //   name: '1_2',
+      //   local_host: 'name-1',
+      //   remote_host: 'name-2',
+      //   style: {
+      //     lineType: 0,
+      //     lineFull: 0,
+      //   },
+      // },
+      // {
+      //   name: '1_3',
+      //   local_host: 'name-1',
+      //   remote_host: 'name-2',
+      //   style: {
+      //     lineType: 0,
+      //     lineFull: 0,
+      //   },
+      // },
+      {
+        name: '2',
+        local_host: 'name-1',
+        remote_host: 'name-3',
+        style: {
+          lineType: 0,
+          lineFull: 0,
+        },
+      },
+    ],
+  };
+  const devices = data.devices;
+  const links = data.links;
+  _.each(devices, (device: any) => {
+    const node = network.createNode('cisco-ASR9');
+    node.name = device.name;
+    node.x = device.location.x;
+    node.y = device.location.y;
+    network.addElement(node);
+  });
+  const nodes = network.getNodeObj();
+  const edges: any[] = [];
+  _.each(links, (link: any) => {
+    const srcNodeName = link.local_host;
+    const destNodeName = link.remote_host;
+    const srcNode = _.get(nodes, srcNodeName);
+    const destNode = _.get(nodes, destNodeName);
+    if (srcNode && destNode) {
+      const edge = network.createEdge(srcNode, destNode);
+      edges.push(edge);
+      edge.name = link.name;
+      edge.on('rightclick', (event: any) => {
+        network.menu.setMenuItems([
+          { label: 'Hide Edge', id: '0' },
+          { label: 'Remove Link', id: '1' },
+          { label: 'Print line Info', id: '2' },
+        ]);
+        network.menu.menuOnAction = (id) => {
+          if (id === '0') {
+            edge.visible = false;
+            _.each(edge.includeGroup, (edgeGroup: any) => {
+              edgeGroup.draw();
+            });
+          } else if (id === '1') {
+            network.removeElements(edge);
+          } else if (id === '2') {
+            // tslint:disable-next-line: no-console
+            console.log(edge);
+          }
+        };
+        network.menu.setClass('popMenu');
+        network.menu.showMenu(event);
+      });
+      edge.initStyle({
+        arrowColor: 0X006aad,
+        arrowAngle: 20,
+        arrowMiddleLength: 5,
+        arrowLength: 8,
+        arrowType: 3,
+        fillArrow: true,
+        lineColor: 0X0386d2,
+        lineType: link.style.lineType,
+        lineFull: link.style.lineFull,
+        lineWidth: 1,
+        bundleStyle: 0,
+      });
+      network.addElement(edge);
+    }
+  });
+  const channel = network.createPortChannel(edges, 0.2);
+  channel.initStyle({
+    lineColor: 0X0386d2,
+    fillColor: 0XFFFFFF,
+  });
+  network.addElement(channel);
+  network.syncView();
+  network.setDrag();
+  network.setZoom();
+  network.setClick();
+  network.setBundleExpanded(true);
+  // network.moveCenter();
+};
+
 network.callback = () => {
   // simpleData();
   // noData();
   // edgeGroupDemo();
-  groupEdgeNode();
+  // groupEdgeNode();
   // dataFlowDemo();
+  portChannel();
   afterDrawTopo();
 };
 // tslint:disable-next-line: only-arrow-functions

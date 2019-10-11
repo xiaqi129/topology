@@ -20,6 +20,7 @@ import { Group } from './group';
 import { MultipleColorLine } from './multiple-color-line';
 import { Node } from './node';
 import { PopMenu } from './pop-menu';
+import { PortChannel } from './port-channel';
 import { Topo } from './topo';
 
 export class Network {
@@ -106,6 +107,10 @@ export class Network {
    */
   public createMultipleLine(start: Node, end: Node) {
     return this.topo.createMultipleColor(start, end, this.domRegex);
+  }
+
+  public createPortChannel(lines: Edge[], ratio?: number) {
+    return this.topo.createPortChannel(lines, ratio);
   }
 
   // Get outside container
@@ -646,7 +651,7 @@ export class Network {
     elements = _.filter(elements, (element: CommonElement) => {
       return !(element instanceof Node);
     });
-    const objOrder = [Node, Edge, EdgeBundle, Group, EdgeGroup, DataFlow, MultipleColorLine];
+    const objOrder = [Node, Edge, EdgeBundle, Group, EdgeGroup, DataFlow, MultipleColorLine, PortChannel];
     elements.sort((a: any, b: any) => {
       return _.indexOf(objOrder, a.constructor) - _.indexOf(objOrder, b.constructor);
     });

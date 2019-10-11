@@ -124,9 +124,9 @@ export class EdgeBundle extends CommonElement {
           const direction = i % 2 === 1 ? 1.5 : -1.5;
           const srcLabel: any = edge.getChildByName('edge_srclabel');
           const endLabel: any = edge.getChildByName('edge_endlabel');
-          const srcLength = this.deleteSpace(srcLabel.text).split(/\s+/).length;
-          const endLength = this.deleteSpace(endLabel.text).split(/\s+/).length;
           if (srcLabel || endLabel) {
+            const srcLength = this.deleteSpace(srcLabel.text).split(/\s+/).length;
+            const endLength = this.deleteSpace(endLabel.text).split(/\s+/).length;
             if (srcLength > 1) {
               srcLabel.anchor.set(0.5, old + i * direction / srcLength * 1.7);
             } else {

@@ -505,7 +505,6 @@ export class MultipleColorLine extends CommonElement {
     const graph = this.background;
     const curveDistance = style.bezierLineDistance;
     const curveDegree = style.bezierLineDegree;
-    const nodePos = this.lineFunction.adustNodePos(style);
     const originPoints = [];
     let lineColor;
     let startDistance;
@@ -578,7 +577,6 @@ export class MultipleColorLine extends CommonElement {
    * Calculate by the line, rectangle points position
    * @param {IPoint} start start node location
    * @param {IPoint} end end node location
-   * @param {number} lineWidth line of width
    * @return {IResultsPoints} use the results to draw line rectangle
    */
   private calcEdgePoints(start: IPoint, end: IPoint): IResultsPoints {

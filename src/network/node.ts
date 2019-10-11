@@ -7,9 +7,7 @@
 
 import * as _ from 'lodash';
 import { CommonElement } from './common-element';
-import { DataFlow } from './data-flow';
 import { Edge } from './edge';
-import { EdgeBundle } from './edge-bundle';
 import { EdgeGroup } from './edge-group';
 import { Group } from './group';
 import { Label } from './label';
@@ -203,7 +201,7 @@ export class Node extends CommonElement {
       this.addChild(border);
     }
     this.hitArea = new PIXI.Circle(0, 0, radius / 2 + 5);
-    this.scale.set(1.5);
+    // this.scale.set(1.5);
   }
 
   public selectOff() {
@@ -218,7 +216,7 @@ export class Node extends CommonElement {
     }
     // this.removeChild(this.getChildByName('node_map-greenSVG'));
 
-    this.scale.set(1);
+    // this.scale.set(1);
   }
 
   public setTooltip(content: string, style?: any) {
@@ -528,8 +526,8 @@ export class Node extends CommonElement {
         _.each(this.includedGroups, (group) => {
           group.draw();
         });
-        _.each(this.exceptEdgesArray, (dataFlow) => {
-          dataFlow.draw();
+        _.each(this.exceptEdgesArray, (element) => {
+          element.draw();
         });
       }
     }
