@@ -74,7 +74,7 @@ const noData = function () {
   for (let i: number = 0, len: number = num; i < len;) {
     const srcNode = nodes[i];
     const destNode = nodes[i + 1];
-    for (let j = 0; j < 2;) {
+    for (let j = 0; j < 4;) {
       const edge = network.createEdge(srcNode, destNode);
       edge.on('rightclick', (event: any) => {
         network.menu.setMenuItems([
@@ -1381,15 +1381,15 @@ const portChannel = function () {
       //     lineFull: 0,
       //   },
       // },
-      // {
-      //   name: '1_3',
-      //   local_host: 'name-1',
-      //   remote_host: 'name-2',
-      //   style: {
-      //     lineType: 0,
-      //     lineFull: 0,
-      //   },
-      // },
+      {
+        name: '1_3',
+        local_host: 'name-1',
+        remote_host: 'name-3',
+        style: {
+          lineType: 0,
+          lineFull: 0,
+        },
+      },
       {
         name: '2',
         local_host: 'name-1',
@@ -1463,7 +1463,10 @@ const portChannel = function () {
   channel.initStyle({
     lineColor: 0X0386d2,
     fillColor: 0XFFFFFF,
+    // lineWidth: 2,
   });
+  channel.setLabel('test');
+  // channel.setLabel('test', 'bottom-left');
   network.addElement(channel);
   network.syncView();
   network.setDrag();

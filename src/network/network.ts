@@ -351,6 +351,13 @@ export class Network {
     return multipleLines;
   }
 
+  public getPortChannel() {
+    const elements = this.topo.getElements();
+    return _.filter(elements, (element) => {
+      return element instanceof PortChannel;
+    });
+  }
+
   // Delete specified elements in topology
   public removeElements(element: CommonElement) {
     const elements = this.getElements();
@@ -375,8 +382,8 @@ export class Network {
           });
           element.bundleParent.removeBundleEdge();
           elements.push(edge);
-          edge.startNode.linksArray.push(edge);
-          edge.endNode.linksArray.push(edge);
+          // edge.startNode.linksArray.push(edge);
+          // edge.endNode.linksArray.push(edge);
           edge.setStyle({
             lineType: 0,
           });
@@ -516,6 +523,16 @@ export class Network {
       const groupLabel = group.getChildByName('group_label');
       if (groupLabel) {
         groupLabel.visible = labelToggle;
+      }
+    });
+  }
+
+  public portChannelLabelToggle(labelToggle: boolean) {
+    const portChannels = this.getPortChannel();
+    _.each(portChannels, (portChannel: PortChannel) => {
+      const label = portChannel.getChildByName('label');
+      if (label) {
+        label.visible = labelToggle;
       }
     });
   }
