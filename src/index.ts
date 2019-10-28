@@ -321,11 +321,22 @@ const dataFlowDemo = function () {
           // lineWidth: 1,
         },
       },
-
+    ],
+    groups: [
+      {
+        name: 'nodeGroup',
+        children: ['name-1', 'name-2', 'name-3'],
+        style: {
+          fillColor: 0X0984e3,
+          lineColor: 0X0984e3,
+          lineWidth: 1,
+        },
+      },
     ],
   };
   const devices = data.devices;
   const links = data.links;
+  const groups = data.groups;
   _.each(devices, (device: any) => {
     const node = network.createNode('cisco-ASR9');
     node.name = device.name;
@@ -352,6 +363,35 @@ const dataFlowDemo = function () {
       });
       network.addElement(dataFlow);
     }
+  });
+  _.each(groups, (g) => {
+    const nodeGroup = network.createGroup();
+    nodeGroup.name = g.name;
+    network.addElement(nodeGroup);
+    _.each(g.children, (child) => {
+      const node: any = _.find(nodes, (n: any) => {
+        return n.name === child;
+      });
+      nodeGroup.addChildNodes(node);
+    });
+    nodeGroup.initStyle(g.style);
+    nodeGroup.setLabel(`${g.name}`);
+    nodeGroup.on('rightclick', (event: any) => {
+      network.menu.setMenuItems([
+        { label: 'Remove Group', id: '0' },
+        { label: 'Debug', id: '1' },
+      ]);
+      network.menu.menuOnAction = (id) => {
+        if (id === '0') {
+          network.removeElements(nodeGroup);
+        } else if (id === '1') {
+          // tslint:disable-next-line:no-console
+          console.log(nodeGroup);
+        }
+      };
+      network.menu.setClass('popMenu');
+      network.menu.showMenu(event);
+    });
   });
   network.syncView();
   network.setDrag();
@@ -1481,8 +1521,8 @@ network.callback = () => {
   // noData();
   // edgeGroupDemo();
   // groupEdgeNode();
-  // dataFlowDemo();
-  portChannel();
+  dataFlowDemo();
+  // portChannel();
   afterDrawTopo();
 };
 // tslint:disable-next-line: only-arrow-functions

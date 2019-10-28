@@ -667,6 +667,7 @@ export class Group extends CommonElement {
     if (this.dragging) {
       const newPosition = this.parent.toLocal(event.data.global);
       let edges: Edge[] = [];
+      let dataFlow: CommonElement[] = [];
       const edgeGroups = this.getEdgeGroups();
       const intersectionNodes = this.intersection()[0];
       const intersectionGroup = this.intersection()[1];
@@ -676,10 +677,14 @@ export class Group extends CommonElement {
             node.position.x += newPosition.x - this.last.parents.x;
             node.position.y += newPosition.y - this.last.parents.y;
             edges = edges.concat(node.linksArray);
+            dataFlow = dataFlow.concat(node.exceptEdgesArray);
           }
         });
         _.each(_.uniq(edges), (edge: Edge) => {
           edge.draw();
+        });
+        _.each(_.uniq(dataFlow), (ele: CommonElement) => {
+          ele.draw();
         });
         _.each(edgeGroups, (edgeGroup: EdgeGroup) => {
           edgeGroup.draw();

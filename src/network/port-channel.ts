@@ -84,6 +84,11 @@ export class PortChannel extends CommonElement {
     return label;
   }
 
+  public setLabelPosition(position: string) {
+    this.labelPosition = position;
+    this.draw();
+  }
+
   public setLabelText(content: string) {
     const label: any = this.getChildByName('label');
     if (label) {
