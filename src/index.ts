@@ -144,48 +144,48 @@ const dataFlowDemo = function () {
           y: 250,
         },
       },
-      {
-        name: 'name-3',
-        location: {
-          x: 500,
-          y: 320,
-        },
-      },
-      {
-        name: 'name-4',
-        location: {
-          x: 430,
-          y: 450,
-        },
-      },
-      {
-        name: 'name-5',
-        location: {
-          x: 270,
-          y: 500,
-        },
-      },
-      {
-        name: 'name-6',
-        location: {
-          x: 150,
-          y: 400,
-        },
-      },
-      {
-        name: 'name-7',
-        location: {
-          x: 50,
-          y: 300,
-        },
-      },
-      {
-        name: 'name-8',
-        location: {
-          x: 0,
-          y: 500,
-        },
-      },
+      // {
+      //   name: 'name-3',
+      //   location: {
+      //     x: 500,
+      //     y: 320,
+      //   },
+      // },
+      // {
+      //   name: 'name-4',
+      //   location: {
+      //     x: 430,
+      //     y: 450,
+      //   },
+      // },
+      // {
+      //   name: 'name-5',
+      //   location: {
+      //     x: 270,
+      //     y: 500,
+      //   },
+      // },
+      // {
+      //   name: 'name-6',
+      //   location: {
+      //     x: 150,
+      //     y: 400,
+      //   },
+      // },
+      // {
+      //   name: 'name-7',
+      //   location: {
+      //     x: 50,
+      //     y: 300,
+      //   },
+      // },
+      // {
+      //   name: 'name-8',
+      //   location: {
+      //     x: 0,
+      //     y: 500,
+      //   },
+      // },
 
     ],
     links: [
@@ -200,143 +200,143 @@ const dataFlowDemo = function () {
       },
       {
         name: '2',
-        local_host: 'name-2',
-        remote_host: 'name-3',
+        local_host: 'name-1',
+        remote_host: 'name-2',
         style: {
           fillColor: 0Xa3d89f,
           lineWidth: 0.8,
         },
       },
-      {
-        name: '3',
-        local_host: 'name-1',
-        remote_host: 'name-4',
-        style: {
-          fillColor: 0Xfcc242,
-          lineWidth: 0.5,
-        },
-      },
-      {
-        name: '4',
-        local_host: 'name-1',
-        remote_host: 'name-7',
-        style: {
-          fillColor: 0xf55d54,
-          lineWidth: 1,
-        },
-      },
-      {
-        name: '5',
-        local_host: 'name-2',
-        remote_host: 'name-4',
-        style: {
-          fillColor: 0Xa3d89f,
-          lineWidth: 1,
-        },
-      },
-      {
-        name: '6',
-        local_host: 'name-3',
-        remote_host: 'name-7',
-        style: {
-          fillColor: 0Xfcc242,
-          lineWidth: 1,
-        },
-      },
-      {
-        name: '7',
-        local_host: 'name-3',
-        remote_host: 'name-6',
-        style: {
-          fillColor: 0xf55d54,
-          lineWidth: 2,
-        },
-      },
-      {
-        name: '8',
-        local_host: 'name-3',
-        remote_host: 'name-8',
-        style: {
-          fillColor: 0Xa3d89f,
-          lineColor: 0xEEEEEE,
-          lineWidth: 1.2,
-        },
-      },
-      {
-        name: '9',
-        local_host: 'name-3',
-        remote_host: 'name-4',
-        style: {
-          fillColor: 0Xfcc242,
-          lineColor: 0xEEEEEE,
-          lineWidth: 1,
-        },
-      },
-      {
-        name: '10',
-        local_host: 'name-6',
-        remote_host: 'name-5',
-        style: {
-          fillColor: 0xf55d54,
-          lineColor: 0xEEEEEE,
-          lineWidth: 1,
-        },
-      },
-      {
-        name: '11',
-        local_host: 'name-6',
-        remote_host: 'name-7',
-        style: {
-          fillColor: 0Xa3d89f,
-          lineColor: 0xEEEEEE,
-          lineWidth: 1,
-        },
-      },
-      {
-        name: '12',
-        local_host: 'name-6',
-        remote_host: 'name-8',
-        style: {
-          fillColor: 0Xfcc242,
-          lineWidth: 1,
-        },
-      },
-      {
-        name: '13',
-        local_host: 'name-5',
-        remote_host: 'name-8',
-        style: {
-          fillColor: 0xf55d54,
-          lineColor: 0xEEEEEE,
-          lineWidth: 1,
-        },
-      },
-      {
-        name: '14',
-        local_host: 'name-7',
-        remote_host: 'name-8',
-        style: {
-          fillColor: 0Xa3d89f,
-          lineColor: 0xEEEEEE,
-          // lineWidth: 1,
-        },
-      },
+      // {
+      //   name: '3',
+      //   local_host: 'name-1',
+      //   remote_host: 'name-2',
+      //   style: {
+      //     fillColor: 0Xfcc242,
+      //     lineWidth: 0.5,
+      //   },
+      // },
+      // {
+      //   name: '4',
+      //   local_host: 'name-1',
+      //   remote_host: 'name-7',
+      //   style: {
+      //     fillColor: 0xf55d54,
+      //     lineWidth: 1,
+      //   },
+      // },
+      // {
+      //   name: '5',
+      //   local_host: 'name-2',
+      //   remote_host: 'name-4',
+      //   style: {
+      //     fillColor: 0Xa3d89f,
+      //     lineWidth: 1,
+      //   },
+      // },
+      // {
+      //   name: '6',
+      //   local_host: 'name-3',
+      //   remote_host: 'name-7',
+      //   style: {
+      //     fillColor: 0Xfcc242,
+      //     lineWidth: 1,
+      //   },
+      // },
+      // {
+      //   name: '7',
+      //   local_host: 'name-3',
+      //   remote_host: 'name-6',
+      //   style: {
+      //     fillColor: 0xf55d54,
+      //     lineWidth: 2,
+      //   },
+      // },
+      // {
+      //   name: '8',
+      //   local_host: 'name-3',
+      //   remote_host: 'name-8',
+      //   style: {
+      //     fillColor: 0Xa3d89f,
+      //     lineColor: 0xEEEEEE,
+      //     lineWidth: 1.2,
+      //   },
+      // },
+      // {
+      //   name: '9',
+      //   local_host: 'name-3',
+      //   remote_host: 'name-4',
+      //   style: {
+      //     fillColor: 0Xfcc242,
+      //     lineColor: 0xEEEEEE,
+      //     lineWidth: 1,
+      //   },
+      // },
+      // {
+      //   name: '10',
+      //   local_host: 'name-6',
+      //   remote_host: 'name-5',
+      //   style: {
+      //     fillColor: 0xf55d54,
+      //     lineColor: 0xEEEEEE,
+      //     lineWidth: 1,
+      //   },
+      // },
+      // {
+      //   name: '11',
+      //   local_host: 'name-6',
+      //   remote_host: 'name-7',
+      //   style: {
+      //     fillColor: 0Xa3d89f,
+      //     lineColor: 0xEEEEEE,
+      //     lineWidth: 1,
+      //   },
+      // },
+      // {
+      //   name: '12',
+      //   local_host: 'name-6',
+      //   remote_host: 'name-8',
+      //   style: {
+      //     fillColor: 0Xfcc242,
+      //     lineWidth: 1,
+      //   },
+      // },
+      // {
+      //   name: '13',
+      //   local_host: 'name-5',
+      //   remote_host: 'name-8',
+      //   style: {
+      //     fillColor: 0xf55d54,
+      //     lineColor: 0xEEEEEE,
+      //     lineWidth: 1,
+      //   },
+      // },
+      // {
+      //   name: '14',
+      //   local_host: 'name-7',
+      //   remote_host: 'name-8',
+      //   style: {
+      //     fillColor: 0Xa3d89f,
+      //     lineColor: 0xEEEEEE,
+      //     // lineWidth: 1,
+      //   },
+      // },
     ],
-    groups: [
-      {
-        name: 'nodeGroup',
-        children: ['name-1', 'name-2', 'name-3'],
-        style: {
-          fillColor: 0X0984e3,
-          lineColor: 0X0984e3,
-          lineWidth: 1,
-        },
-      },
-    ],
+    // groups: [
+    //   {
+    //     name: 'nodeGroup',
+    //     children: ['name-1', 'name-2', 'name-3'],
+    //     style: {
+    //       fillColor: 0X0984e3,
+    //       lineColor: 0X0984e3,
+    //       lineWidth: 1,
+    //     },
+    //   },
+    // ],
   };
   const devices = data.devices;
   const links = data.links;
-  const groups = data.groups;
+  // const groups = data.groups;
   _.each(devices, (device: any) => {
     const node = network.createNode('cisco-ASR9');
     node.name = device.name;
@@ -364,35 +364,35 @@ const dataFlowDemo = function () {
       network.addElement(dataFlow);
     }
   });
-  _.each(groups, (g) => {
-    const nodeGroup = network.createGroup();
-    nodeGroup.name = g.name;
-    network.addElement(nodeGroup);
-    _.each(g.children, (child) => {
-      const node: any = _.find(nodes, (n: any) => {
-        return n.name === child;
-      });
-      nodeGroup.addChildNodes(node);
-    });
-    nodeGroup.initStyle(g.style);
-    nodeGroup.setLabel(`${g.name}`);
-    nodeGroup.on('rightclick', (event: any) => {
-      network.menu.setMenuItems([
-        { label: 'Remove Group', id: '0' },
-        { label: 'Debug', id: '1' },
-      ]);
-      network.menu.menuOnAction = (id) => {
-        if (id === '0') {
-          network.removeElements(nodeGroup);
-        } else if (id === '1') {
-          // tslint:disable-next-line:no-console
-          console.log(nodeGroup);
-        }
-      };
-      network.menu.setClass('popMenu');
-      network.menu.showMenu(event);
-    });
-  });
+  // _.each(groups, (g) => {
+  //   const nodeGroup = network.createGroup();
+  //   nodeGroup.name = g.name;
+  //   network.addElement(nodeGroup);
+  //   _.each(g.children, (child) => {
+  //     const node: any = _.find(nodes, (n: any) => {
+  //       return n.name === child;
+  //     });
+  //     nodeGroup.addChildNodes(node);
+  //   });
+  //   nodeGroup.initStyle(g.style);
+  //   nodeGroup.setLabel(`${g.name}`);
+  //   nodeGroup.on('rightclick', (event: any) => {
+  //     network.menu.setMenuItems([
+  //       { label: 'Remove Group', id: '0' },
+  //       { label: 'Debug', id: '1' },
+  //     ]);
+  //     network.menu.menuOnAction = (id) => {
+  //       if (id === '0') {
+  //         network.removeElements(nodeGroup);
+  //       } else if (id === '1') {
+  //         // tslint:disable-next-line:no-console
+  //         console.log(nodeGroup);
+  //       }
+  //     };
+  //     network.menu.setClass('popMenu');
+  //     network.menu.showMenu(event);
+  //   });
+  // });
   network.syncView();
   network.setDrag();
   network.setZoom();

@@ -782,21 +782,25 @@ export class MultipleColorLine extends CommonElement {
   }
 
   private setBundleEdgesPosition(multipleLines: any[]) {
-    const degree = 30;
-    const degreeStep = 80;
+    const degree = 15;
+    const degreeStep = 6;
     const values: number[][] = [];
     const distance = 10;
-    const distanceStep = 4;
+    const distanceStep = 1;
     const isSameDirection = _.every(multipleLines, (multipleLine: MultipleColorLine) => {
       return multipleLine.start === this.start;
     });
+    let ratio = 1;
+    if (multipleLines.length > 2) {
+      ratio = 2;
+    }
     _.each(multipleLines, (multipleLine: MultipleColorLine, i: number) => {
       if (isSameDirection) {
         _.each([1, -1], (j) => {
-          values.push([(distance + i * distanceStep) * j, (degree + i * degreeStep) * j]);
+          values.push([(distance + i * distanceStep) * j, (degree + i * degreeStep * ratio) * j]);
         });
       } else {
-        values.push([(distance + i * distanceStep), (degree + i * degreeStep)]);
+        values.push([(distance + i * distanceStep), (degree + i * degreeStep * ratio)]);
       }
     });
     _.each(multipleLines, (multipleLine: MultipleColorLine, i) => {
