@@ -826,7 +826,11 @@ export class Group extends CommonElement {
 
   private marginPolygon(rectVertexPoints: number[], margin: number) {
     const offset = new Offset();
-    return offset.data(rectVertexPoints).margin(margin || 10);
+    try {
+      return offset.data(rectVertexPoints).margin(margin || 10);
+    } catch (error) {
+      return;
+    }
   }
 
   private getHulls(rectVertexPoints: number[][]) {

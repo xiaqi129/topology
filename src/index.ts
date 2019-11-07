@@ -1108,6 +1108,8 @@ const simpleData = function () {
   network.moveCenter();
   network.setZoom();
   network.toggleLabel(1, 2);
+  network.setBundleExpanded(false);
+
 };
 
 // tslint:disable-next-line: only-arrow-functions
@@ -1516,12 +1518,194 @@ const portChannel = function () {
   // network.moveCenter();
 };
 
+// tslint:disable-next-line: only-arrow-functions
+const vertexCoincide = function () {
+  const data = {
+    devices: [
+      {
+        name: 'name-1',
+        location: {
+          x: 200,
+          y: 200,
+        },
+      },
+      {
+        name: 'name-2',
+        location: {
+          x: 200,
+          y: 200,
+        },
+      },
+      {
+        name: 'name-3',
+        location: {
+          x: 200,
+          y: 200,
+        },
+      },
+    ],
+    links: [
+      {
+        name: '1',
+        local_host: 'name-1',
+        remote_host: 'name-2',
+        style: {
+          lineType: 0,
+          lineFull: 0,
+        },
+      },
+      // {
+      //   name: '1_1',
+      //   local_host: 'name-1',
+      //   remote_host: 'name-2',
+      //   style: {
+      //     lineType: 0,
+      //     lineFull: 0,
+      //   },
+      // },
+      // {
+      //   name: '1_2',
+      //   local_host: 'name-1',
+      //   remote_host: 'name-2',
+      //   style: {
+      //     lineType: 0,
+      //     lineFull: 0,
+      //   },
+      // },
+      {
+        name: '1_3',
+        local_host: 'name-1',
+        remote_host: 'name-3',
+        style: {
+          lineType: 0,
+          lineFull: 0,
+        },
+      },
+      {
+        name: '2',
+        local_host: 'name-1',
+        remote_host: 'name-3',
+        style: {
+          lineType: 0,
+          lineFull: 0,
+        },
+      },
+    ],
+    groups: [
+      {
+        name: 'nodeGroup',
+        children: ['name-1', 'name-2', 'name-3'],
+        style: {
+          // fillColor: 0X0984e3,
+          // lineColor: 0X0984e3,
+          lineWidth: 1,
+        },
+      },
+    ],
+  };
+  const devices = data.devices;
+  const links = data.links;
+  const groups = data.groups;
+  _.each(devices, (device: any) => {
+    const node = network.createNode('cisco-ASR9');
+    node.name = device.name;
+    node.x = device.location.x;
+    node.y = device.location.y;
+    network.addElement(node);
+  });
+  const nodes = network.getNodeObj();
+  const edges: any[] = [];
+  _.each(links, (link: any) => {
+    const srcNodeName = link.local_host;
+    const destNodeName = link.remote_host;
+    const srcNode = _.get(nodes, srcNodeName);
+    const destNode = _.get(nodes, destNodeName);
+    if (srcNode && destNode) {
+      const edge = network.createEdge(srcNode, destNode);
+      edges.push(edge);
+      edge.name = link.name;
+      edge.on('rightclick', (event: any) => {
+        network.menu.setMenuItems([
+          { label: 'Hide Edge', id: '0' },
+          { label: 'Remove Link', id: '1' },
+          { label: 'Print line Info', id: '2' },
+        ]);
+        network.menu.menuOnAction = (id) => {
+          if (id === '0') {
+            edge.visible = false;
+            _.each(edge.includeGroup, (edgeGroup: any) => {
+              edgeGroup.draw();
+            });
+          } else if (id === '1') {
+            network.removeElements(edge);
+          } else if (id === '2') {
+            // tslint:disable-next-line: no-console
+            console.log(edge);
+          }
+        };
+        network.menu.setClass('popMenu');
+        network.menu.showMenu(event);
+      });
+      edge.initStyle({
+        arrowColor: 0X006aad,
+        arrowAngle: 20,
+        arrowMiddleLength: 5,
+        arrowLength: 8,
+        arrowType: 3,
+        fillArrow: true,
+        lineColor: 0X0386d2,
+        lineType: link.style.lineType,
+        lineFull: link.style.lineFull,
+        lineWidth: 1,
+        bundleStyle: 0,
+      });
+      network.addElement(edge);
+    }
+  });
+  _.each(groups, (g) => {
+    const group = network.createGroup();
+    network.addElement(group);
+    _.each(g.children, (child) => {
+      const node: any = _.find(nodes, (e: any) => {
+        return e.name === child;
+      });
+      group.addChildNodes(node);
+    });
+    group.name = g.name;
+    group.initStyle(g.style);
+    group.setLabel(`${g.name}`);
+    group.setOutlineStyle(3);
+    group.on('rightclick', (event: any) => {
+      network.menu.setMenuItems([
+        { label: 'Remove Group', id: '0' },
+        { label: 'Debug', id: '1' },
+      ]);
+      network.menu.menuOnAction = (id) => {
+        if (id === '0') {
+          network.removeElements(group);
+        } else if (id === '1') {
+          // tslint:disable-next-line:no-console
+          console.log(group);
+        }
+      };
+      network.menu.setClass('popMenu');
+      network.menu.showMenu(event);
+    });
+  });
+
+  network.syncView();
+  network.setDrag();
+  network.setZoom();
+  network.setClick();
+};
+
 network.callback = () => {
-  // simpleData();
+  simpleData();
   // noData();
   // edgeGroupDemo();
+  // vertexCoincide();
   // groupEdgeNode();
-  dataFlowDemo();
+  // dataFlowDemo();
   // portChannel();
   afterDrawTopo();
 };
