@@ -125,7 +125,9 @@ export class Group extends CommonElement {
   }
 
   public addChildNodes(element: Node) {
-    element.setIncluedGroup(this);
+    if (element.includedGroups.indexOf(this) === -1) {
+      element.setIncluedGroup(this);
+    }
     this.position.set(0, 0);
     this.childrenNode.push(element);
     this.emptyObj = undefined;

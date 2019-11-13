@@ -47,9 +47,9 @@ export class EdgeBundle extends CommonElement {
     });
   }
 
-  public multiEdgeBundle() {
+  public multiEdgeBundle(expanded: boolean) {
     if (this.toggleBundle) {
-      if (!this.isExpanded) {
+      if (!expanded) {
         this.closeBundle();
       } else {
         this.openBundle();
@@ -67,7 +67,7 @@ export class EdgeBundle extends CommonElement {
 
   public setExpaned(expanded: boolean) {
     this.isExpanded = expanded;
-    this.multiEdgeBundle();
+    this.multiEdgeBundle(expanded);
   }
 
   public addEdges(edges: Edge[]) {
@@ -171,8 +171,8 @@ export class EdgeBundle extends CommonElement {
         // double click
         if (currentTime - this.lastClickTime < 500) {
           if (edge.parent instanceof EdgeBundle) {
-            this.isExpanded = !this.isExpanded;
-            this.multiEdgeBundle();
+            edge.parent.isExpanded = !edge.parent.isExpanded;
+            edge.parent.multiEdgeBundle(edge.parent.isExpanded);
           }
         } else {
           this.lastClickTime = currentTime;
