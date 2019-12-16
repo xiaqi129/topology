@@ -173,25 +173,27 @@ export class CommonAction {
   public setClick() {
     const elements = this.topo.getElements();
     _.each(elements, (element) => {
-      if (element instanceof EdgeBundle) {
-        const childEdge = element.isExpanded ? element.children : element.bundleData;
-        _.each(childEdge, (edges: any) => {
-          edges.off('mousedown');
-          edges.on('mousedown', (event: PIXI.interaction.InteractionEvent) => {
-            event.stopPropagation();
-            this.removeHighLight();
-            this.topo.setSelectedEdge(edges);
-            edges.selectOn();
+      if (element) {
+        if (element instanceof EdgeBundle) {
+          const childEdge = element.isExpanded ? element.children : element.bundleData;
+          _.each(childEdge, (edges: any) => {
+            edges.off('mousedown');
+            edges.on('mousedown', (event: PIXI.interaction.InteractionEvent) => {
+              event.stopPropagation();
+              this.removeHighLight();
+              this.topo.setSelectedEdge(edges);
+              edges.selectOn();
+            });
           });
-        });
-      } else {
-        element.off('mousedown', () => {
-          this.clickEvent(element);
-        });
-        element.on('mousedown', (event: PIXI.interaction.InteractionEvent) => {
-          event.stopPropagation();
-          this.clickEvent(element);
-        });
+        } else {
+          element.off('mousedown', () => {
+            this.clickEvent(element);
+          });
+          element.on('mousedown', (event: PIXI.interaction.InteractionEvent) => {
+            event.stopPropagation();
+            this.clickEvent(element);
+          });
+        }
       }
     });
   }

@@ -48,6 +48,7 @@ export class EdgeBundle extends CommonElement {
   }
 
   public multiEdgeBundle(expanded: boolean) {
+    this.setBundleEdgesPosition();
     if (this.toggleBundle) {
       if (!expanded) {
         this.closeBundle();
@@ -73,7 +74,6 @@ export class EdgeBundle extends CommonElement {
   public addEdges(edges: Edge[]) {
     this.addChildren(edges);
     this.bundleEdge = this.children;
-    this.setBundleEdgesPosition();
     _.each(edges, (edge) => {
       this.setBundle(edge);
     });
