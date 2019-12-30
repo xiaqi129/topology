@@ -138,7 +138,7 @@ export class Topo implements ITopo {
           this.elements.push(element);
         }
       } else {
-        if (element) {
+        if (element && this.elements.indexOf(element) < 0) {
           this.elements.push(element);
         }
       }

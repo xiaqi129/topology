@@ -13,6 +13,7 @@ export interface IStyles {
   lineColor: number;
   lineType: number;
   lineFull: number;
+  lineOpacity: number;
   bezierLineDistance: number;
   bezierLineDegree: number;
   bezierOacity: number;
@@ -47,6 +48,7 @@ export abstract class CommonElement extends PIXI.Container {
     lineType: 0, // 0: line, 1: besizer
     lineFull: 0, // 0: full line, 1: dotted line
     fillColor: 0xDDDDDD,
+    lineOpacity:1,
     bezierOacity: 1,
     fillOpacity: 1,
     arrowColor: 0Xc71bd3,

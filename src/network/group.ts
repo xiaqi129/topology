@@ -125,14 +125,16 @@ export class Group extends CommonElement {
   }
 
   public addChildNodes(element: Node) {
-    if (element.includedGroups.indexOf(this) === -1) {
-      element.setIncluedGroup(this);
-    }
-    this.position.set(0, 0);
-    this.childrenNode.push(element);
-    this.emptyObj = undefined;
-    if (this.toggleExpanded) {
-      this.edgeArray = _.difference(this.filterEdge(), this.filterInsideEdge());
+    if (this.childrenNode.indexOf(element) < 0) {
+      if (element.includedGroups.indexOf(this) === -1) {
+        element.setIncluedGroup(this);
+      }
+      this.position.set(0, 0);
+      this.childrenNode.push(element);
+      this.emptyObj = undefined;
+      if (this.toggleExpanded) {
+        this.edgeArray = _.difference(this.filterEdge(), this.filterInsideEdge());
+      }
     }
   }
 
@@ -159,7 +161,7 @@ export class Group extends CommonElement {
       groupLabel.destroy();
     }
     const graph: any = this.getChildByName(this.polygonHullOutlineName);
-    if (this.width !== 0 && content && graph) {
+    if (content && graph) {
       this.labelStyle = {
         fill: [
           '#0776da',
@@ -634,7 +636,7 @@ export class Group extends CommonElement {
     const position = this.getGroupPosition();
     const graph = new PIXI.Graphics();
     graph.name = this.polygonHullOutlineName;
-    graph.lineStyle(style.lineWidth, style.lineWidth);
+    graph.lineStyle(style.lineWidth, style.lineWidth, style.lineOpacity);
     graph.beginFill(style.fillColor, style.fillOpacity);
     graph.drawCircle(0, 0, style.width);
     graph.position.set(position.x, position.y);
@@ -854,7 +856,7 @@ export class Group extends CommonElement {
 
   private setOutlineGraphicStyle(graphic: PIXI.Graphics) {
     const style = this.defaultStyle;
-    graphic.lineStyle(style.lineWidth, style.lineColor);
+    graphic.lineStyle(style.lineWidth, style.lineColor, style.lineOpacity);
     graphic.beginFill(style.fillColor, style.fillOpacity);
     return graphic;
   }
@@ -1026,7 +1028,7 @@ export class Group extends CommonElement {
       graph.interactive = true;
       // graph.buttonMode = true;
       this.addChild(graph);
-      graph.lineStyle(style.lineWidth, style.lineColor);
+      graph.lineStyle(style.lineWidth, style.lineColor, style.lineOpacity);
       graph.beginFill(style.fillColor, style.fillOpacity);
       switch (emptyInfo.type) {
         case 'circle':
