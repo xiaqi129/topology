@@ -36,6 +36,7 @@ export class Network {
   private domRegex: string;
   private nodeLabel: number = 0;
   private edgeLabel: number = 0;
+  private zoomChange: any;
 
   constructor(domRegex: string) {
     PIXI.utils.skipHello();
@@ -48,6 +49,7 @@ export class Network {
     this.menu = new PopMenu(domRegex, this.app, this.action);
     this.zoom = 1;
     this.isSelect = false;
+    this.zoomChange = this.zoomOnWheel.bind(this);
     this.disableContextMenu(domRegex);
   }
 
@@ -149,47 +151,56 @@ export class Network {
   public setZoom(isDraw?: boolean) {
     const wrapper = document.getElementById(this.domRegex);
     if (wrapper) {
-      wrapper.addEventListener('wheel', (e) => {
-        const zoom = this.zoom;
-        // this.clearHighlight();
-        if (e.deltaY < 0) {
-          if (zoom <= 1 && zoom > 0.1) {
-            this.zoomElements(NP.plus(zoom, 0.1));
-          } else if (zoom <= 2 && zoom > 1) {
-            this.zoomElements(NP.plus(zoom, 0.2));
-          } else if (zoom > 2) {
-            this.zoomElements(NP.plus(zoom, 1));
-          } else if (zoom <= 0.1 && zoom > 0.01) {
-            this.zoomElements(NP.plus(zoom, 0.01));
-          } else if (zoom <= 0.01 && zoom > 0.001) {
-            this.zoomElements(NP.plus(zoom, 0.001));
-          } else if (zoom <= 0.001 && zoom >= 0.0001) {
-            this.zoomElements(NP.plus(zoom, 0.0001));
-          }
-        } else {
-          if (zoom > 2) {
-            this.zoomElements(NP.minus(zoom, 1));
-          } else if (zoom <= 2 && zoom > 1) {
-            this.zoomElements(NP.minus(zoom, 0.2));
-          } else if (zoom <= 1 && zoom > 0.11) {
-            this.zoomElements(NP.minus(zoom, 0.1));
-          } else if (zoom <= 0.11 && zoom > 0.011) {
-            this.zoomElements(NP.minus(zoom, 0.01));
-          } else if (zoom <= 0.011 && zoom > 0.0011) {
-            this.zoomElements(NP.minus(zoom, 0.001));
-          } else if (zoom <= 0.0011 && zoom > 0.0002) {
-            this.zoomElements(NP.minus(zoom, 0.0001));
-          } else if (zoom <= 0.0002 && zoom > 0) {
-            this.zoomElements(0.0001);
-          }
-        }
-        const scale = NP.divide(this.zoom, zoom);
-        if (isDraw) {
-          this.moveTopology(scale, e.offsetX, e.offsetY, isDraw);
-        } else {
-          this.moveTopology(scale, e.offsetX, e.offsetY, true);
-        }
-      });
+      wrapper.addEventListener('wheel', this.zoomChange);
+    }
+  }
+
+  public clearZoom() {
+    const wrapper = document.getElementById(this.domRegex);
+    if (wrapper) {
+      wrapper.removeEventListener('wheel', this.zoomChange);
+    }
+  }
+
+  public zoomOnWheel(e: any, isDraw?: boolean) {
+    const zoom = this.zoom;
+    // this.clearHighlight();
+    if (e.deltaY < 0) {
+      if (zoom <= 1 && zoom > 0.1) {
+        this.zoomElements(NP.plus(zoom, 0.1));
+      } else if (zoom <= 2 && zoom > 1) {
+        this.zoomElements(NP.plus(zoom, 0.2));
+      } else if (zoom > 2) {
+        this.zoomElements(NP.plus(zoom, 1));
+      } else if (zoom <= 0.1 && zoom > 0.01) {
+        this.zoomElements(NP.plus(zoom, 0.01));
+      } else if (zoom <= 0.01 && zoom > 0.001) {
+        this.zoomElements(NP.plus(zoom, 0.001));
+      } else if (zoom <= 0.001 && zoom >= 0.0001) {
+        this.zoomElements(NP.plus(zoom, 0.0001));
+      }
+    } else {
+      if (zoom > 2) {
+        this.zoomElements(NP.minus(zoom, 1));
+      } else if (zoom <= 2 && zoom > 1) {
+        this.zoomElements(NP.minus(zoom, 0.2));
+      } else if (zoom <= 1 && zoom > 0.11) {
+        this.zoomElements(NP.minus(zoom, 0.1));
+      } else if (zoom <= 0.11 && zoom > 0.011) {
+        this.zoomElements(NP.minus(zoom, 0.01));
+      } else if (zoom <= 0.011 && zoom > 0.0011) {
+        this.zoomElements(NP.minus(zoom, 0.001));
+      } else if (zoom <= 0.0011 && zoom > 0.0002) {
+        this.zoomElements(NP.minus(zoom, 0.0001));
+      } else if (zoom <= 0.0002 && zoom > 0) {
+        this.zoomElements(0.0001);
+      }
+    }
+    const scale = NP.divide(this.zoom, zoom);
+    if (isDraw) {
+      this.moveTopology(scale, e.offsetX, e.offsetY, isDraw);
+    } else {
+      this.moveTopology(scale, e.offsetX, e.offsetY, true);
     }
   }
 

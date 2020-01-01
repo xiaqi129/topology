@@ -1405,42 +1405,42 @@ const portChannel = function () {
           lineFull: 0,
         },
       },
-      // {
-      //   name: '1_1',
-      //   local_host: 'name-1',
-      //   remote_host: 'name-2',
-      //   style: {
-      //     lineType: 0,
-      //     lineFull: 0,
-      //   },
-      // },
-      // {
-      //   name: '1_2',
-      //   local_host: 'name-1',
-      //   remote_host: 'name-2',
-      //   style: {
-      //     lineType: 0,
-      //     lineFull: 0,
-      //   },
-      // },
       {
-        name: '1_3',
+        name: '1_1',
         local_host: 'name-1',
-        remote_host: 'name-3',
+        remote_host: 'name-2',
         style: {
           lineType: 0,
           lineFull: 0,
         },
       },
       {
-        name: '2',
+        name: '1_2',
         local_host: 'name-1',
-        remote_host: 'name-3',
+        remote_host: 'name-2',
         style: {
           lineType: 0,
           lineFull: 0,
         },
       },
+      // {
+      //   name: '1_3',
+      //   local_host: 'name-1',
+      //   remote_host: 'name-3',
+      //   style: {
+      //     lineType: 0,
+      //     lineFull: 0,
+      //   },
+      // },
+      // {
+      //   name: '2',
+      //   local_host: 'name-1',
+      //   remote_host: 'name-3',
+      //   style: {
+      //     lineType: 0,
+      //     lineFull: 0,
+      //   },
+      // },
     ],
   };
   const devices = data.devices;
@@ -1501,7 +1501,7 @@ const portChannel = function () {
       network.addElement(edge);
     }
   });
-  const channel = network.createPortChannel(edges, 0.2);
+  const channel = network.createPortChannel(edges, 0.5);
   channel.initStyle({
     lineColor: 0X0386d2,
     fillColor: 0XFFFFFF,
@@ -1700,14 +1700,14 @@ const vertexCoincide = function () {
 };
 
 network.callback = () => {
-  simpleData();
+  // simpleData();
   // noData();
   // edgeGroupDemo();
   // vertexCoincide();
   // groupEdgeNode();
   // dataFlowDemo();
-  // portChannel();
-  afterDrawTopo();
+  portChannel();
+  // afterDrawTopo();
 };
 // tslint:disable-next-line: only-arrow-functions
 const afterDrawTopo = function () {
