@@ -144,48 +144,48 @@ const dataFlowDemo = function () {
           y: 250,
         },
       },
-      {
-        name: 'name-3',
-        location: {
-          x: 500,
-          y: 320,
-        },
-      },
-      {
-        name: 'name-4',
-        location: {
-          x: 430,
-          y: 450,
-        },
-      },
-      {
-        name: 'name-5',
-        location: {
-          x: 270,
-          y: 500,
-        },
-      },
-      {
-        name: 'name-6',
-        location: {
-          x: 150,
-          y: 400,
-        },
-      },
-      {
-        name: 'name-7',
-        location: {
-          x: 50,
-          y: 300,
-        },
-      },
-      {
-        name: 'name-8',
-        location: {
-          x: 0,
-          y: 500,
-        },
-      },
+      // {
+      //   name: 'name-3',
+      //   location: {
+      //     x: 500,
+      //     y: 320,
+      //   },
+      // },
+      // {
+      //   name: 'name-4',
+      //   location: {
+      //     x: 430,
+      //     y: 450,
+      //   },
+      // },
+      // {
+      //   name: 'name-5',
+      //   location: {
+      //     x: 270,
+      //     y: 500,
+      //   },
+      // },
+      // {
+      //   name: 'name-6',
+      //   location: {
+      //     x: 150,
+      //     y: 400,
+      //   },
+      // },
+      // {
+      //   name: 'name-7',
+      //   location: {
+      //     x: 50,
+      //     y: 300,
+      //   },
+      // },
+      // {
+      //   name: 'name-8',
+      //   location: {
+      //     x: 0,
+      //     y: 500,
+      //   },
+      // },
 
     ],
     links: [
@@ -207,61 +207,61 @@ const dataFlowDemo = function () {
           lineWidth: 0.8,
         },
       },
-      {
-        name: '3',
-        local_host: 'name-3',
-        remote_host: 'name-4',
-        style: {
-          fillColor: 0Xfcc242,
-          lineWidth: 0.5,
-        },
-      },
-      {
-        name: '4',
-        local_host: 'name-3',
-        remote_host: 'name-4',
-        style: {
-          fillColor: 0xf55d54,
-          lineWidth: 1,
-        },
-      },
-      {
-        name: '5',
-        local_host: 'name-5',
-        remote_host: 'name-6',
-        style: {
-          fillColor: 0Xa3d89f,
-          lineWidth: 1,
-        },
-      },
-      {
-        name: '6',
-        local_host: 'name-6',
-        remote_host: 'name-5',
-        style: {
-          fillColor: 0Xfcc242,
-          lineWidth: 1,
-        },
-      },
-      {
-        name: '7',
-        local_host: 'name-7',
-        remote_host: 'name-8',
-        style: {
-          fillColor: 0xf55d54,
-          lineWidth: 2,
-        },
-      },
-      {
-        name: '8',
-        local_host: 'name-8',
-        remote_host: 'name-7',
-        style: {
-          fillColor: 0Xa3d89f,
-          lineColor: 0xEEEEEE,
-          lineWidth: 1.2,
-        },
-      },
+      // {
+      //   name: '3',
+      //   local_host: 'name-3',
+      //   remote_host: 'name-4',
+      //   style: {
+      //     fillColor: 0Xfcc242,
+      //     lineWidth: 0.5,
+      //   },
+      // },
+      // {
+      //   name: '4',
+      //   local_host: 'name-3',
+      //   remote_host: 'name-4',
+      //   style: {
+      //     fillColor: 0xf55d54,
+      //     lineWidth: 1,
+      //   },
+      // },
+      // {
+      //   name: '5',
+      //   local_host: 'name-5',
+      //   remote_host: 'name-6',
+      //   style: {
+      //     fillColor: 0Xa3d89f,
+      //     lineWidth: 1,
+      //   },
+      // },
+      // {
+      //   name: '6',
+      //   local_host: 'name-6',
+      //   remote_host: 'name-5',
+      //   style: {
+      //     fillColor: 0Xfcc242,
+      //     lineWidth: 1,
+      //   },
+      // },
+      // {
+      //   name: '7',
+      //   local_host: 'name-7',
+      //   remote_host: 'name-8',
+      //   style: {
+      //     fillColor: 0xf55d54,
+      //     lineWidth: 2,
+      //   },
+      // },
+      // {
+      //   name: '8',
+      //   local_host: 'name-8',
+      //   remote_host: 'name-7',
+      //   style: {
+      //     fillColor: 0Xa3d89f,
+      //     lineColor: 0xEEEEEE,
+      //     lineWidth: 1.2,
+      //   },
+      // },
       // {
       //   name: '9',
       //   local_host: 'name-3',
@@ -1416,8 +1416,8 @@ const portChannel = function () {
       },
       {
         name: '1_2',
-        local_host: 'name-1',
-        remote_host: 'name-2',
+        local_host: 'name-2',
+        remote_host: 'name-1',
         style: {
           lineType: 0,
           lineFull: 0,
@@ -1705,8 +1705,8 @@ network.callback = () => {
   // edgeGroupDemo();
   // vertexCoincide();
   // groupEdgeNode();
-  // dataFlowDemo();
-  portChannel();
+  dataFlowDemo();
+  // portChannel();
   // afterDrawTopo();
 };
 // tslint:disable-next-line: only-arrow-functions

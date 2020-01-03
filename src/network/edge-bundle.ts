@@ -73,6 +73,7 @@ export class EdgeBundle extends CommonElement {
 
   public addEdges(edges: Edge[]) {
     this.addChildren(edges);
+    this.setBundleEdgesPosition();
     this.bundleEdge = this.children;
     _.each(edges, (edge) => {
       this.setBundle(edge);

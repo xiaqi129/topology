@@ -257,12 +257,22 @@ export class DataFlow extends CommonElement {
     this.splitRatio = 1 / segmentNum;
     for (let index = 0; index < segmentNum; index = index + 1) {
       if (index % 2 === 0) {
-        this.splitStartList.push(index * this.splitRatio);
+        if (index * this.splitRatio > 1) {
+          this.splitStartList.push(1);
+        } else {
+          this.splitStartList.push(index * this.splitRatio);
+        }
       }
     }
     _.each(this.splitStartList, (startNum: number) => {
       if (this.bezierData) {
-        const bezierPoints: IPoint[] = this.bezierData.split(startNum, startNum + this.splitRatio).points;
+        let bezierPoints = [];
+        if (this.splitRatio > 1) {
+          bezierPoints = this.bezierData.split(startNum, 1).points;
+        } else {
+          bezierPoints = this.bezierData.split(startNum, startNum + this.splitRatio).points;
+
+        }
         this.pointsList.push(bezierPoints);
       }
     });
@@ -317,7 +327,7 @@ export class DataFlow extends CommonElement {
       if (this.moveDistance > this.splitRatio * 2) {
         this.moveDistance = 0;
       }
-      this.moveBezierPoints(this.pointsList);
+      this.moveBezierPoints();
     }
   }
 
@@ -338,7 +348,7 @@ export class DataFlow extends CommonElement {
     this.drawImaginaryLink(adustedPoints);
   }
 
-  private moveBezierPoints(points: IPoint[][]): void {
+  private moveBezierPoints(): void {
     interface ISplit {
       start: number;
       end: number;
@@ -352,7 +362,11 @@ export class DataFlow extends CommonElement {
       } else if (adjustedSplitStart >= 1) {
         const end = adjustedSplitStart - 1;
         adjustedSplitStart = 0;
-        adjustedSplitEnd = end;
+        if (end > 1) {
+          adjustedSplitEnd = 1;
+        } else {
+          adjustedSplitEnd = end;
+        }
       }
       adjustedSplitStartAndEnd.push({
         start: adjustedSplitStart,

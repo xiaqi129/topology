@@ -281,7 +281,11 @@ export class PortChannel extends CommonElement {
     } else if (srcNodesList.length > 1 && destNodesList.length === 1) {
       this.startNode = destNodesList[0];
       this.endNodes = srcNodesList;
+    } else if (srcNodesList.length === 2 && destNodesList.length === 2) {
+      this.startNode = srcNodesList[0];
+      this.endNodes = [destNodesList[0]];
     } else {
+
       throw Error('Port channel contains lines must be from the same point');
     }
   }
