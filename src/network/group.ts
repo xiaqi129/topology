@@ -213,7 +213,7 @@ export class Group extends CommonElement {
       } else {
         label.style.wordWrap = false;
         label.style.breakWords = false;
-        label.style.fontSize = 10;
+        label.style.fontSize = 12;
       }
       return label;
     }
@@ -356,16 +356,13 @@ export class Group extends CommonElement {
     if (label && graph) {
       if (this.width !== 0 && this.isExpanded) {
         const fontSize = _.floor(graph.width / 10) + 1;
-        if (fontSize > 12 && fontSize < 20) {
+        if (fontSize > 12 && fontSize < 25) {
           label.style.fontSize = _.floor(graph.width / 10) + 1;
         } else if (fontSize <= 12) {
-          label.style.fontSize = 10;
-        } else if (fontSize >= 20) {
-          label.style.fontSize = 20;
+          label.style.fontSize = 12;
+        } else if (fontSize >= 25) {
+          label.style.fontSize = 25;
         }
-        // label.style.breakWords = true;
-        // label.style.wordWrap = true;
-        // label.style.wordWrapWidth = graph.width - 10;
       } else {
         const textLength = _.ceil(label.text.length / 2);
         label.style.fontSize = nodeWidth / textLength;

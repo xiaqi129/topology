@@ -124,7 +124,7 @@ export class Node extends CommonElement {
     const node = new PIXI.Sprite(texture);
     const sclaeWidth = this.iconWidth / texture.width;
     const scaleHeight = this.iconHeight / texture.height;
-    const scale = sclaeWidth > scaleHeight ? scaleHeight : sclaeWidth;
+    const scale = sclaeWidth < scaleHeight ? scaleHeight : sclaeWidth;
     node.width = texture.width * scale;
     node.height = texture.height * scale;
     node.anchor.set(0.5, 0.5);

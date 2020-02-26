@@ -164,7 +164,6 @@ export class Network {
 
   public zoomOnWheel(e: any, isDraw?: boolean) {
     const zoom = this.zoom;
-    // this.clearHighlight();
     if (e.deltaY < 0) {
       if (zoom <= 1 && zoom > 0.1) {
         this.zoomElements(NP.plus(zoom, 0.1));
@@ -180,9 +179,9 @@ export class Network {
         this.zoomElements(NP.plus(zoom, 0.0001));
       }
     } else {
-      if (zoom > 2) {
+      if (zoom > 2.2) {
         this.zoomElements(NP.minus(zoom, 1));
-      } else if (zoom <= 2 && zoom > 1) {
+      } else if (zoom <= 2.2 && zoom > 1) {
         this.zoomElements(NP.minus(zoom, 0.2));
       } else if (zoom <= 1 && zoom > 0.11) {
         this.zoomElements(NP.minus(zoom, 0.1));
@@ -385,6 +384,7 @@ export class Network {
         _.remove(data, (edge) => {
           return edge === element;
         });
+        element.bundleParent.removeChild(element);
         if (data.length === 1 && data[0]) {
           const edge = data[0];
           // remove edge bundle on elements
@@ -700,6 +700,18 @@ export class Network {
     if (this.zoom < edgeVisibleZoom) {
       this.edgeLabelToggle(false);
     } else {
+      this.edgeLabelToggle(true);
+    }
+    if (nodeVisibleZoom === 0) {
+      this.nodeLabelToggle(false);
+    }
+    if (edgeVisibleZoom === 0) {
+      this.edgeLabelToggle(false);
+    }
+    if (nodeVisibleZoom === -1) {
+      this.nodeLabelToggle(true);
+    }
+    if (edgeVisibleZoom === -1) {
       this.edgeLabelToggle(true);
     }
   }

@@ -159,6 +159,23 @@ export class Edge extends CommonElement {
     }
   }
 
+  public setLabelStyle(style: any) {
+    const srcLabel: any = this.getChildByName('edge_srclabel');
+    const endLabel: any = this.getChildByName('edge_endlabel');
+    _.extend(this.labelStyle, style);
+    if (srcLabel) {
+      srcLabel.setStyle(style);
+    }
+    if (endLabel) {
+      endLabel.setStyle(style);
+    }
+    const result = {
+      src: srcLabel,
+      end: endLabel,
+    };
+    return result;
+  }
+
   // Set up mark on edge
   public setMark(srcMark?: MarkInfo, endMark?: MarkInfo) {
     if (srcMark) {

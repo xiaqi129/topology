@@ -65,16 +65,16 @@ const noData = function () {
     network.addElement(node);
     node.x = Math.random() * 800;
     node.y = Math.random() * 500;
-    node.initStyle({
-      width: 20,
-    });
-    node.addLabelMark('R');
+    // node.initStyle({
+    //   width: 20,
+    // });
+    // node.addLabelMark('R');
   }
   const nodes = network.getNodes();
   for (let i: number = 0, len: number = num; i < len;) {
     const srcNode = nodes[i];
     const destNode = nodes[i + 1];
-    for (let j = 0; j < 4;) {
+    for (let j = 0; j < 2;) {
       const edge = network.createEdge(srcNode, destNode);
       edge.on('rightclick', (event: any) => {
         network.menu.setMenuItems([
@@ -103,13 +103,14 @@ const noData = function () {
         lineType: 0,
         lineFull: 0,
         lineWidth: 1,
-        bundleStyle: 1,
+        bundleStyle: 0,
       });
       network.addElement(edge);
       j += 1;
     }
     i += 2;
   }
+  network.setBundleExpanded(false);
   // const group = network.createGroup();
   // _.each(nodes, (node) => {
   //   group.addChildNodes(node);
@@ -121,6 +122,78 @@ const noData = function () {
   //   lineColor: 0Xb0bdbf,
   // });
   network.syncView();
+  network.setDrag();
+  network.setClick();
+  network.setZoom();
+  network.moveCenter(true);
+};
+
+// tslint:disable-next-line:only-arrow-functions
+const removeTest = function () {
+  const num = 2;
+  const node1 = network.createNode();
+  const node2 = network.createNode();
+  const edgeCatch = [];
+  node1.name = '1';
+  node2.name = '2';
+  // node.setNodeSize(25,25);
+  network.addElement(node1);
+  network.addElement(node2);
+  node1.x = 200;
+  node1.y = 200;
+  node2.x = 500;
+  node2.y = 500;
+
+  const nodes = network.getNodes();
+  for (let i: number = 0, len: number = num; i < len;) {
+    const srcNode = nodes[i];
+    const destNode = nodes[i + 1];
+    for (let j = 0; j < 2;) {
+      const edge = network.createEdge(srcNode, destNode);
+      edge.on('rightclick', (event: any) => {
+        network.menu.setMenuItems([
+          { label: 'Print line Info', id: '2' },
+          { label: 'Remove Link', id: '3' },
+        ]);
+        network.menu.menuOnAction = (id) => {
+          if (id === '2') {
+            // tslint:disable-next-line:no-console
+            console.log(edge);
+          } else if (id === '3') {
+            network.removeElements(edge);
+          }
+        };
+        network.menu.setClass('popMenu');
+        network.menu.showMenu(event);
+      });
+      edge.initStyle({
+        arrowColor: 0X006aad,
+        arrowAngle: 20,
+        arrowMiddleLength: 5,
+        arrowLength: 8,
+        fillArrow: true,
+        lineColor: 0X0386d2,
+        lineType: 0,
+        lineFull: 0,
+        lineWidth: 1,
+        // bundleStyle: 0,
+      });
+      network.addElement(edge);
+      edgeCatch.push(edge);
+      j += 1;
+    }
+    i += 2;
+  }
+
+  network.syncView();
+
+  network.removeElements(node2);
+  network.addElement(node2);
+  _.each(edgeCatch, (edge: any) => {
+    network.addElement(edge);
+  });
+  network.syncView();
+  network.setBundleExpanded(false);
   network.setDrag();
   network.setClick();
   network.setZoom();
@@ -338,7 +411,7 @@ const dataFlowDemo = function () {
   const links = data.links;
   // const groups = data.groups;
   _.each(devices, (device: any) => {
-    const node = network.createNode('cisco-ASR9');
+    const node = network.createNode('laptopSVG');
     node.name = device.name;
     node.x = device.location.x;
     node.y = device.location.y;
@@ -346,6 +419,7 @@ const dataFlowDemo = function () {
       fillColor: 0Xff00000,
     });
     network.addElement(node);
+    node.setNodeSize(40, 40);
   });
   const nodes = network.getNodeObj();
   _.each(links, (link: any) => {
@@ -1101,6 +1175,21 @@ const simpleData = function () {
     });
     network.addElement(newGroup);
   });
+  const wrapper = document.getElementById('network');
+  if (wrapper) {
+    wrapper.addEventListener('wheel', (e) => {
+      if (e.deltaY > 0) {
+        if (network.zoom < 0.2) {
+          network.clearZoom();
+        }
+      } else {
+        if (network.zoom < 0.2) {
+          network.setZoom();
+        }
+      }
+
+    });
+  }
   // network.setBundleExpanded(false);
   network.syncView();
   network.setDrag();
@@ -1700,14 +1789,15 @@ const vertexCoincide = function () {
 };
 
 network.callback = () => {
-  // simpleData();
+  simpleData();
   // noData();
+  // removeTest();
   // edgeGroupDemo();
   // vertexCoincide();
   // groupEdgeNode();
-  dataFlowDemo();
+  // dataFlowDemo();
   // portChannel();
-  // afterDrawTopo();
+  afterDrawTopo();
 };
 // tslint:disable-next-line: only-arrow-functions
 const afterDrawTopo = function () {
@@ -1753,7 +1843,7 @@ const afterDrawTopo = function () {
   if (nodeLabelToggle) {
     nodeLabelToggle.addEventListener('click', () => {
       labelToggle = !labelToggle;
-      network.bundleLabelToggle(labelToggle);
+      network.nodeLabelToggle(labelToggle);
     });
   }
   let bundleLabelToggle = true;
