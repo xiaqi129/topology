@@ -125,12 +125,16 @@ export class Group extends CommonElement {
   }
 
   public addChildNodes(element: Node) {
-    element.setIncluedGroup(this);
-    this.position.set(0, 0);
-    this.childrenNode.push(element);
-    this.emptyObj = undefined;
-    if (this.toggleExpanded) {
-      this.edgeArray = _.difference(this.filterEdge(), this.filterInsideEdge());
+    if (this.childrenNode.indexOf(element) < 0) {
+      if (element.includedGroups.indexOf(this) === -1) {
+        element.setIncluedGroup(this);
+      }
+      this.position.set(0, 0);
+      this.childrenNode.push(element);
+      this.emptyObj = undefined;
+      if (this.toggleExpanded) {
+        this.edgeArray = _.difference(this.filterEdge(), this.filterInsideEdge());
+      }
     }
   }
 
@@ -157,7 +161,7 @@ export class Group extends CommonElement {
       groupLabel.destroy();
     }
     const graph: any = this.getChildByName(this.polygonHullOutlineName);
-    if (this.width !== 0 && content && graph) {
+    if (content && graph) {
       this.labelStyle = {
         fill: [
           '#0776da',
@@ -209,7 +213,7 @@ export class Group extends CommonElement {
       } else {
         label.style.wordWrap = false;
         label.style.breakWords = false;
-        label.style.fontSize = 10;
+        label.style.fontSize = 12;
       }
       return label;
     }
@@ -352,16 +356,13 @@ export class Group extends CommonElement {
     if (label && graph) {
       if (this.width !== 0 && this.isExpanded) {
         const fontSize = _.floor(graph.width / 10) + 1;
-        if (fontSize > 12 && fontSize < 20) {
+        if (fontSize > 12 && fontSize < 25) {
           label.style.fontSize = _.floor(graph.width / 10) + 1;
         } else if (fontSize <= 12) {
-          label.style.fontSize = 10;
-        } else if (fontSize >= 20) {
-          label.style.fontSize = 20;
+          label.style.fontSize = 12;
+        } else if (fontSize >= 25) {
+          label.style.fontSize = 25;
         }
-        // label.style.breakWords = true;
-        // label.style.wordWrap = true;
-        // label.style.wordWrapWidth = graph.width - 10;
       } else {
         const textLength = _.ceil(label.text.length / 2);
         label.style.fontSize = nodeWidth / textLength;
@@ -632,7 +633,7 @@ export class Group extends CommonElement {
     const position = this.getGroupPosition();
     const graph = new PIXI.Graphics();
     graph.name = this.polygonHullOutlineName;
-    graph.lineStyle(style.lineWidth, style.lineWidth);
+    graph.lineStyle(style.lineWidth, style.lineWidth, style.lineOpacity);
     graph.beginFill(style.fillColor, style.fillOpacity);
     graph.drawCircle(0, 0, style.width);
     graph.position.set(position.x, position.y);
@@ -667,6 +668,7 @@ export class Group extends CommonElement {
     if (this.dragging) {
       const newPosition = this.parent.toLocal(event.data.global);
       let edges: Edge[] = [];
+      let dataFlow: CommonElement[] = [];
       const edgeGroups = this.getEdgeGroups();
       const intersectionNodes = this.intersection()[0];
       const intersectionGroup = this.intersection()[1];
@@ -676,10 +678,14 @@ export class Group extends CommonElement {
             node.position.x += newPosition.x - this.last.parents.x;
             node.position.y += newPosition.y - this.last.parents.y;
             edges = edges.concat(node.linksArray);
+            dataFlow = dataFlow.concat(node.exceptEdgesArray);
           }
         });
         _.each(_.uniq(edges), (edge: Edge) => {
           edge.draw();
+        });
+        _.each(_.uniq(dataFlow), (ele: CommonElement) => {
+          ele.draw();
         });
         _.each(edgeGroups, (edgeGroup: EdgeGroup) => {
           edgeGroup.draw();
@@ -821,7 +827,11 @@ export class Group extends CommonElement {
 
   private marginPolygon(rectVertexPoints: number[], margin: number) {
     const offset = new Offset();
-    return offset.data(rectVertexPoints).margin(margin || 10);
+    try {
+      return offset.data(rectVertexPoints).margin(margin || 10);
+    } catch (error) {
+      return;
+    }
   }
 
   private getHulls(rectVertexPoints: number[][]) {
@@ -843,7 +853,7 @@ export class Group extends CommonElement {
 
   private setOutlineGraphicStyle(graphic: PIXI.Graphics) {
     const style = this.defaultStyle;
-    graphic.lineStyle(style.lineWidth, style.lineColor);
+    graphic.lineStyle(style.lineWidth, style.lineColor, style.lineOpacity);
     graphic.beginFill(style.fillColor, style.fillOpacity);
     return graphic;
   }
@@ -1015,7 +1025,7 @@ export class Group extends CommonElement {
       graph.interactive = true;
       // graph.buttonMode = true;
       this.addChild(graph);
-      graph.lineStyle(style.lineWidth, style.lineColor);
+      graph.lineStyle(style.lineWidth, style.lineColor, style.lineOpacity);
       graph.beginFill(style.fillColor, style.fillOpacity);
       switch (emptyInfo.type) {
         case 'circle':

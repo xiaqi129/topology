@@ -47,9 +47,10 @@ export class EdgeBundle extends CommonElement {
     });
   }
 
-  public multiEdgeBundle() {
+  public multiEdgeBundle(expanded: boolean) {
+    this.setBundleEdgesPosition();
     if (this.toggleBundle) {
-      if (!this.isExpanded) {
+      if (!expanded) {
         this.closeBundle();
       } else {
         this.openBundle();
@@ -67,13 +68,13 @@ export class EdgeBundle extends CommonElement {
 
   public setExpaned(expanded: boolean) {
     this.isExpanded = expanded;
-    this.multiEdgeBundle();
+    this.multiEdgeBundle(expanded);
   }
 
   public addEdges(edges: Edge[]) {
     this.addChildren(edges);
-    this.bundleEdge = this.children;
     this.setBundleEdgesPosition();
+    this.bundleEdge = this.children;
     _.each(edges, (edge) => {
       this.setBundle(edge);
     });
@@ -121,12 +122,22 @@ export class EdgeBundle extends CommonElement {
             lineType: 1,
           });
         } else {
-          const direction = i % 2 === 1 ? 1.1 : -1.1;
+          const direction = i % 2 === 1 ? 1.5 : -1.5;
           const srcLabel: any = edge.getChildByName('edge_srclabel');
           const endLabel: any = edge.getChildByName('edge_endlabel');
           if (srcLabel || endLabel) {
-            srcLabel.anchor.set(0.5, old + i * direction);
-            endLabel.anchor.set(0.5, old + i * direction);
+            const srcLength = this.deleteSpace(srcLabel.text).split(/\s+/).length;
+            const endLength = this.deleteSpace(endLabel.text).split(/\s+/).length;
+            if (srcLength > 1) {
+              srcLabel.anchor.set(0.5, old + i * direction / srcLength * 1.7);
+            } else {
+              srcLabel.anchor.set(0.5, old + i * direction);
+            }
+            if (endLength > 1) {
+              endLabel.anchor.set(0.5, old + i * direction / endLength * 1.7);
+            } else {
+              endLabel.anchor.set(0.5, old + i * direction);
+            }
             old = old + i * direction;
           }
           edge.setStyle({
@@ -161,8 +172,8 @@ export class EdgeBundle extends CommonElement {
         // double click
         if (currentTime - this.lastClickTime < 500) {
           if (edge.parent instanceof EdgeBundle) {
-            this.isExpanded = !this.isExpanded;
-            this.multiEdgeBundle();
+            edge.parent.isExpanded = !edge.parent.isExpanded;
+            edge.parent.multiEdgeBundle(edge.parent.isExpanded);
           }
         } else {
           this.lastClickTime = currentTime;
@@ -180,6 +191,12 @@ export class EdgeBundle extends CommonElement {
         fontWeight: 'bold',
       });
     }
+  }
+
+  private deleteSpace(str: string) {
+    const str1 = str.replace(/\s+$/, '');
+    const str2 = str1.replace(/^\s+/, '');
+    return str2;
   }
 
   private closeBundle() {

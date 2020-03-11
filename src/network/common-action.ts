@@ -15,6 +15,7 @@ import { EdgeGroup } from './edge-group';
 import { Group } from './group';
 import { MultipleColorLine } from './multiple-color-line';
 import { Node } from './node';
+import { PortChannel } from './port-channel';
 import { ITopo } from './topo';
 
 export interface ICondition {
@@ -135,7 +136,7 @@ export class CommonAction {
       const distX = event.data.global.x;
       const distY = event.data.global.y;
       const elements: any = this.topo.getElements();
-      const objOrder = [Node, Edge, EdgeBundle, Group, EdgeGroup, DataFlow, MultipleColorLine];
+      const objOrder = [Node, Edge, EdgeBundle, Group, EdgeGroup, DataFlow, MultipleColorLine, PortChannel];
       elements.sort((a: any, b: any) => {
         return _.indexOf(objOrder, a.constructor) - _.indexOf(objOrder, b.constructor);
       });
@@ -172,25 +173,27 @@ export class CommonAction {
   public setClick() {
     const elements = this.topo.getElements();
     _.each(elements, (element) => {
-      if (element instanceof EdgeBundle) {
-        const childEdge = element.isExpanded ? element.children : element.bundleData;
-        _.each(childEdge, (edges: any) => {
-          edges.off('mousedown');
-          edges.on('mousedown', (event: PIXI.interaction.InteractionEvent) => {
-            event.stopPropagation();
-            this.removeHighLight();
-            this.topo.setSelectedEdge(edges);
-            edges.selectOn();
+      if (element) {
+        if (element instanceof EdgeBundle) {
+          const childEdge = element.isExpanded ? element.children : element.bundleData;
+          _.each(childEdge, (edges: any) => {
+            edges.off('mousedown');
+            edges.on('mousedown', (event: PIXI.interaction.InteractionEvent) => {
+              event.stopPropagation();
+              this.removeHighLight();
+              this.topo.setSelectedEdge(edges);
+              edges.selectOn();
+            });
           });
-        });
-      } else {
-        element.off('mousedown', () => {
-          this.clickEvent(element);
-        });
-        element.on('mousedown', (event: PIXI.interaction.InteractionEvent) => {
-          event.stopPropagation();
-          this.clickEvent(element);
-        });
+        } else {
+          element.off('mousedown', () => {
+            this.clickEvent(element);
+          });
+          element.on('mousedown', (event: PIXI.interaction.InteractionEvent) => {
+            event.stopPropagation();
+            this.clickEvent(element);
+          });
+        }
       }
     });
   }

@@ -15,6 +15,7 @@ import { Group } from './group';
 import { Label } from './label';
 import { MultipleColorLine } from './multiple-color-line';
 import { Node } from './node';
+import { PortChannel } from './port-channel';
 
 export interface ITopo {
 
@@ -35,6 +36,8 @@ export interface ITopo {
   createEdge(startNode: Node | Group, endNode: Node | Group, domRegex?: string): Edge;
 
   createLabel(text?: string, style?: PIXI.TextStyleOptions, canvas?: HTMLCanvasElement): Label;
+
+  createPortChannel(lines: Edge[], ratio?: number): PortChannel;
 
   clear(): void;
 
@@ -135,7 +138,9 @@ export class Topo implements ITopo {
           this.elements.push(element);
         }
       } else {
-        this.elements.push(element);
+        if (element && this.elements.indexOf(element) < 0) {
+          this.elements.push(element);
+        }
       }
     });
   }
@@ -175,6 +180,10 @@ export class Topo implements ITopo {
 
   public createLabel(text?: string, style?: PIXI.TextStyleOptions, canvas?: HTMLCanvasElement) {
     return new Label(text, style, canvas);
+  }
+
+  public createPortChannel(lines: Edge[], ratio?: number) {
+    return new PortChannel(lines, ratio);
   }
 
   public clear() {

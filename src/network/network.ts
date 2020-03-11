@@ -20,6 +20,7 @@ import { Group } from './group';
 import { MultipleColorLine } from './multiple-color-line';
 import { Node } from './node';
 import { PopMenu } from './pop-menu';
+import { PortChannel } from './port-channel';
 import { Topo } from './topo';
 
 export class Network {
@@ -35,6 +36,7 @@ export class Network {
   private domRegex: string;
   private nodeLabel: number = 0;
   private edgeLabel: number = 0;
+  private zoomChange: any;
 
   constructor(domRegex: string) {
     PIXI.utils.skipHello();
@@ -47,6 +49,7 @@ export class Network {
     this.menu = new PopMenu(domRegex, this.app, this.action);
     this.zoom = 1;
     this.isSelect = false;
+    this.zoomChange = this.zoomOnWheel.bind(this);
     this.disableContextMenu(domRegex);
   }
 
@@ -108,6 +111,10 @@ export class Network {
     return this.topo.createMultipleColor(start, end, this.domRegex);
   }
 
+  public createPortChannel(lines: Edge[], ratio?: number) {
+    return this.topo.createPortChannel(lines, ratio);
+  }
+
   // Get outside container
   public getContainer() {
     return this.app.getContainer();
@@ -144,47 +151,55 @@ export class Network {
   public setZoom(isDraw?: boolean) {
     const wrapper = document.getElementById(this.domRegex);
     if (wrapper) {
-      wrapper.addEventListener('wheel', (e) => {
-        const zoom = this.zoom;
-        // this.clearHighlight();
-        if (e.deltaY < 0) {
-          if (zoom <= 1 && zoom > 0.1) {
-            this.zoomElements(NP.plus(zoom, 0.1));
-          } else if (zoom <= 2 && zoom > 1) {
-            this.zoomElements(NP.plus(zoom, 0.2));
-          } else if (zoom > 2) {
-            this.zoomElements(NP.plus(zoom, 1));
-          } else if (zoom <= 0.1 && zoom > 0.01) {
-            this.zoomElements(NP.plus(zoom, 0.01));
-          } else if (zoom <= 0.01 && zoom > 0.001) {
-            this.zoomElements(NP.plus(zoom, 0.001));
-          } else if (zoom <= 0.001 && zoom >= 0.0001) {
-            this.zoomElements(NP.plus(zoom, 0.0001));
-          }
-        } else {
-          if (zoom > 2) {
-            this.zoomElements(NP.minus(zoom, 1));
-          } else if (zoom <= 2 && zoom > 1) {
-            this.zoomElements(NP.minus(zoom, 0.2));
-          } else if (zoom <= 1 && zoom > 0.11) {
-            this.zoomElements(NP.minus(zoom, 0.1));
-          } else if (zoom <= 0.11 && zoom > 0.011) {
-            this.zoomElements(NP.minus(zoom, 0.01));
-          } else if (zoom <= 0.011 && zoom > 0.0011) {
-            this.zoomElements(NP.minus(zoom, 0.001));
-          } else if (zoom <= 0.0011 && zoom > 0.0002) {
-            this.zoomElements(NP.minus(zoom, 0.0001));
-          } else if (zoom <= 0.0002 && zoom > 0) {
-            this.zoomElements(0.0001);
-          }
-        }
-        const scale = NP.divide(this.zoom, zoom);
-        if (isDraw) {
-          this.moveTopology(scale, e.offsetX, e.offsetY, isDraw);
-        } else {
-          this.moveTopology(scale, e.offsetX, e.offsetY, true);
-        }
-      });
+      wrapper.addEventListener('wheel', this.zoomChange);
+    }
+  }
+
+  public clearZoom() {
+    const wrapper = document.getElementById(this.domRegex);
+    if (wrapper) {
+      wrapper.removeEventListener('wheel', this.zoomChange);
+    }
+  }
+
+  public zoomOnWheel(e: any, isDraw?: boolean) {
+    const zoom = this.zoom;
+    if (e.deltaY < 0) {
+      if (zoom <= 1 && zoom > 0.1) {
+        this.zoomElements(NP.plus(zoom, 0.1));
+      } else if (zoom <= 2 && zoom > 1) {
+        this.zoomElements(NP.plus(zoom, 0.2));
+      } else if (zoom > 2) {
+        this.zoomElements(NP.plus(zoom, 1));
+      } else if (zoom <= 0.1 && zoom > 0.01) {
+        this.zoomElements(NP.plus(zoom, 0.01));
+      } else if (zoom <= 0.01 && zoom > 0.001) {
+        this.zoomElements(NP.plus(zoom, 0.001));
+      } else if (zoom <= 0.001 && zoom >= 0.0001) {
+        this.zoomElements(NP.plus(zoom, 0.0001));
+      }
+    } else {
+      if (zoom > 2.2) {
+        this.zoomElements(NP.minus(zoom, 1));
+      } else if (zoom <= 2.2 && zoom > 1) {
+        this.zoomElements(NP.minus(zoom, 0.2));
+      } else if (zoom <= 1 && zoom > 0.11) {
+        this.zoomElements(NP.minus(zoom, 0.1));
+      } else if (zoom <= 0.11 && zoom > 0.011) {
+        this.zoomElements(NP.minus(zoom, 0.01));
+      } else if (zoom <= 0.011 && zoom > 0.0011) {
+        this.zoomElements(NP.minus(zoom, 0.001));
+      } else if (zoom <= 0.0011 && zoom > 0.0002) {
+        this.zoomElements(NP.minus(zoom, 0.0001));
+      } else if (zoom <= 0.0002 && zoom > 0) {
+        this.zoomElements(0.0001);
+      }
+    }
+    const scale = NP.divide(this.zoom, zoom);
+    if (isDraw) {
+      this.moveTopology(scale, e.offsetX, e.offsetY, isDraw);
+    } else {
+      this.moveTopology(scale, e.offsetX, e.offsetY, true);
     }
   }
 
@@ -346,6 +361,13 @@ export class Network {
     return multipleLines;
   }
 
+  public getPortChannel() {
+    const elements = this.topo.getElements();
+    return _.filter(elements, (element) => {
+      return element instanceof PortChannel;
+    });
+  }
+
   // Delete specified elements in topology
   public removeElements(element: CommonElement) {
     const elements = this.getElements();
@@ -362,6 +384,7 @@ export class Network {
         _.remove(data, (edge) => {
           return edge === element;
         });
+        element.bundleParent.removeChild(element);
         if (data.length === 1 && data[0]) {
           const edge = data[0];
           // remove edge bundle on elements
@@ -370,8 +393,8 @@ export class Network {
           });
           element.bundleParent.removeBundleEdge();
           elements.push(edge);
-          edge.startNode.linksArray.push(edge);
-          edge.endNode.linksArray.push(edge);
+          // edge.startNode.linksArray.push(edge);
+          // edge.endNode.linksArray.push(edge);
           edge.setStyle({
             lineType: 0,
           });
@@ -515,6 +538,16 @@ export class Network {
     });
   }
 
+  public portChannelLabelToggle(labelToggle: boolean) {
+    const portChannels = this.getPortChannel();
+    _.each(portChannels, (portChannel: PortChannel) => {
+      const label = portChannel.getChildByName('label');
+      if (label) {
+        label.visible = labelToggle;
+      }
+    });
+  }
+
   // Set up the background color of the canvas
   public changeBackgroundColor(color: number) {
     this.app.renderer.backgroundColor = color;
@@ -646,7 +679,7 @@ export class Network {
     elements = _.filter(elements, (element: CommonElement) => {
       return !(element instanceof Node);
     });
-    const objOrder = [Node, Edge, EdgeBundle, Group, EdgeGroup, DataFlow, MultipleColorLine];
+    const objOrder = [Node, Edge, EdgeBundle, Group, EdgeGroup, DataFlow, MultipleColorLine, PortChannel];
     elements.sort((a: any, b: any) => {
       return _.indexOf(objOrder, a.constructor) - _.indexOf(objOrder, b.constructor);
     });
@@ -667,6 +700,18 @@ export class Network {
     if (this.zoom < edgeVisibleZoom) {
       this.edgeLabelToggle(false);
     } else {
+      this.edgeLabelToggle(true);
+    }
+    if (nodeVisibleZoom === 0) {
+      this.nodeLabelToggle(false);
+    }
+    if (edgeVisibleZoom === 0) {
+      this.edgeLabelToggle(false);
+    }
+    if (nodeVisibleZoom === -1) {
+      this.nodeLabelToggle(true);
+    }
+    if (edgeVisibleZoom === -1) {
       this.edgeLabelToggle(true);
     }
   }

@@ -38,8 +38,8 @@ export interface IDottedPoints {
 
 export class Edge extends CommonElement {
   public type: string = 'Edge';
-  public startNode: any;
   public endNode: any;
+  public startNode: any;
   public edge: PIXI.Graphics;
   public arrow: PIXI.Graphics;
   public bundleParent: any;
@@ -138,14 +138,16 @@ export class Edge extends CommonElement {
     if (srcContent || endContent) {
       const srcLabel = new Label(srcContent, this.labelStyle);
       const endLabel = new Label(endContent, this.labelStyle);
+      srcLabel.anchor.set(0.5, 1.2);
+      endLabel.anchor.set(0.5, 1.2);
       this.labelContent.push(srcContent);
       this.labelContent.push(endContent);
       this.labelContent = _.uniq(this.labelContent);
       srcLabel.name = 'edge_srclabel';
       endLabel.name = 'edge_endlabel';
-      this.setLabelPosition(srcLabel, endLabel);
       this.addChild(srcLabel);
       this.addChild(endLabel);
+      this.setLabelPosition(srcLabel, endLabel);
       if (this.defaultStyle.lineType === 1) {
         this.draw();
       }
@@ -155,6 +157,23 @@ export class Edge extends CommonElement {
       };
       return result;
     }
+  }
+
+  public setLabelStyle(style: any) {
+    const srcLabel: any = this.getChildByName('edge_srclabel');
+    const endLabel: any = this.getChildByName('edge_endlabel');
+    _.extend(this.labelStyle, style);
+    if (srcLabel) {
+      srcLabel.setStyle(style);
+    }
+    if (endLabel) {
+      endLabel.setStyle(style);
+    }
+    const result = {
+      src: srcLabel,
+      end: endLabel,
+    };
+    return result;
   }
 
   // Set up mark on edge
@@ -229,7 +248,9 @@ export class Edge extends CommonElement {
 
   // Get edge group included this edge
   public setIncluedGroup(group: EdgeGroup) {
-    this.includeGroup.push(group);
+    if (this.includeGroup.indexOf(group) < 0) {
+      this.includeGroup.push(group);
+    }
   }
 
   // Get Nodes sort UID string with this edge
@@ -945,7 +966,7 @@ export class Edge extends CommonElement {
 
   // Set label position
   private setLabelPosition(srcLabel: PIXI.DisplayObject, endLabel: PIXI.DisplayObject) {
-    const len = this.edgeLength(this.startNode.x, this.startNode.y, this.endNode.x, this.endNode.y) * 0.2;
+    const len = this.edgeLength(this.startNode.x, this.startNode.y, this.endNode.x, this.endNode.y) * 0.25;
     const angle = Math.atan2(this.startNode.y - this.endNode.y, this.startNode.x - this.endNode.x);
     if (this.defaultStyle.lineType !== 1) {
       srcLabel.x = this.startNode.x - len * Math.cos(angle);
