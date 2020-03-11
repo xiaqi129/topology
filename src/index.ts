@@ -133,7 +133,7 @@ const removeTest = function () {
   const num = 2;
   const node1 = network.createNode();
   const node2 = network.createNode();
-  const edgeCatch = [];
+  const edgeCatch: any[] = [];
   node1.name = '1';
   node2.name = '2';
   // node.setNodeSize(25,25);
@@ -148,7 +148,7 @@ const removeTest = function () {
   for (let i: number = 0, len: number = num; i < len;) {
     const srcNode = nodes[i];
     const destNode = nodes[i + 1];
-    for (let j = 0; j < 2;) {
+    for (let j = 0; j < 1;) {
       const edge = network.createEdge(srcNode, destNode);
       edge.on('rightclick', (event: any) => {
         network.menu.setMenuItems([
@@ -172,7 +172,7 @@ const removeTest = function () {
         arrowMiddleLength: 5,
         arrowLength: 8,
         fillArrow: true,
-        lineColor: 0X0386d2,
+        lineColor: 0xfff8ec67,
         lineType: 0,
         lineFull: 0,
         lineWidth: 1,
@@ -185,12 +185,22 @@ const removeTest = function () {
     i += 2;
   }
 
-  network.syncView();
-
-  network.removeElements(node2);
-  network.addElement(node2);
-  _.each(edgeCatch, (edge: any) => {
-    network.addElement(edge);
+  node1.on('rightclick', (event: any) => {
+    network.menu.setMenuItems([
+      { label: 'Print line Info', id: '2' },
+      { label: 'Add Link', id: '3' },
+    ]);
+    network.menu.menuOnAction = (id) => {
+      if (id === '2') {
+        // tslint:disable-next-line:no-console
+        console.log(node1);
+      } else if (id === '3') {
+        network.addElements(edgeCatch);
+        network.syncView();
+      }
+    };
+    network.menu.setClass('popMenu');
+    network.menu.showMenu(event);
   });
   network.syncView();
   network.setBundleExpanded(false);
@@ -1789,10 +1799,10 @@ const vertexCoincide = function () {
 };
 
 network.callback = () => {
-  simpleData();
+  // simpleData();
   // noData();
   // removeTest();
-  // edgeGroupDemo();
+  edgeGroupDemo();
   // vertexCoincide();
   // groupEdgeNode();
   // dataFlowDemo();

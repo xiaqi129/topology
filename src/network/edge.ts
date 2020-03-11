@@ -248,7 +248,9 @@ export class Edge extends CommonElement {
 
   // Get edge group included this edge
   public setIncluedGroup(group: EdgeGroup) {
-    this.includeGroup.push(group);
+    if (this.includeGroup.indexOf(group) < 0) {
+      this.includeGroup.push(group);
+    }
   }
 
   // Get Nodes sort UID string with this edge
