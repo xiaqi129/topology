@@ -1183,7 +1183,9 @@ const simpleData = function () {
       network.menu.setClass('popMenu');
       network.menu.showMenu(event);
     });
-    network.addElement(newGroup);
+    if (newGroup.getChildNodes().length > 0) {
+      network.addElement(newGroup);
+    }
   });
   const wrapper = document.getElementById('network');
   if (wrapper) {
@@ -1800,10 +1802,10 @@ const vertexCoincide = function () {
 };
 
 network.callback = () => {
-  // simpleData();
+  simpleData();
   // noData();
   // removeTest();
-  edgeGroupDemo();
+  // edgeGroupDemo();
   // vertexCoincide();
   // groupEdgeNode();
   // dataFlowDemo();

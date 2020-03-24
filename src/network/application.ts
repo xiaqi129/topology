@@ -38,6 +38,7 @@ export class Application extends PIXI.Application {
       this.renderer.resize(this.viewWrapper.clientWidth, this.viewWrapper.clientHeight);
       this.container = new PIXI.Container();
       this.viewWrapper.appendChild(this.view);
+      this.view.id = 'network_canvas';
       if (this.container) {
         this.stage.addChild(this.container);
         this.moveCenter(this.viewWrapper.clientWidth / 2, this.viewWrapper.clientHeight / 2);
