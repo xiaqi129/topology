@@ -31,7 +31,7 @@ const commonStyles = {
   color: 'black',
   padding: '5px 20px',
   fontSize: '12px',
-  userSelect: 'none',
+  // userSelect: 'none',
 };
 
 const nodeLabelStyle = {

@@ -9,9 +9,9 @@ export class Tooltip {
     position: 'fixed',
     backgroundColor: 'black',
     color: 'white',
-    padding: '5px 20px',
+    // padding: '5px 20px',
     fontSize: '12px',
-    userSelect: 'none',
+    // userSelect: 'none',
   };
   private domRegex: string | undefined;
   constructor(domRegex: string | undefined) {
@@ -19,12 +19,30 @@ export class Tooltip {
   }
 
   public addTooltip(ele: CommonElement, content: string, style?: any) {
+    let isEnterTooltip = false;
     ele.on('mouseover', (event: any) => {
+      isEnterTooltip = false;
       this.tooltipOn(content, style);
       this.tooltipMove(event);
+      const tooltip = document.getElementById('tooltip');
+      if (tooltip) {
+        tooltip.onmouseover = () => {
+          isEnterTooltip = true;
+        };
+        tooltip.onmouseleave = () => {
+          this.clearTooltip();
+        };
+      }
     });
     ele.on('mouseout', (event: any) => {
-      this.clearTooltip();
+      setTimeout(
+        () => {
+          if (!isEnterTooltip) {
+            this.clearTooltip();
+          }
+        },
+        1000,
+      );
     });
   }
 
