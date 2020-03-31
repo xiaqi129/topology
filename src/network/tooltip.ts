@@ -41,7 +41,7 @@ export class Tooltip {
             this.clearTooltip();
           }
         },
-        1000,
+        100,
       );
     });
   }
