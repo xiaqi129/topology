@@ -227,10 +227,7 @@ export class Network {
   // Clear the entire topology
   public clear() {
     const elements = this.topo.getElements();
-    _.each(elements, (element) => {
-      element.destroy();
-    });
-    _.remove(elements, undefined);
+    _.remove(elements);
   }
 
   // Get all elements in the topology
