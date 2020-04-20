@@ -76,6 +76,10 @@ export class MultipleColorLine extends CommonElement {
     this.rightLine = new PIXI.Graphics();
     this.startArrow = new PIXI.Graphics();
     this.endArrow = new PIXI.Graphics();
+    this.leftLine.interactive = true;
+    this.leftLine.buttonMode = true;
+    this.rightLine.interactive = true;
+    this.rightLine.buttonMode = true;
     this.lineFunction = new LineCommonFunction(start, end);
     this.eachSideStyle = {
       // red
