@@ -60,7 +60,7 @@
   "dependencies": {
     "bezier-js": "^2.2.15",
     "graham-scan-convex-hull": "^0.2.0",
-    "lodash": "^4.17.10",
+    "lodash": "^4.17.21",
     "number-precision": "^1.3.1",
     "pixi.js": "^4.8.6",
     "polygon": "^1.0.2",
